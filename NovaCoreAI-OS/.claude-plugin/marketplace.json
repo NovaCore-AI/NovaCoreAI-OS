@@ -1,0 +1,13 @@
+{
+  "name": "novacoreai",
+  "owner": {
+    "name": "NovaCore AI"
+  },
+  "plugins": [
+    {
+      "name": "novacoreai-os",
+      "source": "./",
+      "description": "NovaCoreAI-OS — Team-OS für den Workflow einer Softwarefirma: Skills, Hooks und Commands im Namespace nc:."
+    }
+  ]
+}

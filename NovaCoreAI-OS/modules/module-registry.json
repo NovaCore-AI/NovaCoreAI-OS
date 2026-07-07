@@ -1,0 +1,9 @@
+{
+  "version": "0.1.0",
+  "modules": [
+    { "name": "feature-lifecycle", "enabled": true, "minCoreVersion": "0.1.0" },
+    { "name": "review-quality", "enabled": false, "minCoreVersion": "0.1.0" },
+    { "name": "architecture", "enabled": false, "minCoreVersion": "0.1.0" },
+    { "name": "incident-support", "enabled": false, "minCoreVersion": "0.1.0" }
+  ]
+}

@@ -1,0 +1,5 @@
+# macOS
+.DS_Store
+
+# Nested git repositories (should be integrated as files or submodules)
+*/.git
