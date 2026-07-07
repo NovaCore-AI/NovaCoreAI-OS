@@ -18,6 +18,7 @@ Session-Memory und Safety-Gate.
 |---|---|
 | `/nc:start` | Session-Start: Kontext laden, aktives Modul erkennen |
 | `/nc:save-session` | Session-Ende: Journal, Stand und Entscheidungen sichern |
+| `/nc:journal` | Tages-Journal-Eintrag entwerfen (Git + optional Jira), Team- oder persönlicher Modus |
 | `/nc:setup` | Team-OS initial installieren |
 | `/nc:update` | Team-OS aktualisieren |
 | `/nc:feature-start` | Anforderung klären, Kontext laden, nächsten Skill empfehlen |

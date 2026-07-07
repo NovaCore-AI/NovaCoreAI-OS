@@ -7,7 +7,7 @@ Namespace `nc:`). Hier wird am OS gearbeitet — nicht an Kundenprojekten.
 
 | Pfad | Inhalt |
 |---|---|
-| `skills/` | Core-Skills (`nc-start`, `nc-save-session`, `nc-setup`, `nc-update`) |
+| `skills/` | Core-Skills (`nc-start`, `nc-save-session`, `nc-journal`, `nc-setup`, `nc-update`) |
 | `modules/` | Module mit eigenen Skills; `module-registry.json` steuert Aktivierung |
 | `hooks/` | `nc-session-start.js`, `nc-safety-gate.js`, `hooks.json` (Plugin-Hook-Konfiguration) |
 | `.claude-plugin/plugin.json` | Claude-Code-Plugin-Manifest |
