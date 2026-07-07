@@ -4,6 +4,5 @@
   "description": "NovaCoreAI-OS — Team-OS für den Workflow einer Softwarefirma: Skills, Hooks und Commands im Namespace nc: (Feature-Lifecycle, Session-Memory, Safety-Gate).",
   "author": {
     "name": "NovaCore AI"
-  },
-  "hooks": "./hooks/hooks.json"
+  }
 }

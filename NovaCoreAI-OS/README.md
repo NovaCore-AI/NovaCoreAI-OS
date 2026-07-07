@@ -40,6 +40,15 @@ Session-Memory und Safety-Gate.
 ./install-cli.sh    # installiert den globalen Befehl `ncos`
 ```
 
+Windows / PowerShell:
+
+```powershell
+.\setup.ps1         # Staging + Claude-Code-Registrierung
+.\install-cli.ps1   # erzeugt den ncos.cmd-Shim unter ~\.nc-os\bin
+                    # (Verzeichnis einmalig in den User-PATH aufnehmen —
+                    #  der Installer nennt den fertigen Befehl)
+```
+
 Das Setup stagt die Dateien nach `~/.nc-os/plugin/` und registriert das
 Plugin anschließend bei Claude Code (`claude plugin marketplace add` +
 `claude plugin install novacoreai-os@novacoreai`). Ohne diese Registrierung
@@ -54,6 +63,11 @@ eintragen (Details: [ONBOARDING.md](ONBOARDING.md)).
 ```bash
 ncos update         # git pull + Neu-Deploy + Aufräumen verwaister Dateien
 ```
+
+Windows / PowerShell: `.\update.ps1` (identische Logik; `ncos update`
+funktioniert ebenfalls, sobald der `install-cli.ps1`-Shim im PATH liegt).
+Hinweis: `ncos update` deployt nur — die einmalige Claude-Code-Registrierung
+übernimmt das Setup (`node setup.js`), nicht das Update.
 
 ## Entwicklung
 
