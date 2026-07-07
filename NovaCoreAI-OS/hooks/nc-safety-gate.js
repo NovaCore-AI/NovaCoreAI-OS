@@ -79,7 +79,16 @@ function hasNcOsMarker(startDir) {
   }
   let current = path.resolve(startDir);
   for (;;) {
-    if (fs.existsSync(path.join(current, '.nc-os'))) {
+    // Der Marker ist eine Datei (`touch .nc-os`, siehe ONBOARDING). Das
+    // Staging-VERZEICHNIS `~/.nc-os/` darf nicht als Marker zählen, sonst
+    // wäre jedes Repo unterhalb des Home-Verzeichnisses markiert.
+    let stat = null;
+    try {
+      stat = fs.statSync(path.join(current, '.nc-os'));
+    } catch {
+      stat = null;
+    }
+    if (stat && stat.isFile()) {
       return true;
     }
     const parent = path.dirname(current);
