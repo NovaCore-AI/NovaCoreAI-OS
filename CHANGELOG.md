@@ -5,6 +5,24 @@ Technisches Release-Log für `novacoreai-os`. Format angelehnt an
 stimmen mit `VERSION` / `.claude-plugin/plugin.json` / `package.json` /
 `modules/module-registry.json` überein.
 
+## [Unreleased]
+
+### Changed
+
+- **Repo-Struktur geflacht:** Der Plugin-Inhalt lag bisher doppelt verschachtelt
+  unter `NovaCoreAI-OS/NovaCoreAI-OS/` (Repo-Root enthielt einen gleichnamigen
+  Unterordner mit dem eigentlichen Plugin). Jetzt ist Repo-Root = Plugin-Root,
+  analog zu anderen Plugin-Repos. Betrifft nur Repo-Layout, keine
+  Laufzeit-Logik — `setup.js`/`update.js` lösen ihren Root ohnehin über
+  `__dirname` auf, alle Tests bleiben grün. Duplikate (`.gitattributes`,
+  `docs/superpowers/specs/…`, zweite README) dabei entfernt bzw.
+  zusammengeführt. Kein Versionsbump, da sich am ausgelieferten
+  Plugin-Verhalten nichts ändert.
+- Nach dem Mergen dieses Branches muss die Marketplace-Registrierung
+  (`known_marketplaces.json` → `novacoreai`) auf den neuen Root-Pfad zeigen;
+  danach `claude plugin marketplace update` + `claude plugin update` +
+  Neustart.
+
 ## [0.1.1] — 2026-07-08
 
 Bugfix-Release: Plugin lud in Claude Code teils nicht bzw. das Safety-Gate

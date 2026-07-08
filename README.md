@@ -1,31 +1,85 @@
 # NovaCoreAI-OS
 
-Team-OS-Plugin für **Claude Code** (und später Kimi Code CLI): Skills, Hooks
-und Commands im Namespace `nc:` für den Workflow einer Softwarefirma —
-Feature-Lifecycle, Session-Memory und Safety-Gate.
+Team-OS-Plugin für **Claude Code** (und später Kimi Code CLI): Skills, Hooks und
+Commands im Namespace `nc:` für den Workflow einer Softwarefirma — Feature-Lifecycle,
+Session-Memory und Safety-Gate.
 
-## Repo-Layout
+> Design-Spezifikation: [`docs/superpowers/specs/2026-07-06-novacoreai-os-design.md`](docs/superpowers/specs/2026-07-06-novacoreai-os-design.md)
 
-| Pfad | Inhalt |
+## Architektur
+
+- **Core:** globale Anweisung (`nc-sync.md`), Core-Skills, Hooks, Setup/Update
+- **Module:** eigenständige Einheiten unter `modules/<modul>/`, gesteuert über `modules/module-registry.json`
+- **Memory:** pro Arbeits-Repo unter `.nc/erinnerung/` (Stand + append-only Journal), nie im OS-Repo
+
+## Skills (v0.1.1)
+
+| Skill | Zweck |
 |---|---|
-| [`NovaCoreAI-OS/`](NovaCoreAI-OS/) | Das Plugin selbst: Skills, Hooks, Module, Setup/Update-Tooling — **Details in der [Plugin-README](NovaCoreAI-OS/README.md)** |
-| [`docs/`](docs/) | Design-Spezifikationen (superpowers) |
+| `/nc:start` | Session-Start: Kontext laden, aktives Modul erkennen |
+| `/nc:save-session` | Session-Ende: Journal, Stand und Entscheidungen sichern |
+| `/nc:journal` | Tages-Journal-Eintrag entwerfen (Git + optional Jira), Team- oder persönlicher Modus |
+| `/nc:setup` | Team-OS initial installieren |
+| `/nc:update` | Team-OS aktualisieren |
+| `/nc:feature-start` | Anforderung klären, Kontext laden, nächsten Skill empfehlen |
+| `/nc:plan` | Task in vertikale, PR-große Slices zerlegen |
+| `/nc:commit-prep` | Pre-Commit: Checks prüfen, Commit-Message vorschlagen |
+| `/nc:pr` | PR aus Branch erstellen, Push erst nach Freigabe |
 
-## Quickstart
+## Hooks
+
+| Hook | Event | Verhalten |
+|---|---|---|
+| `nc-session-start` | SessionStart | Begrüßung + `/nc:start`-Hinweis — nur in Repos mit `.nc-os`-Marker |
+| `nc-safety-gate` | PreToolUse (Bash) | Verlangt Faktennennung vor destruktiven Befehlen — nur in `.nc-os`-Repos |
+
+## Installation
 
 ```bash
-cd NovaCoreAI-OS
-./setup.sh          # oder: node setup.js  (Windows: .\setup.ps1)
-./install-cli.sh    # globaler Befehl `ncos`  (Windows: .\install-cli.ps1)
+./setup.sh          # oder: node setup.js  (Windows: setup.ps1)
+./install-cli.sh    # installiert den globalen Befehl `ncos`
 ```
 
-Das Setup stagt nach `~/.nc-os/plugin/` und registriert das Plugin bei
-Claude Code (`claude plugin marketplace add` + `claude plugin install
-novacoreai-os@novacoreai`). Danach pro Arbeits-Repo den Marker anlegen:
-`touch .nc-os` — außerhalb markierter Repos sind alle nc-Hooks no-op.
+Windows / PowerShell:
 
-Update: `ncos update` (bzw. `.\update.ps1`). Onboarding neuer Repos:
-[`NovaCoreAI-OS/ONBOARDING.md`](NovaCoreAI-OS/ONBOARDING.md).
+```powershell
+.\setup.ps1         # Staging + Claude-Code-Registrierung
+.\install-cli.ps1   # erzeugt den ncos.cmd-Shim unter ~\.nc-os\bin
+                    # (Verzeichnis einmalig in den User-PATH aufnehmen —
+                    #  der Installer nennt den fertigen Befehl)
+```
+
+Das Setup stagt die Dateien nach `~/.nc-os/plugin/` und registriert das
+Plugin anschließend bei Claude Code (`claude plugin marketplace add` +
+`claude plugin install novacoreai-os@novacoreai`). Ohne diese Registrierung
+lädt Claude Code das Plugin nicht — bei fehlgeschlagener Registrierung nennt
+das Setup die manuellen Befehle.
+
+Danach pro Arbeits-Repo: `.nc-os`-Marker anlegen und `.nc/` in `.gitignore`
+eintragen (Details: [ONBOARDING.md](ONBOARDING.md)).
+
+## Update
+
+```bash
+ncos update         # git pull + Neu-Deploy + Aufräumen verwaister Dateien
+```
+
+Windows / PowerShell: `.\update.ps1` (identische Logik; `ncos update`
+funktioniert ebenfalls, sobald der `install-cli.ps1`-Shim im PATH liegt).
+Hinweis: `ncos update` deployt nur — die einmalige Claude-Code-Registrierung
+übernimmt das Setup (`node setup.js`), nicht das Update.
+
+## Entwicklung
+
+```bash
+npm test            # node:test-Suiten (Setup-Wiring, Safety-Gate, Plugin-Manifest)
+```
+
+## Koexistenz
+
+NovaCoreAI-OS kollidiert nicht mit `uni:` oder ECC: eigener Namespace `nc:`,
+eigenes Deploy-Manifest (`~/.nc-os/installed-manifest.json`) und Repo-Scoping
+über den `.nc-os`-Marker — außerhalb markierter Repos sind alle Hooks no-op.
 
 ---
 

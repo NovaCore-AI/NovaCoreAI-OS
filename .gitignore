@@ -3,3 +3,6 @@
 
 # Nested git repositories (should be integrated as files or submodules)
 */.git
+
+# Isolated agent/worktree workspaces
+.worktrees/
