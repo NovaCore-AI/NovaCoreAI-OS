@@ -1,6 +1,6 @@
 {
   "name": "novacoreai-os",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "NovaCoreAI-OS — Team-OS-Plugin (Skills, Hooks, Commands) für Claude Code und Kimi Code CLI",
   "private": true,
   "type": "commonjs",

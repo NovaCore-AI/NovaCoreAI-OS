@@ -29,4 +29,4 @@ Update: `ncos update` (bzw. `.\update.ps1`). Onboarding neuer Repos:
 
 ---
 
-*Version 0.1.0 · Pflege: Lucas Vöhringer · Sprache aller Artefakte: Deutsch*
+*Version 0.1.1 · Pflege: Lucas Vöhringer · Sprache aller Artefakte: Deutsch*

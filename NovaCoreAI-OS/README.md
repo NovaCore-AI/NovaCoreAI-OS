@@ -12,7 +12,7 @@ Session-Memory und Safety-Gate.
 - **Module:** eigenständige Einheiten unter `modules/<modul>/`, gesteuert über `modules/module-registry.json`
 - **Memory:** pro Arbeits-Repo unter `.nc/erinnerung/` (Stand + append-only Journal), nie im OS-Repo
 
-## Skills (v0.1.0)
+## Skills (v0.1.1)
 
 | Skill | Zweck |
 |---|---|
@@ -83,4 +83,4 @@ eigenes Deploy-Manifest (`~/.nc-os/installed-manifest.json`) und Repo-Scoping
 
 ---
 
-*Version 0.1.0 · Pflege: Lucas Vöhringer · Sprache aller Artefakte: Deutsch*
+*Version 0.1.1 · Pflege: Lucas Vöhringer · Sprache aller Artefakte: Deutsch*
