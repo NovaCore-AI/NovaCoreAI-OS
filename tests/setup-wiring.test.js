@@ -31,7 +31,7 @@ test('deployt alle Core-Skills in das Zielverzeichnis', () => {
 test('deployt Skills aktivierter Module (feature-lifecycle)', () => {
   const options = freshSetupOptions();
   runSetup(options);
-  for (const skill of ['nc-feature-start', 'nc-plan', 'nc-commit-prep', 'nc-pr']) {
+  for (const skill of ['nc-flc-feature-start', 'nc-flc-plan', 'nc-flc-commit-prep', 'nc-flc-pr']) {
     const skillPath = path.join(options.targetDir, 'skills', skill, 'SKILL.md');
     assert.ok(fs.existsSync(skillPath), `Modul-Skill fehlt im Deploy: ${skill}`);
   }
@@ -98,7 +98,7 @@ test('überspringt Module mit zu hoher minCoreVersion und warnt', () => {
     ],
   };
   const result = runSetup({ ...options, registry });
-  const deployed = path.join(options.targetDir, 'skills', 'nc-feature-start');
+  const deployed = path.join(options.targetDir, 'skills', 'nc-flc-feature-start');
   assert.ok(!fs.existsSync(deployed), 'Modul mit zu hoher minCoreVersion wurde deployt');
   assert.ok(
     result.warnings.some((w) => w.includes('feature-lifecycle')),

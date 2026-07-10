@@ -1,9 +1,9 @@
 ---
-name: nc-feature-start
-description: Feature-Arbeit beginnen — Anforderung klären, Repo-Kontext laden, Feature-Branch vorbereiten und den nächsten nc-Skill empfehlen. Nutze diesen Skill, wenn ein neues Feature, eine Änderung oder ein Ticket bearbeitet werden soll.
+name: nc-flc-feature-start
+description: "[FLC] Feature-Arbeit beginnen — Anforderung klären, Repo-Kontext laden, Feature-Branch vorbereiten und den nächsten nc-Skill empfehlen. Nutze diesen Skill, wenn ein neues Feature, eine Änderung oder ein Ticket bearbeitet werden soll."
 ---
 
-# /nc:feature-start — Feature beginnen
+# /nc:flc-feature-start — Feature beginnen
 
 ## Zweck
 
@@ -16,7 +16,7 @@ Kontext geladen und ein sauberer Arbeitszweig vorhanden ist.
 2. **Kontext laden:** Falls noch nicht geschehen, `/nc:start` ausführen (Stand, Journal, Git-Status).
 3. **Betroffene Stellen finden:** Relevante Dateien, Module und Tests im Repo identifizieren und kurz nennen.
 4. **Branch vorbereiten:** Von `main` (aktuell) einen Feature-Branch vorschlagen (`feat/<kurzbeschreibung>`). Kein direkter `main`-Push — Feature-Branch → PR → Review → Merge.
-5. **Nächsten Schritt empfehlen:** Bei nicht-trivialen Aufgaben `/nc:plan` zum Slicing; bei Kleinständerungen direkt implementieren und mit `/nc:commit-prep` abschließen.
+5. **Nächsten Schritt empfehlen:** Bei nicht-trivialen Aufgaben `/nc:flc-plan` zum Slicing; bei Kleinständerungen direkt implementieren und mit `/nc:flc-commit-prep` abschließen.
 
 ## Regeln
 

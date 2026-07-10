@@ -1,9 +1,9 @@
 ---
-name: nc-pr
-description: Pull Request aus dem aktuellen Feature-Branch erstellen — Beschreibung aus der gesamten Commit-Historie, Push erst nach expliziter Freigabe. Nutze diesen Skill, wenn ein Slice oder Feature bereit für Review ist.
+name: nc-flc-pr
+description: "[FLC] Pull Request aus dem aktuellen Feature-Branch erstellen — Beschreibung aus der gesamten Commit-Historie, Push erst nach expliziter Freigabe. Nutze diesen Skill, wenn ein Slice oder Feature bereit für Review ist."
 ---
 
-# /nc:pr — Pull Request erstellen
+# /nc:flc-pr — Pull Request erstellen
 
 ## Zweck
 

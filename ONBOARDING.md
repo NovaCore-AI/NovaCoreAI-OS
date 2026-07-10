@@ -52,9 +52,9 @@ Initialen Stand anlegen (`.nc/erinnerung/stand.md`):
 | Wann | Was |
 |---|---|
 | Session-Beginn | `/nc:start` |
-| Neues Feature/Ticket | `/nc:feature-start` → `/nc:plan` |
-| Vor jedem Commit | `/nc:commit-prep` |
-| Bereit für Review | `/nc:pr` |
+| Neues Feature/Ticket | `/nc:flc-feature-start` → `/nc:flc-plan` |
+| Vor jedem Commit | `/nc:flc-commit-prep` |
+| Bereit für Review | `/nc:flc-pr` |
 | Session-Ende | `/nc:save-session` |
 
 ## 4. Aktualisieren

@@ -133,7 +133,7 @@ nur die Text-Guidance aus dieser Datei, ohne Plugin/Hook-Enforcement.
 
 1. **Session-Start:** `/nc:start` — lädt Stand (`.nc/erinnerung/stand.md`), letztes Journal und
    Git-Status. **Kein Blind-Start.**
-2. **Feature-Arbeit:** `/nc:feature-start` → `/nc:plan` → implementieren → `/nc:commit-prep` → `/nc:pr`.
+2. **Feature-Arbeit:** `/nc:flc-feature-start` → `/nc:flc-plan` → implementieren → `/nc:flc-commit-prep` → `/nc:flc-pr`.
 3. **Session-Ende:** `/nc:save-session` — append-only ins Journal, Stand konsolidieren, Entscheidungen
    ins Log.
 

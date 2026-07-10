@@ -19,7 +19,7 @@ dort weitergeht, wo die letzte Session endete.
 3. **Letztes Journal laden:** Neueste Datei unter `.nc/erinnerung/journal/` lesen (Format `<YYYY-MM-DD>.md`).
 4. **Git-Status ermitteln:** `git status` und `git log --oneline -5` ausführen; aktuellen Branch und offene Änderungen nennen.
 5. **Aktives Modul erkennen:** `modules/module-registry.json` der OS-Installation lesen und die aktivierten Module nennen.
-6. **Zusammenfassung geben:** Kompakter Überblick — Stand, letzte Session, Git-Zustand, verfügbare `nc:`-Skills — und den passenden nächsten Skill empfehlen (z.B. `/nc:feature-start` für neue Features).
+6. **Zusammenfassung geben:** Kompakter Überblick — Stand, letzte Session, Git-Zustand, verfügbare `nc:`-Skills — und den passenden nächsten Skill empfehlen (z.B. `/nc:flc-feature-start` für neue Features).
 
 ## Regeln
 

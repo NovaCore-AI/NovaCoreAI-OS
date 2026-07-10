@@ -1,9 +1,9 @@
 ---
-name: nc-commit-prep
-description: Pre-Commit-Routine — Lint, Format und Tests prüfen, Diff reviewen und eine Commit-Message im Conventional-Commits-Format vorschlagen. Nutze diesen Skill, bevor Änderungen committet werden.
+name: nc-flc-commit-prep
+description: "[FLC] Pre-Commit-Routine — Lint, Format und Tests prüfen, Diff reviewen und eine Commit-Message im Conventional-Commits-Format vorschlagen. Nutze diesen Skill, bevor Änderungen committet werden."
 ---
 
-# /nc:commit-prep — Commit vorbereiten
+# /nc:flc-commit-prep — Commit vorbereiten
 
 ## Zweck
 

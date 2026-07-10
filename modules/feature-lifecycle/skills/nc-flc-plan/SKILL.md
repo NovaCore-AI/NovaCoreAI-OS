@@ -1,9 +1,9 @@
 ---
-name: nc-plan
-description: Task in vertikale, PR-große Slices zerlegen — jeder Slice ist eigenständig testbar, reviewbar und mergebar. Nutze diesen Skill nach /nc:feature-start für nicht-triviale Aufgaben.
+name: nc-flc-plan
+description: "[FLC] Task in vertikale, PR-große Slices zerlegen — jeder Slice ist eigenständig testbar, reviewbar und mergebar. Nutze diesen Skill nach /nc:flc-feature-start für nicht-triviale Aufgaben."
 ---
 
-# /nc:plan — Task slicen
+# /nc:flc-plan — Task slicen
 
 ## Zweck
 
@@ -13,7 +13,7 @@ gegen lange, ungleichmäßige Reviews.
 
 ## Ablauf
 
-1. **Voraussetzung prüfen:** Die Anforderung muss geklärt sein (aus `/nc:feature-start`). Falls nicht, dorthin zurückverweisen.
+1. **Voraussetzung prüfen:** Die Anforderung muss geklärt sein (aus `/nc:flc-feature-start`). Falls nicht, dorthin zurückverweisen.
 2. **Slices schneiden:** Aufgabe in 2–7 vertikale Slices zerlegen. Jeder Slice:
    - liefert für sich genommen sichtbaren Wert oder abgeschlossene Funktionalität
    - ist unabhängig testbar (Tests gehören zum Slice, nicht ans Ende)

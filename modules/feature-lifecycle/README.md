@@ -7,15 +7,15 @@ Anforderungsklärung bis zum PR.
 
 | Skill | Zweck |
 |---|---|
-| `/nc:feature-start` | Anforderung klären, Kontext laden, nächsten Skill empfehlen |
-| `/nc:plan` | Task in vertikale, PR-große Slices zerlegen |
-| `/nc:commit-prep` | Pre-Commit: Lint/Format/Tests prüfen, Commit-Message vorschlagen |
-| `/nc:pr` | PR aus Branch erstellen, Push erst nach Freigabe |
+| `/nc:flc-feature-start` | Anforderung klären, Kontext laden, nächsten Skill empfehlen |
+| `/nc:flc-plan` | Task in vertikale, PR-große Slices zerlegen |
+| `/nc:flc-commit-prep` | Pre-Commit: Lint/Format/Tests prüfen, Commit-Message vorschlagen |
+| `/nc:flc-pr` | PR aus Branch erstellen, Push erst nach Freigabe |
 
 ## Typischer Ablauf
 
 ```
-/nc:feature-start → /nc:plan → (implementieren) → /nc:commit-prep → /nc:pr
+/nc:flc-feature-start → /nc:flc-plan → (implementieren) → /nc:flc-commit-prep → /nc:flc-pr
 ```
 
 ## Voraussetzungen

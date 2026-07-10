@@ -16,15 +16,15 @@ Session-Memory und Safety-Gate.
 
 | Skill | Zweck |
 |---|---|
-| `/nc:start` | Session-Start: Kontext laden, aktives Modul erkennen |
-| `/nc:save-session` | Session-Ende: Journal, Stand und Entscheidungen sichern |
-| `/nc:journal` | Tages-Journal-Eintrag entwerfen (Git + optional Jira), Team- oder persönlicher Modus |
-| `/nc:setup` | Team-OS initial installieren |
-| `/nc:update` | Team-OS aktualisieren |
-| `/nc:feature-start` | Anforderung klären, Kontext laden, nächsten Skill empfehlen |
-| `/nc:plan` | Task in vertikale, PR-große Slices zerlegen |
-| `/nc:commit-prep` | Pre-Commit: Checks prüfen, Commit-Message vorschlagen |
-| `/nc:pr` | PR aus Branch erstellen, Push erst nach Freigabe |
+| `/nc:start` | Core | Session-Start: Kontext laden, aktives Modul erkennen |
+| `/nc:save-session` | Core | Session-Ende: Journal, Stand und Entscheidungen sichern |
+| `/nc:journal` | Core | Tages-Journal-Eintrag entwerfen (Git + optional Jira), Team- oder persönlicher Modus |
+| `/nc:setup` | Core | Team-OS initial installieren |
+| `/nc:update` | Core | Team-OS aktualisieren |
+| `/nc:flc-feature-start` | FLC | Anforderung klären, Kontext laden, nächsten Skill empfehlen |
+| `/nc:flc-plan` | FLC | Task in vertikale, PR-große Slices zerlegen |
+| `/nc:flc-commit-prep` | FLC | Pre-Commit: Checks prüfen, Commit-Message vorschlagen |
+| `/nc:flc-pr` | FLC | PR aus Branch erstellen, Push erst nach Freigabe |
 
 ## Hooks
 

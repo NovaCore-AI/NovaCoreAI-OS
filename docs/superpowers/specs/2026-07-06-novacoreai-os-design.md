@@ -130,10 +130,10 @@ Setup/Update liest diese Registry und aktiviert nur `enabled: true`-Module. Die 
 
 | Skill | Zweck |
 |---|---|
-| `/nc:feature-start` | Anforderung klären, Kontext laden, nächsten Skill empfehlen |
-| `/nc:plan` | Task in vertikale, PR-große Slices zerlegen |
-| `/nc:commit-prep` | Pre-Commit: Lint/Format/Tests prüfen, Commit-Message vorschlagen |
-| `/nc:pr` | PR aus Branch erstellen, Push erst nach Freigabe |
+| `/nc:flc-feature-start` | Anforderung klären, Kontext laden, nächsten Skill empfehlen |
+| `/nc:flc-plan` | Task in vertikale, PR-große Slices zerlegen |
+| `/nc:flc-commit-prep` | Pre-Commit: Lint/Format/Tests prüfen, Commit-Message vorschlagen |
+| `/nc:flc-pr` | PR aus Branch erstellen, Push erst nach Freigabe |
 
 ### 4.3 Modul `review-quality`
 
@@ -191,7 +191,7 @@ Das zentrale OS-Repo (`NovaCoreAI-OS`) enthält nur ein Template/Beispiel, keine
 ### 5.2 Datenfluss
 
 1. **Session-Start:** `/nc:start` prüft `.nc-os`-Marker, lädt `.nc/erinnerung/stand.md`, ermittelt Git-Status und aktives Modul.
-2. **Task-Start:** Nutzer ruft Modul-Skill auf (z.B. `/nc:feature-start`). Skill liest Projekt-/Repo-Kontext.
+2. **Task-Start:** Nutzer ruft Modul-Skill auf (z.B. `/nc:flc-feature-start`). Skill liest Projekt-/Repo-Kontext.
 3. **Arbeitsphase:** Modul-Skills orchestrieren Agenten, Skills und ggf. Sub-Agenten.
 4. **Protokollierung:** Ergebnisse werden append-only in `.nc/erinnerung/journal/<datum>.md` geschrieben.
 5. **Abschluss:** `/nc:save-session` aktualisiert `.nc/erinnerung/stand.md`, schreibt Journal-Eintrag, sichert Entscheidungen.
@@ -355,7 +355,7 @@ Die erste Iteration umfasst:
 
 1. Core mit `/nc:start`, `/nc:save-session`, `/nc:setup`, `/nc:update`
 2. Safety-Gate-Hook (nur destruktive Befehle, nur in `.nc-os`-Repos)
-3. Modul `feature-lifecycle` mit `/nc:feature-start`, `/nc:plan`, `/nc:commit-prep`, `/nc:pr`
+3. Modul `feature-lifecycle` mit `/nc:flc-feature-start`, `/nc:flc-plan`, `/nc:flc-commit-prep`, `/nc:flc-pr`
 4. Claude-Code-Plugin-Struktur (`.claude-plugin/plugin.json`)
 5. Setup/Update-Logik in Node.js mit dnnen Shell/PowerShell-Wrappers
 6. `ncos`-CLI (setup, update, version)
