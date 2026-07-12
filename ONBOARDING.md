@@ -8,6 +8,19 @@
 
 ## 1. Globale Installation (einmal pro Rechner)
 
+### Variante A — Offizielles Claude-Code-Plugin
+
+Das Repo folgt dem offiziellen Claude-Code-Plugin-Schema
+(`.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json`). In
+einer Claude-Code-Session im Repo-Root:
+
+```
+/plugin marketplace add ./
+/plugin install novacoreai-os@novacoreai
+```
+
+### Variante B — Setup-Skript + globale `ncos`-CLI
+
 ```bash
 git clone <repo-url> && cd NovaCoreAI-OS
 ./setup.sh            # Windows: .\setup.ps1

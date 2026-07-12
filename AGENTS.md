@@ -10,7 +10,8 @@ Namespace `nc:`). Hier wird am OS gearbeitet — nicht an Kundenprojekten.
 | `skills/` | Core-Skills (`nc-start`, `nc-save-session`, `nc-journal`, `nc-setup`, `nc-update`) |
 | `modules/` | Module mit eigenen Skills; `module-registry.json` steuert Aktivierung |
 | `hooks/` | `nc-session-start.js`, `nc-safety-gate.js`, `hooks.json` (Plugin-Hook-Konfiguration) |
-| `.claude-plugin/plugin.json` | Claude-Code-Plugin-Manifest |
+| `.claude-plugin/plugin.json` | Claude-Code-Plugin-Manifest (offizielles Schema) |
+| `.claude-plugin/marketplace.json` | Marketplace-Definition (offizielles Schema) |
 | `setup.js` / `update.js` / `ncos.js` | Setup-, Update- und CLI-Logik (Node, CommonJS) |
 | `tests/` | `node:test`-Suiten (Setup-Wiring, Safety-Gate, Plugin-Manifest) |
 | `docs/superpowers/specs/` | Design-Spezifikation |

@@ -1,5 +1,7 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "novacoreai",
+  "description": "Local marketplace for the novacoreai-os plugin (Team-OS: Feature-Lifecycle, Session-Memory, Safety-Gate).",
   "owner": {
     "name": "NovaCore AI"
   },
@@ -7,7 +9,7 @@
     {
       "name": "novacoreai-os",
       "source": "./",
-      "description": "NovaCoreAI-OS — Team-OS für den Workflow einer Softwarefirma: Skills, Hooks und Commands im Namespace nc:."
+      "description": "Team-OS für den Workflow einer Softwarefirma — Skills, Hooks und Commands im Namespace nc: (Feature-Lifecycle, Session-Memory, Safety-Gate)."
     }
   ]
 }

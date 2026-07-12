@@ -1,8 +1,11 @@
 # NovaCoreAI-OS
 
-Team-OS-Plugin für **Claude Code** (und später Kimi Code CLI): Skills, Hooks und
-Commands im Namespace `nc:` für den Workflow einer Softwarefirma — Feature-Lifecycle,
-Session-Memory und Safety-Gate.
+**Offizielles Claude-Code-Plugin** — Team-OS für den Workflow einer
+Softwarefirma: Skills, Hooks und Commands im Namespace `nc:` für
+Feature-Lifecycle, Session-Memory und Safety-Gate.
+
+**Status: v0.2.0 — offizielles Marketplace-Plugin (Schema-konform,
+integration-ready).** Siehe [CHANGELOG.md](CHANGELOG.md).
 
 > Design-Spezifikation: [`docs/superpowers/specs/2026-07-06-novacoreai-os-design.md`](docs/superpowers/specs/2026-07-06-novacoreai-os-design.md)
 
@@ -12,7 +15,7 @@ Session-Memory und Safety-Gate.
 - **Module:** eigenständige Einheiten unter `modules/<modul>/`, gesteuert über `modules/module-registry.json`
 - **Memory:** pro Arbeits-Repo unter `.nc/erinnerung/` (Stand + append-only Journal), nie im OS-Repo
 
-## Skills (v0.1.1)
+## Skills (v0.2.0)
 
 | Skill | Zweck |
 |---|---|
@@ -34,6 +37,28 @@ Session-Memory und Safety-Gate.
 | `nc-safety-gate` | PreToolUse (Bash) | Verlangt Faktennennung vor destruktiven Befehlen — nur in `.nc-os`-Repos |
 
 ## Installation
+
+### Option A — Als offizielles Plugin in Claude Code
+
+Das Repo ist ein Claude-Code-Plugin nach offiziellem Schema
+(`.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json`). In
+einer Claude-Code-Session im Repo-Root:
+
+```
+/plugin marketplace add ./
+/plugin install novacoreai-os@novacoreai
+```
+
+Für GitHub-basierte Installation (sobald das Repo öffentlich gepusht ist):
+
+```
+/plugin marketplace add NovaCoreAI/NovaCoreAI-OS
+```
+
+Verifikation: `/plugin list` (sollte `novacoreai-os` zeigen) bzw.
+`claude plugin validate .` in einer Shell.
+
+### Option B — Globaler CLI-Installationsweg (mit `ncos`)
 
 ```bash
 ./setup.sh          # oder: node setup.js  (Windows: setup.ps1)
@@ -83,4 +108,4 @@ eigenes Deploy-Manifest (`~/.nc-os/installed-manifest.json`) und Repo-Scoping
 
 ---
 
-*Version 0.1.1 · Pflege: Lucas Vöhringer · Sprache aller Artefakte: Deutsch*
+*Version 0.2.0 · Pflege: Lucas Vöhringer · Sprache aller Artefakte: Deutsch*

@@ -7,21 +7,39 @@ stimmen mit `VERSION` / `.claude-plugin/plugin.json` / `package.json` /
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-07-12
+
+Offizieller Plugin-Release: NovaCoreAI-OS ist jetzt ein Claude-Code-Plugin
+nach offiziellem Schema (analog zum Vorbild `Kimi-code-Plugin-CC`).
+
 ### Changed
 
-- **Repo-Struktur geflacht:** Der Plugin-Inhalt lag bisher doppelt verschachtelt
-  unter `NovaCoreAI-OS/NovaCoreAI-OS/` (Repo-Root enthielt einen gleichnamigen
-  Unterordner mit dem eigentlichen Plugin). Jetzt ist Repo-Root = Plugin-Root,
-  analog zu anderen Plugin-Repos. Betrifft nur Repo-Layout, keine
-  Laufzeit-Logik — `setup.js`/`update.js` lösen ihren Root ohnehin über
-  `__dirname` auf, alle Tests bleiben grün. Duplikate (`.gitattributes`,
-  `docs/superpowers/specs/…`, zweite README) dabei entfernt bzw.
-  zusammengeführt. Kein Versionsbump, da sich am ausgelieferten
-  Plugin-Verhalten nichts ändert.
-- Nach dem Mergen dieses Branches muss die Marketplace-Registrierung
-  (`known_marketplaces.json` → `novacoreai`) auf den neuen Root-Pfad zeigen;
-  danach `claude plugin marketplace update` + `claude plugin update` +
-  Neustart.
+- **Offizielles Plugin-Manifest:** `.claude-plugin/plugin.json` trägt jetzt
+  `$schema`, `repository` und `license` — das Format, das Claude Code für
+  `/plugin marketplace add` + `/plugin install` erwartet. Das Plugin lässt
+  sich jetzt direkt aus dem Repo-Root installieren, ohne den Umweg über das
+  Staging-Verzeichnis.
+- **Offizielles Marketplace-Manifest:** `.claude-plugin/marketplace.json`
+  trägt `$schema` und eine vollständige Beschreibung — Schema-konform zum
+  Claude-Code-Marketplace-Format.
+- **Direkte Plugin-Installation:** Neue Installationsvariante
+  (`/plugin marketplace add ./` + `/plugin install novacoreai-os@novacoreai`)
+  neben dem bestehenden `setup.sh`-Weg.
+- Versionsbump 0.1.1 → 0.2.0 ( konsistent über `VERSION`, `plugin.json`,
+  `package.json`, `modules/module-registry.json`).
+
+### Added
+
+- **Plugin-Manifest-Tests:** Schema-Konformitäts-Checks für `plugin.json`
+  (`$schema`, `repository`, `license`, `author.name`) und `marketplace.json`
+  (`$schema`, `owner.name`, Plugin-Source).
+
+### Docs
+
+- README um den offiziellen Plugin-Status und die direkte
+  `/plugin install`-Variante ergänzt.
+- ONBOARDING um Variante A (offizielles Plugin) ergänzt.
+- AGENTS.md um die marketplace.json im Pfad-Überblick ergänzt.
 
 ## [0.1.1] — 2026-07-08
 

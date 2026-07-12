@@ -23,6 +23,27 @@ test('plugin.json trägt Name "novacoreai-os" und eine Beschreibung', () => {
   );
 });
 
+test('plugin.json folgt dem offiziellen Claude-Code-Plugin-Schema', () => {
+  const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+  assert.equal(
+    manifest.$schema,
+    'https://anthropic.com/claude-code/plugin.schema.json',
+    '$schema fehlt oder zeigt nicht auf das offizielle Plugin-Schema'
+  );
+  assert.ok(
+    typeof manifest.repository === 'string' && /^https?:\/\//.test(manifest.repository),
+    'repository muss eine absolute URL sein (offizielles Plugin-Format)'
+  );
+  assert.ok(
+    typeof manifest.license === 'string' && manifest.license.length > 0,
+    'license fehlt (offizielles Plugin-Format)'
+  );
+  assert.ok(
+    manifest.author && typeof manifest.author.name === 'string',
+    'author.name fehlt (offizielles Plugin-Format)'
+  );
+});
+
 test('plugin.json-Version stimmt mit VERSION-Datei überein', () => {
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
   const version = fs.readFileSync(path.join(REPO_ROOT, 'VERSION'), 'utf8').trim();
@@ -49,6 +70,23 @@ test('marketplace.json existiert und listet das Plugin novacoreai-os', () => {
     marketplace.plugins.some((plugin) => plugin.name === 'novacoreai-os'),
     'Plugin novacoreai-os fehlt im Marketplace'
   );
+});
+
+test('marketplace.json folgt dem offiziellen Claude-Code-Marketplace-Schema', () => {
+  const marketplacePath = path.join(REPO_ROOT, '.claude-plugin', 'marketplace.json');
+  const marketplace = JSON.parse(fs.readFileSync(marketplacePath, 'utf8'));
+  assert.equal(
+    marketplace.$schema,
+    'https://anthropic.com/claude-code/marketplace.schema.json',
+    '$schema fehlt oder zeigt nicht auf das offizielle Marketplace-Schema'
+  );
+  assert.ok(
+    marketplace.owner && typeof marketplace.owner.name === 'string',
+    'owner.name fehlt (offizielles Marketplace-Format)'
+  );
+  const plugin = marketplace.plugins.find((p) => p.name === 'novacoreai-os');
+  assert.ok(plugin, 'Plugin novacoreai-os fehlt');
+  assert.equal(plugin.source, './', 'Plugin-Source muss "./" sein (lokaler Marketplace)');
 });
 
 test('Hooks-Konfiguration des Plugins existiert und referenziert beide Hooks', () => {

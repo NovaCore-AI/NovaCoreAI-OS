@@ -1,8 +1,9 @@
 {
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "novacoreai-os",
-  "version": "0.1.1",
-  "description": "NovaCoreAI-OS — Team-OS für den Workflow einer Softwarefirma: Skills, Hooks und Commands im Namespace nc: (Feature-Lifecycle, Session-Memory, Safety-Gate).",
-  "author": {
-    "name": "NovaCore AI"
-  }
+  "description": "Team-OS für den Workflow einer Softwarefirma — Skills, Hooks und Commands im Namespace nc: (Feature-Lifecycle, Session-Memory, Safety-Gate).",
+  "version": "0.2.0",
+  "author": { "name": "NovaCore AI" },
+  "repository": "https://github.com/NovaCoreAI/NovaCoreAI-OS",
+  "license": "UNLICENSED"
 }
