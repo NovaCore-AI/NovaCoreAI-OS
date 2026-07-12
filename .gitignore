@@ -1,6 +1,9 @@
 # macOS
 .DS_Store
 
+# Project-scope dev CLAUDE.md (lokale Arbeitsregeln, nicht Teil des Plugins)
+CLAUDE.md
+
 # Nested git repositories (should be integrated as files or submodules)
 */.git
 
