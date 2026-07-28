@@ -20,7 +20,7 @@ Kern als **Modul** selbst mit:
 |---|---|---|---|
 | `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Kontroll-Hooks, WP-Rahmen, Registry, Formatregeln, `nc-sync.md` | `/nc:` | 0.4.0 (= `VERSION`) |
 | `nc-development` | Abteilung development — Module `fe` / `be` / `flc` / `wzs` | `/nc-development:` | 0.1.0 |
-| `nc-felix` | Abteilung felix — **eigenständiges Felix-OS** (erster Satellit, privates Repo `NovaCore-AI/NovaCoreAI-OS-Felix`): Kernmodul mit 6 Skills + eigene FFG-Kontrollschicht, hängt **nicht** am Kern | `/nc-felix:` | 0.2.0 |
+| `nc-felix` | Abteilung felix — **eigenständiges Felix-OS** (erster Satellit, privates Repo `NovaCore-AI/Felix-OS`): Kernmodul mit 6 Skills + eigene FFG-Kontrollschicht, hängt **nicht** am Kern | `/nc-felix:` | 0.2.0 |
 
 - **Plugin-Grenze = Abteilungsgrenze:** Wer eine Abteilung installiert, bekommt den Kern
   transitiv mit (`dependencies: ["nc"]`). Ausnahme: das eigenständige Felix-OS `nc-felix`

@@ -21,7 +21,7 @@ Kern-Dependency. Spec-Nachtrag:
 ### Added
 
 - **Abteilungsplugin `nc-felix` 0.2.0 (Satellit, eigenständig):** eigenes privates Repo
-  `NovaCore-AI/NovaCoreAI-OS-Felix` — das Repo IST das Plugin (Manifest an der Wurzel).
+  `NovaCore-AI/Felix-OS` — das Repo IST das Plugin (Manifest an der Wurzel).
   **Kernmodul** ohne Präfix mit 6 Skills (`start`, `save-session`, `journal` als angepasste
   Ports der Kern-Skills; `os-info`, `skill-builder` nach Onsite-Vorbild; `code-tour`
   Neubau), **eigene Kontroll-Schicht** (FFG verbatim-Port + angepasster SessionStart-Hook,

@@ -22,7 +22,7 @@
       "name": "nc-felix",
       "source": {
         "source": "github",
-        "repo": "NovaCore-AI/NovaCoreAI-OS-Felix",
+        "repo": "NovaCore-AI/Felix-OS",
         "ref": "v0.2.0",
         "sha": "dc6f6b98edec2d2c2de44fe2573b30043e3aeaf6"
       },

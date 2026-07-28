@@ -215,7 +215,7 @@ Gates mehrfach; die Plattform verhindert das nicht, der Struktur-Test schon).
 
 Auftrag des Maintainers (2026-07-28, nach dem Umbau, zweistufig präzisiert): Für den
 Kollegen Felix entsteht die zweite Abteilung `felix` — direkt als **Satellit** (eigenes
-privates Repo `NovaCore-AI/NovaCoreAI-OS-Felix`, das Repo IST das Plugin), nicht als
+privates Repo `NovaCore-AI/Felix-OS`, das Repo IST das Plugin), nicht als
 lokales `plugins/`-Verzeichnis. Damit tritt genau der in §8 benannte Fall ein („wird erst
 bei der zweiten Abteilung relevant"); das Nicht-Ziel „Keine Satelliten-Repos" ist erledigt.
 

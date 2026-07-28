@@ -37,7 +37,7 @@
       "namespace": "/nc-felix:",
       "staendig": false,
       "status": "eigenständiges Felix-OS (erster Satellit, eigenes privates Repo) — hängt NICHT am Kern nc: Kernmodul und Kontroll-Schicht (FFG-Port) liegen im Plugin selbst; Modul-SSOT ist dessen eigene module-registry.json. Nicht parallel zum Kern nc betreiben (doppelte Gates).",
-      "repository": "NovaCore-AI/NovaCoreAI-OS-Felix",
+      "repository": "NovaCore-AI/Felix-OS",
       "repoSkillsPath": "skills",
       "module": {
         "kern": "Kernmodul ohne Präfix: start, save-session, journal, os-info, code-tour, skill-builder [alle gebaut]; Arbeitsmodule folgen (werden mit dem Fachbereich definiert)"
