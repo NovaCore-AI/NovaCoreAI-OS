@@ -211,7 +211,21 @@ Gates mehrfach; die Plattform verhindert das nicht, der Struktur-Test schon).
 - `repository`-Feld im Manifest korrigiert auf `https://github.com/NovaCore-AI/NovaCoreAI-OS`
   (bisheriger Wert nannte eine falsche Org ohne Bindestrich).
 
+## 10. Nachtrag 2026-07-28 — zweite Abteilung `felix` als erster Satellit
+
+Auftrag des Maintainers (2026-07-28, nach dem Umbau): Für den Kollegen Felix entsteht die
+zweite Abteilung `felix` — direkt als **Satellit** (eigenes privates Repo
+`NovaCore-AI/NovaCoreAI-OS-Felix`, das Repo IST das Plugin), nicht als lokales
+`plugins/`-Verzeichnis. Damit tritt genau der in §8 benannte Fall ein („wird erst bei der
+zweiten Abteilung relevant"); das Nicht-Ziel „Keine Satelliten-Repos" ist erledigt.
+Mechanik nach Standardprozess `plugin-bau.md` §3a: Marketplace-Eintrag mit GitHub-Source
+und Commit-SHA-Pin, Registry-Eintrag mit `repository` und satelliten-relativem
+`repoSkillsPath`, Kern-Bump 0.3.0 → 0.4.0 (Registry-Erweiterung). Bewusst keine Skills:
+Das Platzhalter-Plugin reserviert Abteilungsgrenze und Namespace `/nc-felix:`; Modul- und
+Skill-Planung folgt gemeinsam mit dem Fachbereich.
+
 ---
 
 *Spec-Version 0.2.0 · 2026-07-28 · erstellt in der Nachtschicht-Session (Fable), Review durch
-Maintainer steht aus — dieser Umbau ist als PR zur Abnahme vorgelegt, nicht gemergt.*
+Maintainer steht aus — dieser Umbau ist als PR zur Abnahme vorgelegt, nicht gemergt.
+Nachtrag §10 ergänzt 2026-07-28 (Abteilung felix, erster Satellit).*

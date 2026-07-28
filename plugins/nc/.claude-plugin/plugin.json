@@ -1,7 +1,7 @@
 {
   "name": "nc",
   "displayName": "NovaCore-OS (Kern)",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam (Shared-Skills für Session-Zyklus und Journal), Kontroll-Hook FFG (Fact-Forcing-Gate), WP-Rahmen WP0–WP8 und Abteilungs-Registry. Jedes Abteilungsplugin setzt diesen Kern als Dependency voraus — wer eine Abteilung installiert, bekommt ihn transitiv aktiviert.",
   "author": {
     "name": "NovaCore AI"

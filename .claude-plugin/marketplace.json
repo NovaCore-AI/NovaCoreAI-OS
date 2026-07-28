@@ -17,6 +17,17 @@
       "source": "./plugins/nc-development",
       "description": "Abteilung development: Module fe (Frontend), be (Backend), flc (Feature-Lifecycle), wzs (Empfehlungssystem WZS) — 11 Skills entlang des GitHub-Flows.",
       "category": "abteilung"
+    },
+    {
+      "name": "nc-felix",
+      "source": {
+        "source": "github",
+        "repo": "NovaCore-AI/NovaCoreAI-OS-Felix",
+        "ref": "v0.1.0",
+        "sha": "447118e6ab9bc06aa155398bc45be1d604e763c9"
+      },
+      "description": "Abteilung felix: angelegt, Module und Skills in Planung — noch keine gebauten Skills. Satelliten-Repo (Standardprozess plugin-bau.md §3a).",
+      "category": "abteilung"
     }
   ]
 }

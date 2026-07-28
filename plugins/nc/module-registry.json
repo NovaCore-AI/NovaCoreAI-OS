@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "marketplace": "novacore-os",
   "_hinweis": "Reiner Metadaten-SSOT des Produkts: Hierarchie Abteilung → Plugin → Module (Skill-Präfix) → Skills. Die Datei steuert NICHTS aus — was ein Nutzer bekommt, entscheidet allein, welche Plugins er installiert hat; die Abteilungsgrenze ist die Plugin-Grenze. staendig=true heißt: Die Abteilung liegt im Kern und wird über die dependencies jedes Abteilungsplugins immer mitaktiviert, ist also technisch nicht abwählbar. minCoreVersion ist dokumentarisch. repoSkillsPath ist der Pfad IM REPO; zur Laufzeit heißt das Skill-Verzeichnis in jedem Plugin schlicht skills/ (Default-Scan). Kein Verzeichnis-Nesting für Skills: der Plugin-Scanner erwartet skills/<name>/SKILL.md, Module sind Namenspräfixe. Ordner ohne SKILL.md ignoriert der Scanner.",
   "abteilungen": [
@@ -30,6 +30,17 @@
         "flc": "Feature-Lifecycle (WP1–WP5): flc-feature-start, flc-plan, flc-commit-prep, flc-pr [alle gebaut]",
         "wzs": "Empfehlungssystem WZS (WP3/WP6, produktspezifisch): wzs-attribution, wzs-blocker-gate, wzs-reward-guard, wzs-share-invariant, wzs-webhook-contract [alle gebaut] — Kandidat für spätere Extraktion (Satellit)"
       }
+    },
+    {
+      "name": "felix",
+      "plugin": "nc-felix",
+      "namespace": "/nc-felix:",
+      "staendig": false,
+      "minCoreVersion": "0.4.0",
+      "status": "angelegt — erster Satellit (eigenes privates Repo), noch keine gebauten Skills; Modul- und Skill-Planung folgt mit dem Fachbereich",
+      "repository": "NovaCore-AI/NovaCoreAI-OS-Felix",
+      "repoSkillsPath": "skills",
+      "module": {}
     }
   ]
 }
