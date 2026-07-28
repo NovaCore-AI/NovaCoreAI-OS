@@ -84,7 +84,7 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Session-Start-**Hinweis**. Team-Mindestversion Claude Code ≥ 2.1.193.
 - **Gebaut (Kern v0.4.0, 2026-07-28):** Zweite Abteilung `felix` als **erster Satellit**
   angelegt — Plugin `nc-felix` 0.2.0 im eigenen privaten Repo
-  `NovaCore-AI/NovaCoreAI-OS-Felix` (das Repo IST das Plugin), Marketplace-Eintrag per
+  `NovaCore-AI/Felix-OS` (das Repo IST das Plugin), Marketplace-Eintrag per
   GitHub-Source mit Commit-SHA-Pin, Registry-Eintrag (Kern-Bump 0.3.0 → 0.4.0 wegen
   Registry-Erweiterung). **Eigenständiges Felix-OS:** Module statt Abteilungen, keine
   Kern-Dependency — Kernmodul (start, save-session, journal, os-info, code-tour,
