@@ -10,6 +10,33 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-07-28
+
+Zweite Abteilung `felix` angelegt — als **erster Satellit** des NovaCore-OS nach dem in
+`knowledge-base/standardprozesse/plugin-bau.md` §3a dokumentierten Muster (Onsite.ai-OS,
+produktiv erprobt). Auftrag des Maintainers vom 2026-07-28; Spec-Nachtrag:
+`knowledge-base/grundwissen/2026-07-28-multi-plugin-architektur-design.md`, §10.
+
+### Added
+
+- **Abteilungsplugin `nc-felix` 0.1.0 (Satellit):** eigenes privates Repo
+  `NovaCore-AI/NovaCoreAI-OS-Felix` — das Repo IST das Plugin (Manifest an der Wurzel,
+  `dependencies: ["nc"]`, bewusst keine eigenen Hooks; Manifest-/Struktur-Tests, CI mit
+  SHA-gepinnten Actions, `.nc-os`-Marker, AGENTS.md mit Satelliten-Regeln). Noch keine
+  gebauten Skills — Modul- und Skill-Planung folgt gemeinsam mit dem Fachbereich.
+- **Marketplace-Eintrag `nc-felix`:** GitHub-Source mit Commit-SHA-Pin
+  (`447118e6ab9bc06aa155398bc45be1d604e763c9`, `ref: v0.1.0`); der Pin greift, sobald der
+  Satellit mit exakt diesem Commit gepusht und getaggt ist (kein Squash/Rebase beim Merge).
+  Kein `version`-Feld im Eintrag — die Version lebt allein in dessen `plugin.json`.
+- **Registry:** Abteilung `felix` (`repository` + satelliten-relatives
+  `repoSkillsPath: "skills"`, `minCoreVersion: 0.4.0`).
+
+### Changed
+
+- **Kern `nc` 0.3.0 → 0.4.0** (`VERSION` + Registry gespiegelt): Registry-Erweiterung um
+  die Abteilung `felix` — ohne Bump erhielte das Team die aktualisierte Registry nie per
+  Auto-Update. — Agent: Claude (Fable 5)
+
 ## [0.3.0] — 2026-07-28
 
 Multi-Plugin-Umbau: Aus dem Single-Root-Plugin `novacoreai-os` wird die Plugin-Familie des

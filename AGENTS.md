@@ -82,9 +82,16 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Marketplace. Das alte marker-gebundene Safety-Gate ist im Destruktiv-Gate des FFG
   aufgegangen (markerlos, deny statt ask); der `.nc-os`-Marker scoped nur noch den
   Session-Start-**Hinweis**. Team-Mindestversion Claude Code ≥ 2.1.193.
+- **Gebaut (Kern v0.4.0, 2026-07-28):** Zweite Abteilung `felix` als **erster Satellit**
+  angelegt — Plugin `nc-felix` 0.1.0 im eigenen privaten Repo
+  `NovaCore-AI/NovaCoreAI-OS-Felix` (das Repo IST das Plugin), Marketplace-Eintrag per
+  GitHub-Source mit Commit-SHA-Pin, Registry-Eintrag (Kern-Bump 0.3.0 → 0.4.0 wegen
+  Registry-Erweiterung). Noch keine Skills — Modul-/Skill-Planung folgt mit dem
+  Fachbereich. Spec-Nachtrag: jüngste Design-Spec, §10.
 - **Noch nicht gebaut** (bewusste Nicht-Ziele der jüngsten Spec, §8): Session-Start-Zwang
   als blockierender Hook, weitere fe-/be-Skills, Module `architecture`/`incident-support`,
-  Kimi-/Codex-Copy-Deploy, Satelliten-Repos.
+  Kimi-/Codex-Copy-Deploy. (Satelliten-Repos sind seit dem `nc-felix`-Anlegen gebaut,
+  siehe oben.)
 - **Versionsmodell:** **Je Plugin eine Version, genau an einer Stelle:**
   `plugins/<name>/.claude-plugin/plugin.json`. Marketplace-Einträge tragen **kein**
   `version`-Feld (Claude Code nutzt den `plugin.json`-Wert „without warning" — Doku
