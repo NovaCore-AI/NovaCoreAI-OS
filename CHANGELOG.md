@@ -12,30 +12,37 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [0.4.0] — 2026-07-28
 
-Zweite Abteilung `felix` angelegt — als **erster Satellit** des NovaCore-OS nach dem in
-`knowledge-base/standardprozesse/plugin-bau.md` §3a dokumentierten Muster (Onsite.ai-OS,
-produktiv erprobt). Auftrag des Maintainers vom 2026-07-28; Spec-Nachtrag:
+Zweite Abteilung `felix` angelegt — als **erster Satellit** des NovaCore-OS (Muster
+`knowledge-base/standardprozesse/plugin-bau.md` §3a, Onsite.ai-OS-erprobt) und auf
+Maintainer-Entscheidung als **eigenständiges Felix-OS**: Module statt Abteilungen, keine
+Kern-Dependency. Spec-Nachtrag:
 `knowledge-base/grundwissen/2026-07-28-multi-plugin-architektur-design.md`, §10.
 
 ### Added
 
-- **Abteilungsplugin `nc-felix` 0.1.0 (Satellit):** eigenes privates Repo
-  `NovaCore-AI/NovaCoreAI-OS-Felix` — das Repo IST das Plugin (Manifest an der Wurzel,
-  `dependencies: ["nc"]`, bewusst keine eigenen Hooks; Manifest-/Struktur-Tests, CI mit
-  SHA-gepinnten Actions, `.nc-os`-Marker, AGENTS.md mit Satelliten-Regeln). Noch keine
-  gebauten Skills — Modul- und Skill-Planung folgt gemeinsam mit dem Fachbereich.
+- **Abteilungsplugin `nc-felix` 0.2.0 (Satellit, eigenständig):** eigenes privates Repo
+  `NovaCore-AI/NovaCoreAI-OS-Felix` — das Repo IST das Plugin (Manifest an der Wurzel).
+  **Kernmodul** ohne Präfix mit 6 Skills (`start`, `save-session`, `journal` als angepasste
+  Ports der Kern-Skills; `os-info`, `skill-builder` nach Onsite-Vorbild; `code-tour`
+  Neubau), **eigene Kontroll-Schicht** (FFG verbatim-Port + angepasster SessionStart-Hook,
+  Env-Schalter `NC_FFG*` unverändert), geteilte Anweisung `felix-sync.md`, `wp-rahmen.md`,
+  eigene `module-registry.json`, `referenz/skill-authoring.md`; FFG-/Struktur-/
+  Frontmatter-Tests (36 grün), CI mit SHA-gepinnten Actions. **Keine Kern-Dependency** —
+  nicht parallel zu `nc` betreiben (doppelte Gates).
 - **Marketplace-Eintrag `nc-felix`:** GitHub-Source mit Commit-SHA-Pin
-  (`447118e6ab9bc06aa155398bc45be1d604e763c9`, `ref: v0.1.0`); der Pin greift, sobald der
+  (`dc6f6b98edec2d2c2de44fe2573b30043e3aeaf6`, `ref: v0.2.0`); der Pin greift, sobald der
   Satellit mit exakt diesem Commit gepusht und getaggt ist (kein Squash/Rebase beim Merge).
   Kein `version`-Feld im Eintrag — die Version lebt allein in dessen `plugin.json`.
 - **Registry:** Abteilung `felix` (`repository` + satelliten-relatives
-  `repoSkillsPath: "skills"`, `minCoreVersion: 0.4.0`).
+  `repoSkillsPath: "skills"`; Modul-SSOT liegt im Satelliten selbst).
 
 ### Changed
 
 - **Kern `nc` 0.3.0 → 0.4.0** (`VERSION` + Registry gespiegelt): Registry-Erweiterung um
   die Abteilung `felix` — ohne Bump erhielte das Team die aktualisierte Registry nie per
-  Auto-Update. — Agent: Claude (Fable 5)
+  Auto-Update.
+- **`plugin-bau.md` §1:** dokumentierte Ausnahme von der Kern-Dependency-Pflicht für
+  eigenständige Abteilungs-OS in Satelliten-Repos. — Agent: Claude (Fable 5)
 
 ## [0.3.0] — 2026-07-28
 

@@ -5,22 +5,26 @@
 vieler Privat-Setups.
 
 **Status: Kern `nc` v0.4.0 · Abteilung `nc-development` v0.1.0 · Abteilung `nc-felix`
-v0.1.0 (erster Satellit, angelegt) — Multi-Plugin-Architektur (Umbau 2026-07-28).** Historie: [CHANGELOG.md](CHANGELOG.md) · Normativ für Agenten:
+v0.2.0 (erster Satellit, eigenständiges Felix-OS) — Multi-Plugin-Architektur (Umbau
+2026-07-28).** Historie: [CHANGELOG.md](CHANGELOG.md) · Normativ für Agenten:
 [AGENTS.md](AGENTS.md) · Design-Spec:
 [`knowledge-base/grundwissen/2026-07-28-multi-plugin-architektur-design.md`](knowledge-base/grundwissen/2026-07-28-multi-plugin-architektur-design.md)
 
 ## Architektur
 
-Ein Marketplace (`novacore-os`), je Abteilung ein Plugin, der Kern ist Dependency von allem:
+Ein Marketplace (`novacore-os`), je Abteilung ein Plugin; der Kern ist Dependency der
+Abteilungsplugins dieses Repos — eigenständige Satelliten-OS wie `nc-felix` bringen ihren
+Kern als **Modul** selbst mit:
 
 | Plugin | Rolle | Namespace | Version |
 |---|---|---|---|
 | `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Kontroll-Hooks, WP-Rahmen, Registry, Formatregeln, `nc-sync.md` | `/nc:` | 0.4.0 (= `VERSION`) |
 | `nc-development` | Abteilung development — Module `fe` / `be` / `flc` / `wzs` | `/nc-development:` | 0.1.0 |
-| `nc-felix` | Abteilung felix — **angelegt** (erster Satellit, eigenes privates Repo `NovaCore-AI/NovaCoreAI-OS-Felix`, noch keine Skills) | `/nc-felix:` | 0.1.0 |
+| `nc-felix` | Abteilung felix — **eigenständiges Felix-OS** (erster Satellit, privates Repo `NovaCore-AI/NovaCoreAI-OS-Felix`): Kernmodul mit 6 Skills + eigene FFG-Kontrollschicht, hängt **nicht** am Kern | `/nc-felix:` | 0.2.0 |
 
 - **Plugin-Grenze = Abteilungsgrenze:** Wer eine Abteilung installiert, bekommt den Kern
-  transitiv mit (`dependencies: ["nc"]`).
+  transitiv mit (`dependencies: ["nc"]`). Ausnahme: das eigenständige Felix-OS `nc-felix`
+  führt keine Kern-Dependency (Kernmodul + Kontroll-Schicht im Plugin selbst).
 - **Hooks nur im Kern**, Module sind Skill-Präfixe, die `module-registry.json` ist reiner
   Metadaten-SSOT.
 - **Memory** pro Arbeits-Repo unter `.nc/erinnerung/` (Stand + append-only Journal), nie im
@@ -48,8 +52,10 @@ Ein Marketplace (`novacore-os`), je Abteilung ein Plugin, der Kern ist Dependenc
 | `be` Backend | `be-review` | WP6 |
 | `wzs` Empfehlungssystem WZS | `wzs-attribution` · `wzs-blocker-gate` · `wzs-reward-guard` · `wzs-share-invariant` · `wzs-webhook-contract` | WP3/WP6 |
 
-**Abteilung `nc-felix`:** angelegt, noch keine gebauten Skills — Modul- und Skill-Planung
-erfolgt separat mit dem Fachbereich (Satelliten-Repo, siehe Architektur).
+**Abteilung `nc-felix` (eigenständiges Felix-OS):** Kernmodul ohne Präfix — `start`,
+`save-session`, `journal`, `os-info`, `code-tour`, `skill-builder`; Arbeitsmodule folgen
+(Satelliten-Repo mit eigener Kontroll-Schicht, siehe Architektur — nicht parallel zu `nc`
+betreiben).
 
 Fachablauf und Trigger-Matrix: [`plugins/nc-development/workflow.md`](plugins/nc-development/workflow.md);
 Rahmen WP0–WP8: [`plugins/nc/wp-rahmen.md`](plugins/nc/wp-rahmen.md).
@@ -73,10 +79,12 @@ Voraussetzungen: Claude Code **≥ 2.1.193**, Node.js ≥ 18 (Hooks). In Claude 
 /plugin install nc-development@novacore-os
 ```
 
-Der Kern `nc` kommt automatisch als Dependency mit. Weitere Abteilungen analog, z. B.
-`/plugin install nc-felix@novacore-os` (Satellit — auf Maschinen ohne geladenen SSH-Key
-vorher `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` setzen). Details, Migration von v0.2.0 und
-Arbeits-Repo-Einrichtung: [ONBOARDING.md](ONBOARDING.md).
+Der Kern `nc` kommt automatisch als Dependency mit. Das eigenständige Felix-OS installiert
+sich analog per `/plugin install nc-felix@novacore-os` (Satellit — auf Maschinen ohne
+geladenen SSH-Key vorher `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` setzen); es bringt eine eigene
+Kontroll-Schicht mit und läuft **nicht** parallel zu `nc`/`nc-development` in derselben
+Session. Details, Migration von v0.2.0 und Arbeits-Repo-Einrichtung:
+[ONBOARDING.md](ONBOARDING.md).
 
 ## Update
 
@@ -107,7 +115,9 @@ Auto-Update.
 
 Eigene Namespaces `nc:`/`nc-development:`/`nc-felix:`, keine Kollision mit `uni:` oder ECC. Das FFG
 gatet markerlos in jeder Session, in der der Kern installiert ist (Opt-out `NC_FFG=off`);
-die SessionStart-Begrüßung bleibt auf `.nc-os`-markierte Repos beschränkt.
+die SessionStart-Begrüßung bleibt auf `.nc-os`-markierte Repos beschränkt. Das eigenständige
+`nc-felix` trägt einen eigenen FFG-Port mit denselben Env-Schaltern — deshalb `nc` und
+`nc-felix` nie parallel in derselben Session betreiben (doppelte Gates und Begrüßungen).
 
 ---
 
