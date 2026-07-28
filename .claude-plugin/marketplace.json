@@ -1,15 +1,22 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "novacoreai",
-  "description": "Local marketplace for the novacoreai-os plugin (Team-OS: Feature-Lifecycle, Session-Memory, Safety-Gate).",
+  "name": "novacore-os",
+  "description": "Interner Marketplace von NovaCore AI: verteilt den Kern nc (Shared-Skills, Kontroll-Hook FFG, WP-Rahmen) und je Abteilung ein eigenes Plugin. Jedes Abteilungsplugin hängt am Kern — installiert man eine Abteilung, kommt der Kern transitiv mit.",
   "owner": {
     "name": "NovaCore AI"
   },
   "plugins": [
     {
-      "name": "novacoreai-os",
-      "source": "./",
-      "description": "Team-OS für den Workflow einer Softwarefirma — Skills, Hooks und Commands im Namespace nc: (Feature-Lifecycle, Session-Memory, Safety-Gate)."
+      "name": "nc",
+      "source": "./plugins/nc",
+      "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam (start, save-session, journal), Kontroll-Hook FFG, WP-Rahmen WP0–WP8, Abteilungs-Registry. Wird von jedem Abteilungsplugin vorausgesetzt.",
+      "category": "kern"
+    },
+    {
+      "name": "nc-development",
+      "source": "./plugins/nc-development",
+      "description": "Abteilung development: Module fe (Frontend), be (Backend), flc (Feature-Lifecycle), wzs (Empfehlungssystem WZS) — 11 Skills entlang des GitHub-Flows.",
+      "category": "abteilung"
     }
   ]
 }

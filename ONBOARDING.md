@@ -1,49 +1,52 @@
-# ONBOARDING — Ersteinrichtung NovaCoreAI-OS
+# ONBOARDING — Ersteinrichtung NovaCore-OS
 
 ## Voraussetzungen
 
-- **Node.js v18+** (`node --version`)
-- **Claude Code** installiert
-- Git-Zugriff auf dieses Repo
+- **Claude Code ≥ 2.1.193** (`claude --version`) — das Abteilungsmodell braucht die
+  Dependency-Mechanik dieser Version
+- **Node.js ≥ 18** (`node --version`) — für die Kontroll-Hooks
+- GitHub-Zugriff auf `NovaCore-AI/NovaCoreAI-OS`
 
-## 1. Globale Installation (einmal pro Rechner)
+## 1. Installation (einmal pro Rechner)
 
-### Variante A — Offizielles Claude-Code-Plugin
-
-Das Repo folgt dem offiziellen Claude-Code-Plugin-Schema
-(`.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json`). In
-einer Claude-Code-Session im Repo-Root:
+In einer Claude-Code-Session:
 
 ```
-/plugin marketplace add ./
-/plugin install novacoreai-os@novacoreai
+/plugin marketplace add NovaCore-AI/NovaCoreAI-OS
+/plugin install nc-development@novacore-os
 ```
 
-### Variante B — Setup-Skript + globale `ncos`-CLI
+Der Kern `nc` wird als Dependency **automatisch** mitinstalliert und -aktiviert.
+Verifikation: `/plugin list` zeigt `nc` und `nc-development`.
 
-```bash
-git clone <repo-url> && cd NovaCoreAI-OS
-./setup.sh            # Windows: .\setup.ps1
-./install-cli.sh      # Windows: .\install-cli.ps1  → globaler Befehl `ncos`
+Für lokale Entwicklung am OS selbst: `/plugin marketplace add <pfad-zum-checkout>` und
+identisch installieren.
+
+> **Privates Repo + SSH:** GitHub-Shorthand-Quellen klonen per Default über SSH. Ohne
+> geladenen SSH-Key schlägt die Installation mit `Permission denied (publickey)` fehl —
+> dann `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` setzen (nutzt die gh/git-Credentials) oder
+> einen SSH-Key einrichten.
+
+## Migration von v0.2.0 (altes Single-Plugin + `ncos`-CLI)
+
+Die alte Install-Identität `novacoreai-os@novacoreai` hat **keinen** Auto-Upgrade-Pfad auf
+die neue Struktur. Einmalig:
+
+```
+/plugin uninstall novacoreai-os@novacoreai
+/plugin marketplace remove novacoreai
+/plugin marketplace add NovaCore-AI/NovaCoreAI-OS
+/plugin install nc-development@novacore-os
 ```
 
-Das Setup macht zwei Dinge:
-
-1. **Staging-Deploy:** Core-Skills, Skills aktivierter Module (siehe
-   `modules/module-registry.json`) und Hooks werden nach `~/.nc-os/plugin/`
-   kopiert; das Deploy-Manifest liegt unter `~/.nc-os/installed-manifest.json`.
-2. **Registrierung bei Claude Code:** Das Setup führt automatisch
-   `claude plugin marketplace add <repo>` und
-   `claude plugin install novacoreai-os@novacoreai` aus — erst dadurch lädt
-   Claude Code Skills und Hooks. Schlägt das fehl (z.B. `claude` nicht im
-   PATH), gibt das Setup die beiden Befehle zum manuellen Nachholen aus.
+Zusätzlich aufräumen (stammt vom alten Setup-Skript, wird nicht mehr genutzt):
+Staging-Verzeichnis `~/.nc-os/` löschen; einen globalen `ncos`-Befehl aus dem PATH nehmen.
+Projekt-Memory unter `.nc/erinnerung/` bleibt unverändert gültig.
 
 ## 2. Arbeits-Repo einrichten (einmal pro Repo)
 
-Im Kunden-/Arbeits-Repo:
-
 ```bash
-touch .nc-os                          # aktiviert Hooks & Begrüßung in diesem Repo
+touch .nc-os                          # Marker-DATEI — aktiviert die Session-Begrüßung
 mkdir -p .nc/erinnerung/journal
 echo ".nc/" >> .gitignore             # Kunden-Interna nie committen
 ```
@@ -60,25 +63,39 @@ Initialen Stand anlegen (`.nc/erinnerung/stand.md`):
 <Branches, offene PRs, bekannte Risiken>
 ```
 
+**Wichtig:** Der Marker muss eine **Datei** sein (`touch .nc-os`), kein Verzeichnis — und
+er scoped nur die Begrüßung. Das Fact-Forcing-Gate (FFG) ist **überall** aktiv, wo der
+Kern installiert ist; Opt-out ausschließlich per Umgebungsvariable `NC_FFG=off`
+(menschliche Entscheidung, kein Agenten-Schalter).
+
 ## 3. Arbeiten mit dem OS
 
 | Wann | Was |
 |---|---|
 | Session-Beginn | `/nc:start` |
-| Neues Feature/Ticket | `/nc:flc-feature-start` → `/nc:flc-plan` |
-| Vor jedem Commit | `/nc:flc-commit-prep` |
-| Bereit für Review | `/nc:flc-pr` |
+| Neues Feature | `/nc-development:flc-feature-start` → `/nc-development:flc-plan` |
+| Vor jedem Commit | `/nc-development:flc-commit-prep` |
+| Bereit für Review | `/nc-development:flc-pr` |
+| Review durchführen | `/nc-development:fe-review` bzw. `/nc-development:be-review` |
+| WZS-Arbeit | `/nc-development:wzs-…` (Attribution, Blocker-Gate, Reward-Guard, …) |
+| Zwischendurch | `/nc:journal` (Ereignis sofort festhalten) |
 | Session-Ende | `/nc:save-session` |
+
+Der Rahmen WP0–WP8 steht in `wp-rahmen.md` des Kern-Plugins, der Fachablauf in
+`workflow.md` der Abteilung.
 
 ## 4. Aktualisieren
 
-```bash
-ncos update      # git pull + Neu-Deploy + Entfernen verwaister Dateien
-ncos version     # installierte Version prüfen
-```
+Updates kommen über den Marketplace: `/plugin update` (bzw. Auto-Update). Ein Update
+erscheint nur, wenn die Plugin-Version in `plugin.json` gebumpt wurde.
 
 ## Fehlerbehebung
 
-- **Skills erscheinen nicht:** Setup erneut ausführen (`ncos setup`), Claude Code neu starten.
-- **Hooks feuern im falschen Repo:** Prüfen, ob dort versehentlich eine `.nc-os`-Datei liegt — ohne Marker sind alle nc-Hooks no-op.
-- **Modul fehlt:** In `modules/module-registry.json` prüfen, ob `enabled: true` und `minCoreVersion` ≤ Inhalt von `VERSION`.
+- **Skills erscheinen nicht:** `/plugin list` prüfen; ggf. `/plugin update` und Claude Code
+  neu starten. Bei lokalem Checkout: `/reload-plugins`.
+- **Keine Begrüßung beim Start:** Liegt im Repo-Root eine Marker-**Datei** `.nc-os`?
+  (Ein Verzeichnis zählt nicht — bewusste Härtung nach Bug 0.1.1.)
+- **FFG blockt einen Aufruf:** Das ist das erwartete Verhalten — geforderte Fakten im
+  Antworttext nennen und denselben Aufruf wiederholen. Gate-Texte erklären genau, was
+  fehlt.
+- **`Permission denied (publickey)` bei der Installation:** siehe SSH-Hinweis oben.

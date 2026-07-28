@@ -1,16 +1,13 @@
 {
-  "name": "novacoreai-os",
-  "version": "0.2.0",
-  "description": "NovaCoreAI-OS — Team-OS-Plugin (Skills, Hooks, Commands) für Claude Code und Kimi Code CLI",
+  "name": "novacore-os",
+  "description": "NovaCore-OS — Repo-Tooling (Testsuite) der Claude-Code-Plugin-Familie. Versionen leben je Plugin in plugins/<name>/.claude-plugin/plugin.json; dieses Manifest trägt bewusst keine.",
   "private": true,
   "type": "commonjs",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test",
-    "setup": "node setup.js",
-    "update": "node update.js"
+    "test": "node --test plugins/nc/tests/*.test.mjs"
   },
   "license": "UNLICENSED"
 }
