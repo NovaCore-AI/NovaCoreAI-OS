@@ -1,0 +1,30 @@
+# `{{PLUGIN_NAME}}` — Abteilung {{ABTEILUNG}}
+
+> **Status: Plugin angelegt, keine gebauten Skills.** Das Plugin ist installierbar, damit die
+> Abteilungsgrenze existiert und der Kern als Dependency mitkommt — die Modul- und
+> Skill-Planung erfolgt separat mit dem Fachbereich. Diesen Absatz ersetzen, sobald die
+> Abteilung Skills ausliefert.
+
+{{BESCHREIBUNG}}
+
+**Abhängigkeit:** `dependencies: ["nc"]` — Installation zieht den Kern `nc` automatisch mit
+(Session-Skills WP0/WP8, Kontroll-Hook FFG, WP-Rahmen `wp-rahmen.md`). Eigene Hooks bringt
+dieses Plugin bewusst **nicht** mit; die Kontroll-Schicht liegt ausschließlich im Kern. Der
+Namespace `{{NAMESPACE}}<skill>` ist reserviert.
+
+## Module und Skills
+
+Noch keine. Sobald der Modul-Zuschnitt (Skill-Präfixe) steht, hier die Übersichtstabelle nach
+dem Vorbild von `plugins/nc-development/README.md` im OS-Repo ergänzen:
+
+| Modul | WP | Skills |
+|---|---|---|
+| — | — | — |
+
+## Nächster Schritt
+
+Modul-Zuschnitt und Skill-Kandidaten mit dem Fachbereich festlegen, dann nach
+`referenz/skill-authoring.md` des Kern-Plugins bauen. Sobald WP1–WP7 auf den realen Zyklus
+dieser Abteilung abgebildet sind, entsteht daneben eine `workflow.md` (Vorbild:
+`plugins/nc-development/workflow.md` im OS-Repo); der Rahmen WP0–WP8 bleibt im Kern.
+Ablauf im Standardprozess `knowledge-base/standardprozesse/plugin-bau.md` des OS-Repos.

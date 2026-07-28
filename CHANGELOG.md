@@ -1,11 +1,110 @@
 # Changelog
 
-Technisches Release-Log für `novacoreai-os`. Format angelehnt an
-[Keep a Changelog](https://keepachangelog.com/); Versionen folgen SemVer und
-stimmen mit `VERSION` / `.claude-plugin/plugin.json` / `package.json` /
-`modules/module-registry.json` überein.
+Technisches Release-Log des NovaCore-OS (Plugin-Familie: Kern `nc`, Abteilung
+`nc-development`). Format angelehnt an
+[Keep a Changelog](https://keepachangelog.com/); Versionen folgen SemVer und leben
+**je Plugin** allein in `plugins/<name>/.claude-plugin/plugin.json` — die Kern-Version ist
+die Produkt-Leitversion und wird in `VERSION` und `plugins/nc/module-registry.json`
+gespiegelt (testgesichert). Einträge bis einschließlich 0.2.0 beschreiben das frühere
+Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
+
+## [0.3.0] — 2026-07-28
+
+Multi-Plugin-Umbau: Aus dem Single-Root-Plugin `novacoreai-os` wird die Plugin-Familie des
+NovaCore-OS — Marketplace `novacore-os` mit Kern `nc` (0.3.0) und Abteilung
+`nc-development` (0.1.0). Architektur-Übertrag aus der produktiv erprobten
+Onsite.ai-Ausprägung derselben Produktvision; verbindliche Grundlage:
+`knowledge-base/grundwissen/2026-07-28-multi-plugin-architektur-design.md`.
+
+### Added
+
+- **Marketplace `novacore-os`:** Repo-Wurzel ist nur noch Marketplace-Wurzel; zwei
+  Einträge (`nc`, `nc-development`), bewusst **ohne** `version`-Feld (Doku
+  plugin-marketplaces: der `plugin.json`-Wert gewinnt „without warning").
+- **Kern-Plugin `nc` (Namespace `/nc:`):** Skills `start`, `save-session`, `journal`;
+  `wp-rahmen.md` (Pflicht-Zyklus WP0–WP8 mit roten Linien — Einlösung des
+  Vision-Punkts „für NovaCore AI noch zu definieren"); `module-registry.json`
+  (Metadaten-SSOT Abteilung → Plugin → Module → Skills); `referenz/skill-authoring.md`
+  (verbindliche Formatregeln, mit ausgeliefert); `nc-sync.md` (aus der Repo-Wurzel in den
+  Kern gezogen und auf die neue Architektur aktualisiert).
+- **FFG v2 — Fact-Forcing-Gate** (`hooks/nc-ffg.js` + `hooks/lib/bash-analyse.js` +
+  `hooks/lib/shell-substitution.js`), Port des Onsite-FFG nach GateGuard-Vorbild:
+  Datei-Gate je Zieldatei (getrennte Edit-/Write-Texte, Subagenten übersprungen,
+  `.claude/settings*.json` ausgenommen, Ausnahmen per `NC_FFG_EXEMPT_GLOBS`,
+  Volltext-Budget `NC_FFG_FULL_DENIALS`), Destruktiv-Gate je Kommando (rm -rf,
+  git push --force / reset --hard / clean -f / checkout -- / commit --amend, drop table,
+  dd, find -exec, sh -c-Wrapper; quote-aware, Newline-Trenner — GHSA-4v57-ph3x-gf55;
+  Zusatzmuster `NC_FFG_EXTRA_DESTRUCTIVE`), Routine-Bash einmal je Session,
+  Read-only-Git nie. **Markerlos aktiv**, Opt-out nur per Env `NC_FFG=off`; fail-open.
+- **Abteilungsplugin `nc-development`** (Namespace `/nc-development:`,
+  `dependencies: ["nc"]` → Kern kommt transitiv): 11 Skills in 4 Modulen — `flc`
+  (4 migrierte Lifecycle-Skills), `wzs` (5 migrierte WZS-Skills), `fe`/`be` (neu:
+  `fe-review`, `be-review` — WP6-Diff-Reviews mit Severity-Schema, Entwurf statt Post);
+  `workflow.md` (WP1–WP7 auf GitHub-Flow, Rote-Linien-Ownership, Trigger-Matrix).
+- **Testsuite `plugins/nc/tests/`:** 26 Hook-Tests (FFG-Suite + Session-Start inkl.
+  Regressionstest für den 0.1.1-Marker-Verzeichnis-Bug) + Struktur-Invarianten
+  (Marketplace↔Platte, kein `version` im Marketplace, Dependencies-Topologie, Hooks nur
+  im Kern, `CLAUDE_PLUGIN_ROOT`-Pflicht, MCP-Wächter, Frontmatter-/YAML-Falle,
+  Plugin-Grenze, Leitversions-Gleichstand, Registry-Konsistenz, Vorlagen-Hygiene).
+- **Vorlage `vorlagen/abteilungsplugin/`** (kein Plugin, `.vorlage`-Endungen) für künftige
+  Abteilungen.
+- **Wissensbasis `knowledge-base/`:** `grundwissen/` (Produktvision
+  `NovaCore-OS-Produktarchitektur.md` ins Heimat-Repo übernommen; Design-Spec und
+  Umbau-Plan 2026-07-28), `standardprozesse/` (`plugin-bau.md`, `os-bau-methode.md` —
+  die wiederverwendbare, an die Firmenphilosophie anpassbare OS-Bau-Methode),
+  `debugging-findings/` (`agent-learnings.md`, append-only Fehlerprotokoll).
+- **`AGENTS.md`** als normative Einstiegs-Doku (Pflicht-Einstieg, Repo-Karte, Glossar,
+  Standardzyklus mit Abschluss-Checkliste, Sync-Matrix).
+
+### Changed
+
+- **Namespaces:** `/nc:start` statt `/novacoreai-os:nc-start`; Abteilungs-Skills unter
+  `/nc-development:<modul>-<name>` (Verzeichnisnamen ohne redundantes `nc-`-Präfix).
+- **Session-Start-Hook:** liest die Version aus der `plugin.json` des eigenen Plugins
+  statt `../VERSION` (Pfad existiert im Plugin-Cache nicht); Marker-Prüfung
+  (`stat.isFile()`) in den Hook gezogen; bleibt bewusst Marker-gebunden (Komfort,
+  kein Gate).
+- **Versionsmodell:** je Plugin genau eine Versionsquelle (`plugin.json`); `VERSION` +
+  Registry spiegeln nur den Kern; `package.json` trägt keine Version mehr — die frühere
+  Vier-Dateien-Gleichstand-Regel ist aufgehoben.
+- **README/ONBOARDING** vollständig auf Marketplace-Installation, Migration von v0.2.0
+  und die neue Architektur umgestellt.
+- **Review-Härtungen gegenüber dem Vorbild-FFG** (externes Kimi-Review, 2 MAJOR + Hinweise):
+  Exempt-Globs voll verankert und case-gefoldet — kein Substring-Bypass mehr (`*.md`
+  exemptete zuvor auch `foo.md.bak` und `x.md/evil.js`; Regressionstest ergänzt);
+  Datei-Gate-Key wird nur auf case-insensitiven Plattformen (win32/darwin) gefoldet
+  (Linux: getrennte Gates für `Foo.md`/`foo.md`); Session-Key-Sanitisierung hasht bei
+  jeder Zeichen-Ersetzung (keine Key-Kollision `a/b` ↔ `a_b`). Fail-open bei
+  unbeschreibbarem State und der konditionale MCP-Wächter-Test bleiben dokumentierte
+  Design-Entscheidungen. Die drei gehärteten Muster stammen 1:1 aus dem Vorbild —
+  Backport-Kandidat für das Onsite.ai-OS.
+
+### Fixed
+
+- **Alle fünf WZS-Skills hatten nicht parsende Frontmatter** (`name` mit Doppelpunkt
+  `nc:wzs-…` — unzulässige Zeichen — und `description` als Plain-Scalar mit „Quelle: ").
+  Sie luden laut Validator „with empty metadata" und konnten **nie automatisch
+  triggern**. Durch die Migration behoben; die Struktur-Tests verhindern die
+  Wiederholung mechanisch.
+
+### Removed
+
+- **Eigene CLI-/Deploy-Infrastruktur ersatzlos:** `ncos.js`, `setup.js`/`.sh`/`.ps1`,
+  `update.js`/`.sh`/`.ps1`, `install-cli.sh`/`.ps1`, Deploy-Manifest-Mechanik
+  (`~/.nc-os/plugin`) — Verteilung und Updates laufen ausschließlich über den
+  Marketplace.
+- Skills `nc-setup`/`nc-update` (Aufgabe übernimmt die Marketplace-Mechanik; Migration
+  in ONBOARDING dokumentiert).
+- `hooks/nc-safety-gate.js` — im Destruktiv-Gate des FFG aufgegangen (deny statt ask,
+  markerlos, breitere Erkennung); die Vision-Schicht „Safety-Gate" ist damit erfüllt,
+  nicht gestrichen.
+- Alte Testsuiten `setup-wiring`/`safety-gate`/`plugin-manifest` (ersetzt durch Hook- und
+  Struktur-Tests) sowie das Root-Plugin-Manifest `.claude-plugin/plugin.json`.
+
+*Beitrag: Claude (Fable), Nachtschicht 2026-07-28 — Umsetzung mit drei Subagenten
+(FFG-Port, Kern-Inhalte, Abteilung development); zur Abnahme als PR vorgelegt.*
 
 ## [0.2.0] — 2026-07-12
 

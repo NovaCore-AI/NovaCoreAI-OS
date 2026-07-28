@@ -1,0 +1,14 @@
+{
+  "name": "nc-development",
+  "displayName": "NovaCore-OS — Abteilung development",
+  "version": "0.1.0",
+  "description": "Abteilung development des NovaCore-OS: 11 Skills in 4 Modulen (fe, be, flc, wzs) entlang des GitHub-Flows — Auftrag, Branch, PR, Review, Merge. Aufruf /nc-development:<skill>; der Kern nc kommt als Dependency mit.",
+  "author": {
+    "name": "NovaCore AI"
+  },
+  "repository": "https://github.com/NovaCore-AI/NovaCoreAI-OS",
+  "license": "UNLICENSED",
+  "dependencies": [
+    "nc"
+  ]
+}

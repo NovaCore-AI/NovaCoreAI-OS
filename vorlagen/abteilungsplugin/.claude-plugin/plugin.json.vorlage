@@ -1,0 +1,14 @@
+{
+  "name": "{{PLUGIN_NAME}}",
+  "displayName": "NovaCore-OS — Abteilung {{ABTEILUNG}}",
+  "version": "{{VERSION}}",
+  "description": "Abteilung {{ABTEILUNG}} des NovaCore-OS: {{BESCHREIBUNG}}. Aufruf {{NAMESPACE}}<skill>; der Kern nc kommt als Dependency mit.",
+  "author": {
+    "name": "NovaCore AI"
+  },
+  "repository": "https://github.com/NovaCore-AI/NovaCoreAI-OS",
+  "license": "UNLICENSED",
+  "dependencies": [
+    "nc"
+  ]
+}

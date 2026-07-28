@@ -1,111 +1,105 @@
 # NovaCoreAI-OS
 
-**Offizielles Claude-Code-Plugin** — Team-OS für den Workflow einer
-Softwarefirma: Skills, Hooks und Commands im Namespace `nc:` für
-Feature-Lifecycle, Session-Memory und Safety-Gate.
+**NovaCore-OS** — das Team-Betriebssystem für KI-Arbeit von NovaCore AI, ausgeliefert als
+**Familie von Claude-Code-Plugins** aus einem Marketplace: eine Methode für alle statt
+vieler Privat-Setups.
 
-**Status: v0.2.0 — offizielles Marketplace-Plugin (Schema-konform,
-integration-ready).** Siehe [CHANGELOG.md](CHANGELOG.md).
-
-> Design-Spezifikation: [`docs/superpowers/specs/2026-07-06-novacoreai-os-design.md`](docs/superpowers/specs/2026-07-06-novacoreai-os-design.md)
+**Status: Kern `nc` v0.3.0 · Abteilung `nc-development` v0.1.0 — Multi-Plugin-Architektur
+(Umbau 2026-07-28).** Historie: [CHANGELOG.md](CHANGELOG.md) · Normativ für Agenten:
+[AGENTS.md](AGENTS.md) · Design-Spec:
+[`knowledge-base/grundwissen/2026-07-28-multi-plugin-architektur-design.md`](knowledge-base/grundwissen/2026-07-28-multi-plugin-architektur-design.md)
 
 ## Architektur
 
-- **Core:** globale Anweisung (`nc-sync.md`), Core-Skills, Hooks, Setup/Update
-- **Module:** eigenständige Einheiten unter `modules/<modul>/`, gesteuert über `modules/module-registry.json`
-- **Memory:** pro Arbeits-Repo unter `.nc/erinnerung/` (Stand + append-only Journal), nie im OS-Repo
+Ein Marketplace (`novacore-os`), je Abteilung ein Plugin, der Kern ist Dependency von allem:
 
-## Skills (v0.2.0)
+| Plugin | Rolle | Namespace | Version |
+|---|---|---|---|
+| `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Kontroll-Hooks, WP-Rahmen, Registry, Formatregeln, `nc-sync.md` | `/nc:` | 0.3.0 (= `VERSION`) |
+| `nc-development` | Abteilung development — Module `fe` / `be` / `flc` / `wzs` | `/nc-development:` | 0.1.0 |
 
-| Skill | Zweck |
-|---|---|
-| `/nc:start` | Core | Session-Start: Kontext laden, aktives Modul erkennen |
-| `/nc:save-session` | Core | Session-Ende: Journal, Stand und Entscheidungen sichern |
-| `/nc:journal` | Core | Tages-Journal-Eintrag entwerfen (Git + optional Jira), Team- oder persönlicher Modus |
-| `/nc:setup` | Core | Team-OS initial installieren |
-| `/nc:update` | Core | Team-OS aktualisieren |
-| `/nc:flc-feature-start` | FLC | Anforderung klären, Kontext laden, nächsten Skill empfehlen |
-| `/nc:flc-plan` | FLC | Task in vertikale, PR-große Slices zerlegen |
-| `/nc:flc-commit-prep` | FLC | Pre-Commit: Checks prüfen, Commit-Message vorschlagen |
-| `/nc:flc-pr` | FLC | PR aus Branch erstellen, Push erst nach Freigabe |
+- **Plugin-Grenze = Abteilungsgrenze:** Wer eine Abteilung installiert, bekommt den Kern
+  transitiv mit (`dependencies: ["nc"]`).
+- **Hooks nur im Kern**, Module sind Skill-Präfixe, die `module-registry.json` ist reiner
+  Metadaten-SSOT.
+- **Memory** pro Arbeits-Repo unter `.nc/erinnerung/` (Stand + append-only Journal), nie im
+  OS-Repo.
 
-## Hooks
+## Skills
+
+**Kern `nc` (immer dabei):**
+
+| Skill | WP | Zweck |
+|---|---|---|
+| `/nc:start` | WP0 | Session-Start: Stand, Journal, Git-Lage laden — kein Blind-Start |
+| `/nc:save-session` | WP8 | Session-Ende: Journal schreiben, Stand konsolidieren |
+| `/nc:journal` | laufend | Einzelne Ereignisse sofort festhalten |
+
+**Abteilung `nc-development`:**
+
+| Modul | Skills | WP |
+|---|---|---|
+| `flc` Feature-Lifecycle | `flc-feature-start` · `flc-plan` · `flc-commit-prep` · `flc-pr` | WP1–WP5 |
+| `fe` Frontend | `fe-review` | WP6 |
+| `be` Backend | `be-review` | WP6 |
+| `wzs` Empfehlungssystem WZS | `wzs-attribution` · `wzs-blocker-gate` · `wzs-reward-guard` · `wzs-share-invariant` · `wzs-webhook-contract` | WP3/WP6 |
+
+Fachablauf und Trigger-Matrix: [`plugins/nc-development/workflow.md`](plugins/nc-development/workflow.md);
+Rahmen WP0–WP8: [`plugins/nc/wp-rahmen.md`](plugins/nc/wp-rahmen.md).
+
+## Kontroll-Schicht (Hooks, nur im Kern)
 
 | Hook | Event | Verhalten |
 |---|---|---|
-| `nc-session-start` | SessionStart | Begrüßung + `/nc:start`-Hinweis — nur in Repos mit `.nc-os`-Marker |
-| `nc-safety-gate` | PreToolUse (Bash) | Verlangt Faktennennung vor destruktiven Befehlen — nur in `.nc-os`-Repos |
+| `nc-ffg` (FFG, Fact-Forcing-Gate) | PreToolUse (Write/Edit/MultiEdit/Bash) | Fakten **vor** der Aktion: Datei-Gate je Zieldatei, Destruktiv-Gate je Kommando (quote-aware), Routine-Bash einmal je Session; Read-only-Git nie. **Markerlos aktiv**, Opt-out nur per Env `NC_FFG=off`; Betreiber-Schalter: `NC_FFG_EXEMPT_GLOBS`, `NC_FFG_FULL_DENIALS`, `NC_FFG_EXTRA_DESTRUCTIVE`. Fail-open bei internen Fehlern. |
+| `nc-session-start` | SessionStart | Begrüßung + `/nc:start`-Hinweis + Version — **nur** in Repos mit `.nc-os`-Marker-**Datei** (Komfort, kein Gate) |
+
+Das frühere marker-gebundene Safety-Gate ist im Destruktiv-Gate des FFG aufgegangen
+(deny statt ask, breitere Erkennung).
 
 ## Installation
 
-### Option A — Als offizielles Plugin in Claude Code
-
-Das Repo ist ein Claude-Code-Plugin nach offiziellem Schema
-(`.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json`). In
-einer Claude-Code-Session im Repo-Root:
+Voraussetzungen: Claude Code **≥ 2.1.193**, Node.js ≥ 18 (Hooks). In Claude Code:
 
 ```
-/plugin marketplace add ./
-/plugin install novacoreai-os@novacoreai
+/plugin marketplace add NovaCore-AI/NovaCoreAI-OS
+/plugin install nc-development@novacore-os
 ```
 
-Für GitHub-basierte Installation (sobald das Repo öffentlich gepusht ist):
-
-```
-/plugin marketplace add NovaCoreAI/NovaCoreAI-OS
-```
-
-Verifikation: `/plugin list` (sollte `novacoreai-os` zeigen) bzw.
-`claude plugin validate .` in einer Shell.
-
-### Option B — Globaler CLI-Installationsweg (mit `ncos`)
-
-```bash
-./setup.sh          # oder: node setup.js  (Windows: setup.ps1)
-./install-cli.sh    # installiert den globalen Befehl `ncos`
-```
-
-Windows / PowerShell:
-
-```powershell
-.\setup.ps1         # Staging + Claude-Code-Registrierung
-.\install-cli.ps1   # erzeugt den ncos.cmd-Shim unter ~\.nc-os\bin
-                    # (Verzeichnis einmalig in den User-PATH aufnehmen —
-                    #  der Installer nennt den fertigen Befehl)
-```
-
-Das Setup stagt die Dateien nach `~/.nc-os/plugin/` und registriert das
-Plugin anschließend bei Claude Code (`claude plugin marketplace add` +
-`claude plugin install novacoreai-os@novacoreai`). Ohne diese Registrierung
-lädt Claude Code das Plugin nicht — bei fehlgeschlagener Registrierung nennt
-das Setup die manuellen Befehle.
-
-Danach pro Arbeits-Repo: `.nc-os`-Marker anlegen und `.nc/` in `.gitignore`
-eintragen (Details: [ONBOARDING.md](ONBOARDING.md)).
+Der Kern `nc` kommt automatisch als Dependency mit. Details, Migration von v0.2.0 und
+Arbeits-Repo-Einrichtung: [ONBOARDING.md](ONBOARDING.md).
 
 ## Update
 
-```bash
-ncos update         # git pull + Neu-Deploy + Aufräumen verwaister Dateien
-```
-
-Windows / PowerShell: `.\update.ps1` (identische Logik; `ncos update`
-funktioniert ebenfalls, sobald der `install-cli.ps1`-Shim im PATH liegt).
-Hinweis: `ncos update` deployt nur — die einmalige Claude-Code-Registrierung
-übernimmt das Setup (`node setup.js`), nicht das Update.
+Marketplace-Mechanik: Versions-Bump in `plugin.json` → `/plugin update` bzw. Auto-Update.
+Es gibt **keine** eigene CLI mehr (`ncos`/Setup-Skripte sind mit 0.3.0 entfallen).
 
 ## Entwicklung
 
 ```bash
-npm test            # node:test-Suiten (Setup-Wiring, Safety-Gate, Plugin-Manifest)
+npm test                                        # node --test plugins/nc/tests/*.test.mjs
+claude plugin validate .                        # Marketplace-Manifest
+claude plugin validate plugins/nc --strict      # Manifest + Skills (je Plugin!)
+claude plugin validate plugins/nc-development --strict
 ```
+
+Verbindliche Prozesse: [`knowledge-base/standardprozesse/plugin-bau.md`](knowledge-base/standardprozesse/plugin-bau.md)
+(Plugin-Ebene) und [`knowledge-base/standardprozesse/os-bau-methode.md`](knowledge-base/standardprozesse/os-bau-methode.md)
+(Gesamt-Methode). Skill-Format: `plugins/nc/referenz/skill-authoring.md`.
+
+## Versionsmodell
+
+Je Plugin **eine** Version, genau an einer Stelle: `plugins/<name>/.claude-plugin/plugin.json`
+— die Marketplace-Einträge tragen bewusst **kein** `version`-Feld. Kern-Version =
+Produkt-Leitversion (`VERSION` + Registry gespiegelt, testgesichert). Kein Bump = kein
+Auto-Update.
 
 ## Koexistenz
 
-NovaCoreAI-OS kollidiert nicht mit `uni:` oder ECC: eigener Namespace `nc:`,
-eigenes Deploy-Manifest (`~/.nc-os/installed-manifest.json`) und Repo-Scoping
-über den `.nc-os`-Marker — außerhalb markierter Repos sind alle Hooks no-op.
+Eigene Namespaces `nc:`/`nc-development:`, keine Kollision mit `uni:` oder ECC. Das FFG
+gatet markerlos in jeder Session, in der der Kern installiert ist (Opt-out `NC_FFG=off`);
+die SessionStart-Begrüßung bleibt auf `.nc-os`-markierte Repos beschränkt.
 
 ---
 
-*Version 0.2.0 · Pflege: Lucas Vöhringer · Sprache aller Artefakte: Deutsch*
+*Pflege: NovaCore AI · Sprache aller Artefakte: Deutsch*
