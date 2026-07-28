@@ -32,6 +32,10 @@ NovaCore-AI/NovaCoreAI-OS-<Abteilung>    je ein PRIVATES Satelliten-Repo pro aus
 - **Jedes Abteilungsplugin führt `dependencies: ["nc"]`.** Installieren oder Aktivieren zieht
   den Kern automatisch mit; Deaktivieren des Kerns wird blockiert, solange eine Abteilung aktiv
   ist. Damit ist die ständige Abteilung technisch erzwungen.
+  **Ausnahme (Maintainer-Entscheidung 2026-07-28, Spec-Nachtrag §10):** Eigenständige
+  Abteilungs-OS in Satelliten-Repos (erster Fall: `nc-felix`) führen **keine** Kern-Dependency
+  — sie bringen Kernmodul und Kontroll-Schicht (FFG-Port) selbst mit und werden nicht parallel
+  zum Kern betrieben (sonst doppelte Gates).
 - **Hooks nur im Kern.** Abteilungsplugins bringen keine Hooks mit — sonst feuert die
   Kontroll-Schicht mehrfach.
 - **Namespace ist nicht wählbar:** Er ist der Name des **Marketplace-Eintrags**. Kern-Skills

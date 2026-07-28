@@ -211,18 +211,27 @@ Gates mehrfach; die Plattform verhindert das nicht, der Struktur-Test schon).
 - `repository`-Feld im Manifest korrigiert auf `https://github.com/NovaCore-AI/NovaCoreAI-OS`
   (bisheriger Wert nannte eine falsche Org ohne Bindestrich).
 
-## 10. Nachtrag 2026-07-28 — zweite Abteilung `felix` als erster Satellit
+## 10. Nachtrag 2026-07-28 — zweite Abteilung `felix`: erster Satellit, eigenständiges OS
 
-Auftrag des Maintainers (2026-07-28, nach dem Umbau): Für den Kollegen Felix entsteht die
-zweite Abteilung `felix` — direkt als **Satellit** (eigenes privates Repo
-`NovaCore-AI/NovaCoreAI-OS-Felix`, das Repo IST das Plugin), nicht als lokales
-`plugins/`-Verzeichnis. Damit tritt genau der in §8 benannte Fall ein („wird erst bei der
-zweiten Abteilung relevant"); das Nicht-Ziel „Keine Satelliten-Repos" ist erledigt.
-Mechanik nach Standardprozess `plugin-bau.md` §3a: Marketplace-Eintrag mit GitHub-Source
-und Commit-SHA-Pin, Registry-Eintrag mit `repository` und satelliten-relativem
-`repoSkillsPath`, Kern-Bump 0.3.0 → 0.4.0 (Registry-Erweiterung). Bewusst keine Skills:
-Das Platzhalter-Plugin reserviert Abteilungsgrenze und Namespace `/nc-felix:`; Modul- und
-Skill-Planung folgt gemeinsam mit dem Fachbereich.
+Auftrag des Maintainers (2026-07-28, nach dem Umbau, zweistufig präzisiert): Für den
+Kollegen Felix entsteht die zweite Abteilung `felix` — direkt als **Satellit** (eigenes
+privates Repo `NovaCore-AI/NovaCoreAI-OS-Felix`, das Repo IST das Plugin), nicht als
+lokales `plugins/`-Verzeichnis. Damit tritt genau der in §8 benannte Fall ein („wird erst
+bei der zweiten Abteilung relevant"); das Nicht-Ziel „Keine Satelliten-Repos" ist erledigt.
+
+**Design-Entscheidung Eigenständigkeit:** Das Felix-OS unterteilt in **Module statt
+Abteilungen** — „kein Kern notwendig als Plugin, das reicht als Modul" (Maintainer). Es
+führt daher **keine** `dependencies: ["nc"]`; die Kern-Strukturen sind als angepasste Ports
+ins Plugin übernommen: **Kernmodul** ohne Präfix (`start`, `save-session`, `journal`,
+`os-info`, `code-tour`, `skill-builder`), **eigene Kontroll-Schicht** (FFG verbatim,
+SessionStart-Hook auf `/nc-felix:` angepasst, Env-Schalter `NC_FFG*` und Marker `.nc-os`
+unverändert), `felix-sync.md` (Port der `nc-sync.md`), `wp-rahmen.md`, eigene
+`module-registry.json` als Modul-SSOT, `referenz/skill-authoring.md`. **Koexistenz-Regel:**
+`nc-felix` läuft nicht parallel zum Kern `nc` in derselben Session (doppelte Gates).
+Mechanik nach Standardprozess `plugin-bau.md` §3a (Ausnahme zur Dependency-Pflicht dort in
+§1 dokumentiert): Marketplace-Eintrag mit GitHub-Source und Commit-SHA-Pin, Registry-Eintrag
+mit `repository` und satelliten-relativem `repoSkillsPath`, Kern-Bump 0.3.0 → 0.4.0
+(Registry-Erweiterung). Arbeitsmodule folgen gemeinsam mit dem Fachbereich.
 
 ---
 
