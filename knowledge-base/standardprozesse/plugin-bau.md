@@ -140,6 +140,37 @@ erprobt):
    SSH-Key einrichten. Für den Team-Rollout dokumentieren.
 9. Zentral: eigener Branch → PR → Maintainer-Merge (kein direkter main-Push).
 
+## 3b. Eigenständiges Abteilungs-OS direkt als Satellit anlegen (Pilot `nc-felix`, 2026-07-28)
+
+Erfolgreich pilotierter Ablauf für ein **eigenständiges** Kollegen-/Abteilungs-OS: Module
+statt Abteilungen, **keine** Kern-Dependency (Ausnahme §1), Kernmodul + Kontroll-Schicht im
+Plugin selbst. Ergänzt §3a; dort gilt weiterhin alles zur Pin-Mechanik.
+
+1. **Repo = Plugin:** Manifest an der Wurzel, Startgerüst wie §3a (Tests, CI SHA-gepinnt,
+   `.gitignore` mit `.nc/`, `.nc-os`-Marker, AGENTS.md). **Repo-Name = reale GitHub-Heimat**
+   — nie aus der Namenskonvention raten: `plugin.json.repository`, Marketplace-`repo` und
+   Registry-`repository` müssen exakt `owner/repo` treffen (Struktur-Test erzwingt
+   Registry↔Pin-Gleichheit).
+2. **Kernmodul statt Kern-Plugin:** `dependencies` weglassen; angepasste Ports von
+   `start`/`save-session`/`journal` + Basics (`os-info`, `code-tour`, `skill-builder`);
+   `felix-sync.md`-Pendant, `wp-rahmen.md`, eigene `module-registry.json`
+   (Version = Manifest-Version, testgesichert), `referenz/skill-authoring.md` — alles IM
+   Plugin (Cache-Isolation, Mechanik-Fakt 4).
+3. **FFG-Port:** `hooks/` verbatim aus dem Kern übernehmen (Env-Schalter `NC_FFG*`
+   unverändert), Session-Hook-Texte auf den neuen Namespace. **Falle:** `package.json` darf
+   **kein** `"type": "module"` tragen — die Hooks sind CommonJS und brechen sonst im
+   Plugin-Cache (im Pilot durch die übernommene FFG-Testsuite gefangen).
+4. **Prüfen:** `npm test` + `claude plugin validate . --strict` — die Wurzel IST das
+   Plugin, strict prüft hier Manifest **und** Skills in einem Lauf.
+5. **Pin:** lokaler Commit-SHA = Marketplace-Pin; Push (Maintainer) ohne Squash/Rebase.
+   OS-Repo: Eintrag + Registry + Kern-Bump + Doku-Sync + Spec-Nachtrag wie §3/§3a.
+6. **Install-Fallen (im Pilot beide getroffen):** (a) SSH-Falle → vorher
+   `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` (settings.json `env` + Windows-Var, CC-Neustart);
+   (b) das Plugin-Repo **nie** als Marketplace hinzufügen — Marketplace ist allein das
+   OS-Repo, sonst „Marketplace manifest not found".
+7. **Koexistenz:** eigenständiges OS nie parallel zum Kern `nc` in einer Session (doppelte
+   Gates) — in Doku und `os-info`-Skill verankern.
+
 ## 4. Bekannte Fehler — nicht wiederholen
 
 | Fehler | Folge | Vermeidung |

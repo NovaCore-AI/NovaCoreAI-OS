@@ -42,7 +42,10 @@ Kern-Dependency. Spec-Nachtrag:
   die Abteilung `felix` — ohne Bump erhielte das Team die aktualisierte Registry nie per
   Auto-Update.
 - **`plugin-bau.md` §1:** dokumentierte Ausnahme von der Kern-Dependency-Pflicht für
-  eigenständige Abteilungs-OS in Satelliten-Repos. — Agent: Claude (Fable 5)
+  eigenständige Abteilungs-OS in Satelliten-Repos; **§3b neu:** pilotierter Standardablauf
+  „eigenständiges Abteilungs-OS direkt als Satellit" inkl. der real getroffenen Fallen
+  (Repo-Name = reale Heimat, kein `type: module` bei CommonJS-Hooks, SSH-Falle,
+  Plugin-Repo ≠ Marketplace). — Agent: Claude (Fable 5)
 
 ## [0.3.0] — 2026-07-28
 

@@ -121,6 +121,12 @@ NovaCoreAI-OS/
                                         # standardprozesse, debugging-findings
 ```
 
+Abteilungen können zusätzlich in **Satelliten-Repos** leben (das Repo IST das Plugin,
+Marketplace-Eintrag per Commit-SHA-Pin) — auch als **eigenständiges Kollegen-OS** ohne
+Kern-Dependency (erster Fall: `nc-felix`). Verbindlicher Ablauf inklusive der verifizierten
+Install-Fallen: `knowledge-base/standardprozesse/plugin-bau.md` §3a/§3b im **OS-Repo**
+(Quellenangabe, nicht zur Laufzeit auflösbar).
+
 **Version je Plugin genau an einer Stelle:** in dessen `plugin.json`. Marketplace-Einträge tragen
 **kein** `version`-Feld — Claude Code nimmt ohne Warnung den Wert aus `plugin.json`.
 
