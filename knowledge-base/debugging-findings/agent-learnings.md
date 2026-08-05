@@ -67,3 +67,17 @@
   abbilden — jede Referenz braucht einen Erzeuger oder eine bewusste Auslassung.
 
 *(Weitere Einträge dieser Session werden vor dem PR ergänzt, falls Fehler auftreten.)*
+
+### 2026-08-05 — Unsichtbares BOM-Literal in CHANGELOG und Commit-Message eingeschleppt
+
+- **Kontext/Aufgabe:** Biggi-OS-Satellit (nc-biggi); das K3-Review-Finding „BOM-Literal im
+  Regex" sollte im CHANGELOG des Satelliten dokumentiert werden.
+- **Was schiefging:** Beim Dokumentieren wanderte das unsichtbare U+FEFF-Zeichen selbst in
+  den CHANGELOG-Text und in die Commit-Message; der erste Gegenfix ersetzte BOM durch BOM,
+  weil U+FEFF (unsichtbar) in einfachen JS-Quotes erneut als Unicode-Escape interpretiert wurde.
+- **Ursache:** Unsichtbare Zeichen überleben Copy/Paste unbemerkt; die Escape-Ebenen
+  Bash→Node wurden beim Gegenfix falsch gestapelt.
+- **Lernerkenntnis/Präventionsregel:** Unsichtbare Zeichen nie wörtlich zitieren, sondern
+  als Escape-Sequenz (Backslash-uFEFF) schreiben; nach jedem solchen Fund einen
+  Node-Scan über alle berührten Textdateien laufen lassen; in Bash→Node-Einzeilern
+  Ersatzstrings aus String.fromCharCode bauen statt Escapes zu raten.

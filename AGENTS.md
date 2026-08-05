@@ -91,6 +91,17 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   skill-builder) und eigene Kontroll-Schicht (FFG-Port) liegen im Plugin; nicht parallel
   zu `nc` betreiben. Arbeitsmodule folgen mit dem Fachbereich. Spec-Nachtrag: jüngste
   Design-Spec, §10.
+- **Gebaut (Kern v0.5.0, 2026-08-05):** Dritte Abteilung `biggi` als **zweiter Satellit**
+  angelegt — Plugin `nc-biggi` 0.1.1 im eigenen privaten Repo `NovaCore-AI/Biggi-OS`
+  (das Repo IST das Plugin), Marketplace-Eintrag per GitHub-Source mit Commit-SHA-Pin,
+  Registry-Eintrag (Kern-Bump 0.4.0 → 0.5.0 wegen Registry-Erweiterung). Eigenständiges
+  Biggi-OS nach dem Felix-Muster, architektonisch am Onsite-Vorbild ausgerichtet
+  (Maintainer-Leitlinie: bei Unterschieden gewinnt Onsite): Session-Start-Zwang statt
+  Marker-Begrüßung, FFG mit Felix-Härtungen + Onsite-`exitCode`-Fix, CI/`release.yml`
+  nach Onsite-Standard. Arbeitsmodul-Konvention reserviert: `controlling` (`ctrl`),
+  `medizinisches` (`mdzn`), `dokumentation-daily-work` (`doc` + `day` — ein Modul, zwei
+  Präfixe). Pilotierter Ablauf als `plugin-bau.md` **§3b** formalisiert; Felix-Tags/
+  -Releases nachgezogen, Pin auf `v0.2.1`. Spec-Nachtrag: jüngste Design-Spec, §11.
 - **Noch nicht gebaut** (bewusste Nicht-Ziele der jüngsten Spec, §8): Session-Start-Zwang
   als blockierender Hook, weitere fe-/be-Skills, Module `architecture`/`incident-support`,
   Kimi-/Codex-Copy-Deploy. (Satelliten-Repos sind seit dem `nc-felix`-Anlegen gebaut,

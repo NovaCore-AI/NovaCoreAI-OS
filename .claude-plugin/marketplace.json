@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "novacore-os",
-  "description": "Interner Marketplace von NovaCore AI: verteilt den Kern nc (Shared-Skills, Kontroll-Hook FFG, WP-Rahmen) und je Abteilung ein eigenes Plugin. Abteilungsplugins aus diesem Repo hängen am Kern — installiert man eine Abteilung, kommt der Kern transitiv mit. Ausnahme: eigenständige Abteilungs-OS in Satelliten-Repos (nc-felix) bringen Kernmodul und Kontroll-Schicht selbst mit und hängen nicht am Kern.",
+  "description": "Interner Marketplace von NovaCore AI: verteilt den Kern nc (Shared-Skills, Kontroll-Hook FFG, WP-Rahmen) und je Abteilung ein eigenes Plugin. Abteilungsplugins aus diesem Repo hängen am Kern — installiert man eine Abteilung, kommt der Kern transitiv mit. Ausnahme: eigenständige Abteilungs-OS in Satelliten-Repos (nc-felix, nc-biggi) bringen Kernmodul und Kontroll-Schicht selbst mit und hängen nicht am Kern.",
   "owner": {
     "name": "NovaCore AI"
   },
@@ -23,10 +23,21 @@
       "source": {
         "source": "github",
         "repo": "NovaCore-AI/Felix-OS",
-        "ref": "v0.2.0",
-        "sha": "dc6f6b98edec2d2c2de44fe2573b30043e3aeaf6"
+        "ref": "v0.2.1",
+        "sha": "a8407fafdbf95a7229db3bf99a0d862e0234ff93"
       },
-      "description": "Abteilung felix: eigenständiges Felix-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder) und eigener Kontroll-Schicht (FFG-Port). Hängt NICHT am Kern nc; nicht parallel zu nc betreiben. Satelliten-Repo (Standardprozess plugin-bau.md §3a).",
+      "description": "Abteilung felix: eigenständiges Felix-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder) und eigener Kontroll-Schicht (FFG-Port). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-biggi betreiben. Satelliten-Repo (Standardprozess plugin-bau.md §3b).",
+      "category": "abteilung"
+    },
+    {
+      "name": "nc-biggi",
+      "source": {
+        "source": "github",
+        "repo": "NovaCore-AI/Biggi-OS",
+        "ref": "v0.1.1",
+        "sha": "edd5ad06a546508f1c36ae844b65a8c03e8c5ff9"
+      },
+      "description": "Abteilung biggi: eigenständiges Biggi-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder; Arbeitsmodul-Konvention reserviert: controlling/ctrl, medizinisches/mdzn, dokumentation-daily-work/doc+day — ein Modul, zwei Präfixe) und eigener Kontroll-Schicht (FFG mit Review-Härtungen + Session-Start-Zwang nach Onsite-Vorbild, Opt-outs NC_FFG=off / NC_START_GATE=off). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-felix betreiben. Satelliten-Repo (Standardprozess plugin-bau.md §3b).",
       "category": "abteilung"
     }
   ]

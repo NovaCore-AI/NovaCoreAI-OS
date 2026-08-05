@@ -233,8 +233,42 @@ Mechanik nach Standardprozess `plugin-bau.md` §3a (Ausnahme zur Dependency-Pfli
 mit `repository` und satelliten-relativem `repoSkillsPath`, Kern-Bump 0.3.0 → 0.4.0
 (Registry-Erweiterung). Arbeitsmodule folgen gemeinsam mit dem Fachbereich.
 
+## 11. Nachtrag 2026-08-05 — dritte Abteilung `biggi`: zweiter Satellit, Onsite-Leitlinie
+
+Auftrag des Maintainers (2026-08-05): Für Biggi entsteht die dritte Abteilung `biggi` als
+**zweites eigenständiges Kollegen-OS** im Satelliten-Repo `NovaCore-AI/Biggi-OS` (das Repo
+IST das Plugin), nach dem mit `nc-felix` pilotierten Ablauf — mit diesem Nachtrag als
+**§3b** in `standardprozesse/plugin-bau.md` formalisiert (die §3b-Verweise aus
+Felix-CHANGELOG/-AGENTS liefen bis dahin ins Leere — Doku-Drift behoben).
+**Architektur-Leitlinie laut Auftrag: bei Unterschieden zwischen NovaCore- und
+Onsite-Vorbild gewinnt das Onsite.ai-OS.**
+
+Konsequenzen gegenüber dem Felix-Stand (§10):
+
+- **Session-Start-Zwang statt Marker-Begrüßung:** `nc-biggi` portiert den
+  Onsite-Injektionshook (markerlos — „ein Gate, das man vergessen kann, ist kein Gate";
+  Opt-out `NC_START_GATE=off`); der `.nc-os`-Marker entfällt dort vollständig.
+- **FFG-Synthese beider Vorbilder:** Felix-Port (trägt die Review-Härtungen 2026-07-28
+  gegenüber dem Onsite-Original: verankerte Exempt-Globs, Session-Key-Hashing,
+  plattformbewusstes Case-Folding) plus Onsite-Fix 2026-08-04 (`process.exitCode = 0`
+  statt `process.exit(0)` — gepufferte stdout-Pipes).
+- **CI-/Release-Standard nach Onsite:** `ci.yml` (Ubuntu+Windows × Node 20/22/24,
+  Validator-Positivkontrolle) und `release.yml` (annotierter Tag ↔ Manifest-Abgleich,
+  Notes aus dem CHANGELOG) — für künftige Satelliten verbindlich (§3b Nr. 2).
+- **Module:** Kernmodul (6 Skills, Ports) plus reservierte Arbeitsmodul-Konvention ohne
+  Vollständigkeitsanspruch: `controlling` (`ctrl`), `medizinisches` (`mdzn`),
+  `dokumentation-daily-work` (`doc` + `day` — **ein** Modul, **zwei** Präfixe; das
+  Registry-Schema des Satelliten führt dafür `praefixe`-Arrays). Platzhalter-Ordner
+  (`PLATZHALTER.md`) reservieren die Namen.
+
+Mechanik wie §10: Marketplace-Eintrag mit GitHub-Source und Commit-SHA-Pin,
+Registry-Eintrag mit `repository` und satelliten-relativem `repoSkillsPath`, Kern-Bump
+0.4.0 → 0.5.0 (Registry-Erweiterung). Zusätzlich Release-Hygiene im Felix-Satelliten
+nachgezogen (annotierte Tags `v0.2.0`/`v0.2.1` + GitHub-Releases; Pin auf `v0.2.1`).
+
 ---
 
 *Spec-Version 0.2.0 · 2026-07-28 · erstellt in der Nachtschicht-Session (Fable), Review durch
 Maintainer steht aus — dieser Umbau ist als PR zur Abnahme vorgelegt, nicht gemergt.
-Nachtrag §10 ergänzt 2026-07-28 (Abteilung felix, erster Satellit).*
+Nachtrag §10 ergänzt 2026-07-28 (Abteilung felix, erster Satellit).
+Nachtrag §11 ergänzt 2026-08-05 (Abteilung biggi, zweiter Satellit, Onsite-Leitlinie).*

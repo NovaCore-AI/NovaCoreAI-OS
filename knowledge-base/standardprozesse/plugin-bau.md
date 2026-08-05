@@ -140,6 +140,45 @@ erprobt):
    SSH-Key einrichten. Für den Team-Rollout dokumentieren.
 9. Zentral: eigener Branch → PR → Maintainer-Merge (kein direkter main-Push).
 
+## 3b. Eigenständiges Kollegen-OS als Satellit (pilotiert mit Felix-OS, bestätigt mit Biggi-OS)
+
+Variante von §3a für **persönliche Abteilungs-OS** (erster Fall: `nc-felix`, zweiter Fall:
+`nc-biggi`): Das Satelliten-Repo ist ein **eigenständiges** OS — EIN Plugin mit **Modulen**
+(Skill-Präfixen) statt Abteilungen, **ohne** Kern-Dependency (Ausnahme in §1 dokumentiert).
+Nicht parallel zum Kern `nc` oder zu einem anderen eigenständigen OS der Familie betreiben
+(doppelte Gates) — die Koexistenz-Regel gehört in README, AGENTS und Sync-Anweisung des
+Satelliten.
+
+1. **Struktur:** Das Repo IST das Plugin (Manifest an der Wurzel). Kernmodul ohne Präfix
+   (Ports der Kern-Skills `start`, `save-session`, `journal` plus Maintenance-Basics
+   `os-info`, `code-tour`, `skill-builder`), **eigene Kontroll-Schicht unter `hooks/`**
+   (FFG-Port, Env-Schalter `NC_FFG*` unverändert; seit `nc-biggi` zusätzlich der
+   Session-Start-Zwang nach Onsite-Vorbild, markerlos, Opt-out `NC_START_GATE=off`),
+   geteilte Anweisung `<name>-sync.md`, `wp-rahmen.md`, eigene `module-registry.json`
+   (Modul-SSOT; ein Modul kann **mehrere** Präfixe führen — Biggi-Fall
+   `dokumentation-daily-work`: `doc` + `day`), `referenz/skill-authoring.md`, Tests
+   (`node --test test/*.test.mjs`). Namen reservieren Platzhalter-Ordner mit
+   `PLATZHALTER.md` (der Scanner liefert Ordner ohne `SKILL.md` nie aus).
+2. **CI-/Release-Standard (seit `nc-biggi` verbindlich, Onsite-Muster):** `ci.yml`
+   (Testsuite Ubuntu+Windows × Node 20/22/24 mit Bash-Glob, Plugin-Validierung `--strict`
+   mit **Positivkontrolle** des Validators, Actions per Full-SHA gepinnt) und
+   `release.yml` (annotierter Tag `v<version>` → Tag-Typ-Prüfung, Tag↔Manifest-Abgleich
+   gegen `plugin.json`, Testsuite, GitHub-Release mit den CHANGELOG-Notes).
+3. **Weiter wie §3a** ab Schritt 2: Verifizieren, externes Review **vor** dem ersten Push,
+   Veröffentlichen (privates Repo, Push, annotierter Tag `v<version>`, GitHub-Release),
+   Marketplace-Pin (`ref` + 40-stelliger `sha`), Registry-Eintrag (`repository`,
+   `repoSkillsPath: "skills"`), Install-Probe in isoliertem `CLAUDE_CONFIG_DIR`.
+4. **Vier verifizierte Fallen (Pilot 2026-07-28 — nicht wiederholen):**
+   - **Repo-Name = reale Heimat**, nie aus dem Namensschema raten (Felix-Fall:
+     `NovaCore-AI/Felix-OS`, nicht `NovaCoreAI-OS-<Abteilung>`).
+   - **Kein `type: module` in der `package.json`**, solange die Hooks CommonJS sind
+     (`require`) — sie laufen im Plugin-Cache mit dieser `package.json` im Scope.
+   - **SSH-Falle:** GitHub-Sources klonen per Default über SSH — ohne geladenen Key
+     schlägt die Installation mit `Permission denied (publickey)` fehl; Abhilfe
+     `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` (für den Rollout dokumentieren).
+   - **Plugin-Repo nie als Marketplace adden** — installiert wird über den Marketplace
+     des OS-Repos (`/plugin install nc-<name>@novacore-os`).
+
 ## 4. Bekannte Fehler — nicht wiederholen
 
 | Fehler | Folge | Vermeidung |
