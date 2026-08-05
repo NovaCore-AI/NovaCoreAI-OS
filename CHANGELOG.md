@@ -10,6 +10,57 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
+### Added
+
+- **ONBOARDING §1b — Kollegen-OS installieren:** Installationsweg der Satelliten
+  (`nc-felix`, `nc-biggi`) inkl. Koexistenz-Regel und Marker-Unterschied (Biggi-OS
+  markerlos, Opt-out `NC_START_GATE=off`); Abschnitt 2 um den Biggi-Hinweis ergänzt.
+  Fund des Frische-Instanz-Reviews nach dem 0.5.0-Release: die Ersteinrichtungs-Doku
+  kannte die Satelliten bis dahin nicht. — Agent: Claude (Opus 5)
+
+## [0.5.0] — 2026-08-05
+
+Dritte Abteilung `biggi` angelegt — als **zweites eigenständiges Kollegen-OS** im
+Satelliten-Repo `NovaCore-AI/Biggi-OS` (Auftrag Maintainer 2026-08-05, Muster Felix-OS;
+Architektur-Leitlinie laut Auftrag: bei Unterschieden zwischen NovaCore- und Onsite-Vorbild
+gewinnt Onsite). Der mit Felix pilotierte Ablauf ist jetzt als `plugin-bau.md` **§3b**
+formalisiert — die §3b-Verweise aus Felix-CHANGELOG/-AGENTS liefen bisher ins Leere
+(Doku-Drift behoben). Spec-Nachtrag:
+`knowledge-base/grundwissen/2026-07-28-multi-plugin-architektur-design.md`, §11.
+
+### Added
+
+- **Abteilungsplugin `nc-biggi` 0.1.0 (Satellit, eigenständig):** eigenes privates Repo
+  `NovaCore-AI/Biggi-OS` — das Repo IST das Plugin. **Kernmodul** ohne Präfix mit 6 Skills
+  (Ports aus dem Felix-OS, auf das markerlose Modell umgestellt), **Kontroll-Schicht als
+  Synthese beider Vorbilder**: FFG mit den Felix-Review-Härtungen (verankerte Exempt-Globs,
+  Session-Key-Hashing, plattformbewusstes Case-Folding) plus Onsite-`exitCode`-Fix;
+  **Session-Start-Zwang** als Onsite-Port (Injektion, markerlos, Opt-out
+  `NC_START_GATE=off`). Arbeitsmodul-Konvention reserviert (nicht auf Vollständigkeit
+  angelegt): `controlling` (`ctrl`), `medizinisches` (`mdzn`), `dokumentation-daily-work`
+  (`doc` + `day` — ein Modul, zwei Präfixe; Registry-Schema mit `praefixe`-Arrays,
+  Platzhalter-Ordner je Präfix). 45 Tests grün; CI `ci.yml` (Ubuntu+Windows × Node
+  20/22/24, Validator-Positivkontrolle) und `release.yml` (Tag↔Manifest-Abgleich,
+  Release-Notes aus dem CHANGELOG) nach Onsite-Standard. Extern reviewt (K3/Kimi) vor dem
+  ersten Push; ausgeliefert als 0.1.1 (0.1.0 + BOM-Literal-Patch, Details im
+  Satelliten-CHANGELOG).
+- **Marketplace-Eintrag `nc-biggi`:** GitHub-Source mit Commit-SHA-Pin (`ref: v0.1.1`);
+  kein `version`-Feld im Eintrag — die Version lebt allein in dessen `plugin.json`.
+- **Registry:** Abteilung `biggi` (`repository` + satelliten-relatives
+  `repoSkillsPath: "skills"`; Modul-SSOT liegt im Satelliten selbst).
+- **`plugin-bau.md` §3b:** pilotierter Standardablauf „eigenständiges Kollegen-OS als
+  Satellit" ausformuliert — inkl. der vier verifizierten Install-Fallen und des
+  CI-/Release-Standards für Satelliten.
+
+### Changed
+
+- **Kern `nc` 0.4.0 → 0.5.0** (`VERSION` + Registry gespiegelt): Registry-Erweiterung um
+  die Abteilung `biggi`.
+- **Felix-OS-Release-Hygiene nachgezogen:** annotierte Tags `v0.2.0`/`v0.2.1` und
+  GitHub-Releases im Satelliten erzeugt — der Marketplace-`ref: v0.2.0` zeigte bisher auf
+  einen nicht existierenden Tag (nur der SHA trug); Eintrag `nc-felix` auf `v0.2.1`
+  umgepinnt (realer Stand inkl. Repository-URL-Fix). — Agent: Claude (Opus 5)
+
 ## [0.4.0] — 2026-07-28
 
 Zweite Abteilung `felix` angelegt — als **erster Satellit** des NovaCore-OS (Muster

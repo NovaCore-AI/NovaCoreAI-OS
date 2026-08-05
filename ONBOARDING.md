@@ -27,6 +27,27 @@ identisch installieren.
 > dann `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` setzen (nutzt die gh/git-Credentials) oder
 > einen SSH-Key einrichten.
 
+## 1b. Kollegen-OS installieren (Satelliten `nc-felix` / `nc-biggi`)
+
+Die eigenständigen Abteilungs-OS installieren sich aus demselben Marketplace:
+
+```
+/plugin marketplace add NovaCore-AI/NovaCoreAI-OS
+/plugin install nc-biggi@novacore-os      # bzw. nc-felix@novacore-os
+```
+
+- Sie bringen Kernmodul **und** Kontroll-Schicht selbst mit und hängen **nicht** am Kern
+  `nc` — `/plugin list` zeigt nur das eine Plugin.
+- **Koexistenz:** `nc`/`nc-development`, `nc-felix` und `nc-biggi` nie parallel in
+  derselben Session betreiben (doppelte Gates) — wer mehrere installiert hat, deaktiviert
+  alle bis auf eines (`/plugin disable …`).
+- Private Satelliten-Repos: der SSH-Hinweis oben gilt auch hier
+  (`CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1`).
+- **Marker-Unterschied:** Der `.nc-os`-Marker aus Abschnitt 2 scoped nur die
+  Session-Begrüßung des Kerns `nc` (und des Felix-OS, das den Marker-Hook portiert hat).
+  Das **Biggi-OS arbeitet markerlos** — sein Session-Start-Zwang injiziert den
+  Pflicht-Einstieg in jede Session (Opt-out nur per Env `NC_START_GATE=off`).
+
 ## Migration von v0.2.0 (altes Single-Plugin + `ncos`-CLI)
 
 Die alte Install-Identität `novacoreai-os@novacoreai` hat **keinen** Auto-Upgrade-Pfad auf
@@ -66,7 +87,8 @@ Initialen Stand anlegen (`.nc/erinnerung/stand.md`):
 **Wichtig:** Der Marker muss eine **Datei** sein (`touch .nc-os`), kein Verzeichnis — und
 er scoped nur die Begrüßung. Das Fact-Forcing-Gate (FFG) ist **überall** aktiv, wo der
 Kern installiert ist; Opt-out ausschließlich per Umgebungsvariable `NC_FFG=off`
-(menschliche Entscheidung, kein Agenten-Schalter).
+(menschliche Entscheidung, kein Agenten-Schalter). Für das **Biggi-OS** entfällt der
+Marker-Schritt komplett (markerloser Session-Start-Zwang, §1b).
 
 ## 3. Arbeiten mit dem OS
 
