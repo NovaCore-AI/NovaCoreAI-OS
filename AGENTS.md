@@ -21,7 +21,9 @@
    (`NovaCore-OS-Produktarchitektur.md`) ist die Referenz für Vision-Abgleiche.
 4. **Aufgabenspezifisch nachladen** (Glossar unten): Skill-Arbeit →
    `plugins/nc/referenz/skill-authoring.md` · Plugin-/Marketplace-Arbeit →
-   `knowledge-base/standardprozesse/plugin-bau.md` · Workflow-Logik →
+   `knowledge-base/standardprozesse/plugin-bau.md` (neue Abteilung §3 · Satellit-Extraktion
+   §3a · **eigenständiges Kollegen-/Abteilungs-OS §3b** — pilotiert 2026-07-28 mit
+   `nc-felix`, inkl. Install-Fallen) · Workflow-Logik →
    `plugins/nc/wp-rahmen.md` (Rahmen WP0–WP8) und `plugins/nc-development/workflow.md`
    (Fachablauf) · Methodenfragen → `knowledge-base/standardprozesse/os-bau-methode.md`.
 
