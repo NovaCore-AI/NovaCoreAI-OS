@@ -10,6 +10,14 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
+### Added
+
+- **ONBOARDING §1b — Kollegen-OS installieren:** Installationsweg der Satelliten
+  (`nc-felix`, `nc-biggi`) inkl. Koexistenz-Regel und Marker-Unterschied (Biggi-OS
+  markerlos, Opt-out `NC_START_GATE=off`); Abschnitt 2 um den Biggi-Hinweis ergänzt.
+  Fund des Frische-Instanz-Reviews nach dem 0.5.0-Release: die Ersteinrichtungs-Doku
+  kannte die Satelliten bis dahin nicht. — Agent: Claude (Opus 5)
+
 ## [0.5.0] — 2026-08-05
 
 Dritte Abteilung `biggi` angelegt — als **zweites eigenständiges Kollegen-OS** im
