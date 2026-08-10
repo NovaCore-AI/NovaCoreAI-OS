@@ -113,20 +113,18 @@ function bereitstellen(quelle) {
   try {
     if (!istKlon) {
       fs.mkdirSync(basisVerzeichnis(), { recursive: true });
-      // blob:none + sparse: die grossen Teile des Repos bleiben weg. ACHTUNG zur Semantik:
-      // sparse-checkout laeuft im Cone-Modus, und der materialisiert Dateien auf der
-      // WURZELEBENE immer mit (README, VERSION, …) — ausgeschlossen werden nur andere
-      // VERZEICHNISSE (plugins/, docs/, …). Genau das ist hier gewollt: die Wurzeldateien
-      // sind ein paar Kilobyte, die Verzeichnisse waeren das Vielfache.
-      git(['clone', '--filter=blob:none', '--sparse', quelle.repo, ziel]);
-      git(['-C', ziel, 'sparse-checkout', 'set', quelle.wissenspfad]);
+      // VOLLER Klon, bewusst. Ein frueherer Entwurf holte per --sparse nur die
+      // Wissensbasis — das schnitt `plugins/` weg (das u. a. referenz/skill-authoring.md
+      // traegt, auf das doku-sync verweist) und sparte dabei ganze 445 KB. Funktionsverlust
+      // fuer nichts: das gesamte Repo ist wenige Megabyte. Wer die Wissensbasis lokal
+      // braucht, soll das Repo lokal haben.
+      git(['clone', quelle.repo, ziel]);
     } else {
       // Lokale Aenderungen NIE ueberschreiben — melden und in Ruhe lassen.
       if (git(['-C', ziel, 'status', '--porcelain'])) {
         return { ...quelle, pfad: ziel, zustand: 'lokal-veraendert' };
       }
       git(['-C', ziel, 'pull', '--ff-only']);
-      git(['-C', ziel, 'sparse-checkout', 'set', quelle.wissenspfad]);
     }
   } catch (error) {
     return { ...quelle, pfad: ziel, zustand: 'fehler', meldung: fehlerText(error) };

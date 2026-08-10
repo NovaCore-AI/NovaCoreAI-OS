@@ -19,9 +19,22 @@ Review-Resolves/Approvals · alles Kundensichtbare (PR-Texte, Ticket-Kommentare 
 
 ## Kern-SSOT (Wissensbasis der Firma)
 
-Die verbindliche Wissensbasis liegt im OS-Repo `NovaCore-AI/NovaCoreAI-OS`; Einstieg ist
-dort der Master-Index `knowledge-base/SSOT-Document-Index.md` (Pfad im OS-Repo). Vor
-Vermutungen dort triagieren — der Index nennt je Quelle die Abruf-Situation.
+Die verbindliche Wissensbasis ist das OS-Repo `NovaCore-AI/NovaCoreAI-OS`. Es liegt **lokal
+geklont** unter:
+
+```
+~/.nc/ssot/NovaCoreAI-OS/
+```
+
+Dieses Verzeichnis IST das OS-Repo (vollständiger Klon).
+**Einstieg ist dort** `knowledge-base/SSOT-Document-Index.md` — der Master-Index nennt je
+Quelle die Abruf-Situation. Vor Vermutungen dort triagieren.
+Alle Pfadangaben der Skills, die sich auf das OS-Repo beziehen, sind relativ zu diesem
+Verzeichnis zu lesen — solange nicht ohnehin im OS-Repo selbst gearbeitet wird.
+
+Fehlt das Verzeichnis, ist die Wissensbasis auf diesem Rechner noch nicht bereitgestellt:
+einmal `/nc:setup` ausführen. Bis dahin gilt — Aussagen, die die Wissensbasis bräuchten,
+werden als **nicht belegbar** gekennzeichnet, nicht geraten.
 
 ---
 

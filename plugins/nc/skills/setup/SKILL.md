@@ -31,11 +31,21 @@ und ruft diesen Skill nicht auf; wer ihn braucht, ruft ihn selbst.
 node "<skills-pfad>/setup/ssot-provision.js" --json
 ```
 
-Er ist idempotent und entscheidet selbst, was zu tun ist: Fehlende Quellen werden sparse
-geklont (nur der Wissenspfad wird materialisiert), vorhandene per **Fast-Forward**
-nachgezogen. Welche Quellen nötig sind, liest er aus der Registry des Kerns — der Kern
-immer, dazu jede installierte Abteilung mit **eigenem Repo und eigenem Wissen außerhalb
-ihres Plugins**. Satelliten brauchen nichts: bei ihnen ist das Repo das Plugin.
+Er ist idempotent und entscheidet selbst, was zu tun ist: Fehlende Quellen werden **voll
+geklont**, vorhandene per **Fast-Forward** nachgezogen. Welche Quellen nötig sind, liest er
+aus der Registry des Kerns — der Kern immer, dazu jede installierte Abteilung mit **eigenem
+Repo und eigenem Wissen außerhalb ihres Plugins**. Satelliten brauchen nichts: bei ihnen ist
+das Repo das Plugin.
+
+**Voller Klon, kein Teilausschnitt.** Die SSOT-Skills verweisen nicht nur auf die
+Wissensbasis, sondern auch auf Repo-Inhalte daneben (etwa die Formatregeln unter
+`referenz/`). Ein Ausschnitt würde genau diese Verweise brechen — und das ganze Repo sind
+wenige Megabyte.
+
+**Die Verlinkung ist der feste Pfad.** Der Klon landet deterministisch unter
+`~/.nc/ssot/<repo-name>/`, und der Firmen-Block in der globalen `CLAUDE.md` nennt genau
+diesen Pfad als Einstieg. Dadurch lösen die relativen Pfadangaben der Skills auf, ohne dass
+ein Skill geändert werden müsste.
 
 Danach das Ergebnis berichten: je Quelle Zustand (`angelegt` · `aktualisiert` ·
 `lokal-veraendert` · `fehler`), Zielpfad und Commit. Bei `fehler` den genannten Grund

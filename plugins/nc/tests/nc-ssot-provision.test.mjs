@@ -90,9 +90,11 @@ test('Erstlauf: klont sparse, materialisiert nur den Wissenspfad, schreibt den Z
   assert.equal(q.zustand, 'angelegt');
   assert.equal(liesText(path.join(q.pfad, 'knowledge-base', 'index.md')), 'stand eins\n');
 
-  // Sparse muss greifen: fremde VERZEICHNISSE duerfen nicht ankommen.
-  assert.equal(fs.existsSync(path.join(q.pfad, 'grossordner')), false,
-    'sparse-checkout hat ein Verzeichnis ausserhalb des Wissenspfads materialisiert');
+  // VOLLER Klon: Der Rest des Repos MUSS mitkommen. Ein frueherer Entwurf holte per
+  // --sparse nur die Wissensbasis und schnitt damit `plugins/` weg — genau das, worauf
+  // doku-sync (referenz/skill-authoring.md) verweist. Dieser Test haelt das offen.
+  assert.equal(fs.existsSync(path.join(q.pfad, 'grossordner', 'gross.md')), true,
+    'der Klon ist unvollstaendig — die SSOT-Skills brauchen das ganze Repo, nicht nur die Wissensbasis');
 
   const zeiger = JSON.parse(fs.readFileSync(path.join(ablage, 'index.json'), 'utf8'));
   assert.equal(zeiger.quellen.nc.pfad, q.pfad);
