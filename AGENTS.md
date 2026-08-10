@@ -95,8 +95,8 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   `dependencies: ["nc"]`). Die frühere eigene CLI (`ncos`, setup/update-Skripte) ist
   **ersatzlos abgeschafft** — Verteilung und Updates laufen ausschließlich über den
   Marketplace. Das alte marker-gebundene Safety-Gate ist im Destruktiv-Gate des FFG
-  aufgegangen (markerlos, deny statt ask); der `.nc-os`-Marker scoped nur noch den
-  Session-Start-**Hinweis**. Team-Mindestversion Claude Code ≥ 2.1.193.
+  aufgegangen (markerlos, deny statt ask); der `.nc-os`-Marker scopte damals nur noch den
+  Session-Start-**Hinweis** — seit 0.6.0 hat er **gar keine Funktion mehr** (siehe unten). Team-Mindestversion Claude Code ≥ 2.1.193.
 - **Gebaut (Kern v0.4.0, 2026-07-28):** Zweite Abteilung `felix` als **erster Satellit**
   angelegt — Plugin `nc-felix` 0.2.0 im eigenen privaten Repo
   `NovaCore-AI/Felix-OS` (das Repo IST das Plugin), Marketplace-Eintrag per

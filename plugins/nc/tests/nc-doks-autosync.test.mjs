@@ -35,10 +35,17 @@ function runHook(target, { stdin, env = {} } = {}) {
   const eingabe = stdin === undefined
     ? JSON.stringify({ session_id: 'test', source: 'startup', hook_event_name: 'SessionStart' })
     : stdin;
+  // Geerbte Opt-outs muessen raus, BEVOR das testeigene env greift: auf einer Maschine mit
+  // dokumentiertem NC_AUTOSYNC=off (Koexistenz-Empfehlung) waere die Suite sonst rot, ohne
+  // dass am Code etwas falsch ist. Muster aus nc-start-gate.test.mjs.
+  const kindEnv = { ...process.env, CLAUDE_PLUGIN_ROOT: PLUGIN_ROOT, NC_AUTOSYNC_TARGET: target };
+  delete kindEnv.NC_AUTOSYNC;
+  Object.assign(kindEnv, env);
+
   const r = spawnSync(process.execPath, [HOOK], {
     input: eingabe,
     encoding: 'utf8',
-    env: { ...process.env, CLAUDE_PLUGIN_ROOT: PLUGIN_ROOT, NC_AUTOSYNC_TARGET: target, ...env }
+    env: kindEnv
   });
   return { status: r.status, stdout: (r.stdout || '').trim(), stderr: (r.stderr || '').trim() };
 }
@@ -149,6 +156,35 @@ test('Vor einem Schreiblauf existiert danach die rollierende Sicherung', () => {
   assert.ok(fs.existsSync(backup), 'Backup-Datei fehlt nach dem Schreiblauf');
   assert.equal(fs.readFileSync(backup, 'utf8'), privat,
     'das Backup muss den Stand VOR dem Schreiben tragen');
+});
+
+// Review-Haertung (PR #10, Nachtrag N2/M2): Der Schreiblauf ist atomar (Temp + rename), und
+// eine gute Sicherung darf nie durch eine schlechtere ersetzt werden. Sonst konnte ein
+// zweiter, gleichzeitig startender Prozess einen halb geschriebenen Bestand als "Backup"
+// ueber die einzige intakte Sicherung kopieren — Privat-Zone dauerhaft weg.
+test('Eine intakte Sicherung wird nicht durch einen markerlosen Torso ersetzt', () => {
+  const privat = '# Privat\nWichtige eigene Regeln.\n';
+  const target = ziel();
+  runHook(target);                                    // Erstlauf: legt Block an
+  const backup = target + '.nc-autosync-backup';
+
+  // Zustand herstellen: gutes Backup (mit Markerpaar), Bestand als Torso ohne Marker.
+  fs.writeFileSync(backup, START + '\nguter Stand\n' + ENDE + '\n' + privat, 'utf8');
+  fs.writeFileSync(target, 'abgeschnittener Torso ohne Marker\n', 'utf8');
+  const gutesBackup = fs.readFileSync(backup, 'utf8');
+
+  const { status, stderr } = runHook(target);
+  assert.equal(status, 0);
+  assert.equal(fs.readFileSync(backup, 'utf8'), gutesBackup,
+    'das intakte Backup darf nicht mit dem Torso ueberschrieben werden');
+  assert.match(stderr, /Sicherung/i, 'der Verzicht auf das Ueberschreiben gehoert auf stderr');
+});
+
+test('Nach dem Schreiblauf bleibt keine Temp-Datei liegen', () => {
+  const target = ziel('Bestand ohne Marker\n');
+  runHook(target);
+  const reste = fs.readdirSync(path.dirname(target)).filter((f) => f.includes('.nc-autosync-tmp-'));
+  assert.deepEqual(reste, [], 'atomarer Write darf keine Temp-Datei hinterlassen');
 });
 
 test('Fail-open: unlesbares Ziel (Verzeichnis statt Datei) bricht die Session nicht', () => {

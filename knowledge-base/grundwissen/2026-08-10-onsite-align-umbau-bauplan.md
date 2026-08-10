@@ -304,6 +304,45 @@ Felix-Tags v0.2.0/v0.2.1 nachgezogen), ist die saubere Historie der richtige End
 Ein GitHub-Release entsteht dadurch **nicht**: `release.yml` existiert an diesen alten
 Commits nicht, der Workflow läuft für diese Tags also nie an.
 
+### N2 — Review-Härtungen an Gate 2 und am Autosync (über den 1:1-Port hinaus)
+*(2026-08-10, Claude Opus 5, nach dem PR-Review von PR #10)*
+
+**Anlass:** Das adversariale Review des fertigen PR fand zwei HIGH- und drei
+MEDIUM-Befunde. Zwei davon (H1, M1) betreffen Logik, die AP2.2 als **1:1-Port** vorschreibt —
+sie sind also im Vorbild genauso vorhanden. Ein Fix ist daher eine bewusste Abweichung vom
+Plan und wird hier dokumentiert, bevor er gebaut wird.
+
+| # | Befund | Kern |
+|---|---|---|
+| **H1** | Der Fakten-Stempel verifiziert **nichts**, wenn er aus einem Nicht-Git-Verzeichnis läuft — `git rev-parse` schlägt fehl, der Prüfblock wird übersprungen, der Stempel wird mit `branch: null` geschrieben, und das Gate öffnet danach für das **echte** Repo. Ein `cd` genügt. | Die zentrale Zusage von Gate 2 ist aushebelbar. |
+| **M1** | Der Durchlass `command.includes('nc-start-stempel.js')` matcht per **Substring** — `echo x > /tmp/y # nc-start-stempel.js` passiert Gate 2 ungehindert. | Jeder schreibende Bash-Befehl kommt mit angehängtem Kommentar vorbei. |
+| **M2** | Der Autosync schreibt **nicht atomar** und überschreibt sein einziges Backup. Zwei gleichzeitig startende Sessions können die Privat-Zone der Nutzer-`CLAUDE.md` dauerhaft kürzen — samt beschädigtem Backup. | Datenverlustpfad in fremden Dateien. |
+| **H2** | Zwei der vier Testsuites erben `NC_AUTOSYNC`/`NC_START_GATE` aus der Umgebung: auf einer Maschine mit gesetztem Opt-out fallen **16 von 77** Tests um. | Das AP8-Abnahmekriterium scheitert reproduzierbar. |
+| **M3** | Die Release-Tag-Invariante wird **still grün**, wenn die Tagliste leer ist (Fork, Checkout ohne `fetch-tags`). | Die Regel, die die 0.3.0/0.4.0-Lücke fand, kann unbemerkt aussetzen. |
+
+**Entscheidung:** Alle fünf werden behoben. Für H1/M1 heißt das: **das NovaCore-Gate 2 wird
+strenger als sein Vorbild** — dieselbe Begründung wie bei den FFG-Härtungen aus §1
+(„Onsite gewinnt für Struktur, nicht für Sicherheitsabbau"). Konkret:
+
+1. **H1:** Der Stempel löst die Git-Lage gegen das **Projektverzeichnis** auf
+   (`CLAUDE_PROJECT_DIR`, sonst cwd) statt gegen das cwd des Stempel-Prozesses, und
+   schreibt ein Feld `verified`. Das Gate akzeptiert einen unverifizierten Stempel **nur
+   dann**, wenn das Verzeichnis der gegateten Aktion selbst kein Git-Baum ist — sonst
+   Ablehnung mit klarer Begründung. Der legitime „außerhalb eines Git-Baums"-Fall bleibt
+   damit erhalten, der `cd`-Trick nicht.
+2. **M1:** Der Durchlass ankert auf eine **echte Invokation** am Zeilenanfang und verwirft
+   alles, was danach per `;`, `&&`, `|`, `>` oder `#` angehängt wird.
+3. **M2:** Schreiben per Temp-Datei + `rename` (atomar auf demselben Volume); ein Backup
+   wird **nie** mit einem Inhalt überschrieben, der die Marker verloren hat.
+4. **H2:** Beide Testsuites filtern die Opt-out-Variablen aus dem geerbten Env — exakt das
+   Muster, das `nc-start-gate.test.mjs` bereits verwendet.
+5. **M3:** Die Invariante unterscheidet „kein Git-Repo" (überspringen) von „Repo ohne Tags"
+   (Fehlschlag mit Hinweis auf `fetch-tags`).
+
+Jede Härtung bekommt einen **Regressionstest**, der die im Review reproduzierte Umgehung
+nachstellt. Die Doku-Zusagen (`hooks.json`-`description`, README, ONBOARDING,
+Gates-Definition) beschreiben danach den realen Stand.
+
 ---
 *Plan erstellt und administriert: Claude Fable 5, 2026-08-10, auf Weisung Lucas Vöhringer.
 Umsetzende Agenten zeichnen ihre CHANGELOG-Einträge selbst; Abnahme gegen diesen Plan.

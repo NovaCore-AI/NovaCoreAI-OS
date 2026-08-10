@@ -31,10 +31,13 @@ function runHook(cwd, { stdin, env = {} } = {}) {
   const eingabe = stdin === undefined
     ? JSON.stringify({ session_id: 'test', cwd, source: 'startup', hook_event_name: 'SessionStart' })
     : stdin;
-  const kindEnv = { ...process.env, CLAUDE_PLUGIN_ROOT: PLUGIN_ROOT, ...env };
-  // Muss weg: ein geerbtes CLAUDE_PROJECT_DIR wuerde das Fixture-Scoping aushebeln.
+  const kindEnv = { ...process.env, CLAUDE_PLUGIN_ROOT: PLUGIN_ROOT };
+  // Muss weg: ein geerbtes CLAUDE_PROJECT_DIR wuerde das Fixture-Scoping aushebeln, ein
+  // geerbtes NC_START_GATE=off (dokumentierte Koexistenz-Empfehlung) die ganze Suite
+  // aushebeln — sie waere rot, ohne dass am Code etwas falsch ist.
   delete kindEnv.CLAUDE_PROJECT_DIR;
-  if (env.CLAUDE_PROJECT_DIR) kindEnv.CLAUDE_PROJECT_DIR = env.CLAUDE_PROJECT_DIR;
+  delete kindEnv.NC_START_GATE;
+  Object.assign(kindEnv, env);
 
   const r = spawnSync(process.execPath, [HOOK], {
     cwd, input: eingabe, encoding: 'utf8', env: kindEnv

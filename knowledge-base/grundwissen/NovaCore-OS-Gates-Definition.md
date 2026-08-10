@@ -17,7 +17,7 @@ per Env **je Gate**. Alle Hooks liegen im Kern `nc`.
 | # | Gate | Erzwingt | Mechanik | Fragt den Menschen? | Status (2026-08-10) | Opt-out | Quelle |
 |---|---|---|---|---|---|---|---|
 | **1** | **FFG** (Fact-Forcing-Gate) — im Kern als domänen-freies **Basis-Gate**; drei Sub-Gates („FFG 1–3") | Fakten **vor** schreibenden Aktionen: **(1) Datei-Gate** je Zieldatei (Edit/Write/MultiEdit), **(2) Destruktiv-Gate** je Kommando (`rm -rf`, Force-Push, `reset --hard`, SQL-DDL, `find -exec` …), **(3) Routine-Bash-Gate** einmal je Session; Read-only-Git nie | PreToolUse (`nc-ffg.js`); Ablehnung mit Investigations-Text, Durchlass nach Faktenvorlage; quote-aware Bash-Analyse (GHSA-4v57-ph3x-gf55-Härtung), verankerte Exempt-Globs, plattformbewusstes Case-Folding, Session-Key-Hashing bei jeder Zeichen-Ersetzung | **Nie** — es verlangt Fakten und lässt danach den normalen Permission-Flow laufen | **gebaut** (v2; Review-Härtungen 2026-07-28, Lib-Extraktion + `exitCode`-Fix 2026-08-10) | `NC_FFG=off` | Design-Spec 2026-07-28 §5; Bauplan 2026-08-10 AP1 |
-| **2** | **Session-Start-Zwang** | Kein Blind-Start: Pflicht-Einstieg + lebender Projektstand zu Sessionbeginn; die **erste schreibende Aktion** erst, nachdem `/nc:start` gelaufen und der Fakten-Stempel gesetzt ist — Lesen und Fragen bleiben frei | zweiteilig („Zangen-Prinzip"): SessionStart-**Injektion** (`nc-session-start.js`; kann plattformbedingt nicht blocken) + PreToolUse-**Erzwingungs-Begleiter** (`nc-start-gate.js`) mit Fakten-Stempel (`nc-start-stempel.js`, verifiziert `--branch`/`--head` gegen die reale Git-Lage) | Nein | **gebaut** mit dem Umbau 2026-08-10 (vorher: markergebundener Begrüßungs-Hinweis, kein Gate) | `NC_START_GATE=off` (ein Schalter für beide Teile) | Bauplan 2026-08-10 AP2 |
+| **2** | **Session-Start-Zwang** | Kein Blind-Start: Pflicht-Einstieg + lebender Projektstand zu Sessionbeginn; die **erste schreibende Aktion** erst, nachdem `/nc:start` gelaufen und der Fakten-Stempel gesetzt ist — Lesen und Fragen bleiben frei | zweiteilig („Zangen-Prinzip"): SessionStart-**Injektion** (`nc-session-start.js`; kann plattformbedingt nicht blocken) + PreToolUse-**Erzwingungs-Begleiter** (`nc-start-gate.js`) mit Fakten-Stempel (`nc-start-stempel.js`, verifiziert `--branch`/`--head` gegen die Git-Lage des **Projektverzeichnisses**) | Nein | **gebaut** mit dem Umbau 2026-08-10 (vorher: markergebundener Begrüßungs-Hinweis, kein Gate) | `NC_START_GATE=off` (ein Schalter für beide Teile) | Bauplan 2026-08-10 AP2, Nachtrag N2 |
 | **3** | **Safety-Gate** | Echte **menschliche Freigabe** vor Aktionen mit Außen- oder Infrastrukturwirkung: Infra/Deploy/Prod **und** kundensichtbare Schreibaktionen — Vorlagepflicht: Empfänger/Zielort + **wörtlicher** Text | PreToolUse mit `permissionDecision: "ask"` → echter Freigabedialog; semantische Schreib-Marker auch für `mcp__*`-Tools (manifest-unabhängig); Fehlalarm-Schutz als Abnahmekriterium | **Ja — genau dafür existiert es** (das einzige Gate mit Dialog) | **nicht gebaut** (wie im Vorbild) | vorgesehen, analog je Gate | offen |
 | **4** | **Sitzungsabschluss** | Kein Wissensverlust am Sessionende: ungesicherte substanzielle Arbeit wird angemahnt, Erinnerung/Journal und Logs werden gepflegt | vorgesehen dreiteilig: PostToolUse-**Akkumulator** + **Stop**-Hook (blockt **einmal** je Turn-Kette, Schleifenschutz) + SessionEnd-Protokoll; menschliches Gegenstück ist `/nc:save-session` | Nein — es mahnt und blockt einmal, entscheidet nicht | **nicht gebaut** — nur der Skill `/nc:save-session` existiert | vorgesehen, analog je Gate | offen |
 
@@ -34,6 +34,21 @@ per Env **je Gate**. Alle Hooks liegen im Kern `nc`.
 - **Gate 2 vs. Gate 4:** Der Start-Zwang sichert den **Anfang** (richtiger Kontext, bevor
   geschrieben wird), der Sitzungsabschluss das **Ende** (nichts geht verloren). Ihre
   menschlichen Gegenstücke sind `/nc:start` und `/nc:save-session`.
+
+## Was Gate 2 deterministisch prüft — und was nicht
+
+Ehrliche Reichweite, damit die Tabelle oben nicht mehr verspricht, als der Code hält:
+
+- **Geprüft wird die Git-Lage.** Der Stempel löst sie gegen das **Projektverzeichnis** auf
+  (`CLAUDE_PROJECT_DIR`, sonst cwd) und vergleicht `--branch`/`--head` gegen
+  `git rev-parse`. Ein Stempel aus einem Verzeichnis ohne Git wird als **unverifiziert**
+  markiert und öffnet nur dort, wo auch die gegatete Aktion in keinem Git-Baum läuft —
+  ein `cd` in ein leeres Verzeichnis reicht also nicht (Nachtrag N2, Befund H1).
+- **Nicht geprüft wird, ob `/nc:start` inhaltlich lief.** Kein Hook kann das feststellen;
+  der Stempel ist der Proxy. Wer ihn setzt, ohne den Ablauf durchlaufen zu haben, umgeht
+  Gate 2 so bewusst wie per `NC_START_GATE=off`. Das ist die dokumentierte Proxy-Grenze.
+- **`NotebookEdit`** verlangt den erledigten Session-Start (Gate 2 matcht es), aber **keine
+  Fakten je Zieldatei** — Gate 1 matcht es nicht.
 
 ## Satelliten (Kollegen-OS)
 

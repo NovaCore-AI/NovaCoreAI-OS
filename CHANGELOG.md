@@ -118,6 +118,32 @@ Bauplans) dokumentiert die einzige Abweichung.
 
 ### Fixed
 
+- **Review-Härtungen an Gate 2 und am Autosync** (adversariales Review von PR #10; Details
+  und Begründung: Bauplan §6, Nachtrag N2). Zwei davon machen NovaCore **strenger als das
+  Vorbild** — dieselbe Linie wie bei den FFG-Härtungen: „Onsite gewinnt für Struktur, nicht
+  für Sicherheitsabbau".
+  - **Der Fakten-Stempel verifizierte nichts, wenn er aus einem Nicht-Git-Verzeichnis lief**
+    (reproduziert): `git rev-parse` schlug fehl, der Prüfblock wurde übersprungen, der
+    Stempel wurde gesetzt — und öffnete das Gate für das **echte** Repo. Ein `cd` genügte.
+    Jetzt löst der Stempel gegen das **Projektverzeichnis** auf (`CLAUDE_PROJECT_DIR`, sonst
+    cwd) und schreibt ein Feld `verified`; das Gate akzeptiert einen unverifizierten Stempel
+    nur, wenn auch die gegatete Aktion in keinem Git-Baum läuft. Der legitime
+    „außerhalb-von-Git"-Fall bleibt, der Trick nicht.
+  - **Der Stempel-Durchlass matchte per Substring** (reproduziert):
+    `echo x > /tmp/y # nc-start-stempel.js` passierte Gate 2. Jetzt wird eine **echte,
+    verankerte Invokation** verlangt; angehängte Zweitaktionen (`;`, `&&`, `|`, `>`, `#`,
+    `$(…)`) verwerfen den Durchlass.
+  - **Der Autosync schrieb nicht atomar und überschrieb sein einziges Backup.** Zwei
+    gleichzeitig startende Sessions konnten die Privat-Zone dauerhaft kürzen. Jetzt
+    Temp-Datei + `rename`, und eine intakte Sicherung wird nie durch einen markerlosen
+    Torso ersetzt.
+  - **Zwei Testsuites waren nicht hermetisch:** Sie erbten `NC_AUTOSYNC`/`NC_START_GATE` aus
+    der Umgebung — auf einer Maschine mit dem dokumentierten Opt-out fielen **16 von 77**
+    Tests um, obwohl am Code nichts falsch war. Beide filtern die Schalter jetzt heraus.
+  - **Die Release-Tag-Invariante wurde still grün**, wenn die Tagliste leer war (Fork,
+    Checkout ohne `fetch-tags`). Sie unterscheidet jetzt „kein Repo" von „Repo ohne Tags"
+    und schlägt im zweiten Fall fehl.
+  - Fünf Regressionstests stellen die reproduzierten Umgehungen nach (Suite: 77 → 82).
 - **Tag-Lücke geschlossen:** Die neue Release-Tag-Invariante deckte auf, dass die
   veröffentlichten Stände **0.3.0 und 0.4.0 nie getaggt** wurden. Beide Tags sind
   nachgesetzt — annotiert, mit Begründung im Tag-Text, nach der Konvention von `nc--v0.5.0`
@@ -141,6 +167,15 @@ Bauplans) dokumentiert die einzige Abweichung.
   lokale Plugins fängt das eine schlafende Invariante ab; externe Affiliate-Plugins (wie
   `kimi-code-plugin-cc`, das einen MCP-Server mitbringt) lösen sie bewusst **nicht** aus.
   Dokumentierte bekannte Grenze, kein stiller Zustand.
+- **`NotebookEdit` läuft nicht durch das FFG:** Gate 2 gated es (Matcher
+  `Write|Edit|MultiEdit|NotebookEdit|Bash`), Gate 1 nicht (`Write|Edit|MultiEdit|Bash`). Ein
+  Notebook-Schreibvorgang verlangt also den erledigten Session-Start, aber keine Fakten je
+  Zieldatei. Aus dem Vorbild übernommen und hier bewusst nicht stillschweigend geändert —
+  eine Matcher-Angleichung ist eine eigene Entscheidung mit eigenem Test.
+- **Der Stempel-Durchlass des Start-Gates bleibt eine Proxy-Grenze:** Wer den Stempel-Befehl
+  ausführt, ohne `/nc:start` inhaltlich durchlaufen zu haben, umgeht Gate 2 so bewusst wie
+  per `NC_START_GATE=off`. Deterministisch prüfbar ist nur die Git-Lage — und die wird
+  geprüft.
 - **`mneme-kimi-code` ist vorbereitet, aber nicht eingetragen:** Die Konvertierung zum
   Claude-Code-Plugin liegt lokal bereit (`.claude-plugin/plugin.json`, `hooks/hooks.json`
   mit allen sieben Events inkl. `PostToolUseFailure`, `.mcp.json` für den FastMCP-Server;

@@ -42,8 +42,11 @@ function runGate(cwd, state, { tool = 'Write', toolInput = { file_path: 'x.md' }
   return { status: r.status, stdout, ausgabe };
 }
 
-function runStempel(cwd, state, args) {
+function runStempel(cwd, state, args, extraEnv = {}) {
   const kindEnv = { ...process.env, NC_START_GATE_STATE_DIR: state };
+  // Ein geerbtes CLAUDE_PROJECT_DIR wuerde die Projekt-Aufloesung des Stempels aushebeln.
+  delete kindEnv.CLAUDE_PROJECT_DIR;
+  Object.assign(kindEnv, extraEnv);
   return spawnSync(process.execPath, [STEMPEL, ...args], { cwd, encoding: 'utf8', env: kindEnv });
 }
 
@@ -120,6 +123,71 @@ test('Fakten-Stempel: falsche Branch/HEAD-Angaben werden verweigert, korrekte oe
   assert.equal(richtig.status, 0, 'korrekte Fakten muessen stempeln: ' + richtig.stderr);
   const r = runGate(dir, state);
   assert.equal(r.stdout, '', 'nach korrektem Stempel ist das Gate offen');
+});
+
+// --- Review-Haertungen (PR #10, Nachtrag N2) ------------------------------------------
+// Die folgenden drei Faelle waren im Review REPRODUZIERTE Umgehungen. Sie stehen hier als
+// Regressionstests, damit sie nicht stillschweigend zurueckkehren.
+
+test('H1: Stempel aus einem Nicht-Git-Verzeichnis oeffnet das Gate NICHT fuer ein Git-Repo', () => {
+  const { dir: repo } = gitFixture();      // echtes Repo — hier wird spaeter geschrieben
+  const fremd = fixture();                 // Nicht-Git-Verzeichnis — von hier aus gestempelt
+  const state = stateDir();
+
+  const s = runStempel(fremd, state, ['--session', 'test-h1']);
+  assert.equal(s.status, 0, 'ausserhalb von Git darf gestempelt werden: ' + s.stderr);
+  assert.match(s.stdout, /nichts zu verifizieren/,
+    'die Meldung muss offenlegen, dass NICHTS verifiziert wurde');
+
+  // Genau das war die Luecke: derselbe Stempel oeffnete das echte Repo.
+  const r = runGate(repo, state, { session: 'test-h1' });
+  const grund = denyReason(r);
+  assert.match(grund, /OHNE Git-Verifikation/,
+    'im Git-Baum muss ein unverifizierter Stempel abgelehnt werden');
+
+  // Ausserhalb eines Git-Baums bleibt der unverifizierte Stempel gueltig (legitimer Fall).
+  assert.equal(runGate(fremd, state, { session: 'test-h1' }).stdout, '',
+    'ohne Git-Baum gibt es nichts zu verifizieren — der Stempel muss dort gelten');
+});
+
+test('H1: der Stempel verifiziert gegen CLAUDE_PROJECT_DIR, nicht gegen das cwd', () => {
+  const { dir: repo, branch, head } = gitFixture();
+  const fremd = fixture();
+  const state = stateDir();
+
+  // Aus dem fremden Verzeichnis, aber mit gesetztem Projektverzeichnis: die Fakten des
+  // ECHTEN Repos muessen stimmen — falsche werden abgelehnt, richtige akzeptiert.
+  const falsch = runStempel(fremd, state, ['--session', 'test-h1b', '--branch', 'falsch', '--head', '1234567'],
+    { CLAUDE_PROJECT_DIR: repo });
+  assert.equal(falsch.status, 1, 'falsche Fakten des Projekt-Repos muessen verweigert werden');
+
+  const richtig = runStempel(fremd, state, ['--session', 'test-h1b', '--branch', branch, '--head', head.slice(0, 8)],
+    { CLAUDE_PROJECT_DIR: repo });
+  assert.equal(richtig.status, 0, 'korrekte Fakten muessen stempeln: ' + richtig.stderr);
+  assert.equal(runGate(repo, state, { session: 'test-h1b' }).stdout, '',
+    'nach verifiziertem Stempel ist das Gate offen');
+});
+
+test('M1: der Stempel-Durchlass matcht nur eine echte Invokation, keinen angehaengten Kommentar', () => {
+  const state = stateDir();
+  const echt = 'node "' + STEMPEL + '" --session test-session';
+
+  // Muss durch: die echte Invokation.
+  assert.equal(runGate(fixture(), state, { tool: 'Bash', toolInput: { command: echt } }).stdout, '',
+    'die echte Stempel-Invokation muss durchgelassen werden');
+
+  // Darf NICHT durch: alles, was den Namen nur erwaehnt oder eine Zweitaktion anhaengt.
+  for (const command of [
+    'echo pwned > /tmp/x.txt   # nc-start-stempel.js',
+    'rm -rf /tmp/x # nc-start-stempel.js',
+    'echo nc-start-stempel.js && npm publish',
+    echt + ' ; echo pwned > /tmp/x.txt',
+    echt + ' && rm -rf /tmp/x',
+    echt + ' > /tmp/beute.txt'
+  ]) {
+    const r = runGate(fixture(), state, { tool: 'Bash', toolInput: { command } });
+    assert.notEqual(r.stdout, '', 'muss gegated werden: ' + command);
+  }
 });
 
 test('Ohne --session wird der Stempel verweigert', () => {

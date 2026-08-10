@@ -21,6 +21,7 @@
 // Opt-out AUSSCHLIESSLICH per Env: NC_START_GATE=off — derselbe Schalter wie die
 // Injektion (ein Gate, ein Schalter). Fail-open bei internen Fehlern.
 'use strict';
+const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { resolveSessionKey, isSubagentInvocation } = require('./lib/session-key');
@@ -30,7 +31,24 @@ const { stateFileFor } = require('./nc-start-stempel');
 const OFF_VALUES = new Set(['0', 'false', 'off', 'disabled', 'disable']);
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // wie FFG: Stempel verfaellt nach 30 Min Inaktivitaet
 const HEARTBEAT_MS = 60 * 1000;            // last_active hoechstens einmal je Minute auffrischen
+const GIT_TIMEOUT_MS = 2000;
 const STEMPEL_SKRIPT = path.join(__dirname, 'nc-start-stempel.js');
+
+// Echte Invokation des Stempel-Skripts erkennen — NICHT per Substring (Review-Haertung
+// 2026-08-10, Nachtrag N2/M1): `echo x > /tmp/y   # nc-start-stempel.js` haette den
+// Durchlass sonst geoeffnet, also jeden schreibenden Befehl mit angehaengtem Kommentar.
+// Verlangt wird: der Befehl BEGINNT mit einem node-Aufruf auf das Skript, und danach folgt
+// nichts, was eine zweite Aktion anhaengt (; && || | > < & #).
+const STEMPEL_INVOKATION = /^\s*(?:"[^"]*node[^"]*"|'[^']*node[^']*'|[^\s;&|<>#]*node(?:\.exe)?)\s+(?:"[^"]*nc-start-stempel\.js"|'[^']*nc-start-stempel\.js'|[^\s;&|<>#]*nc-start-stempel\.js)(?![^\s;&|<>#])/i;
+
+function istStempelBefehl(command) {
+  const raw = String(command || '');
+  if (!STEMPEL_INVOKATION.test(raw)) return false;
+  // Nach dem Skriptpfad duerfen nur noch Argumente stehen — kein Verketten, kein Kommentar,
+  // keine Umleitung, keine Kommando-Substitution.
+  const rest = raw.slice(raw.search(/nc-start-stempel\.js/i) + 'nc-start-stempel.js'.length);
+  return !/[;&|<>#`]|\$\(/.test(rest);
+}
 
 function isDisabled() {
   return OFF_VALUES.has(String(process.env.NC_START_GATE || '').trim().toLowerCase());
@@ -49,6 +67,26 @@ function loadStamp(file) {
     }
     return stamp;
   } catch (_) { return null; } // defekter Stempel zaehlt als nicht gestempelt
+}
+
+// Ist `dir` ein Git-Arbeitsbaum? Rein lesend, kurz getimeoutet. Wird nur gebraucht, um zu
+// entscheiden, ob ein UNVERIFIZIERTER Stempel hier gelten darf (Nachtrag N2, H1).
+function istGitBaum(dir) {
+  try {
+    const out = execFileSync('git', ['-C', dir, 'rev-parse', '--is-inside-work-tree'], {
+      encoding: 'utf8', timeout: GIT_TIMEOUT_MS,
+      stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true
+    });
+    return String(out || '').trim() === 'true';
+  } catch (_) { return false; } // kein Git, kein Repo, Timeout → nichts zu verifizieren
+}
+
+// Ein Stempel gilt als verifiziert, wenn er es ausweist. Aeltere Stempel ohne das Feld
+// werden aus branch/head abgeleitet, damit ein Versionswechsel mitten in einer Session
+// niemanden aussperrt.
+function istVerifiziert(stamp) {
+  if (typeof stamp.verified === 'boolean') return stamp.verified;
+  return Boolean(stamp.branch && stamp.head);
 }
 
 function heartbeat(file, stamp) {
@@ -83,6 +121,17 @@ function startMsg(sessionKey) {
     + 'Danach DENSELBEN Aufruf wiederholen.';
 }
 
+// Ablehnung, wenn ein ungeprueft gesetzter Stempel in einem echten Git-Baum vorgelegt wird.
+function ungeprueftMsg(sessionKey) {
+  return '[Start-Gate] Der Stempel dieser Session wurde OHNE Git-Verifikation gesetzt '
+    + '(er entstand außerhalb eines Git-Baums), dieses Verzeichnis ist aber eines. Damit ist '
+    + 'die Git-Lage nie geprüft worden. Erneut stempeln — aus dem Projektverzeichnis heraus '
+    + 'bzw. mit gesetztem CLAUDE_PROJECT_DIR: '
+    + 'node "' + STEMPEL_SKRIPT + '" --session ' + sessionKey
+    + ' --branch <branch> --head <head> (git rev-parse --abbrev-ref HEAD · '
+    + 'git rev-parse --short HEAD). Lesen und Read-only-Git bleiben frei.';
+}
+
 function main() {
   const input = JSON.parse(fs.readFileSync(0, 'utf8'));
   if (isDisabled()) return;
@@ -100,14 +149,24 @@ function main() {
   const sessionKey = resolveSessionKey(input);
   const file = stateFileFor(sessionKey);
   const stamp = loadStamp(file);
-  if (stamp) return heartbeat(file, stamp); // Start erledigt → normaler Permission-Flow
+  if (stamp) {
+    // Ein verifizierter Stempel oeffnet ueberall. Ein UNVERIFIZIERTER gilt nur dort, wo es
+    // wirklich nichts zu verifizieren gab — sonst waere er per `cd` in ein Nicht-Git-
+    // Verzeichnis erschlichen (Nachtrag N2, H1).
+    if (istVerifiziert(stamp)) return heartbeat(file, stamp);
+    const arbeitsDir = process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd();
+    if (!istGitBaum(arbeitsDir)) return heartbeat(file, stamp);
+    return deny(ungeprueftMsg(sessionKey));
+  }
 
   if (tool === 'Bash') {
     const command = (input.tool_input && input.tool_input.command) || '';
-    // Der Stempel-Befehl selbst muss durch — sonst kann das Gate nie oeffnen. Ein
-    // Missbrauch dieses Durchlasses (Stempeln ohne /nc:start) ist die dokumentierte
-    // Proxy-Grenze; der Fakten-Stempel verifiziert Branch/HEAD trotzdem.
-    if (command.includes('nc-start-stempel.js')) return;
+    // Der Stempel-Befehl selbst muss durch — sonst kann das Gate nie oeffnen. Erkannt wird
+    // eine ECHTE Invokation (verankert, ohne angehaengte Zweitaktion), nicht ein blosses
+    // Vorkommen der Zeichenkette. Ein Missbrauch des Durchlasses (Stempeln ohne /nc:start)
+    // bleibt die dokumentierte Proxy-Grenze; der Fakten-Stempel verifiziert Branch/HEAD
+    // dabei trotzdem gegen das Projektverzeichnis.
+    if (istStempelBefehl(command)) return;
     if (isReadOnlyGitIntrospection(command)) return; // Pflicht-Einstieg selbst nie blocken
   }
 

@@ -47,9 +47,19 @@ function stateFileFor(sessionKey) {
   return safe ? path.join(stateDir(), 'start-' + safe + '.json') : null;
 }
 
+// Bezugspunkt der Verifikation ist das PROJEKT, nicht das cwd des Stempel-Prozesses.
+// Review-Haertung 2026-08-10 (Nachtrag N2, H1): Vorher lief `git rev-parse` im aktuellen
+// Verzeichnis — ein `cd <irgendwohin ohne .git>` liess die Pruefung ins Leere laufen, der
+// Stempel wurde ungeprueft gesetzt und oeffnete das Gate fuer das ECHTE Repo. Ein `cd`
+// darf die zentrale Zusage von Gate 2 nicht aushebeln.
+function projektVerzeichnis() {
+  const dir = String(process.env.CLAUDE_PROJECT_DIR || '').trim();
+  return dir || process.cwd();
+}
+
 function git(args) {
   try {
-    const out = execFileSync('git', args, {
+    const out = execFileSync('git', ['-C', projektVerzeichnis(), ...args], {
       encoding: 'utf8', timeout: GIT_TIMEOUT_MS,
       stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true
     });
@@ -98,15 +108,23 @@ function main() {
   }
 
   const now = Date.now();
+  // `verified` haelt fest, OB ueberhaupt etwas geprueft wurde. Ohne dieses Feld kann das
+  // Gate einen ungeprueften Stempel nicht von einem geprueften unterscheiden — genau die
+  // Luecke aus Nachtrag N2 (H1). Ein unverifizierter Stempel bleibt gueltig, aber nur dort,
+  // wo es wirklich nichts zu verifizieren gibt; das entscheidet das Gate.
+  const verified = Boolean(echterBranch && echterHead);
   fs.mkdirSync(stateDir(), { recursive: true });
   fs.writeFileSync(file, JSON.stringify({
     stamped_at: now,
     last_active: now,
+    verified,
     branch: echterBranch || null,
     head: echterHead ? echterHead.slice(0, 12) : null
   }, null, 2), 'utf8');
   process.stdout.write('[Start-Gate] Stempel gesetzt — Session-Start-Zwang erfuellt'
-    + (echterBranch ? ' (Branch ' + echterBranch + ', HEAD ' + echterHead.slice(0, 7) + ')' : '')
+    + (verified
+      ? ' (Branch ' + echterBranch + ', HEAD ' + echterHead.slice(0, 7) + ')'
+      : ' (kein Git-Baum unter ' + projektVerzeichnis() + ' — nichts zu verifizieren)')
     + '. Schreibende Aktionen sind frei; rote Linien gelten unveraendert.\n');
 }
 

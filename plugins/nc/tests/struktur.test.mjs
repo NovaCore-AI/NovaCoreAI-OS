@@ -330,14 +330,22 @@ test('Release-Tags: jede veroeffentlichte CHANGELOG-Version ausser der juengsten
     'CHANGELOG fuehrt weniger als zwei veroeffentlichte Abschnitte — Muster geaendert?');
 
   let tags;
+  let imRepo = false;
   try {
+    imRepo = execFileSync('git', ['rev-parse', '--is-inside-work-tree'],
+      { cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() === 'true';
     tags = execFileSync('git', ['tag', '--list'], { cwd: REPO, encoding: 'utf8' })
       .split('\n').map((s) => s.trim()).filter(Boolean);
   } catch {
-    return; // kein Git verfuegbar (Quell-Export): Regel hier nicht pruefbar, nicht falsch
+    return; // kein Git / kein Repo (Quell-Export): Regel hier nicht pruefbar, nicht falsch
   }
-  // Ein Klon ohne Tags (flacher CI-Checkout) darf nicht stillschweigend gruen werden —
-  // deshalb holt ci.yml die Tags explizit; fehlen sie dennoch ganz, ist die Lage unklar.
+  // Wir sind in einem Repo, sehen aber keine Tags: dann ist die Invariante NICHT geprueft.
+  // Frueher wurde hier still gruen gemeldet — genau so kann die Regel, die die 0.3.0/0.4.0-
+  // Luecke gefunden hat, unbemerkt aussetzen (Review-Befund M3, Nachtrag N2). ci.yml holt
+  // die Tags per `fetch-tags: true`; fehlen sie trotzdem, ist das ein Konfigurationsfehler.
+  assert.notEqual(imRepo && tags.length === 0, true,
+    'Git-Repo ohne Tags: die Release-Tag-Invariante konnte nichts pruefen — Checkout ohne '
+    + '`fetch-tags: true` (ci.yml/release.yml) oder Fork ohne Tags');
   if (tags.length === 0) return;
 
   const vorhanden = new Set(tags);

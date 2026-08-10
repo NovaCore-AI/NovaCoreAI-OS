@@ -83,10 +83,55 @@ function anzahl(text, marker) {
   return text.split(marker).length - 1;
 }
 
-/** Rollierende Sicherung vor JEDEM Schreiben; wirft bei Fehlern (dann wird nicht geschrieben). */
+/** Ein Text traegt genau ein wohlgeformtes Markerpaar. */
+function hatIntaktesMarkerpaar(text) {
+  return anzahl(text, START) === 1 && anzahl(text, ENDE) === 1
+    && text.indexOf(START) < text.indexOf(ENDE);
+}
+
+/**
+ * Sicherung anlegen — aber NIE eine gute Sicherung durch eine schlechtere ersetzen
+ * (Nachtrag N2/M2). Wenn das vorhandene Backup ein intaktes Markerpaar traegt und der
+ * aktuelle Bestand keines, ist der Bestand vermutlich beschaedigt (abgeschnittener Read,
+ * fremder Teilschreiber) — dann bleibt das aeltere, bessere Backup stehen.
+ */
+function sichere(ziel) {
+  const backup = ziel + '.nc-autosync-backup';
+  try {
+    if (fs.existsSync(backup)) {
+      const altesBackup = fs.readFileSync(backup, 'utf8');
+      const bestand = fs.readFileSync(ziel, 'utf8');
+      if (hatIntaktesMarkerpaar(altesBackup) && !hatIntaktesMarkerpaar(bestand)) {
+        warn('vorhandene Sicherung wirkt intakter als der aktuelle Bestand von ' + ziel
+          + ' — sie wird NICHT ueberschrieben.');
+        return;
+      }
+    }
+  } catch (_) { /* unlesbares Backup: normal weiter sichern */ }
+  fs.copyFileSync(ziel, backup);
+}
+
+/**
+ * Rollierende Sicherung vor JEDEM Schreiben, danach ATOMARER Write; wirft bei Fehlern
+ * (dann wird nicht geschrieben).
+ *
+ * Atomar per Temp-Datei + rename (Review-Haertung 2026-08-10, Nachtrag N2/M2): SessionStart
+ * feuert auch bei resume/clear/compact/fork, zwei parallel startende Fenster sind also real.
+ * Vorher schrieb der Hook in-place — ein zweiter Prozess konnte einen halb geschriebenen
+ * Bestand lesen, darin keine Marker finden, den Torso als "Backup" ueber die einzige gute
+ * Sicherung kopieren und ihn hinter den Block haengen: Privat-Zone dauerhaft gekuerzt.
+ * Die Temp-Datei liegt im selben Verzeichnis, damit rename auf demselben Volume bleibt.
+ */
 function schreibeMitBackup(ziel, neuerInhalt, bestandExistiert) {
-  if (bestandExistiert) fs.copyFileSync(ziel, ziel + '.nc-autosync-backup');
-  fs.writeFileSync(ziel, neuerInhalt, 'utf8');
+  if (bestandExistiert) sichere(ziel);
+  const tmp = ziel + '.nc-autosync-tmp-' + process.pid;
+  try {
+    fs.writeFileSync(tmp, neuerInhalt, 'utf8');
+    fs.renameSync(tmp, ziel);
+  } catch (error) {
+    try { fs.unlinkSync(tmp); } catch (_) { /* egal */ }
+    throw error;
+  }
 }
 
 function main() {
