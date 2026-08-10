@@ -44,9 +44,22 @@ Ehrliche Reichweite, damit die Tabelle oben nicht mehr verspricht, als der Code 
   `git rev-parse`. Ein Stempel aus einem Verzeichnis ohne Git wird als **unverifiziert**
   markiert und öffnet nur dort, wo auch die gegatete Aktion in keinem Git-Baum läuft —
   ein `cd` in ein leeres Verzeichnis reicht also nicht (Nachtrag N2, Befund H1).
+- **Geprüft wird *eine* reale Git-Lage — nicht zwingend die des Zielpfads.** Der Stempel gilt
+  für die ganze Session, nicht je Repo: Wer in einer Session mehrere Repos anfasst, stempelt
+  einmal. Ein Stempel, der gegen Repo A verifiziert wurde, öffnet also auch Schreibvorgänge
+  in Repo B. Das ist Absicht — ein Toplevel-Vergleich würde Mehr-Repo-Sessions unbrauchbar
+  machen. Gate 2 erzwingt „der Agent hat eine echte Git-Lage angesehen", nicht „genau die
+  des nächsten Schreibvorgangs".
 - **Nicht geprüft wird, ob `/nc:start` inhaltlich lief.** Kein Hook kann das feststellen;
   der Stempel ist der Proxy. Wer ihn setzt, ohne den Ablauf durchlaufen zu haben, umgeht
   Gate 2 so bewusst wie per `NC_START_GATE=off`. Das ist die dokumentierte Proxy-Grenze.
+- **Der Durchlass für den Stempel-Befehl ist eng gefasst:** Er verlangt eine einzeilige,
+  am Zeilenanfang verankerte Invokation von **genau diesem** Skript (Pfadvergleich, nicht
+  Namenssuffix); alles, was eine zweite Aktion anhängt — `;`, `&&`, `|`, `>`, `#`, `$(…)`
+  oder ein Zeilenumbruch —, verwirft ihn.
+- **Fail-open bleibt fail-open:** Läuft die Git-Abfrage des Gates in den 2-Sekunden-Timeout,
+  wird durchgelassen (wie bei allen Gates) — dann aber mit einer Warnung auf stderr, damit
+  Last die Kontroll-Schicht nicht unbemerkt abschwächt.
 - **`NotebookEdit`** verlangt den erledigten Session-Start (Gate 2 matcht es), aber **keine
   Fakten je Zieldatei** — Gate 1 matcht es nicht.
 

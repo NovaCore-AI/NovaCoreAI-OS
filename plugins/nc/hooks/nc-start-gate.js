@@ -37,16 +37,38 @@ const STEMPEL_SKRIPT = path.join(__dirname, 'nc-start-stempel.js');
 // Echte Invokation des Stempel-Skripts erkennen — NICHT per Substring (Review-Haertung
 // 2026-08-10, Nachtrag N2/M1): `echo x > /tmp/y   # nc-start-stempel.js` haette den
 // Durchlass sonst geoeffnet, also jeden schreibenden Befehl mit angehaengtem Kommentar.
-// Verlangt wird: der Befehl BEGINNT mit einem node-Aufruf auf das Skript, und danach folgt
-// nichts, was eine zweite Aktion anhaengt (; && || | > < & #).
-const STEMPEL_INVOKATION = /^\s*(?:"[^"]*node[^"]*"|'[^']*node[^']*'|[^\s;&|<>#]*node(?:\.exe)?)\s+(?:"[^"]*nc-start-stempel\.js"|'[^']*nc-start-stempel\.js'|[^\s;&|<>#]*nc-start-stempel\.js)(?![^\s;&|<>#])/i;
+// Verlangt wird: der Befehl BEGINNT mit einem node-Aufruf auf GENAU DIESES Skript, und
+// danach folgt nichts, was eine zweite Aktion anhaengt.
+// Gruppe 1/2/3 fangen den Skriptpfad (gequotet doppelt/einfach/nackt) fuer den
+// Identitaetsvergleich in istDiesesSkript().
+const STEMPEL_INVOKATION = /^[^\S\r\n]*(?:"[^"]*node[^"]*"|'[^']*node[^']*'|[^\s;&|<>#]*node(?:\.exe)?)[^\S\r\n]+(?:"([^"]*nc-start-stempel\.js)"|'([^']*nc-start-stempel\.js)'|([^\s;&|<>#]*nc-start-stempel\.js))(?![^\s;&|<>#])/i;
+
+// Zeigt der Pfad auf DIESE Datei? Der blosse Namenssuffix genuegt nicht (Review-Runde 2):
+// `node "<irgendwo>/my-nc-start-stempel.js"` waere sonst ein Kanal fuer beliebigen
+// Node-Code durch Gate 2. Verglichen wird der aufgeloeste Pfad; Case-Folding nur auf
+// case-insensitiven Plattformen (wie im FFG-Datei-Gate).
+function istDiesesSkript(pfad) {
+  if (!pfad) return false;
+  try {
+    const kandidat = path.resolve(pfad);
+    const echt = path.resolve(STEMPEL_SKRIPT);
+    const foldCase = process.platform === 'win32' || process.platform === 'darwin';
+    return foldCase ? kandidat.toLowerCase() === echt.toLowerCase() : kandidat === echt;
+  } catch (_) { return false; }
+}
 
 function istStempelBefehl(command) {
   const raw = String(command || '');
-  if (!STEMPEL_INVOKATION.test(raw)) return false;
+  // Zeilenumbruch und Wagenruecklauf sind vollwertige Kommandotrenner (Bash wie
+  // PowerShell). Ein mehrzeiliger Befehl ist NIE "nur der Stempel" — genau darueber war
+  // der erste M1-Fix noch umgehbar (Review-Runde 2).
+  if (/[\r\n]/.test(raw)) return false;
+  const treffer = STEMPEL_INVOKATION.exec(raw);
+  if (!treffer) return false;
+  if (!istDiesesSkript(treffer[1] || treffer[2] || treffer[3])) return false;
   // Nach dem Skriptpfad duerfen nur noch Argumente stehen — kein Verketten, kein Kommentar,
   // keine Umleitung, keine Kommando-Substitution.
-  const rest = raw.slice(raw.search(/nc-start-stempel\.js/i) + 'nc-start-stempel.js'.length);
+  const rest = raw.slice(treffer[0].length);
   return !/[;&|<>#`]|\$\(/.test(rest);
 }
 
@@ -78,7 +100,18 @@ function istGitBaum(dir) {
       stdio: ['ignore', 'pipe', 'ignore'], windowsHide: true
     });
     return String(out || '').trim() === 'true';
-  } catch (_) { return false; } // kein Git, kein Repo, Timeout → nichts zu verifizieren
+  } catch (error) {
+    // Kein Git / kein Repo → es gibt wirklich nichts zu verifizieren, stiller Durchlass.
+    // Ein TIMEOUT ist etwas anderes: dann wissen wir es nicht und lassen fail-open durch
+    // (repo-weite Doktrin) — das aber nicht stumm, sonst schwaecht Last unbemerkt Gate 2.
+    if (error && (error.code === 'ETIMEDOUT' || error.signal === 'SIGTERM')) {
+      try {
+        process.stderr.write('[nc-start-gate] git rev-parse in ' + dir + ' lief in den '
+          + 'Timeout — ein unverifizierter Stempel wird hier durchgelassen (fail-open).\n');
+      } catch (_) { /* egal */ }
+    }
+    return false;
+  }
 }
 
 // Ein Stempel gilt als verifiziert, wenn er es ausweist. Aeltere Stempel ohne das Feld

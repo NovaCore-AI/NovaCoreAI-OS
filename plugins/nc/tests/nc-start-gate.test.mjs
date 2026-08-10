@@ -168,25 +168,40 @@ test('H1: der Stempel verifiziert gegen CLAUDE_PROJECT_DIR, nicht gegen das cwd'
     'nach verifiziertem Stempel ist das Gate offen');
 });
 
-test('M1: der Stempel-Durchlass matcht nur eine echte Invokation, keinen angehaengten Kommentar', () => {
+test('M1: der Stempel-Durchlass matcht nur eine echte Invokation DIESES Skripts', () => {
   const state = stateDir();
   const echt = 'node "' + STEMPEL + '" --session test-session';
+  // Gleicher Dateiname, anderer Pfad — darf NICHT als Stempel gelten.
+  const fremdesSkript = path.join(fixture(), 'my-nc-start-stempel.js');
 
-  // Muss durch: die echte Invokation.
-  assert.equal(runGate(fixture(), state, { tool: 'Bash', toolInput: { command: echt } }).stdout, '',
-    'die echte Stempel-Invokation muss durchgelassen werden');
+  // Muss durch: die echte Invokation, in allen legitimen Schreibweisen.
+  for (const command of [
+    echt,
+    '"' + process.execPath + '" "' + STEMPEL + '" --session test-session',
+    '  node   "' + STEMPEL + '"   --session test-session'
+  ]) {
+    assert.equal(runGate(fixture(), state, { tool: 'Bash', toolInput: { command } }).stdout, '',
+      'legitime Stempel-Invokation muss durch: ' + command);
+  }
 
-  // Darf NICHT durch: alles, was den Namen nur erwaehnt oder eine Zweitaktion anhaengt.
+  // Darf NICHT durch: Namensnennung, angehaengte Zweitaktion, Zeilenumbruch, Fremdskript.
   for (const command of [
     'echo pwned > /tmp/x.txt   # nc-start-stempel.js',
     'rm -rf /tmp/x # nc-start-stempel.js',
     'echo nc-start-stempel.js && npm publish',
     echt + ' ; echo pwned > /tmp/x.txt',
     echt + ' && rm -rf /tmp/x',
-    echt + ' > /tmp/beute.txt'
+    echt + ' > /tmp/beute.txt',
+    // Zeilenumbruch als Kommandotrenner (Review-Runde 2): die zweite Zeile darf beliebiger
+    // Code sein und braucht keines der sonst verbotenen Zeichen.
+    echt + '\necho pwned-via-newline',
+    echt + '\r\nnode -e "process.exit(0)"',
+    // Fremdes Skript mit passendem Namenssuffix (Review-Runde 2).
+    'node "' + fremdesSkript + '" --session test-session',
+    'node "' + path.join(fixture(), 'nc-start-stempel.js') + '" --session test-session'
   ]) {
     const r = runGate(fixture(), state, { tool: 'Bash', toolInput: { command } });
-    assert.notEqual(r.stdout, '', 'muss gegated werden: ' + command);
+    assert.notEqual(r.stdout, '', 'muss gegated werden: ' + JSON.stringify(command));
   }
 });
 
