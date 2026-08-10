@@ -198,7 +198,17 @@ test('M1: der Stempel-Durchlass matcht nur eine echte Invokation DIESES Skripts'
     echt + '\r\nnode -e "process.exit(0)"',
     // Fremdes Skript mit passendem Namenssuffix (Review-Runde 2).
     'node "' + fremdesSkript + '" --session test-session',
-    'node "' + path.join(fixture(), 'nc-start-stempel.js') + '" --session test-session'
+    'node "' + path.join(fixture(), 'nc-start-stempel.js') + '" --session test-session',
+    // Fremder INTERPRETER auf dem echten Stempelpfad (Review-Runde 3): frueher genuegte
+    // es, dass der gequotete Pfad "node" enthielt — in jedem Repo mit node_modules
+    // erfuellt das jede Datei in node_modules/.bin.
+    '"' + path.join(fixture(), 'node_modules', '.bin', 'rimraf.cmd') + '" "' + STEMPEL + '" --session s',
+    '"' + path.join(fixture(), 'nodejs-wrapper.bat') + '" "' + STEMPEL + '" --session s',
+    '"' + path.join(fixture(), 'evilnode') + '" "' + STEMPEL + '" --session s',
+    '"' + path.join(fixture(), 'evilnode.exe') + '" "' + STEMPEL + '" --session s',
+    // Flags zwischen Interpreter und Skript sind keine legitime Aufrufform und koennten
+    // fremden Code vorladen.
+    'node --require=./evil.js "' + STEMPEL + '" --session s'
   ]) {
     const r = runGate(fixture(), state, { tool: 'Bash', toolInput: { command } });
     assert.notEqual(r.stdout, '', 'muss gegated werden: ' + JSON.stringify(command));

@@ -172,10 +172,12 @@ function pluginVersion() {
 // damit der Agent ihn nach /nc:start nicht raten muss. Das Start-Gate
 // (nc-start-gate.js) lehnt schreibende Aktionen ab, bis der Stempel gesetzt ist.
 function stempelHinweis(sessionKey) {
-  const pluginRoot = process.env.CLAUDE_PLUGIN_ROOT;
-  const skript = pluginRoot
-    ? path.join(pluginRoot, 'hooks', 'nc-start-stempel.js')
-    : 'nc-start-stempel.js (hooks/-Verzeichnis des Kern-Plugins nc)';
+  // Bewusst aus __dirname, NICHT aus CLAUDE_PLUGIN_ROOT (Review-Runde 3, LOW): Das Gate
+  // vergleicht den vorgeschlagenen Pfad gegen sein eigenes __dirname. Zeigt
+  // CLAUDE_PLUGIN_ROOT ueber eine Junction/einen Symlink auf das Plugin, wichen beide
+  // Zeichenketten ab — die Injektion haette einen Befehl vorgeschlagen, den das Gate
+  // ablehnt. Dieselbe Quelle auf beiden Seiten schliesst das aus.
+  const skript = path.join(__dirname, 'nc-start-stempel.js');
   return '**Abschluss-Stempel (Start-Gate):** Erst NACH abgeschlossenem `/nc:start` setzen: '
     + '`node "' + skript + '" --session ' + sessionKey + ' --branch <branch> --head <head>` — '
     + 'Branch und HEAD aus der realen Git-Lage (`git rev-parse --abbrev-ref HEAD` · '

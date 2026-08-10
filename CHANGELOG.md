@@ -131,8 +131,17 @@ Bauplans) dokumentiert die einzige Abweichung.
     „außerhalb-von-Git"-Fall bleibt, der Trick nicht.
   - **Der Stempel-Durchlass matchte per Substring** (reproduziert):
     `echo x > /tmp/y # nc-start-stempel.js` passierte Gate 2. Jetzt wird eine **echte,
-    verankerte Invokation** verlangt; angehängte Zweitaktionen (`;`, `&&`, `|`, `>`, `#`,
-    `$(…)`) verwerfen den Durchlass.
+    verankerte, einzeilige Invokation genau dieses Skripts durch genau `node`** verlangt.
+    Der Weg dahin brauchte drei Review-Runden, weil jeder Zwischenstand noch eine Lücke
+    ließ — der Reihe nach geschlossen: angehängte Zweitaktionen (`;`, `&&`, `|`, `>`, `#`,
+    `$(…)`) · **Zeilenumbruch als Kommandotrenner** (`\n`/`\r`; die zweite Zeile durfte
+    beliebiger Code sein und über einen handgeschriebenen `verified: true`-Stempel fiel
+    damit auch die H1-Härtung) · **Skript-Identität statt Namenssuffix** (`path.resolve`
+    gegen das echte Skript, plus Realpath-Vergleich; vorher war jede
+    `*nc-start-stempel.js` an beliebigem Ort ein Kanal) · **Interpreter-Identität statt
+    Namensmuster** (Basisname muss `node`/`node.exe` sein; vorher genügte ein gequoteter
+    Pfad, der „node" nur *enthielt* — womit in jedem Repo mit `node_modules` jede Datei
+    unter `node_modules/.bin` als Interpreter durchging).
   - **Der Autosync schrieb nicht atomar und überschrieb sein einziges Backup.** Zwei
     gleichzeitig startende Sessions konnten die Privat-Zone dauerhaft kürzen. Jetzt
     Temp-Datei + `rename`, und eine intakte Sicherung wird nie durch einen markerlosen

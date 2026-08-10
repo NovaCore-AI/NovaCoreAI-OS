@@ -39,21 +39,43 @@ const STEMPEL_SKRIPT = path.join(__dirname, 'nc-start-stempel.js');
 // Durchlass sonst geoeffnet, also jeden schreibenden Befehl mit angehaengtem Kommentar.
 // Verlangt wird: der Befehl BEGINNT mit einem node-Aufruf auf GENAU DIESES Skript, und
 // danach folgt nichts, was eine zweite Aktion anhaengt.
-// Gruppe 1/2/3 fangen den Skriptpfad (gequotet doppelt/einfach/nackt) fuer den
-// Identitaetsvergleich in istDiesesSkript().
-const STEMPEL_INVOKATION = /^[^\S\r\n]*(?:"[^"]*node[^"]*"|'[^']*node[^']*'|[^\s;&|<>#]*node(?:\.exe)?)[^\S\r\n]+(?:"([^"]*nc-start-stempel\.js)"|'([^']*nc-start-stempel\.js)'|([^\s;&|<>#]*nc-start-stempel\.js))(?![^\s;&|<>#])/i;
+// Gruppe 1/2/3 fangen den INTERPRETER, Gruppe 4/5/6 den SKRIPTPFAD (jeweils gequotet
+// doppelt/einfach/nackt). Beide werden anschliessend auf Identitaet geprueft — die Regex
+// selbst entscheidet bewusst nichts ueber Namen.
+const STEMPEL_INVOKATION = /^[^\S\r\n]*(?:"([^"]*)"|'([^']*)'|([^\s;&|<>#]+))[^\S\r\n]+(?:"([^"]*nc-start-stempel\.js)"|'([^']*nc-start-stempel\.js)'|([^\s;&|<>#]*nc-start-stempel\.js))(?![^\s;&|<>#])/i;
+
+const NODE_BINARIES = new Set(['node', 'node.exe']);
+
+function gleicherPfad(a, b) {
+  const foldCase = process.platform === 'win32' || process.platform === 'darwin';
+  return foldCase ? a.toLowerCase() === b.toLowerCase() : a === b;
+}
+
+// Ist das ausfuehrende Programm wirklich node? Namensmuster genuegt nicht (Review-Runde 3):
+// Ein gequoteter Pfad, der "node" nur ENTHAELT, traf frueher zu — in jedem Repo mit
+// node_modules erfuellt damit JEDE Datei in node_modules/.bin das Kriterium
+// (`"…/node_modules/.bin/rimraf" "<stempelpfad>"` haette vor erledigtem Session-Start das
+// Stempel-Skript geloescht). Geprueft wird jetzt der Basisname.
+function istNodeInterpreter(pfad) {
+  if (!pfad) return false;
+  return NODE_BINARIES.has(path.basename(String(pfad).trim()).toLowerCase());
+}
 
 // Zeigt der Pfad auf DIESE Datei? Der blosse Namenssuffix genuegt nicht (Review-Runde 2):
 // `node "<irgendwo>/my-nc-start-stempel.js"` waere sonst ein Kanal fuer beliebigen
 // Node-Code durch Gate 2. Verglichen wird der aufgeloeste Pfad; Case-Folding nur auf
-// case-insensitiven Plattformen (wie im FFG-Datei-Gate).
+// case-insensitiven Plattformen (wie im FFG-Datei-Gate). Zusaetzlich ein Realpath-Vergleich,
+// damit ein ueber Symlink/Junction adressiertes Plugin-Root nicht den eigenen Oeffner
+// aussperrt (Review-Runde 3, LOW).
 function istDiesesSkript(pfad) {
   if (!pfad) return false;
   try {
     const kandidat = path.resolve(pfad);
     const echt = path.resolve(STEMPEL_SKRIPT);
-    const foldCase = process.platform === 'win32' || process.platform === 'darwin';
-    return foldCase ? kandidat.toLowerCase() === echt.toLowerCase() : kandidat === echt;
+    if (gleicherPfad(kandidat, echt)) return true;
+    try {
+      return gleicherPfad(fs.realpathSync(kandidat), fs.realpathSync(echt));
+    } catch (_) { return false; } // Datei existiert nicht → kein Treffer
   } catch (_) { return false; }
 }
 
@@ -65,7 +87,8 @@ function istStempelBefehl(command) {
   if (/[\r\n]/.test(raw)) return false;
   const treffer = STEMPEL_INVOKATION.exec(raw);
   if (!treffer) return false;
-  if (!istDiesesSkript(treffer[1] || treffer[2] || treffer[3])) return false;
+  if (!istNodeInterpreter(treffer[1] || treffer[2] || treffer[3])) return false;
+  if (!istDiesesSkript(treffer[4] || treffer[5] || treffer[6])) return false;
   // Nach dem Skriptpfad duerfen nur noch Argumente stehen — kein Verketten, kein Kommentar,
   // keine Umleitung, keine Kommando-Substitution.
   const rest = raw.slice(treffer[0].length);
