@@ -22,6 +22,39 @@ Bauplans) dokumentiert die einzige Abweichung.
 
 ### Added
 
+- **`/nc:setup` — SSOT-Provisionierung** (Bauplan
+  `2026-08-10-ssot-provisionierung-bauplan.md`). Schließt eine Lücke, die der Doks-Autosync
+  sonst zur aktiv irreführenden Anweisung gemacht hätte: Der Marketplace liefert **nur das
+  Plugin** aus, die Wissensbasis liegt außerhalb von `plugins/nc/` und reist nicht mit — der
+  Firmen-Block in der globalen `CLAUDE.md` verweist aber auf sie („vor Vermutungen dort
+  triagieren"). Ohne lokale Kopie zeigte dieser Router ins Leere. Das Vorbild kennt dieselbe
+  Lücke und nennt sie in seinem Folgeplan einen **Rollout-Blocker**.
+  **Ein Skill, ein Befehl, ein Ergebnis:** idempotent — fehlt die Kopie, wird sparse geklont
+  (`--filter=blob:none --sparse`); ist sie da, wird per **Fast-Forward** nachgezogen. Nie
+  Merge, Rebase, Reset oder Force; eine lokal veränderte Kopie wird **gemeldet, nicht
+  überschrieben**. Ablage `~/.nc/ssot/` (Override `NC_SSOT_DIR`) mit einem Zeiger
+  `index.json`, über den andere Skills die Kopie finden. Arbeits-Repo und globale
+  `CLAUDE.md` werden nie angefasst.
+  **Registry-getrieben:** der Kern immer, dazu jede Abteilung, die `repository` **und** das
+  neue optionale Feld `repoKnowledgePath` führt. Heute löst das auf „nur Kern" auf — bei den
+  Satelliten `nc-felix`/`nc-biggi` **ist** das Repo das Plugin, ihr Wissen reist im Paket mit
+  und aktualisiert sich über den Marketplace-Pin; dort gibt es nichts zu klonen. Das Feld ist
+  der dokumentierte Andockpunkt für künftige Abteilungen, ohne Codeänderung.
+  **`/nc:start` bleibt unverändert** (Maintainer-Weisung): Die Verbindung ist eine reine
+  Abhängigkeit — `/nc:start` *braucht* die Wissensbasis, `/nc:setup` *liefert* sie. Bewusst
+  keine automatische Frischeprüfung, kein Prüf-Modus, kein Frische-Fenster; der Skill wird
+  von Hand aufgerufen.
+  **Bekannte Grenze, offen benannt:** Das OS-Repo ist privat — ohne `git` und ohne Zugang
+  bleibt die Wissensbasis unerreichbar. Der Skill sagt das dann klar, statt einen Erfolg
+  vorzutäuschen (robuster für nicht-technische Nutzer wäre, die Wissensbasis ins
+  Plugin-Paket auszuliefern; als Nachiteration im Bauplan §6 festgehalten).
+  8 Tests gegen ein lokal erzeugtes `file://`-Repo — ohne Netz und ohne Zugangsdaten, damit
+  sie auch in der CI eines Forks laufen. Sie fanden beim ersten Lauf **zwei echte Fehler**:
+  (a) das Muster für „git fehlt" traf die harmlose git-Warnung „filtering **not recognized**
+  by server" und meldete damit jeden git-Fehler — auch eine Divergenz — als fehlende
+  Installation; ein fehlendes Binary wird jetzt strukturell über `error.code` erkannt.
+  (b) Die Divergenz-Erkennung suchte „diverged", neuere git-Versionen sagen aber
+  „**Diverging** branches can't be fast-forwarded". Suite: 82 → 90.
 - **Gate 2 — Session-Start-Zwang (AP2), zweiteilig nach dem Zangen-Prinzip:** Ein Hook kann
   keinen Skill starten, nur blocken und injizieren — deshalb sagt
   `hooks/nc-session-start.js` (SessionStart) dem Agenten, was zu tun ist, und
