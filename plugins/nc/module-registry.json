@@ -1,18 +1,18 @@
 {
   "version": "0.6.0",
   "marketplace": "novacore-os",
-  "_hinweis": "Reiner Metadaten-SSOT des Produkts: Hierarchie Abteilung → Plugin → Module (Skill-Präfix) → Skills. Die Datei steuert NICHTS aus — was ein Nutzer bekommt, entscheidet allein, welche Plugins er installiert hat; die Abteilungsgrenze ist die Plugin-Grenze. staendig=true heißt: Die Abteilung liegt im Kern und wird über die dependencies jedes Abteilungsplugins immer mitaktiviert, ist also technisch nicht abwählbar. minCoreVersion ist dokumentarisch. repoSkillsPath ist der Pfad IM REPO; zur Laufzeit heißt das Skill-Verzeichnis in jedem Plugin schlicht skills/ (Default-Scan). Kein Verzeichnis-Nesting für Skills: der Plugin-Scanner erwartet skills/<name>/SKILL.md, Module sind Namenspräfixe. Ordner ohne SKILL.md ignoriert der Scanner. AFFILIATE-ABGRENZUNG (Bauplan 2026-08-10, AP7): Der Marketplace führt neben den Kategorien kern/abteilung auch die Kategorie affiliate — persönliche bzw. externe Werkzeuge (heute: kimi-code-plugin-cc). Affiliate-Plugins sind KEINE Abteilungen: sie bekommen keine Zeile in dieser Registry, hängen an keinem NovaCore-Plugin und teilen kein Wissen mit dem Kern oder den Satelliten (Begriffsnorm: knowledge-base/grundwissen/NovaCore-OS-SSOT-Definition.md, Abschnitt firmenintern vs. affiliate).",
+  "_hinweis": "Reiner Metadaten-SSOT des Produkts: Hierarchie Abteilung → Plugin → Module (Skill-Präfix) → Skills. Die Datei steuert NICHTS aus — was ein Nutzer bekommt, entscheidet allein, welche Plugins er installiert hat; die Abteilungsgrenze ist die Plugin-Grenze. staendig=true heißt: Die Abteilung liegt im Kern und wird über die dependencies jedes Abteilungsplugins immer mitaktiviert, ist also technisch nicht abwählbar. minCoreVersion ist dokumentarisch. repoKnowledgePath ist OPTIONAL und steuert die SSOT-Provisionierung (/nc:setup): Es nennt den Pfad IM SATELLITEN-REPO, unter dem eine Abteilung eigenes Wissen AUSSERHALB ihres Plugin-Anteils führt. Nur Abteilungen, die repository UND repoKnowledgePath setzen, werden lokal geklont. Heute setzt es keine: bei nc-felix/nc-biggi IST das Repo das Plugin, ihr Wissen reist im Paket mit und aktualisiert sich über den Marketplace-Pin — dort gibt es nichts zu klonen. Das Feld ist der dokumentierte Andockpunkt für künftige Abteilungen. repoSkillsPath ist der Pfad IM REPO; zur Laufzeit heißt das Skill-Verzeichnis in jedem Plugin schlicht skills/ (Default-Scan). Kein Verzeichnis-Nesting für Skills: der Plugin-Scanner erwartet skills/<name>/SKILL.md, Module sind Namenspräfixe. Ordner ohne SKILL.md ignoriert der Scanner. AFFILIATE-ABGRENZUNG (Bauplan 2026-08-10, AP7): Der Marketplace führt neben den Kategorien kern/abteilung auch die Kategorie affiliate — persönliche bzw. externe Werkzeuge (heute: kimi-code-plugin-cc). Affiliate-Plugins sind KEINE Abteilungen: sie bekommen keine Zeile in dieser Registry, hängen an keinem NovaCore-Plugin und teilen kein Wissen mit dem Kern oder den Satelliten (Begriffsnorm: knowledge-base/grundwissen/NovaCore-OS-SSOT-Definition.md, Abschnitt firmenintern vs. affiliate).",
   "abteilungen": [
     {
       "name": "gemeinsam",
       "plugin": "nc",
       "namespace": "/nc:",
       "staendig": true,
-      "status": "ausgeliefert im Kern — nutzbar: start, save-session, journal, doku-sync, os-info, skill-builder",
+      "status": "ausgeliefert im Kern — nutzbar: start, save-session, journal, setup, doku-sync, os-info, skill-builder",
       "repoSkillsPath": "plugins/nc/skills",
       "rahmen": "plugins/nc/wp-rahmen.md",
       "module": {
-        "core": "Session-Zyklus WP0/WP8 + Journal + Infrapflege: start [gebaut], save-session [gebaut], journal [gebaut], doku-sync [gebaut], os-info [gebaut], skill-builder [gebaut] (kein Präfix)"
+        "core": "Session-Zyklus WP0/WP8 + Journal + Infrapflege: start [gebaut], save-session [gebaut], journal [gebaut], setup [gebaut], doku-sync [gebaut], os-info [gebaut], skill-builder [gebaut] (kein Präfix)"
       }
     },
     {

@@ -27,6 +27,30 @@ identisch installieren.
 > dann `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` setzen (nutzt die gh/git-Credentials) oder
 > einen SSH-Key einrichten.
 
+## 1a. Wissensbasis bereitstellen (einmal pro Rechner)
+
+Der Marketplace liefert **nur das Plugin** aus — Hooks, Skills, Formatregeln, WP-Rahmen.
+Die **Wissensbasis liegt im OS-Repo außerhalb des Plugin-Verzeichnisses** und reist deshalb
+nicht mit. `/nc:start` braucht sie aber, und der Firmen-Block in der globalen `CLAUDE.md`
+verweist auf sie. Deshalb nach der Installation **einmal**:
+
+```
+/nc:setup
+```
+
+Der Skill klont die nötigen Quellen sparse nach `~/.nc/ssot/` und legt dort einen Zeiger
+`index.json` ab, über den die anderen Skills sie finden. Er ist idempotent: bei jedem
+weiteren Aufruf zieht er nur per Fast-Forward nach. Später erneut aufrufen, wenn die
+Wissensbasis veraltet ist — automatisch geschieht das **nicht**.
+
+- **Voraussetzung:** `git` im PATH **und** Zugriff auf das private OS-Repo (z. B. per
+  `gh auth login` oder Git-Credential-Helper). Fehlt eines von beidem, sagt der Skill das
+  klar — er täuscht keinen Erfolg vor.
+- **Was er nie tut:** mergen, rebasen, zurücksetzen oder eine lokal veränderte Kopie
+  überschreiben. Solche Fälle meldet er, statt sie zu überfahren.
+- **Satelliten brauchen das nicht:** Bei `nc-felix`/`nc-biggi` ist das Repo das Plugin —
+  ihr Wissen reist im Paket mit und aktualisiert sich über den Marketplace.
+
 ## 1b. Kollegen-OS installieren (Satelliten `nc-felix` / `nc-biggi`)
 
 Die eigenständigen Abteilungs-OS installieren sich aus demselben Marketplace:
