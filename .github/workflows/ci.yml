@@ -1,0 +1,109 @@
+name: CI
+
+# Die Hooks (FFG, Start-Gate) laufen beim Team auf Windows UND Linux, deshalb beide
+# Plattformen. Node-Spanne 20-24: das Team-Minimum ist nicht gepinnt, und
+# `node --test` mit Glob-Argumenten verhält sich je Version unterschiedlich -
+# darum expandiert hier immer die Bash das Glob (shell: bash, auch auf Windows).
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: ["20", "22", "24"]
+    steps:
+      # Actions per Full-SHA gepinnt: mutable Major-Tags wären derselbe
+      # Supply-Chain-Vektor, gegen den der Marketplace seine Satelliten pinnt.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # Die Release-Tag-Invariante in struktur.test.mjs liest `git tag --list`;
+          # der Standard-Checkout holt keine Tags, der Test waere sonst in der CI
+          # zahnlos (er ueberspringt bei leerer Tagliste bewusst still).
+          fetch-tags: true
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: ${{ matrix.node }}
+
+      # Aufrufform wortgleich aus der Abschluss-Checkliste (AGENTS.md):
+      # explizites Glob, nie ein Verzeichnis-Argument.
+      - name: Testsuite (Gate- + Struktur-Invarianten)
+        shell: bash
+        run: node --test plugins/nc/tests/*.test.mjs
+
+  plugin-validate:
+    name: Plugin-Validierung (beide Ebenen)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+
+      # Version gepinnt: @latest hieße, das Validierungsverhalten kann sich unter
+      # den Füßen ändern. Bump bewusst zusammen mit der Team-Mindestversion pflegen
+      # (Aktualisierungs-Index §2.3, Zeile "Mindestversion Claude Code / Node").
+      - name: Claude Code CLI installieren
+        run: npm install -g @anthropic-ai/claude-code@2.1.220
+
+      # Harter Guard gegen stilles Überspringen: ohne CLI auf dem PATH würden
+      # die folgenden Schritte nie etwas prüfen.
+      - name: CLI auflösbar
+        run: claude --version
+
+      # Positivkontrolle VOR der eigentlichen Prüfung: Ein absichtlich defekter
+      # Plain-Scalar in einer Wegwerf-Kopie MUSS den Validator rot machen. Meldet er
+      # dort keinen Fehler, prüft er keine Skills mehr - dann ist jedes Grün darunter
+      # wertlos (genau so blieben im Vorbild-System 19 von 22 Skills mit toter
+      # Frontmatter unentdeckt).
+      # Robustheit: Ziel-Selektion exakt auf die Frontmatter-Zeile "description: >-"
+      # begrenzt (nie Body-Treffer), und eine intakte Kontrollgruppe unterscheidet
+      # "Validator erkennt Defekt" von "Validator crasht aus fremdem Grund" - beides
+      # wäre sonst ein Fehlschlag des kaputten Laufs und zählte als bestanden.
+      - name: Positivkontrolle des Validators
+        run: |
+          cp -R plugins/nc /tmp/nc-intakt
+          cp -R plugins/nc /tmp/nc-kaputt
+          ziel="$(grep -rlE '^description: >-[[:space:]]*$' /tmp/nc-kaputt/skills --include=SKILL.md | head -1)"
+          test -n "$ziel"
+          sed -i 's/^description: >-[[:space:]]*$/description: Kaputt: absichtlich defekter Plain-Scalar/' "$ziel"
+          claude plugin validate /tmp/nc-intakt --strict
+          if claude plugin validate /tmp/nc-kaputt --strict; then
+            echo "::error::Validator hat den absichtlich defekten Skill NICHT bemängelt - Skill-Prüfung ist wirkungslos"
+            exit 1
+          fi
+          echo "Positivkontrolle bestanden: intakte Kopie grün, defekte Kopie rot."
+
+      - name: Marketplace-Manifest (Wurzel-Ebene)
+        run: claude plugin validate .
+
+      # Die Wurzel-Variante allein genügt nie - sie prüft keine Skills
+      # (AGENTS.md, Abschluss-Checkliste). Deshalb zusätzlich jedes Plugin.
+      # Fehler werden gesammelt statt beim ersten roten Plugin abzubrechen -
+      # ein Lauf zeigt den Gesamtzustand.
+      - name: Jedes Plugin inkl. Skills (--strict)
+        run: |
+          fail=0
+          for p in plugins/*/; do
+            echo "::group::${p}"
+            claude plugin validate "$p" --strict || fail=1
+            echo "::endgroup::"
+          done
+          exit "$fail"

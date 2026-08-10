@@ -1,63 +1,168 @@
+// Tests fuer den Session-Start-Zwang (plugins/nc/hooks/nc-session-start.js, Gate 2 Teil 1;
+// Bauplan 2026-08-10 „Onsite-Align-Umbau", AP2). Der Hook injiziert Kontext und kann laut
+// offizieller Doku NICHT blocken — geprueft wird also: bedingungslose Aktivierung (KEIN
+// Marker mehr), Inhalt (Pflicht-Einstieg + Stand), Robustheit (fehlende Quellen, defekte
+// Eingabe, kein Git) und der Env-Opt-out. Jeder Fall bekommt ein eigenes Fixture-Verzeichnis.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
 
-// nc-session-start.js ist CommonJS (require.main-Guard) — ueber createRequire
-// einbinden statt per ESM-Import, damit module.exports direkt nutzbar bleibt.
-const require = createRequire(import.meta.url);
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const HOOK_PATH = path.resolve(HERE, '..', 'hooks', 'nc-session-start.js');
-const PLUGIN_JSON_PATH = path.resolve(HERE, '..', '.claude-plugin', 'plugin.json');
+const HIER = path.dirname(fileURLToPath(import.meta.url));
+const HOOK = path.join(HIER, '..', 'hooks', 'nc-session-start.js');
+const PLUGIN_ROOT = path.join(HIER, '..');
 
-const { buildSessionStartResponse, hasNcOsMarker, readOsVersion } = require(HOOK_PATH);
-
-function tmpRepo() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'nc-session-start-'));
+/** Frisches Fixture-Verzeichnis mit optionalen Dateien (relativer Pfad → Inhalt). */
+function fixture(extra = {}) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nc-start-'));
+  for (const [rel, inhalt] of Object.entries(extra)) {
+    const ziel = path.join(dir, rel);
+    fs.mkdirSync(path.dirname(ziel), { recursive: true });
+    fs.writeFileSync(ziel, inhalt, 'utf8');
+  }
+  return dir;
 }
 
-function expectedVersion() {
-  const manifest = JSON.parse(fs.readFileSync(PLUGIN_JSON_PATH, 'utf8'));
-  return manifest.version;
+/** Hook ausfuehren. Gibt { status, stdout, ausgabe } zurueck; `ausgabe` = geparstes JSON | null. */
+function runHook(cwd, { stdin, env = {} } = {}) {
+  const eingabe = stdin === undefined
+    ? JSON.stringify({ session_id: 'test', cwd, source: 'startup', hook_event_name: 'SessionStart' })
+    : stdin;
+  const kindEnv = { ...process.env, CLAUDE_PLUGIN_ROOT: PLUGIN_ROOT };
+  // Muss weg: ein geerbtes CLAUDE_PROJECT_DIR wuerde das Fixture-Scoping aushebeln, ein
+  // geerbtes NC_START_GATE=off (dokumentierte Koexistenz-Empfehlung) die ganze Suite
+  // aushebeln — sie waere rot, ohne dass am Code etwas falsch ist.
+  delete kindEnv.CLAUDE_PROJECT_DIR;
+  delete kindEnv.NC_START_GATE;
+  Object.assign(kindEnv, env);
+
+  const r = spawnSync(process.execPath, [HOOK], {
+    cwd, input: eingabe, encoding: 'utf8', env: kindEnv
+  });
+  const stdout = (r.stdout || '').trim();
+  let ausgabe = null;
+  if (stdout) {
+    try { ausgabe = JSON.parse(stdout); } catch (_) { ausgabe = 'UNPARSEBAR'; }
+  }
+  return { status: r.status, stdout, ausgabe };
 }
 
-test('Marker-DATEI .nc-os vorhanden: Kontext-String mit Version aus plugin.json', () => {
-  const repo = tmpRepo();
-  fs.writeFileSync(path.join(repo, '.nc-os'), '');
+/** Kontext eines erfolgreichen Laufs. */
+function kontextVon(dir, opts) {
+  const { status, ausgabe } = runHook(dir, opts);
+  assert.equal(status, 0);
+  assert.notEqual(ausgabe, 'UNPARSEBAR', 'Ausgabe muss gueltiges JSON sein');
+  assert.ok(ausgabe && ausgabe.hookSpecificOutput, 'hookSpecificOutput fehlt');
+  assert.equal(ausgabe.hookSpecificOutput.hookEventName, 'SessionStart');
+  return ausgabe.hookSpecificOutput.additionalContext;
+}
 
-  const response = buildSessionStartResponse({ cwd: repo });
-
-  assert.notEqual(response, null);
-  const context = response.hookSpecificOutput.additionalContext;
-  assert.match(context, /\/nc:start/);
-  assert.match(context, /\/nc:save-session/);
-  assert.ok(
-    context.includes(`v${expectedVersion()}`),
-    `Kontext soll Version ${expectedVersion()} enthalten, war: ${context}`
-  );
-
-  // readOsVersion() liest dieselbe plugin.json direkt.
-  assert.equal(readOsVersion(), expectedVersion());
+test('Aktiv ohne jede Marker-Datei (Aktivierungsbedingung ist die Installation)', () => {
+  // Regression gegen den gestrichenen `.nc-os`-Marker: ein leeres Verzeichnis ohne
+  // Marker, ohne Git, ohne Repo-Quellen muss den Regelblock trotzdem liefern.
+  const kontext = kontextVon(fixture());
+  assert.match(kontext, /Pflicht-Einstieg/);
+  assert.ok(!/\.nc-os/.test(kontext), 'der Marker darf nirgends mehr erwaehnt werden');
 });
 
-test('Marker als VERZEICHNIS .nc-os (Regressionstest Bug 0.1.1): liefert null', () => {
-  const repo = tmpRepo();
-  fs.mkdirSync(path.join(repo, '.nc-os'));
-
-  const response = buildSessionStartResponse({ cwd: repo });
-
-  assert.equal(response, null);
-  assert.equal(hasNcOsMarker(repo), false);
+test('Injiziert Pflicht-Einstieg, rote Linien und die Kern-Version', () => {
+  const kontext = kontextVon(fixture());
+  assert.match(kontext, /\/nc:start/, 'muss auf das Start-Ritual verweisen');
+  assert.match(kontext, /Rote Linien/, 'muss die roten Linien nennen');
+  assert.match(kontext, /Kein Commit\/Push ohne/, 'muss die Freigabe-Regel nennen');
+  assert.match(kontext, /0\.\d+\.\d+/, 'muss die Version des Kern-Plugins nennen');
 });
 
-test('kein Marker im Repo-Baum: liefert null', () => {
-  const repo = tmpRepo();
+test('Injiziert den Stempel-Befehl samt Session-Schluessel (Zangen-Prinzip)', () => {
+  const kontext = kontextVon(fixture());
+  assert.match(kontext, /nc-start-stempel\.js/, 'Stempel-Skript fehlt im Hinweis');
+  assert.match(kontext, /--session test/, 'Session-Schluessel fehlt im Stempel-Befehl');
+  assert.match(kontext, /--branch <branch> --head <head>/, 'Fakten-Argumente fehlen');
+});
 
-  const response = buildSessionStartResponse({ cwd: repo });
+test('NC_START_GATE=off schaltet den Hook ab', () => {
+  for (const wert of ['off', '0', 'false', 'disabled', 'OFF']) {
+    const { status, stdout } = runHook(fixture(), { env: { NC_START_GATE: wert } });
+    assert.equal(status, 0);
+    assert.equal(stdout, '', `NC_START_GATE=${wert} muss den Hook abschalten`);
+  }
+});
 
-  assert.equal(response, null);
-  assert.equal(hasNcOsMarker(repo), false);
+test('Fehlende Repo-Quellen brechen den Hook nicht (fremdes Repo ohne knowledge-base)', () => {
+  const kontext = kontextVon(fixture());
+  assert.ok(!/Laufende Vorhaben/.test(kontext),
+    'ohne grundwissen/-Ordner darf der Abschnitt nicht erscheinen');
+  assert.ok(!/Unreleased/.test(kontext), 'ohne CHANGELOG darf der Abschnitt nicht erscheinen');
+  assert.ok(!/Abteilungen und Module/.test(kontext),
+    'ohne Registry darf der Abschnitt nicht erscheinen');
+});
+
+test('Vorhandene Quellen landen im Kontext (VERSION, CHANGELOG, Registry)', () => {
+  const dir = fixture({
+    'VERSION': '9.9.9\n',
+    'CHANGELOG.md': '# Changelog\n\n## [Unreleased]\n\n### Added\n\n- **Testeintrag** mit Prosa\n  Fortsetzungszeile die nicht erscheinen darf\n\n## [0.1.0] — 2026-01-01\n- alt\n',
+    'plugins/nc/module-registry.json': JSON.stringify({
+      version: '9.9.9',
+      abteilungen: [
+        { name: 'gemeinsam', namespace: '/nc:', staendig: true, module: { core: 'x', _weiteres: 'y' } },
+        { name: 'development', namespace: '/nc-development:', module: { fe: 'a', be: 'b' } }
+      ]
+    })
+  });
+  const kontext = kontextVon(dir);
+  assert.match(kontext, /9\.9\.9/, 'Leitversion aus VERSION fehlt');
+  assert.match(kontext, /Testeintrag/, 'Rubrik-/Bullet-Zeile des CHANGELOG fehlt');
+  assert.ok(!/Fortsetzungszeile/.test(kontext),
+    'Prosa-Fortsetzungszeilen sind Rauschen und muessen wegfallen');
+  assert.ok(!/\[0\.1\.0\]/.test(kontext), 'nur [Unreleased] darf ausgelesen werden');
+  assert.match(kontext, /\/nc-development:/, 'Namespace aus der Registry fehlt');
+  assert.match(kontext, /fe, be/, 'Modulliste aus der Registry fehlt');
+  assert.ok(!/_weiteres/.test(kontext), 'Registry-Schluessel mit _ sind intern und gehoeren nicht rein');
+});
+
+// NovaCore-Mapping (Bauplan §2): kein Ordner „Aktive Baupläne" wie im Vorbild — gelistet
+// werden die juengsten 5 datierten Dateien aus knowledge-base/grundwissen/.
+test('Laufende Vorhaben: juengste 5 datierte Dateien aus grundwissen/, undatierte nie', () => {
+  const dateien = {};
+  for (const tag of ['01', '02', '03', '04', '05', '06']) {
+    dateien['knowledge-base/grundwissen/2026-03-' + tag + '-plan-' + tag + '.md'] = 'x\n';
+  }
+  dateien['knowledge-base/grundwissen/NovaCore-OS-Produktarchitektur.md'] = 'x\n';
+  const kontext = kontextVon(fixture(dateien));
+
+  assert.match(kontext, /Laufende Vorhaben/);
+  assert.match(kontext, /2026-03-06-plan-06\.md/, 'juengste Datei fehlt');
+  assert.match(kontext, /2026-03-02-plan-02\.md/, 'fuenftjuengste Datei fehlt');
+  assert.ok(!/2026-03-01-plan-01\.md/.test(kontext), 'hoechstens 5 Dateien');
+  assert.ok(!/Produktarchitektur/.test(kontext),
+    'undatierte Dauerreferenzen sind keine laufenden Vorhaben');
+});
+
+test('Repo-Wurzel wird aus einem Unterverzeichnis gefunden (Git-Toplevel)', () => {
+  const wurzel = fixture({ 'VERSION': '7.7.7\n' });
+  if (spawnSync('git', ['-C', wurzel, 'init', '-q'], { encoding: 'utf8' }).status !== 0) return;
+  const tief = path.join(wurzel, 'plugins', 'nc', 'skills');
+  fs.mkdirSync(tief, { recursive: true });
+  const kontext = kontextVon(tief);
+  assert.match(kontext, /7\.7\.7/,
+    'VERSION der Repo-Wurzel muss auch aus einem Unterordner gelesen werden');
+});
+
+test('Defekte Eingabe blockt nichts (fail-open, Exit 0)', () => {
+  const dir = fixture();
+  for (const stdin of ['', 'kein json', '[]', 'null']) {
+    const { status } = runHook(dir, { stdin });
+    assert.equal(status, 0, `Eingabe ${JSON.stringify(stdin)} darf nicht zu Exit != 0 fuehren`);
+  }
+});
+
+test('Umlaut-Pfade erscheinen lesbar (core.quotepath=false)', () => {
+  const dir = fixture();
+  if (spawnSync('git', ['-C', dir, 'init', '-q'], { encoding: 'utf8' }).status !== 0) return;
+  fs.writeFileSync(path.join(dir, 'Bauplän.md'), 'x\n', 'utf8');
+  const kontext = kontextVon(dir);
+  assert.ok(!/\\303/.test(kontext), 'git darf Nicht-ASCII-Pfade nicht oktal-escaped liefern');
 });

@@ -39,6 +39,17 @@
       },
       "description": "Abteilung biggi: eigenständiges Biggi-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder; Arbeitsmodul-Konvention reserviert: controlling/ctrl, medizinisches/mdzn, dokumentation-daily-work/doc+day — ein Modul, zwei Präfixe) und eigener Kontroll-Schicht (FFG mit Review-Härtungen + Session-Start-Zwang nach Onsite-Vorbild, Opt-outs NC_FFG=off / NC_START_GATE=off). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-felix betreiben. Satelliten-Repo (Standardprozess plugin-bau.md §3b).",
       "category": "abteilung"
+    },
+    {
+      "name": "kimi-code-plugin-cc",
+      "source": {
+        "source": "github",
+        "repo": "ArchiDoxx/Kimi-code-Plugin-CC",
+        "ref": "v1.4.0",
+        "sha": "159cd9d059b5e2e918a0333693a59f3620fdf61a"
+      },
+      "description": "Affiliate-Werkzeug (kein Abteilungs-OS): bindet headless CLI-Agenten — vor allem Kimi Code — als externe Zweitmeinung in Claude Code ein. Liefert Review-Loops, Planning-Loops und adversariale Dual-Reviews (santa) für heterogene Besetzung: Implementierer und Reviewer sind verschiedene Modelle. HOST-ANFORDERUNGEN: das Plugin bringt einen MCP-Server via stdio mit und startet ihn über `uv run` — `uv` muss installiert sein, die `kimi`-CLI ebenfalls (samt eigenem Zugang). Lizenz MIT, externes Repo (nicht von NovaCore gepflegt), gepinnt auf den Commit des annotierten Tags v1.4.0. Hängt an keinem NovaCore-Plugin und trägt keine Abteilungs-Registry-Zeile.",
+      "category": "affiliate"
     }
   ]
 }

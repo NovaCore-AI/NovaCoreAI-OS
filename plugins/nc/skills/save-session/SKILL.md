@@ -54,8 +54,8 @@ sichert **Wissen** — er stellt keine Commit-Reife her und ersetzt kein Review.
 - **Der Agent committet und pusht nie selbst.** Keine automatischen Pushes, Merges, Posts,
   Releases oder Deployments ohne explizite Nutzerfreigabe — auch nicht „nur schnell den
   Journal-Eintrag".
-- **Fehlender `.nc-os`-Marker ist kein Abbruchgrund** — er steuert nur den Begrüßungs-Scope des
-  Session-Start-Hooks. Der Skill sichert den Stand trotzdem.
+- **Kein Marker nötig** — die Kontroll-Schicht ist markerlos aktiv, wo der Kern installiert
+  ist. Der Skill sichert den Stand in jedem Arbeits-Repo.
 
 ## Verifikation
 
