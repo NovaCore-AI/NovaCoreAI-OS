@@ -81,3 +81,37 @@
   als Escape-Sequenz (Backslash-uFEFF) schreiben; nach jedem solchen Fund einen
   Node-Scan über alle berührten Textdateien laufen lassen; in Bash→Node-Einzeilern
   Ersatzstrings aus String.fromCharCode bauen statt Escapes zu raten.
+
+### 2026-08-10 — Regeltext über die Plugin-Grenze verletzte die Regel, die er beschreibt
+
+- **Kontext/Aufgabe:** Onsite-Align-Umbau, AP5 — Port des Skills `skill-builder` nach
+  `plugins/nc/skills/skill-builder/SKILL.md`.
+- **Was schiefging:** In der Regel „Plugin-Grenze wahren" stand das verbotene Muster als
+  Literal im Fließtext. Die Struktur-Invariante „Plugin-Dateien verweisen nicht über die
+  Plugin-Grenze" prüft zeilenweise per Regex und kennt keinen Unterschied zwischen Verweis
+  und Zitat — die Suite wurde rot (76/77).
+- **Ursache:** Beim Formulieren wurde an den Leser gedacht, nicht an den Prüfer. Die einzige
+  Datei, die das Muster zitieren darf, ist `referenz/skill-authoring.md` (namentliche
+  Ausnahme im Test) — das war bekannt, wurde beim Schreiben aber nicht mitgedacht.
+- **Lernerkenntnis/Präventionsregel:** In ausgelieferten Dateien **verbotene Muster nie
+  wörtlich zitieren**, sondern benennen („nie ins Elternverzeichnis springen") und für den
+  Wortlaut auf die Ausnahme-Datei verweisen. Allgemeiner: Wer eine Regel in Prosa
+  wiedergibt, die ein Test mechanisch prüft, prüft zuerst, ob die eigene Formulierung
+  selbst darunter fällt.
+
+### 2026-08-10 — Neue Invariante deckte Altbestand auf; erster Impuls war, sie zu entschärfen
+
+- **Kontext/Aufgabe:** Onsite-Align-Umbau, AP6 — Port der Release-Tag-Invariante
+  („jede veröffentlichte CHANGELOG-Version außer der jüngsten ist getaggt").
+- **Was schiefging:** Der Test wurde beim ersten Lauf rot, weil `0.3.0` und `0.4.0` nie
+  getaggt wurden. Der erste Impuls war, die Regel weicher zu fassen (nur die jüngsten N
+  Versionen prüfen), statt den Befund als das zu behandeln, was er ist: ein echter,
+  vorbestehender Drift.
+- **Ursache:** Eine rote Suite fühlt sich wie ein Bau-Fehler an, obwohl sie hier genau das
+  tat, wofür sie portiert wurde. Rot ≠ falsch.
+- **Lernerkenntnis/Präventionsregel:** Deckt eine **neu eingeführte** Invariante Altbestand
+  auf, wird die Invariante **nicht** aufgeweicht. Richtig ist: Befund melden, Ursache
+  benennen, und wenn die Behebung eine rote Linie berührt (hier: Tags setzen braucht
+  Maintainer-Freigabe), eine **endliche, namentlich gelistete und kommentierte** Ausnahme
+  bauen plus Plan-Nachtrag. Eine unbegrenzte Lockerung hätte die Regel für immer stumpf
+  gemacht.

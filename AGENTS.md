@@ -19,7 +19,13 @@
 3. **Planungsstand:** Specs/Pläne liegen final in `knowledge-base/grundwissen/` mit
    Datumspräfix — die jüngste Spec ist der aktuellste Planungsstand; die Produktvision
    (`NovaCore-OS-Produktarchitektur.md`) ist die Referenz für Vision-Abgleiche.
-4. **Aufgabenspezifisch nachladen** (Glossar unten): Skill-Arbeit →
+4. **Triage über den Master-Index:** `knowledge-base/SSOT-Document-Index.md` — Teil 1 sagt,
+   wohin ein Dokument gehört, Teil 2 („Relevant wenn …") nennt je Quelle die
+   Abruf-Situation. Vor Vermutungen dort nachsehen.
+5. **Vor jeder Änderung:** `knowledge-base/standardprozesse/aktualisierungs-index.md` —
+   die Änderungs-Matrix nennt je Änderungsart, was vorher zu lesen und was in derselben
+   Änderung nachzuziehen ist.
+6. **Aufgabenspezifisch nachladen** (Glossar unten): Skill-Arbeit →
    `plugins/nc/referenz/skill-authoring.md` · Plugin-/Marketplace-Arbeit →
    `knowledge-base/standardprozesse/plugin-bau.md` (neue Abteilung §3 · Satellit-Extraktion
    §3a · **eigenständiges Kollegen-/Abteilungs-OS §3b** — pilotiert 2026-07-28 mit
@@ -55,7 +61,8 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | `CHANGELOG.md` | autoritative Änderungshistorie (Keep a Changelog) |
 | `VERSION` | Produkt-Leitversion (SemVer) = Version des Kern-Plugins |
 | `.claude-plugin/marketplace.json` | Marketplace `novacore-os` — Einträge ohne `version`-Feld (die steht allein in der jeweiligen `plugin.json`); die Repo-Wurzel ist **nur** Marketplace-Wurzel, kein Plugin |
-| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`save-session`/`journal`, Hooks (FFG `nc-ffg.js` + `lib/`, `nc-session-start.js`), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `nc-sync.md`, `tests/` |
+| `.github/workflows/` | `ci.yml` (Ubuntu+Windows × Node 20/22/24, Suite + Validator-Positivkontrolle) und `release.yml` (Tag `nc--v*` → GitHub-Release aus dem CHANGELOG-Abschnitt) |
+| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`save-session`/`journal`/`doku-sync`/`os-info`/`skill-builder`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; dazu `nc-doks-autosync.js`) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `nc-sync.md`, `tests/` |
 | `plugins/nc-development/` | Abteilung `development` (Namespace `/nc-development:`): 11 Skills in 4 Modulen (`fe`/`be`/`flc`/`wzs`, flaches Layout) + `workflow.md` (Fachablauf WP1–WP7) |
 | `vorlagen/abteilungsplugin/` | Vorlage für neue Abteilungsplugins — **kein Plugin** (`.vorlage`-Endungen) |
 | `knowledge-base/` | Wissensbasis — Glossar im nächsten Abschnitt |
@@ -66,9 +73,15 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 
 | Kategorie | Zweck | Wann konsultieren |
 |---|---|---|
-| `grundwissen/` | Produktvision, Design-Specs, Pläne (Datumspräfix; jüngste Spec = Planungsstand) | Vision-/Architektur-Fragen; vor Design-Entscheidungen; Planungsarbeit |
-| `standardprozesse/` | verbindliche Abläufe: `plugin-bau.md` (Plugin-/Marketplace-Ebene), `os-bau-methode.md` (Gesamt-Methode, an die Firmenphilosophie anpassbar) | vor **jeder** inhaltlichen Änderung am Plugin oder Repo — zuerst prüfen, ob ein Standardprozess existiert |
+| **`SSOT-Document-Index.md`** (Wurzel) | **Master-Index** der Wissensbasis: Teil 1 Ordner-Routing (wohin gehört ein Dokument), Teil 2 Quellen-Triage („Relevant wenn …") über alle Bestandsdateien. **Einzige Datei auf Wurzelebene** (testerzwungen) | **zuerst** — vor dem Griff in eine Kategorie und vor dem Anlegen/Verschieben/Löschen einer Wissensdatei |
+| `grundwissen/` | Produktvision, Begriffsnormen (SSOT-, Gates-, CLAUDE-Ebenen-Definition), Design-Specs und Pläne (Datumspräfix; jüngste Datei = Planungsstand) | Vision-/Architektur-Fragen; vor Design-Entscheidungen; Planungsarbeit; wenn ein Begriff (SSOT, Gate, CLAUDE-Ebene) erklärt oder abgegrenzt werden muss |
+| `standardprozesse/` | verbindliche Abläufe: `aktualisierungs-index.md` (**„ich ändere X — was muss ich anfassen"**, Langfassung der Sync-Matrix + Prüfzyklus + Selbsttest), `plugin-bau.md` (Plugin-/Marketplace-Ebene), `os-bau-methode.md` (Gesamt-Methode, an die Firmenphilosophie anpassbar) | vor **jeder** inhaltlichen Änderung am Plugin oder Repo — zuerst prüfen, ob ein Standardprozess existiert |
 | `debugging-findings/` | `agent-learnings.md` — Agenten-Fehlerprotokoll (append-only Pflicht) | bei Debugging; nach jedem eigenen Fehler; vor neuen Aufgaben (eigene Fehlermuster) |
+
+**Zwei Indizes, zwei Fragen** — beide gehören zum Ablauf, in dieser Reihenfolge:
+`SSOT-Document-Index.md` beantwortet *„welches Dokument existiert, wohin gehört es, wann
+brauche ich es"*; `standardprozesse/aktualisierungs-index.md` beantwortet *„ich ändere X — was
+muss ich alles mitändern"*.
 
 Die **SKILL.md-Formatregeln** (`skill-authoring.md`) liegen **nicht** hier, sondern im
 Kern-Plugin (`plugins/nc/referenz/`), weil sie zur Laufzeit mit ausgeliefert werden — ein
@@ -104,10 +117,24 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   `medizinisches` (`mdzn`), `dokumentation-daily-work` (`doc` + `day` — ein Modul, zwei
   Präfixe). Pilotierter Ablauf als `plugin-bau.md` **§3b** formalisiert; Felix-Tags/
   -Releases nachgezogen, Pin auf `v0.2.1`. Spec-Nachtrag: jüngste Design-Spec, §11.
-- **Noch nicht gebaut** (bewusste Nicht-Ziele der jüngsten Spec, §8): Session-Start-Zwang
-  als blockierender Hook, weitere fe-/be-Skills, Module `architecture`/`incident-support`,
-  Kimi-/Codex-Copy-Deploy. (Satelliten-Repos sind seit dem `nc-felix`-Anlegen gebaut,
-  siehe oben.)
+- **Gebaut (Kern v0.6.0, 2026-08-10): Onsite-Align-Umbau** nach Bauplan
+  `grundwissen/2026-08-10-onsite-align-umbau-bauplan.md` (AP1–AP8). **Gate 2
+  (Session-Start-Zwang) ist jetzt gebaut** — zweiteilig nach dem Zangen-Prinzip:
+  `nc-session-start.js` injiziert Pflicht-Einstieg + lebenden Projektstand,
+  `nc-start-gate.js` lehnt jede schreibende Aktion ab, bis `/nc:start` per Fakten-Stempel
+  (`nc-start-stempel.js`, verifiziert Branch/HEAD gegen die reale Git-Lage) abgeschlossen
+  ist; **der `.nc-os`-Marker hat keine Funktion mehr**. Dazu: FFG-Angleich (geteilte
+  `hooks/lib/session-key.js`, `process.exitCode` statt `process.exit`, erweiterte
+  Read-only-Git-Erkennung) unter Beibehaltung aller NC-Review-Härtungen · **Doks-Autosync**
+  (`nc-doks-autosync.js` + `doks/global-claude-firmenblock.md`, CLAUDE-Ebene 1) ·
+  **SSOT-Infrastruktur** (Master-Index + Aktualisierungs-Index + drei Begriffsnormen) ·
+  drei Kern-Infrapflege-Skills · CI/Release-Workflows · Marketplace-Kategorie `affiliate`.
+  **Bewusst ausgeschlossen:** Queue-Logik/SSOT-Abstufung des Vorbilds und jeder
+  Memory-Share zwischen Satelliten (Maintainer-Entscheid; siehe SSOT-Definition).
+- **Noch nicht gebaut:** Gate 3 (Safety-Gate mit echtem Freigabedialog), Gate 4
+  (Sitzungsabschluss als Hook), CLAUDE-Ebene 0 und 2, weitere fe-/be-Skills, Module
+  `architecture`/`incident-support`. Übersicht:
+  `grundwissen/NovaCore-OS-Gates-Definition.md`.
 - **Versionsmodell:** **Je Plugin eine Version, genau an einer Stelle:**
   `plugins/<name>/.claude-plugin/plugin.json`. Marketplace-Einträge tragen **kein**
   `version`-Feld (Claude Code nutzt den `plugin.json`-Wert „without warning" — Doku
@@ -186,8 +213,10 @@ Repo-Struktur, Manifeste, `CHANGELOG.md` und Spec.
 
    | Änderung | Nachziehen in |
    |---|---|
-   | Datei/Ordner verschoben/umbenannt/gelöscht | Repo-Karte + Glossar (hier); README; alle Live-Verweise per `grep` |
-   | Neue Wissensdatei in `knowledge-base/` | Glossar (hier) |
+   | Datei/Ordner verschoben/umbenannt/gelöscht | `knowledge-base/SSOT-Document-Index.md` (Teil 1 **und** Teil 2); Repo-Karte + Glossar (hier); README; alle Live-Verweise per `grep` |
+   | Neue Wissensdatei in `knowledge-base/` | `knowledge-base/SSOT-Document-Index.md` Teil 2 (**testerzwungen**: Vollständigkeit + Linkgültigkeit); Glossar (hier) nur bei neuer Kategorie |
+   | Hook / Gate geändert | `plugins/nc/hooks/hooks.json` (`description` trägt den Prosa-Zustand der ganzen Kontroll-Schicht), `grundwissen/NovaCore-OS-Gates-Definition.md`, README (Hook-Tabelle inkl. Opt-out-Envs), CHANGELOG — Details: `standardprozesse/aktualisierungs-index.md` §2.1 |
+   | Pflicht-Einstieg / rote Linien geändert | der Text ist gespiegelt in `nc-session-start.js`, `skills/start/SKILL.md`, `doks/global-claude-firmenblock.md` und hier — alle vier gemeinsam, **plus Kern-Bump** |
    | Agent macht selbst einen Fehler | `debugging-findings/agent-learnings.md` (sofort, append-only) |
    | Skill neu / entfernt / umbenannt | Skill-Tabelle (README + Plugin-README), Trigger-Matrix (`workflow.md`), CHANGELOG, Registry |
    | Neues Modul | Registry, README, CHANGELOG, Repo-Karte (hier) |

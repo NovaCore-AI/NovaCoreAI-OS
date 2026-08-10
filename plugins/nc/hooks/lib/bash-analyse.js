@@ -512,7 +512,10 @@ function isReadOnlyGitIntrospection(command) {
   }
 
   if (subcommand === 'log') {
-    return args.every(arg => arg === '--oneline' || /^--max-count=\d+$/.test(arg));
+    // `-N` (z. B. -10) ergaenzt 2026-08-10 (Bauplan Onsite-Align-Umbau, AP1): die Kurzform
+    // ist der in AGENTS.md dokumentierte Pflicht-Einstieg (`git log --oneline -10`) und
+    // rein lesend.
+    return args.every(arg => arg === '--oneline' || /^--max-count=\d+$/.test(arg) || /^-\d+$/.test(arg));
   }
 
   if (subcommand === 'show') {
@@ -534,7 +537,12 @@ function isReadOnlyGitIntrospection(command) {
   }
 
   if (subcommand === 'rev-parse') {
-    return args.length === 2 && args[0] === '--abbrev-ref' && /^head$/i.test(args[1]);
+    // Erlaubt: `--abbrev-ref HEAD` (Branch) sowie seit 2026-08-10 (Bauplan Onsite-Align-
+    // Umbau, AP1) `--short HEAD` und blankes `HEAD` (Commit-Hash) — die Formen des
+    // Fakten-Stempels aus Gate 2, rein lesend.
+    if (args.length === 2 && args[0] === '--abbrev-ref' && /^head$/i.test(args[1])) return true;
+    if (args.length === 2 && args[0] === '--short' && /^head$/i.test(args[1])) return true;
+    return args.length === 1 && /^head$/i.test(args[0]);
   }
 
   return false;

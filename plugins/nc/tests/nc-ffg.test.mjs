@@ -271,3 +271,32 @@ test('erweiterte Read-only-Git-Introspektion: diff --cached/--stat und show <ref
   assert.equal(run(inputFor('t-ro2', 'Bash', { command: 'git diff --cached --stat' }), d.env), '');
   assert.equal(run(inputFor('t-ro2', 'Bash', { command: 'git show HEAD --stat' }), d.env), '');
 });
+
+// Erweiterung 2026-08-10 (Bauplan Onsite-Align-Umbau, AP1): Pflicht-Einstieg `git log
+// --oneline -10` und die drei Fakten-Stempel-Formen von `git rev-parse` sind rein lesend.
+test('Read-only-Git: log -N und die rev-parse-Formen des Fakten-Stempels', () => {
+  const d = freshDirs();
+  for (const command of [
+    'git log --oneline -10',
+    'git log -5',
+    'git rev-parse --abbrev-ref HEAD',
+    'git rev-parse --short HEAD',
+    'git rev-parse HEAD'
+  ]) {
+    assert.equal(run(inputFor('t-ro3', 'Bash', { command }), d.env), '', command + ' darf nicht gaten');
+  }
+});
+
+// Negativkontrolle zur Erweiterung: die Allowlist bleibt eng — nicht abgedeckte bzw.
+// angehaengte Formen laufen weiter ins Routine- bzw. Destruktiv-Gate.
+test('Read-only-Git-Allowlist bleibt eng: unbekannte rev-parse-/log-Formen gaten weiter', () => {
+  for (const command of [
+    'git rev-parse --git-dir',
+    'git rev-parse --abbrev-ref main',
+    'git log --oneline -10 --author=x',
+    'git log -10 && rm -rf /tmp/x'
+  ]) {
+    const d = freshDirs();
+    assert.notEqual(run(inputFor('t-ro4', 'Bash', { command }), d.env), '', command + ' muss gegated werden');
+  }
+});

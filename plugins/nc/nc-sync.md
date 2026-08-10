@@ -84,11 +84,10 @@ Behauptungen nur mit Beweis (grüner Test, Command-Output, beobachtetes Verhalte
 
 ## 3. Pfade & Struktur
 
-### 3.1 Arbeits-Repo (mit `.nc-os`-Marker)
+### 3.1 Arbeits-Repo
 
 ```
 <repo-root>/
-├── .nc-os                  # Marker-DATEI — schaltet die Begrüßung des SessionStart-Hooks frei
 ├── .nc/                    # lokales nc-Memory (in .gitignore, nie committen)
 │   └── erinnerung/
 │       ├── stand.md        # konsolidierter Gesamtstand
@@ -202,9 +201,9 @@ Der verbindliche Rahmen steht in `wp-rahmen.md` des Kern-Plugins `nc` (WP0–WP8
   - **Routine-Bash-Gate:** einmal je Session; reine Read-only-Git-Introspektion nie.
 
   Das Gate antwortet mit **deny**, nicht mit „ask": Es verschärft nur, es lockert nie. Es ist
-  **markerlos aktiv** — überall dort, wo das Kern-Plugin installiert ist, unabhängig von der
-  `.nc-os`-Datei. **Opt-out ausschließlich per Env `NC_FFG=off`**, gesetzt vom Menschen, nie vom
-  Agenten. Auf CLIs ohne Gate-Enforcement gilt dieselbe Disziplin manuell.
+  **markerlos aktiv** — überall dort, wo das Kern-Plugin installiert ist. **Opt-out
+  ausschließlich per Env `NC_FFG=off`**, gesetzt vom Menschen, nie vom Agenten. Auf CLIs ohne
+  Gate-Enforcement gilt dieselbe Disziplin manuell.
 - **Branching:** Feature-Branch → Pull Request → Review → Merge. **Kein direkter Push auf
   `main`.** `main` bleibt lauffähig. Der Merge ist eine rote Linie: der Mensch führt ihn aus.
 - **Memory:** Kundenkontext bleibt im Arbeits-Repo unter `.nc/` (in `.gitignore`); nichts davon
@@ -226,13 +225,19 @@ Kern-Skills laufen unter `/nc:`, Abteilungs-Skills unter dem Namespace ihres Plu
 wählbar. Die Familie ist kollisionsfrei zu anderen installierten Plugin-Familien; deren Dateien
 werden **nie** verändert.
 
-Zum Repo-Scoping gelten zwei verschiedene Regeln — bewusst:
+Zum Repo-Scoping gilt seit 2026-08-10 **eine** Regel: **Aktivierungsbedingung ist die
+Installation, nicht ein Marker.** Ein Gate, das man vergessen kann, ist kein Gate — die
+frühere `.nc-os`-Marker-Datei wird nicht mehr ausgewertet und darf gelöscht werden.
 
-- Die **SessionStart-Begrüßung** greift nur, wenn im Repo-Root die **Datei** `.nc-os` liegt. Ein
-  gleichnamiges *Verzeichnis* zählt nicht (bekannter Bug aus 0.1.1, seither per isFile-Prüfung
-  abgedeckt). Außerhalb markierter Repos ist die Begrüßung ein No-op — sie ist Komfort, kein Gate.
-- Das **FFG ist markerlos** und gatet überall, wo das Kern-Plugin installiert ist. Ein
-  unmarkiertes Repo war früher ein ungeschütztes Repo; genau dieses Schlupfloch ist geschlossen.
+- Das **FFG (Gate 1)** gatet überall, wo das Kern-Plugin installiert ist. Opt-out `NC_FFG=off`.
+- Der **Session-Start-Zwang (Gate 2)** injiziert in jeder Session den Pflicht-Einstieg samt
+  lebendem Stand und lehnt schreibende Aktionen ab, bis `/nc:start` per Fakten-Stempel
+  abgeschlossen ist. Lesen, Fragen und Read-only-Git bleiben frei. Opt-out
+  `NC_START_GATE=off` (ein Schalter für Injektion und Gate).
+- Der **Doks-Autosync** hält den Firmen-Block der globalen `CLAUDE.md` aktuell und lässt die
+  Privat-Zone außerhalb der Marker unberührt. Opt-out `NC_AUTOSYNC=off`.
+
+Alle drei sind fail-open: ein interner Fehler blockiert nie die Arbeit.
 
 ---
 

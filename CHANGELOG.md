@@ -10,13 +10,145 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
+Onsite-Align-Umbau nach dem Bauplan
+`knowledge-base/grundwissen/2026-08-10-onsite-align-umbau-bauplan.md` (Arbeitspakete
+AP1–AP8, Auftrag Maintainer 2026-08-10; Plan verfasst von Claude Fable 5, Umsetzung Claude
+Opus 5). Vorbild: `Onsite.ai-OS` (Kern `oai` 0.11.1, main `f8cb0fb`, plus PR #22). Jede
+Port-Datei wurde beim Bau frisch aus dem Vorbild gelesen. **Bewusst ausgeschlossen**
+(Maintainer-Entscheid, nicht verhandelbar): die Queue-Logik/SSOT-Abstufung des Vorbilds
+(Onsite-Spec §15.24) und **jeder Memory-Share zwischen Satelliten** — firmenintern
+(`nc`, `nc-development`) und affiliate bleiben strikt getrennt. Plan-Nachtrag N1 (§6 des
+Bauplans) dokumentiert die einzige Abweichung.
+
 ### Added
 
+- **Gate 2 — Session-Start-Zwang (AP2), zweiteilig nach dem Zangen-Prinzip:** Ein Hook kann
+  keinen Skill starten, nur blocken und injizieren — deshalb sagt
+  `hooks/nc-session-start.js` (SessionStart) dem Agenten, was zu tun ist, und
+  `hooks/nc-start-gate.js` (PreToolUse auf `Write|Edit|MultiEdit|NotebookEdit|Bash`) macht
+  Nicht-Tun zur Sackgasse. Geöffnet wird über den **Fakten-Stempel**
+  `hooks/nc-start-stempel.js`, der `--branch`/`--head` gegen `git rev-parse` verifiziert —
+  wer stempeln will, muss die Git-Lage wirklich angesehen haben. Die Injektion ersetzt den
+  bisherigen 99-Zeilen-Begrüßer und liefert den **lebenden Stand**: `VERSION`, Branch, die
+  letzten fünf Commits, Working-Tree-Änderungen (`-c core.quotepath=false`, 2 s Timeout),
+  den `[Unreleased]`-Kopf, die jüngsten fünf datierten Dateien aus
+  `knowledge-base/grundwissen/` und die Abteilungen aus `module-registry.json`.
+  Stempel-State liegt **env-unabhängig** in `os.tmpdir()/nc-start-gate` (Onsite-Lesson
+  0.11.1: `CLAUDE_PLUGIN_DATA` divergiert zwischen Hook- und Bash-Prozess → Deadlock trotz
+  Erfolgsmeldung); `NC_START_GATE_STATE_DIR` nur als Test-Override. Durchlässe: der
+  Stempel-Befehl selbst, Read-only-Git, Subagenten. 30-Min-Verfall, 1-Min-Heartbeat,
+  **ein** Opt-out `NC_START_GATE=off` für beide Teile. 21 neue Tests.
+- **Doks-Autosync — CLAUDE-Ebene 1 (AP3):** `hooks/nc-doks-autosync.js` hält den
+  Firmen-Block in `~/.claude/CLAUDE.md` auf dem Stand des installierten Kerns
+  (Payload: `plugins/nc/doks/global-claude-firmenblock.md`). Marker-Chirurgie mit
+  `<!-- NC:BLOCK:START/VERSION/ENDE global -->`: fehlt die Datei → anlegen · ohne Marker →
+  Block oben, Bestand byte-identisch dahinter · identisch → No-op · abweichend → nur
+  zwischen den Markern ersetzen · **defekte Marker → nichts schreiben** (lieber veraltet
+  als zerstört). Die Privat-Zone außerhalb der Marker wird nie verändert; vor jedem
+  Schreiben entsteht `<ziel>.nc-autosync-backup`. Kein externer State — der
+  Versions-Kommentar im Block IST der Stempel. Opt-out `NC_AUTOSYNC=off`, Ziel-Override
+  `NC_AUTOSYNC_TARGET` (die Tests laufen ausschließlich dagegen, nie gegen die reale
+  globale CLAUDE.md). 10 neue Tests.
+- **SSOT-Infrastruktur (AP4), ohne jede Queue-Mechanik:**
+  `knowledge-base/SSOT-Document-Index.md` als Master-Index (Teil 1 Ordner-Routing, Teil 2
+  Quellen-Triage „Relevant wenn …", inkl. Mapping-Tabelle zur flacheren
+  NovaCore-Struktur) — **einzige Datei auf der Wurzelebene**, testerzwungen ·
+  `standardprozesse/aktualisierungs-index.md` als Änderungs-Matrix („ich ändere X — was
+  muss ich anfassen") mit Prüfzyklus und Selbsttest, bewusst auf die real vorhandenen
+  Artefakte reduziert und ohne neue Spiegelstellen · drei Begriffsnormen in
+  `grundwissen/`: **Gates-Definition** (Vier-Gates-Tabelle, Klarstellung „FFG 1–3 =
+  Sub-Gates von Gate 1", drei Abgrenzungen), **SSOT-Definition** (mit dem Abschnitt
+  „firmenintern vs. affiliate" **statt** der Onsite-Abstufung) und
+  **CLAUDE-Ebenen-Definition** (Ebenen 0/1/2/3/3b mit ehrlichem Status).
+- **Drei Kern-Infrapflege-Skills (AP5):** `/nc:doku-sync` (führt die
+  AGENTS.md-Abschluss-Checkliste aus, Stempel `.git/nc/doku-sync.stamp`), `/nc:os-info`
+  (erklärt das OS aus der **realen Installation**, inkl. Status aller drei Opt-out-Schalter
+  und Koexistenz-Warnung bei parallel installierten Satelliten) und `/nc:skill-builder`.
+  Nicht portiert: `firmenwissen-suche` (Atlassian-spezifisch) und die Platzhalter-Skills.
+- **CI und Release (AP6):** `.github/workflows/ci.yml` (Ubuntu + Windows × Node 20/22/24,
+  `fetch-tags: true`, Testaufruf wortgleich zur Checkliste, Validierung beider Ebenen,
+  **Positivkontrolle** — ein absichtlich defekter Wegwerf-Skill muss den Validator rot
+  machen, eine intakte Kontrollgruppe grün) und `.github/workflows/release.yml` (Auslöser
+  `nc--v*`; vier hart scheiternde Vorbedingungen: annotierter Tag, Tag == Leitversion,
+  grüne Suite, vorhandener CHANGELOG-Abschnitt). Actions per Full-SHA gepinnt.
+- **Vier neue Struktur-Invarianten (AP6):** SSOT-Index-Vollständigkeit, Linkgültigkeit,
+  Wurzel-Regel und die Release-Tag-Invariante (Schema `nc--vX.Y.Z`, Altform
+  `novacoreai-os--v*` zählt mit).
+- **Marketplace-Kategorie `affiliate` (AP7):** Eintrag `kimi-code-plugin-cc`
+  (`ArchiDoxx/Kimi-code-Plugin-CC`, `ref: v1.4.0`, Commit-SHA
+  `159cd9d059b5e2e918a0333693a59f3620fdf61a` — das annotierte Tag wurde per `gh api` auf
+  den Commit dereferenziert). Affiliate-Plugins sind **keine Abteilungen**: keine
+  Registry-Zeile, keine Kern-Dependency, kein Wissens-Share. Host-Anforderungen (`uv` +
+  `kimi`-CLI) und die Lizenz (MIT) stehen in der Eintrags-Description, damit sie im
+  Installationsdialog sichtbar sind.
 - **ONBOARDING §1b — Kollegen-OS installieren:** Installationsweg der Satelliten
   (`nc-felix`, `nc-biggi`) inkl. Koexistenz-Regel und Marker-Unterschied (Biggi-OS
   markerlos, Opt-out `NC_START_GATE=off`); Abschnitt 2 um den Biggi-Hinweis ergänzt.
   Fund des Frische-Instanz-Reviews nach dem 0.5.0-Release: die Ersteinrichtungs-Doku
   kannte die Satelliten bis dahin nicht. — Agent: Claude (Opus 5)
+
+### Changed
+
+- **Kern `nc` 0.5.0 → 0.6.0** (`VERSION` + Registry gespiegelt): Neuerung — Gate 2,
+  Doks-Autosync, drei Skills.
+- **FFG-Angleich (AP1), ohne Sicherheitsabbau:** Die Session-Schlüssel-Ableitung
+  (`hashSessionKey`, `sanitizeSessionKey`, `resolveSessionKey`, `isSubagentInvocation`)
+  wandert aus `nc-ffg.js` in die geteilte `hooks/lib/session-key.js` — Start-Gate, Stempel
+  und Injektion müssen denselben Schlüssel ableiten, eine zweite Kopie wäre Drift-Risiko in
+  Sicherheitscode. **Alle drei NovaCore-Review-Härtungen von 2026-07-28 bleiben unverändert
+  erhalten** (voll verankerte Exempt-Globs statt Substring-Match; Case-Folding nur auf
+  win32/darwin; Hash bei *jeder* Zeichen-Ersetzung statt nur bei Überlänge) — sie sind
+  strenger als das Vorbild, „Onsite gewinnt" gilt für Struktur, nicht für Sicherheit.
+- **`process.exit(0)` → `process.exitCode = 0`** in allen Hooks: `exit()` kann auf POSIX den
+  gepufferten stdout-Write abschneiden — eine abgeschnittene Deny-JSON hieße, **das Gate
+  blockt still nicht**.
+- **Read-only-Git-Erkennung erweitert** (`hooks/lib/bash-analyse.js`): `git log -N` (der
+  dokumentierte Pflicht-Einstieg `git log --oneline -10`) sowie `git rev-parse --short HEAD`
+  und blankes `git rev-parse HEAD` (die Formen des Fakten-Stempels) gelten jetzt als
+  lesend. Die Allowlist bleibt eng — mit Negativkontrolle abgesichert.
+- **`/nc:start`:** Marker-Schritt entfernt, Fakten-Stempel als letzter Ablaufschritt
+  ergänzt; die Regel „rein lesend" ist auf die ephemere Stempeldatei präzisiert.
+- **`hooks.json`:** zwei PreToolUse-Blöcke (FFG und Start-Gate mit eigenen Matchern),
+  SessionStart mit Injektion + Autosync, überall `timeout: 10`; das `description`-Feld
+  trägt jetzt den Prosa-Zustand der **gesamten** Kontroll-Schicht inklusive aller Opt-outs.
+- **Doku nachgezogen:** `AGENTS.md` (Pflicht-Einstieg um Index-Triage erweitert, Repo-Karte,
+  Glossar, Produktstand, Sync-Matrix um Hook- und Wissensdatei-Zeilen), `README.md`
+  (Skill-Tabelle, Kontroll-Schicht-Tabelle, Affiliate-Abschnitt), `ONBOARDING.md`
+  (markerloses Setup, Gate-Tabelle, Troubleshooting).
+
+### Fixed
+
+- **Tag-Lücke geschlossen:** Die neue Release-Tag-Invariante deckte auf, dass die
+  veröffentlichten Stände **0.3.0 und 0.4.0 nie getaggt** wurden. Beide Tags sind
+  nachgesetzt — annotiert, mit Begründung im Tag-Text, nach der Konvention von `nc--v0.5.0`
+  auf die integrierenden Merge-Commits (`nc--v0.3.0` → `ef9f263`, PR #3; `nc--v0.4.0` →
+  `37047f2`, PR #4; Versionsstand dort gegen `VERSION` **und** `plugin.json` geprüft). Die
+  Invariante gilt damit **ohne Ausnahme**; ein GitHub-Release entsteht nicht, weil
+  `release.yml` an diesen alten Commits nicht existiert. Details: Bauplan §6, Nachtrag N1.
+
+### Removed
+
+- **Der `.nc-os`-Marker hat keine Funktion mehr.** Er scopte bisher den
+  Session-Start-*Hinweis*; mit Gate 2 entfällt er ersatzlos — ein Gate, das man vergessen
+  kann, ist kein Gate. Bestehende Marker-Dateien stören nicht und können gelöscht werden;
+  das Felix-OS trägt den alten Hook weiterhin (dort dokumentiert). Die Export-API von
+  `nc-session-start.js` (`buildSessionStartResponse`, `hasNcOsMarker`, `readOsVersion`)
+  entfällt damit ebenfalls — der Hook ist reiner Entrypoint.
+
+### Known / offen
+
+- **`mcp__*`-Werkzeuge laufen nicht durch das FFG** — der Matcher deckt sie nicht ab. Für
+  lokale Plugins fängt das eine schlafende Invariante ab; externe Affiliate-Plugins (wie
+  `kimi-code-plugin-cc`, das einen MCP-Server mitbringt) lösen sie bewusst **nicht** aus.
+  Dokumentierte bekannte Grenze, kein stiller Zustand.
+- **`mneme-kimi-code` ist vorbereitet, aber nicht eingetragen:** Die Konvertierung zum
+  Claude-Code-Plugin liegt lokal bereit (`.claude-plugin/plugin.json`, `hooks/hooks.json`
+  mit allen sieben Events inkl. `PostToolUseFailure`, `.mcp.json` für den FastMCP-Server;
+  `claude plugin validate --strict` grün). Der Marketplace-Eintrag ist **blockiert bis
+  Push + Tag im ArchiDoxx-Repo** — ein Eintrag ohne Tag würde Installs brechen.
+
+*Beitrag: Claude (Opus 5, Claude Code), 2026-08-10 — Umsetzung des Onsite-Align-Umbaus
+AP1–AP8 auf Weisung Lucas Vöhringer; Plan und Abnahmemaßstab: Claude Fable 5.*
 
 ## [0.5.0] — 2026-08-05
 

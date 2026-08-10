@@ -1,0 +1,190 @@
+// Tests fuer den Erzwingungs-Begleiter des Session-Start-Zwangs ("Start-Hook",
+// plugins/nc/hooks/nc-start-gate.js + nc-start-stempel.js, Gate 2; Bauplan 2026-08-10
+// „Onsite-Align-Umbau", AP2). Geprueft wird die Zangen-Mechanik: schreibende Aktionen sind
+// vor dem Fakten-Stempel Sackgassen (Deny nennt den exakten Stempel-Befehl samt
+// Session-Schluessel), Lesen und Read-only-Git bleiben frei, der Stempel verifiziert
+// Branch/HEAD gegen die reale Git-Lage, Subagenten und Env-Opt-out sind ausgenommen,
+// defekte Eingabe faellt offen.
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const HIER = path.dirname(fileURLToPath(import.meta.url));
+const GATE = path.join(HIER, '..', 'hooks', 'nc-start-gate.js');
+const STEMPEL = path.join(HIER, '..', 'hooks', 'nc-start-stempel.js');
+
+function fixture() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'nc-startgate-'));
+}
+
+/** Isoliertes State-Verzeichnis je Testfall — Sessions duerfen sich nie teilen. */
+function stateDir() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'nc-startgate-state-'));
+}
+
+function runGate(cwd, state, { tool = 'Write', toolInput = { file_path: 'x.md' }, session = 'test-session', env = {}, stdin } = {}) {
+  const eingabe = stdin !== undefined ? stdin : JSON.stringify({
+    session_id: session, cwd, hook_event_name: 'PreToolUse',
+    tool_name: tool, tool_input: toolInput
+  });
+  const kindEnv = { ...process.env, NC_START_GATE_STATE_DIR: state, ...env };
+  delete kindEnv.CLAUDE_PROJECT_DIR;
+  delete kindEnv.NC_START_GATE; // geerbtes Opt-out darf die Tests nicht aushebeln
+  if (env.NC_START_GATE) kindEnv.NC_START_GATE = env.NC_START_GATE;
+  const r = spawnSync(process.execPath, [GATE], { cwd, input: eingabe, encoding: 'utf8', env: kindEnv });
+  const stdout = (r.stdout || '').trim();
+  let ausgabe = null;
+  if (stdout) { try { ausgabe = JSON.parse(stdout); } catch (_) { ausgabe = 'UNPARSEBAR'; } }
+  return { status: r.status, stdout, ausgabe };
+}
+
+function runStempel(cwd, state, args) {
+  const kindEnv = { ...process.env, NC_START_GATE_STATE_DIR: state };
+  return spawnSync(process.execPath, [STEMPEL, ...args], { cwd, encoding: 'utf8', env: kindEnv });
+}
+
+function denyReason(ergebnis) {
+  assert.notEqual(ergebnis.ausgabe, null, 'erwartet eine Deny-Ausgabe');
+  assert.notEqual(ergebnis.ausgabe, 'UNPARSEBAR', 'Ausgabe muss gueltiges JSON sein');
+  const h = ergebnis.ausgabe.hookSpecificOutput;
+  assert.equal(h.permissionDecision, 'deny');
+  return h.permissionDecisionReason;
+}
+
+/** Git-Repo-Fixture mit einem Commit; liefert { dir, branch, head }. */
+function gitFixture() {
+  const dir = fixture();
+  const git = (args) => spawnSync('git', ['-C', dir, ...args], { encoding: 'utf8' });
+  git(['init', '-q']);
+  git(['-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '--allow-empty', '-q', '-m', 'init']);
+  const branch = git(['rev-parse', '--abbrev-ref', 'HEAD']).stdout.trim();
+  const head = git(['rev-parse', 'HEAD']).stdout.trim();
+  return { dir, branch, head };
+}
+
+test('Write vor dem Stempel: Deny nennt Stempel-Befehl und Session-Schluessel', () => {
+  const grund = denyReason(runGate(fixture(), stateDir()));
+  assert.match(grund, /\[Start-Gate\]/);
+  assert.match(grund, /\/nc:start/);
+  assert.match(grund, /nc-start-stempel\.js/);
+  assert.match(grund, /--session test-session/);
+});
+
+test('Edit, MultiEdit und NotebookEdit werden vor dem Stempel ebenfalls abgelehnt', () => {
+  for (const tool of ['Edit', 'MultiEdit', 'NotebookEdit']) {
+    const grund = denyReason(runGate(fixture(), stateDir(), { tool }));
+    assert.match(grund, /\[Start-Gate\]/, tool + ' muss gegated sein');
+  }
+});
+
+test('Read-only-Git-Introspektion bleibt frei (sie IST der Pflicht-Einstieg)', () => {
+  const state = stateDir();
+  for (const command of ['git status', 'git log --oneline -10', 'git rev-parse --abbrev-ref HEAD', 'git rev-parse --short HEAD', 'git rev-parse HEAD']) {
+    const r = runGate(fixture(), state, { tool: 'Bash', toolInput: { command } });
+    assert.equal(r.stdout, '', command + ' darf nicht gegated werden');
+  }
+});
+
+test('Beliebige andere Bash wird vor dem Stempel abgelehnt', () => {
+  const grund = denyReason(runGate(fixture(), stateDir(), { tool: 'Bash', toolInput: { command: 'npm test' } }));
+  assert.match(grund, /\[Start-Gate\]/);
+});
+
+test('Der Stempel-Befehl selbst bleibt frei — sonst kann das Gate nie oeffnen', () => {
+  const command = 'node "' + STEMPEL + '" --session test-session';
+  const r = runGate(fixture(), stateDir(), { tool: 'Bash', toolInput: { command } });
+  assert.equal(r.stdout, '');
+});
+
+test('Ausserhalb eines Git-Baums stempelt --session allein; danach ist das Gate offen', () => {
+  const dir = fixture(); const state = stateDir();
+  const s = runStempel(dir, state, ['--session', 'test-session']);
+  assert.equal(s.status, 0, 'Stempel muss ausserhalb von Git ohne branch/head durchgehen');
+  assert.match(s.stdout, /Stempel gesetzt/);
+  const r = runGate(dir, state);
+  assert.equal(r.stdout, '', 'nach dem Stempel darf Write nicht mehr gegated sein');
+});
+
+test('Fakten-Stempel: falsche Branch/HEAD-Angaben werden verweigert, korrekte oeffnen', () => {
+  const { dir, branch, head } = gitFixture(); const state = stateDir();
+  const falsch = runStempel(dir, state, ['--session', 'test-session', '--branch', 'falsch', '--head', '1234567']);
+  assert.equal(falsch.status, 1, 'falsche Fakten muessen den Stempel verweigern');
+  assert.match(falsch.stderr, /verweigert/);
+  denyReason(runGate(dir, state)); // Gate bleibt zu
+
+  const richtig = runStempel(dir, state, ['--session', 'test-session', '--branch', branch, '--head', head.slice(0, 8)]);
+  assert.equal(richtig.status, 0, 'korrekte Fakten muessen stempeln: ' + richtig.stderr);
+  const r = runGate(dir, state);
+  assert.equal(r.stdout, '', 'nach korrektem Stempel ist das Gate offen');
+});
+
+test('Ohne --session wird der Stempel verweigert', () => {
+  const s = runStempel(fixture(), stateDir(), []);
+  assert.equal(s.status, 1);
+  assert.match(s.stderr, /--session/);
+});
+
+test('Subagenten sind vom Start-Gate ausgenommen', () => {
+  const dir = fixture();
+  const stdin = JSON.stringify({
+    session_id: 'test-session', cwd: dir, hook_event_name: 'PreToolUse',
+    tool_name: 'Write', tool_input: { file_path: 'x.md' }, agent_type: 'reviewer'
+  });
+  const r = runGate(dir, stateDir(), { stdin });
+  assert.equal(r.stdout, '');
+});
+
+test('NC_START_GATE=off schaltet das Gate ab (ein Schalter fuer beide Gate-2-Teile)', () => {
+  for (const wert of ['off', '0', 'false', 'disabled', 'OFF']) {
+    const r = runGate(fixture(), stateDir(), { env: { NC_START_GATE: wert } });
+    assert.equal(r.stdout, '', 'NC_START_GATE=' + wert + ' muss abschalten');
+  }
+});
+
+test('Lesende Werkzeuge matchen nicht (Lesen und Fragen bleiben frei)', () => {
+  for (const tool of ['Read', 'Glob', 'Grep', 'WebFetch']) {
+    const r = runGate(fixture(), stateDir(), { tool, toolInput: {} });
+    assert.equal(r.stdout, '', tool + ' darf nie gegated werden');
+  }
+});
+
+test('Fail-open: defekte Eingabe blockt nichts und crasht nicht', () => {
+  const r = runGate(fixture(), stateDir(), { stdin: 'kein json' });
+  assert.equal(r.status, 0);
+  assert.equal(r.stdout, '');
+});
+
+// Regressionstest zur Onsite-Lesson 0.11.1: Stempel-Skript und Gate-Hook laufen in
+// Prozessen mit VERSCHIEDENEM CLAUDE_PLUGIN_DATA (Bash-Tool vs. Hook-Env) — vor dem Fix
+// landete der Stempel im fremden Verzeichnis und das Gate blieb trotz Erfolgsmeldung
+// dauerhaft zu. Hier bewusst OHNE NC_START_GATE_STATE_DIR, damit die echte
+// Fallback-Ableitung beider Seiten getestet wird.
+test('CLAUDE_PLUGIN_DATA beeinflusst den State-Ort nicht (Stempel- und Gate-Env divergieren)', () => {
+  const dir = fixture();
+  const session = 'test-envdivergenz-' + process.pid;
+  const stempelEnv = { ...process.env, CLAUDE_PLUGIN_DATA: fixture() };
+  delete stempelEnv.NC_START_GATE_STATE_DIR;
+  delete stempelEnv.NC_START_GATE;
+  try {
+    const s = spawnSync(process.execPath, [STEMPEL, '--session', session],
+      { cwd: dir, encoding: 'utf8', env: stempelEnv });
+    assert.equal(s.status, 0, 'Stempel muss durchgehen: ' + s.stderr);
+
+    const gateEnv = { ...process.env, CLAUDE_PLUGIN_DATA: fixture() }; // anderes Verzeichnis als beim Stempel
+    delete gateEnv.NC_START_GATE_STATE_DIR;
+    delete gateEnv.NC_START_GATE;
+    const eingabe = JSON.stringify({
+      session_id: session, cwd: dir, hook_event_name: 'PreToolUse',
+      tool_name: 'Write', tool_input: { file_path: 'x.md' }
+    });
+    const r = spawnSync(process.execPath, [GATE], { cwd: dir, input: eingabe, encoding: 'utf8', env: gateEnv });
+    assert.equal((r.stdout || '').trim(), '',
+      'Gate muss den Stempel trotz divergierendem CLAUDE_PLUGIN_DATA sehen');
+  } finally {
+    fs.rmSync(path.join(os.tmpdir(), 'nc-start-gate', 'start-' + session + '.json'), { force: true });
+  }
+});

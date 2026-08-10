@@ -8,6 +8,7 @@
 // prüfbar. (Muster übernommen aus dem Onsite.ai-OS, angepasst 2026-07-28.)
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -129,8 +130,16 @@ test('Sobald ein Plugin einen MCP-Server mitbringt, gatet das FFG auch mcp__*-To
   // Das FFG matcht heute nur Write|Edit|MultiEdit|Bash. MCP-Werkzeuge laufen unter
   // mcp__<plugin>_<server>__<tool> und wuerden am Matcher vorbeilaufen — ein
   // schreibfaehiger MCP-Server wuerde das Gate also still umgehen. Dieser Test ist heute
-  // trivial gruen (kein Plugin hat einen MCP-Server) und schlaegt an dem Tag an, an dem
-  // einer dazukommt.
+  // trivial gruen (kein LOKALES Plugin hat einen MCP-Server) und schlaegt an dem Tag an,
+  // an dem einer dazukommt.
+  //
+  // REICHWEITE (praezisiert 2026-08-10, Bauplan AP7): Geprueft werden ausschliesslich die
+  // Manifeste unter plugins/ — also die Plugins, die dieses Repo SELBST ausliefert.
+  // Fremde Marketplace-Eintraege der Kategorie `affiliate` (z. B. kimi-code-plugin-cc,
+  // das einen stdio-MCP-Server mitbringt) loesen die Invariante NICHT aus: ihr Inhalt
+  // liegt in einem fremden Repo und ist hier weder lesbar noch pflegbar. Dass das FFG
+  // mcp__*-Tools heute gar nicht gatet, bleibt damit eine bewusst dokumentierte Grenze
+  // (Gates-Definition, Gate 1) — kein stiller Zustand.
   const mitMcp = pluginDirsOnDisk().filter((dir) => {
     const m = readJson(p('plugins', dir, '.claude-plugin', 'plugin.json'));
     return m.mcpServers !== undefined || fs.existsSync(p('plugins', dir, '.mcp.json'));
@@ -246,6 +255,100 @@ test('Registry beschreibt genau die vorhandenen Plugins mit korrektem Namespace'
     .filter((pl) => !satellites.includes(pl)).sort();
   assert.deepEqual(localRegistered, pluginDirsOnDisk().sort(),
     'Registry (lokale Abteilungen) und plugins/ driften auseinander');
+});
+
+// --- SSOT-Document-Index (Bauplan 2026-08-10, AP4/AP6) --------------------------------
+// Der Master-Index traegt zwei Funktionen: Ordner-Routing (wohin gehoert ein Dokument) und
+// Quellen-Triage ("Relevant wenn …"). Beide sind nur so viel wert, wie der Index
+// vollstaendig ist — das kann keine Checkliste garantieren, deshalb hier mechanisch.
+const WISSEN = p('knowledge-base');
+const INDEX_DATEI = path.join(WISSEN, 'SSOT-Document-Index.md');
+
+/** Alle Wissensdateien relativ zu `knowledge-base/`, POSIX-normalisiert. */
+function wissensDateien() {
+  const out = [];
+  const stack = [WISSEN];
+  while (stack.length) {
+    const cur = stack.pop();
+    for (const entry of fs.readdirSync(cur, { withFileTypes: true })) {
+      const full = path.join(cur, entry.name);
+      if (entry.isDirectory()) { stack.push(full); continue; }
+      if (full === INDEX_DATEI) continue;
+      out.push(path.relative(WISSEN, full).split(path.sep).join('/'));
+    }
+  }
+  return out.sort();
+}
+
+/** Link-Ziele des Index (Markdown, inkl. <>-Form fuer Pfade mit Leerzeichen). */
+function indexZiele() {
+  const raw = fs.readFileSync(INDEX_DATEI, 'utf8');
+  return [...raw.matchAll(/\]\(\s*<?([^)>\n]+?)>?\s*\)/g)]
+    .map((m) => m[1].trim())
+    .filter((z) => !/^(https?:|mailto:|#)/.test(z));
+}
+
+test('SSOT-Document-Index: jede Wissensdatei ist indiziert', () => {
+  assert.ok(fs.existsSync(INDEX_DATEI), 'knowledge-base/SSOT-Document-Index.md fehlt');
+  const index = fs.readFileSync(INDEX_DATEI, 'utf8');
+  const fehlend = wissensDateien().filter((rel) => !index.includes(rel));
+  assert.deepEqual(fehlend, [],
+    `nicht im SSOT-Document-Index.md erfasst: ${fehlend.join(', ')} — jede neue Wissensdatei braucht eine Zeile mit "Relevant wenn …"`);
+});
+
+test('SSOT-Document-Index: kein Eintrag zeigt ins Leere', () => {
+  const tot = indexZiele().filter((ziel) => !fs.existsSync(path.join(WISSEN, ...ziel.split('/'))));
+  assert.deepEqual(tot, [],
+    `toter Verweis im SSOT-Document-Index.md: ${tot.join(', ')} — Pfade sind relativ zu "knowledge-base/"`);
+});
+
+test('Wissensbasis-Wurzel: nur der Index liegt oben', () => {
+  // Entwurfsentscheidung: Der Index ist das einzige Dokument hierarchisch ueber den
+  // Kategorien. Alles andere gehoert in eine Kategorie, sonst zerfaellt die Triage.
+  const oben = fs.readdirSync(WISSEN, { withFileTypes: true })
+    .filter((e) => e.isFile()).map((e) => e.name).sort();
+  assert.deepEqual(oben, ['SSOT-Document-Index.md'],
+    'direkt in knowledge-base/ darf nur SSOT-Document-Index.md liegen — jede weitere Datei gehoert in eine Kategorie');
+});
+
+// Tag-Luecke (Lehre aus dem 0.2.0-Release): Der Tag-Schritt liegt hinter dem Merge, also
+// hinter dem Ende der Arbeitseinheit, die ihn haette setzen koennen — und keine Pruefung
+// sieht ihn. Absichtlich geprueft wird nur "alle AUSSER der juengsten": die oberste Version
+// ist im Release-PR naturgemaess noch nicht getaggt (Henne-Ei). Sobald ein zweiter Abschnitt
+// geschnitten wird, ohne den ersten zu taggen, wird die CI rot.
+// Tag-Schema dieses Repos: `{plugin-name}--v{version}`, fuer die Leitversion also `nc--vX.Y.Z`
+// (`claude plugin tag`). Die historischen `novacoreai-os--v*`-Tags bleiben unberuehrt.
+//
+// HISTORIE (Bauplan 2026-08-10, Nachtrag N1): Bei ihrer Einfuehrung deckte diese Invariante
+// zwei veroeffentlichte, aber nie getaggte Staende auf (0.3.0, 0.4.0). Beide Tags wurden
+// mit Maintainer-Freigabe nachgesetzt (annotiert, auf die Merge-Commits von PR #3 bzw. #4,
+// analog nc--v0.5.0) — die Regel gilt daher OHNE Ausnahme.
+test('Release-Tags: jede veroeffentlichte CHANGELOG-Version ausser der juengsten ist getaggt', () => {
+  const versionen = [...fs.readFileSync(p('CHANGELOG.md'), 'utf8')
+    .matchAll(/^## \[(\d+(?:\.\d+)+)\]/gm)].map((m) => m[1]);
+  assert.ok(versionen.length > 1,
+    'CHANGELOG fuehrt weniger als zwei veroeffentlichte Abschnitte — Muster geaendert?');
+
+  let tags;
+  try {
+    tags = execFileSync('git', ['tag', '--list'], { cwd: REPO, encoding: 'utf8' })
+      .split('\n').map((s) => s.trim()).filter(Boolean);
+  } catch {
+    return; // kein Git verfuegbar (Quell-Export): Regel hier nicht pruefbar, nicht falsch
+  }
+  // Ein Klon ohne Tags (flacher CI-Checkout) darf nicht stillschweigend gruen werden —
+  // deshalb holt ci.yml die Tags explizit; fehlen sie dennoch ganz, ist die Lage unklar.
+  if (tags.length === 0) return;
+
+  const vorhanden = new Set(tags);
+  // Uebergangsregel: Vor Einfuehrung des Schemas `nc--v*` (2026-07-28) galten
+  // `novacoreai-os--v*`-Tags; beide Formen zaehlen als getaggt.
+  const istGetaggt = (v) => vorhanden.has(`${KERN}--v${v}`) || vorhanden.has(`novacoreai-os--v${v}`);
+  const ohneTag = versionen.slice(1).filter((v) => !istGetaggt(v));
+  assert.deepEqual(ohneTag, [],
+    `veroeffentlichte Versionen ohne Tag: ${ohneTag.join(', ')} — Release nachholen `
+    + '(Aktualisierungs-Index Abschnitt 3.6: annotiert taggen und pushen, Tag und Release '
+    + 'nie vom Versions-Commit trennen)');
 });
 
 test('Vorlage ist kein Plugin und enthaelt keine ausgefuellten Werte', () => {
