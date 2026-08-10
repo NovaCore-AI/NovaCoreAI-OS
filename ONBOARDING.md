@@ -38,8 +38,9 @@ verweist auf sie. Deshalb nach der Installation **einmal**:
 /nc:setup
 ```
 
-Der Skill klont die nötigen Quellen sparse nach `~/.nc/ssot/` und legt dort einen Zeiger
-`index.json` ab, über den die anderen Skills sie finden. Er ist idempotent: bei jedem
+Der Skill klont die nötigen Quellen vollständig nach `~/.nc/ssot/<repo-name>/`. Die
+Verlinkung läuft über diesen festen Pfad, den der Firmen-Block in der globalen `CLAUDE.md`
+als Einstieg nennt. Er ist idempotent: bei jedem
 weiteren Aufruf zieht er nur per Fast-Forward nach. Später erneut aufrufen, wenn die
 Wissensbasis veraltet ist — automatisch geschieht das **nicht**.
 

@@ -34,7 +34,7 @@ function git(cwd, args) {
   return (r.stdout || '').trim();
 }
 
-/** Origin-Repo mit Wissensbasis + einer Datei ausserhalb davon (fuer die Sparse-Probe). */
+/** Origin-Repo mit Wissensbasis + einer Datei ausserhalb davon (Vollklon-Probe). */
 function origin({ wissenspfad = 'knowledge-base', mitWissen = true } = {}) {
   const dir = tmp('nc-ssot-origin-');
   git(dir, ['init', '-q', '-b', 'main']);
@@ -44,11 +44,10 @@ function origin({ wissenspfad = 'knowledge-base', mitWissen = true } = {}) {
     fs.mkdirSync(path.join(dir, ...wissenspfad.split('/')), { recursive: true });
     fs.writeFileSync(path.join(dir, ...wissenspfad.split('/'), 'index.md'), 'stand eins\n', 'utf8');
   }
-  // Ein VERZEICHNIS ausserhalb des Wissenspfads — das darf sparse-checkout nicht
-  // materialisieren. (Wurzel-DATEIEN kommen im Cone-Modus immer mit; das ist gewollt und
-  // kostet nur Kilobyte, siehe Kommentar im Skript.)
+  // Ein VERZEICHNIS ausserhalb des Wissenspfads — es MUSS mit dem vollen Klon ankommen
+  // (die SSOT-Skills verweisen auch auf Repo-Inhalt neben der Wissensbasis).
   fs.mkdirSync(path.join(dir, 'grossordner'), { recursive: true });
-  fs.writeFileSync(path.join(dir, 'grossordner', 'gross.md'), 'nicht ausliefern\n', 'utf8');
+  fs.writeFileSync(path.join(dir, 'grossordner', 'gross.md'), 'gehoert dazu\n', 'utf8');
   git(dir, ['add', '-A']);
   git(dir, ['commit', '-q', '-m', 'eins']);
   return { dir, url: pathToFileURL(dir).href };
@@ -80,7 +79,7 @@ function quelle(ergebnis, name) {
   return q;
 }
 
-test('Erstlauf: klont sparse, materialisiert nur den Wissenspfad, schreibt den Zeiger', () => {
+test('Erstlauf: klont voll, materialisiert das ganze Repo, schreibt den Zeiger', () => {
   const o = origin();
   const ablage = tmp('nc-ssot-ablage-');
   const r = run(pluginWurzel(o.url), ablage);

@@ -13,7 +13,7 @@
 // EIN Aufruf, EIN Ergebnis (bewusst ohne Modi und ohne Frische-Fenster — die gab es nur
 // fuer eine automatische Start-Anbindung, die der Maintainer gestrichen hat):
 //   node ssot-provision.js [--json]
-// Fehlt eine Quelle → sparse klonen. Ist sie da → `git pull --ff-only`. Idempotent.
+// Fehlt eine Quelle → voll klonen. Ist sie da → `git pull --ff-only`. Idempotent.
 //
 // QUELLEN (registry-getrieben, damit kuenftige Abteilungen ohne Codeaenderung mitlaufen):
 //   - Kern: Repo-URL aus dem ausgelieferten .claude-plugin/plugin.json (`repository`),

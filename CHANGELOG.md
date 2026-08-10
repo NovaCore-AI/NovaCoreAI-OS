@@ -29,11 +29,12 @@ Bauplans) dokumentiert die einzige Abweichung.
   Firmen-Block in der globalen `CLAUDE.md` verweist aber auf sie („vor Vermutungen dort
   triagieren"). Ohne lokale Kopie zeigte dieser Router ins Leere. Das Vorbild kennt dieselbe
   Lücke und nennt sie in seinem Folgeplan einen **Rollout-Blocker**.
-  **Ein Skill, ein Befehl, ein Ergebnis:** idempotent — fehlt die Kopie, wird sparse geklont
-  (`--filter=blob:none --sparse`); ist sie da, wird per **Fast-Forward** nachgezogen. Nie
+  **Ein Skill, ein Befehl, ein Ergebnis:** idempotent — fehlt die Kopie, wird **voll**
+  geklont; ist sie da, wird per **Fast-Forward** nachgezogen. Nie
   Merge, Rebase, Reset oder Force; eine lokal veränderte Kopie wird **gemeldet, nicht
-  überschrieben**. Ablage `~/.nc/ssot/` (Override `NC_SSOT_DIR`) mit einem Zeiger
-  `index.json`, über den andere Skills die Kopie finden. Arbeits-Repo und globale
+  überschrieben**. Ablage `~/.nc/ssot/<repo-name>/` (Override `NC_SSOT_DIR`); die
+  **Verlinkung ist der feste Pfad**, den der Firmen-Block in der globalen `CLAUDE.md` als
+  Einstieg nennt. Arbeits-Repo und globale
   `CLAUDE.md` werden nie angefasst.
   **Registry-getrieben:** der Kern immer, dazu jede Abteilung, die `repository` **und** das
   neue optionale Feld `repoKnowledgePath` führt. Heute löst das auf „nur Kern" auf — bei den
@@ -151,6 +152,16 @@ Bauplans) dokumentiert die einzige Abweichung.
 
 ### Fixed
 
+- **`/nc:setup` nach dem Livetest korrigiert** (PR #13, Review-Iteration Kimi Code). Zwei
+  Fehler der Erstfassung: (a) **„Verlinken" war gar nicht gebaut** — der Zeiger `index.json`
+  wurde geschrieben, aber von niemandem gelesen, und alle SSOT-Verweise sind relative Pfade,
+  die im Klon nicht auflösen. Die Verlinkung ist jetzt der **feste Pfad plus Firmen-Block**:
+  Der Klon liegt deterministisch unter `~/.nc/ssot/<repo-name>/`, und
+  `doks/global-claude-firmenblock.md` nennt genau diesen Pfad als Einstieg. (b) **Der
+  Sparse-Klon schnitt `plugins/` weg** — genau das, worauf `doku-sync` mit
+  `referenz/skill-authoring.md` verweist — und sparte dafür 445 KB. Jetzt **voller Klon**;
+  der Regressionstest verlangt, dass Repo-Inhalt außerhalb der Wissensbasis mit ankommt.
+  Doku-Spiegel (SKILL-Description, ONBOARDING, README, Bauplan-Nachtrag N1) nachgezogen.
 - **Review-Härtungen an Gate 2 und am Autosync** (adversariales Review von PR #10; Details
   und Begründung: Bauplan §6, Nachtrag N2). Zwei davon machen NovaCore **strenger als das
   Vorbild** — dieselbe Linie wie bei den FFG-Härtungen: „Onsite gewinnt für Struktur, nicht

@@ -2,9 +2,10 @@
 name: setup
 description: >-
   Stellt die Wissensbasis (SSOT) des OS lokal bereit — in einem Schritt. Klont die
-  benötigten Quellen sparse in eine feste Ablage unterhalb des Home-Verzeichnisses, zieht
-  eine vorhandene Kopie per Fast-Forward nach und schreibt einen Zeiger, über den die
-  anderen Skills sie finden. Einmal nach der Installation ausführen, später bei Bedarf
+  benötigten Quellen vollständig in eine feste Ablage unterhalb des Home-Verzeichnisses
+  (`~/.nc/ssot/<repo-name>/`) und zieht eine vorhandene Kopie per Fast-Forward nach. Die
+  Verlinkung ist der feste Pfad, den der Firmen-Block in der globalen CLAUDE.md nennt.
+  Einmal nach der Installation ausführen, später bei Bedarf
   erneut. Trigger-Begriffe: „Setup", „Ersteinrichtung", „SSOT einrichten", „Wissensbasis
   fehlt", „Wissensbasis aktualisieren", „nach der Installation".
 ---
