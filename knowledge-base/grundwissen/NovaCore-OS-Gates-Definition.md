@@ -55,8 +55,14 @@ Ehrliche Reichweite, damit die Tabelle oben nicht mehr verspricht, als der Code 
   Gate 2 so bewusst wie per `NC_START_GATE=off`. Das ist die dokumentierte Proxy-Grenze.
 - **Der Durchlass für den Stempel-Befehl ist eng gefasst:** Er verlangt eine einzeilige,
   am Zeilenanfang verankerte Invokation von **genau diesem** Skript (Pfadvergleich, nicht
-  Namenssuffix); alles, was eine zweite Aktion anhängt — `;`, `&&`, `|`, `>`, `#`, `$(…)`
-  oder ein Zeilenumbruch —, verwirft ihn.
+  Namenssuffix) durch **genau `node`/`node.exe`** (Basisname-Vergleich, nicht Namensmuster);
+  alles, was eine zweite Aktion anhängt — `;`, `&&`, `|`, `>`, `#`, `$(…)` oder ein
+  Zeilenumbruch —, verwirft ihn, ebenso Flags zwischen Interpreter und Skript.
+  **Bewusst nicht akzeptiert:** das Debian-Legacy-Binary `nodejs`. Begründung: `hooks.json`
+  startet die Hooks selbst über `node` — wo `node` fehlt, läuft die Kontroll-Schicht
+  ohnehin nicht, und ein weiterer akzeptierter Interpretername wäre nur Angriffsfläche
+  ohne Nutzen. Der Fehlfall ist selbstheilend: Die Ablehnung nennt den funktionierenden
+  Befehl wörtlich.
 - **Fail-open bleibt fail-open:** Läuft die Git-Abfrage des Gates in den 2-Sekunden-Timeout,
   wird durchgelassen (wie bei allen Gates) — dann aber mit einer Warnung auf stderr, damit
   Last die Kontroll-Schicht nicht unbemerkt abschwächt.
