@@ -62,7 +62,7 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | `VERSION` | Produkt-Leitversion (SemVer) = Version des Kern-Plugins |
 | `.claude-plugin/marketplace.json` | Marketplace `novacore-os` — Einträge ohne `version`-Feld (die steht allein in der jeweiligen `plugin.json`); die Repo-Wurzel ist **nur** Marketplace-Wurzel, kein Plugin |
 | `.github/workflows/` | `ci.yml` (Ubuntu+Windows × Node 20/22/24, Suite + Validator-Positivkontrolle) und `release.yml` (Tag `nc--v*` → GitHub-Release aus dem CHANGELOG-Abschnitt) |
-| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`save-session`/`journal`/`doku-sync`/`os-info`/`skill-builder`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; dazu `nc-doks-autosync.js`) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `nc-sync.md`, `tests/` |
+| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`save-session`/`journal`/`setup`/`doku-sync`/`os-info`/`skill-builder`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; dazu `nc-doks-autosync.js`) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `nc-sync.md`, `tests/` |
 | `plugins/nc-development/` | Abteilung `development` (Namespace `/nc-development:`): 11 Skills in 4 Modulen (`fe`/`be`/`flc`/`wzs`, flaches Layout) + `workflow.md` (Fachablauf WP1–WP7) |
 | `vorlagen/abteilungsplugin/` | Vorlage für neue Abteilungsplugins — **kein Plugin** (`.vorlage`-Endungen) |
 | `knowledge-base/` | Wissensbasis — Glossar im nächsten Abschnitt |
@@ -129,6 +129,10 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   (`nc-doks-autosync.js` + `doks/global-claude-firmenblock.md`, CLAUDE-Ebene 1) ·
   **SSOT-Infrastruktur** (Master-Index + Aktualisierungs-Index + drei Begriffsnormen) ·
   drei Kern-Infrapflege-Skills · CI/Release-Workflows · Marketplace-Kategorie `affiliate`.
+  Nachtrag 2026-08-11: **`/nc:setup` — SSOT-Provisionierung** (Bauplan
+  `grundwissen/2026-08-10-ssot-provisionierung-bauplan.md`): klont die Wissensbasis voll
+  nach `~/.nc/ssot/<repo-name>/`, Verlinkung über den festen Pfad im Firmen-Block, per
+  Fast-Forward aktuell; nach dem Livetest korrigiert (PR #13, Nachtrag N1).
   **Bewusst ausgeschlossen:** Queue-Logik/SSOT-Abstufung des Vorbilds und jeder
   Memory-Share zwischen Satelliten (Maintainer-Entscheid; siehe SSOT-Definition).
 - **Noch nicht gebaut:** Gate 3 (Safety-Gate mit echtem Freigabedialog), Gate 4

@@ -58,7 +58,7 @@ bringen ihren Kern als **Modul** selbst mit:
 | `/nc:start` | WP0 | Session-Start: Stand, Journal, Git-Lage laden — kein Blind-Start; setzt zum Abschluss den Fakten-Stempel, der Gate 2 öffnet |
 | `/nc:save-session` | WP8 | Session-Ende: Journal schreiben, Stand konsolidieren |
 | `/nc:journal` | laufend | Einzelne Ereignisse sofort festhalten |
-| `/nc:setup` | einmal pro Rechner | Stellt die Wissensbasis lokal bereit (sparse-Klon nach `~/.nc/ssot/`) und hält sie per Fast-Forward aktuell — der Marketplace liefert nur das Plugin aus, nicht die Wissensbasis |
+| `/nc:setup` | einmal pro Rechner | Stellt die Wissensbasis lokal bereit (voller Klon nach `~/.nc/ssot/<repo-name>/`, Verlinkung über den festen Pfad im Firmen-Block) und hält sie per Fast-Forward aktuell — der Marketplace liefert nur das Plugin aus, nicht die Wissensbasis |
 | `/nc:doku-sync` | vor Commit | Lebende Doku nach der Sync-Matrix nachziehen, CHANGELOG + Versions-Gleichstand prüfen, Prüfstempel setzen |
 | `/nc:os-info` | jederzeit | Erklärt das OS **auf Basis der realen Installation** — Plugins, Module, nutzbare Skills, Gate-Status |
 | `/nc:skill-builder` | jederzeit | Führt durch den Bau eines Skills nach den OS-Regeln (Sandbox oder OS-Beitrag, inkl. Fork-back) |

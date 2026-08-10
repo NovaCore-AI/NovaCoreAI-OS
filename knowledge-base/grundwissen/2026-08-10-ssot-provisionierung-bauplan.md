@@ -102,5 +102,25 @@ das dann klar, statt es zu verschleiern. Falls sich das in der Praxis als Hürde
 Weg A (Wissensbasis ins Plugin-Paket) die Nachiteration — die beiden schließen einander
 nicht aus.
 
+## 7. Nachtrag N1 (2026-08-11, nach dem Livetest — PR #13)
+
+Der Livetest der Erstfassung scheiterte an zwei Fehlern; beide Entscheidungen aus §3 werden
+hiermit **revidiert** (Spec-Nachtrag statt stiller Abweichung):
+
+1. **§3.2 revidiert — der Zeiger allein „verlinkt" nicht.** `index.json` wurde geschrieben,
+   aber **von niemandem gelesen** (per `grep` über `plugins/` verifiziert), und alle
+   SSOT-Verweise sind relative Pfade, die im Klon unter `~/.nc/ssot/` nicht auflösen. Die
+   Verlinkung ist jetzt der **feste Pfad plus Firmen-Block**: der Klon liegt deterministisch
+   unter `~/.nc/ssot/<repo-name>/`, und `doks/global-claude-firmenblock.md` — das einzige
+   Artefakt, das ausgeliefert **und** in jeder Session gelesen wird — nennt genau diesen
+   Pfad als Einstieg. Der Zeiger bleibt als Bestandsaufnahme, ist aber nicht mehr der
+   beschriebene Findemechanismus. `/nc:start` bleibt unangetastet (§3.6 steht weiter).
+2. **§3.3 revidiert — voller Klon statt Sparse.** Gemessen: `knowledge-base` 184K,
+   `plugins` 425K, `docs` 20K. Der Ausschnitt schnitt `plugins/` weg — genau das, worauf
+   `doku-sync` mit `referenz/skill-authoring.md` verweist — und sparte dafür 445 KB.
+   Funktionsverlust für nichts. Jetzt `git clone` ohne `--filter`/`--sparse`; der
+   Regressionstest verlangt, dass Repo-Inhalt außerhalb der Wissensbasis mit ankommt.
+
 ---
 *Angelegt 2026-08-10 durch Claude (Opus 5, Claude Code) auf Weisung Lucas Vöhringer.*
+*Nachtrag N1: 2026-08-11, Livetest-Befunde durch das NovaCore-Team, Doku-Nachzug Kimi Code.*
