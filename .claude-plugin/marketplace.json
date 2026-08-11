@@ -23,10 +23,10 @@
       "source": {
         "source": "github",
         "repo": "NovaCore-AI/Felix-OS",
-        "ref": "v0.2.1",
-        "sha": "a8407fafdbf95a7229db3bf99a0d862e0234ff93"
+        "ref": "v0.4.1",
+        "sha": "ed41f224a7451736ad1504f221c1c5b44e2ea20c"
       },
-      "description": "Abteilung felix: eigenständiges Felix-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder) und eigener Kontroll-Schicht (FFG-Port). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-biggi betreiben. Satelliten-Repo (Standardprozess abteilungs-plugin-bau.md §3b).",
+      "description": "Abteilung felix: eigenständiges Felix-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder, doku-sync) und eigener Kontroll-Schicht (FFG mit Review-Härtungen + Session-Start-Zwang, markerlos, Opt-outs NC_FFG=off / NC_START_GATE=off) samt eigener isolierter Wissensbasis unter knowledge-base/. Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-biggi betreiben. Satelliten-Repo (Standardprozess abteilungs-plugin-bau.md §3b).",
       "category": "abteilung"
     },
     {

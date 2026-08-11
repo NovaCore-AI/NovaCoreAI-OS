@@ -76,11 +76,12 @@ Die eigenständigen Abteilungs-OS installieren sich aus demselben Marketplace:
   alle bis auf eines (`/plugin disable …`).
 - Private Satelliten-Repos: der SSH-Hinweis oben gilt auch hier
   (`CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1`).
-- **Marker-Unterschied (Stand 2026-08-10):** Kern `nc` und **Biggi-OS** arbeiten
-  **markerlos** — ihr Session-Start-Zwang injiziert den Pflicht-Einstieg in jede Session
-  (Opt-out nur per Env `NC_START_GATE=off`). Nur das **Felix-OS** trägt noch den alten
-  marker-gebundenen Begrüßungs-Hook (`.nc-os`-**Datei** im Repo-Root); dort ist die
-  Begrüßung ein Komfort-Hinweis, kein Gate.
+- **Alle markerlos (Stand 2026-08-12):** Kern `nc`, **Biggi-OS** und **Felix-OS** arbeiten
+  **markerlos** — ihr Session-Start-Zwang injiziert den Pflicht-Einstieg in jede Session und
+  blockt schreibende Aktionen bis zum Fakten-Stempel (Opt-out nur per Env
+  `NC_START_GATE=off`). Die frühere Ausnahme des Felix-OS — ein marker-gebundener
+  Begrüßungs-Hook an einer `.nc-os`-**Datei** im Repo-Root, der nur Komfort-Hinweis statt Gate
+  war — ist mit `nc-felix` **0.4.1** entfallen.
 
 ## Migration von v0.2.0 (altes Single-Plugin + `ncos`-CLI)
 
@@ -128,8 +129,8 @@ ist alles überall dort, wo der Kern installiert ist:
 | **Doks-Autosync** | hält den Firmen-Block in `~/.claude/CLAUDE.md` aktuell; die Privat-Zone außerhalb der Marker bleibt unberührt | `NC_AUTOSYNC=off` |
 
 Eine noch vorhandene `.nc-os`-Datei aus früheren Setups **stört nicht** und kann gelöscht
-werden — sie hat keine Funktion mehr. Ausnahme: Das **Felix-OS** trägt noch den alten
-marker-gebundenen Begrüßungs-Hook (§1b).
+werden — sie hat keine Funktion mehr; seit `nc-felix` 0.4.1 gilt das auch für das
+**Felix-OS**, dessen frühere Marker-Ausnahme entfallen ist (§1b).
 
 **Erste Session nach der Installation:** Vor der ersten Änderung `/nc:start` ausführen. Wer
 das überspringt, bekommt beim ersten Schreibversuch eine Ablehnung, die den exakten
