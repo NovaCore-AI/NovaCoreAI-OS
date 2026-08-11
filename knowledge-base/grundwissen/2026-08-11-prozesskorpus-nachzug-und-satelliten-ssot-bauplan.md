@@ -581,6 +581,51 @@ verlangt Inhaltsgleichheit **in der Substanz**, und die Substanz ist die Auslief
 nicht der Klon-Mechanismus. Der Befund gehört zusätzlich ins `debug-log.md` (AP3.2), weil er ein
 Fremdbefund am Vorbild ist, kein eigener Fehler.
 
+### N4 — Die Historie folgt der Abteilungshälfte, nicht dem Kernteil
+
+**Anlass:** AP1.1 und Entscheid E2 schreiben vor, `plugin-bau.md` **per `git mv` nach
+`kern-plugin-bau.md`** zu überführen, damit der Kernteil die Historie des Vorgängers trägt. Vier
+lebende Dokumente haben diese Wirkung anschließend behauptet (`AGENTS.md`, `CHANGELOG.md`,
+`SSOT-Document-Index.md`, der Kopf von `kern-plugin-bau.md`). Im Review am 2026-08-12 gegen die
+Platte geprüft — **die Behauptung trifft nicht zu:**
+
+```
+$ git log --follow --oneline -- knowledge-base/standardprozesse/kern-plugin-bau.md
+6201519 feat: Prozesskorpus und Satelliten-SSOT nachgezogen        # nur dieser Commit
+
+$ git diff origin/main HEAD --summary -M -- knowledge-base/standardprozesse/
+ create ... abteilungs-plugin-bau.md · create ... kern-plugin-bau.md
+ delete ... plugin-bau.md                                          # gar kein Rename
+
+$ git diff origin/main HEAD -M5% --summary -- knowledge-base/standardprozesse/
+ rename knowledge-base/standardprozesse/{plugin-bau.md => abteilungs-plugin-bau.md} (43%)
+```
+
+**Ursache:** Git speichert **kein** Rename. `git mv` ist Komfort für `mv` + `git add`; wer die
+Historie sieht, entscheidet die **inhaltsbasierte** Rename-Erkennung beim Lesen. Der größere
+Textanteil des Vorgängers (Architektur, Mechanik-Fakten, §3/§3a/§3b) liegt in
+`abteilungs-plugin-bau.md`; der Kernteil ist überwiegend neu geschrieben. Bei der
+Standardschwelle (50 %) reicht selbst die Abteilungshälfte nicht — dort gilt `plugin-bau.md`
+als gelöscht.
+
+**Entscheidung:** Die **Doku wird auf den belegten Zustand korrigiert**, nicht die Historie.
+History-Rewrite ist eine rote Linie (§7), und eine Rename-Zuordnung lässt sich nicht verordnen:
+Sie fällt bei jedem `git log` neu und folgt dem Inhalt. Die vier Fundstellen sagen jetzt, dass
+die Vorgeschichte an keiner der beiden Hälften hängt, und nennen den Weg, der sie **wirklich**
+liefert:
+
+```
+git log --oneline -- knowledge-base/standardprozesse/plugin-bau.md        # voll: bis b04cc0d
+git log --follow --find-renames=40% -- .../abteilungs-plugin-bau.md      # Abteilungshälfte
+```
+
+**Begründung:** Eine Zusage, die der vorgeschriebene Prüfbefehl (`git log --follow`, Drift-Regel
+in `AGENTS.md`) widerlegt, kostet genau in dem Moment Vertrauen, in dem jemand die Vorgeschichte
+einer Kernregel wirklich braucht — und schickt ihn mit leerem Ergebnis weg. **Lehre für künftige
+Teilungen:** „trägt die Historie" ist keine planbare Eigenschaft eines `git mv`; wer sie
+zusichern will, prüft sie nach dem Commit mit `git log --follow` und schreibt das Ergebnis hin,
+statt die Absicht.
+
 ---
 
 *Angelegt 2026-08-11 durch Claude (Opus 5, Claude Code) auf Weisung Lucas Vöhringer.

@@ -141,8 +141,8 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Memory-Share zwischen Satelliten (Maintainer-Entscheid; siehe SSOT-Definition).
 - **Gebaut (Kern v0.7.0, 2026-08-11): Prozesskorpus-Nachzug** nach Bauplan
   `grundwissen/2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md` (AP1–AP5).
-  Aus `plugin-bau.md` wurden **vier** Standardprozesse: `kern-plugin-bau.md` (per `git mv`,
-  trägt die Historie — Scope, **Governance-Zwei-Schichten-Tabelle §1a**,
+  Aus `plugin-bau.md` wurden **vier** Standardprozesse: `kern-plugin-bau.md` (Scope,
+  **Governance-Zwei-Schichten-Tabelle §1a**,
   **Autosync-Standardprozess §2a**, Mindest-Client-Schwellen), `abteilungs-plugin-bau.md`
   (Architektur, **Auslieferungsgrenze §1a**, Mechanik-Fakten, §3/§3a/§3b),
   **`ssot-aufbau.md`** (sieben Grundbausteine, §4 Struktur-Vererbung an Satelliten,
@@ -153,6 +153,9 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Aktualisierungs-Index. **Nachtrag N3 korrigiert eine Mechanik-Behauptung des Vorbilds:**
   Der sparse clone hängt am Source-Typ `git-subdir`, nicht am `ref`/`sha`-Pin — die reale
   Auslieferungsgrenze ist die Kopie des **Plugin-Verzeichnisses** in den Cache.
+  **Nachtrag N4:** Die Git-Historie des alten `plugin-bau.md` hängt an **keiner** der beiden
+  Hälften — Vorgeschichte über den alten Pfad lesen
+  (`git log --oneline -- knowledge-base/standardprozesse/plugin-bau.md`).
   Minor-Bump, weil neue normative Prozesse hinzukommen.
 - **Gebaut (Kern v0.6.1, 2026-08-11):** `/nc:setup` heilt **Sparse-Relikte der
   Erstfassung** — eine unveränderte Sparse-Kopie wird vor dem Pull per

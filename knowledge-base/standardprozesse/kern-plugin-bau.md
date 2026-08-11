@@ -11,7 +11,11 @@
 >
 > **Status: lebendes Teilwerk.** Hervorgegangen aus der Zweiteilung des früheren
 > `plugin-bau.md` (2026-08-11, Bauplan-AP1; das Vorbild `Onsite.ai-OS` hat sie am 2026-08-09
-> vollzogen) — diese Datei trägt per `git mv` die Historie des Vorgängers. Mechanik-Aussagen
+> vollzogen). **Diese Datei trägt die Git-Historie des Vorgängers nicht** (Review-Befund
+> 2026-08-12, Plan-Nachtrag N4): Git erkennt Umbenennungen inhaltsbasiert, und der größere
+> Textanteil ist in `abteilungs-plugin-bau.md` gelandet. Wer die Vorgeschichte einer Regel
+> braucht, liest sie über den alten Pfad —
+> `git log --oneline -- knowledge-base/standardprozesse/plugin-bau.md`. Mechanik-Aussagen
 > sind gegen die offizielle Claude-Code-Doku verifiziert (`plugin-marketplaces` zuletzt
 > **2026-08-11**, `plugins-reference`/`skills` **2026-07-28**, Hooks-Doku **2026-08-10**). Vor
 > Format-Änderungen erneut abrufen — nie aus dem Gedächtnis.

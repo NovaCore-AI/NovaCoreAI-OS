@@ -276,7 +276,14 @@ function wissensDateien() {
       if (full === INDEX_DATEI) continue;
       // PLATZHALTER.md haelt eine noch leere Kategorie in Git (Vorbild-Muster) und ist
       // bewusst NICHT indexpflichtig — sie traegt kein Wissen, nur Struktur.
-      if (entry.name === 'PLATZHALTER.md') continue;
+      // Die Ausnahme gilt nur, SOLANGE der Ordner leer ist (so ist sie dokumentiert:
+      // Index Teil 1 "solange leer", die Datei selbst "sobald das erste Dokument hier liegt,
+      // wird diese Datei geloescht", Aktualisierungs-Index "PLATZHALTER.md entfernen, sobald
+      // die erste echte Idee liegt"). Unbedingt gestellt waere sie ein Loch in der
+      // Indexpflicht: echtes Wissen entkaeme ihr, indem es PLATZHALTER.md heisst
+      // (Review-Gegenprobe 2026-08-12: zwei Dateien mit Inhalt in nicht-leeren Kategorien
+      // liefen unbemerkt durch).
+      if (entry.name === 'PLATZHALTER.md' && fs.readdirSync(cur).length === 1) continue;
       out.push(path.relative(WISSEN, full).split(path.sep).join('/'));
     }
   }
@@ -309,12 +316,25 @@ test('SSOT-Document-Index: jede Kategorie ist im Routing erfasst', () => {
   // Entscheid E1 (2026-08-11): Der Kern fuehrt die Fuenferstruktur des Vorbilds. Eine
   // Kategorie ohne Routing-Zeile in Teil 1 ist ein Ablageort ohne Regel — genau die Luecke,
   // durch die Dokumente am falschen Ort landen.
+  //
+  // Geprueft wird die ZEILE IN TEIL 1, nicht die blosse Erwaehnung irgendwo im Index
+  // (Review-Gegenprobe 2026-08-12): Ein Kategoriename steht auch in der Mapping-Tabelle, in
+  // der Spalte "gehoert nicht hierher" fremder Zeilen und in den Teil-2-Ueberschriften. Eine
+  // Volltextsuche war deshalb schon gruen, NACHDEM die Routing-Zeile geloescht wurde — der
+  // Test haette den Verlust der Regel nicht gemeldet.
   const index = fs.readFileSync(INDEX_DATEI, 'utf8');
+  const teil1 = (index.split(/^## Teil 1\b[^\n]*$/m)[1] ?? '').split(/^## /m)[0];
+  assert.ok(teil1.trim().length > 0,
+    'Abschnitt "## Teil 1 …" im SSOT-Document-Index nicht gefunden — ohne ihn prueft diese '
+    + 'Invariante nichts mehr (Ueberschrift umbenannt? dann hier nachziehen)');
   const kategorien = fs.readdirSync(WISSEN, { withFileTypes: true })
     .filter((e) => e.isDirectory()).map((e) => e.name).sort();
-  const ungeroutet = kategorien.filter((k) => !index.includes('`' + k + '/`'));
+  const alsRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Ordnername ist Literal
+  const ungeroutet = kategorien
+    .filter((k) => !new RegExp('^\\|\\s*`' + alsRegex(k) + '/`', 'm').test(teil1));
   assert.deepEqual(ungeroutet, [],
-    `Kategorie ohne Routing-Zeile in Teil 1: ${ungeroutet.join(', ')} — als \`<name>/\` im Index nennen`);
+    `Kategorie ohne Routing-Zeile in Teil 1: ${ungeroutet.join(', ')} — als eigene Tabellenzeile `
+    + '`<name>/` in Teil 1 aufnehmen (gehoert hierher / gehoert nicht hierher / Lebenszyklus)');
 });
 
 test('Wissensbasis-Wurzel: nur der Index liegt oben', () => {
@@ -381,6 +401,18 @@ test('Vorlage ist kein Plugin und enthaelt keine ausgefuellten Werte', () => {
   const tpl = fs.readFileSync(path.join(dir, '.claude-plugin', 'plugin.json.vorlage'), 'utf8');
   assert.match(tpl, /\{\{PLUGIN_NAME\}\}/, 'Vorlage ohne Platzhalter — wurde sie versehentlich ausgefuellt?');
   assert.match(tpl, /"dependencies":\s*\[\s*"nc"\s*\]/s, 'Vorlage muss dependencies ["nc"] vorgeben');
+
+  // Die Wissensbasis-Vorlage der Satelliten faellt unter dieselbe Invariante: Der
+  // Aktualisierungs-Index (Zeile "Vorlage `ssot-grundgeruest` geaendert") beruft sich fuer
+  // "Platzhalter {{ABTEILUNG}} muss stehenbleiben" ausdruecklich auf sie — geprueft wurde das
+  // bisher nicht (Review-Befund 2026-08-12). Ohne Platzhalter waere die Vorlage eine
+  // ausgefuellte Instanz und wuerde beim Kopieren stillschweigend fremde Namen mitschleppen.
+  const ssot = path.join(dir, 'ssot-grundgeruest.md.vorlage');
+  assert.ok(fs.existsSync(ssot),
+    'vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage fehlt — sie ist die verbindliche '
+    + 'Vorlage der Satelliten-Wissensbasis (ssot-aufbau.md §4, abteilungs-plugin-bau.md §3b.1)');
+  assert.match(fs.readFileSync(ssot, 'utf8'), /\{\{ABTEILUNG\}\}/,
+    'ssot-grundgeruest.md.vorlage ohne Platzhalter {{ABTEILUNG}} — wurde sie ausgefuellt?');
 });
 
 test('Keine offenen Vorlagen-Platzhalter in ausgelieferten Plugins', () => {

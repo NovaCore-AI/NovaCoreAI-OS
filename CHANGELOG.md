@@ -52,8 +52,9 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 - **Prozesskorpus des Vorbilds nachgezogen — vier Standardprozesse statt einem** (Bauplan AP1,
   AP2, AP4; Entscheid E2). Jede Quelldatei wurde aus `origin/main` des Vorbilds gelesen
   (`git show "origin/main:<pfad>"`), nicht rekonstruiert.
-  - **`plugin-bau.md` zweigeteilt:** `standardprozesse/kern-plugin-bau.md` (per `git mv`, trägt
-    die Historie) und neu `standardprozesse/abteilungs-plugin-bau.md`. Der Kernteil bekommt die
+  - **`plugin-bau.md` zweigeteilt:** `standardprozesse/kern-plugin-bau.md` und neu
+    `standardprozesse/abteilungs-plugin-bau.md` (die Git-Historie des Vorgängers hängt an keiner
+    der beiden Hälften — Plan-Nachtrag **N4**). Der Kernteil bekommt die
     **Governance-Zwei-Schichten-Tabelle §1a** (team-shared ↔ individuell, samt Prüfungs-Eigentum
     und der Begründung, warum ein Satellit eigene Gate-Kopien tragen darf, ohne die Regel zu
     verletzen), den **Autosync-Standardprozess §2a** und die **Mindest-Client-Schwellen** als
@@ -160,6 +161,32 @@ Single-Plugin-Layout und bleiben historisch unverändert.
   `README.md.vorlage`. Historische Dokumente blieben unverändert; die als **lebend** indizierte
   Design-Spec bekam statt einer In-place-Änderung den **Nachtrag §12** mit der Lesehilfe
   alt → neu. — *Claude (Opus 5)*
+- **Adversariales Review des PR (2026-08-12): drei Wächter-Invarianten gehärtet, eine falsche
+  Historien-Zusage korrigiert.** Beide Befunde stehen mit Gegenprobe im `debug-log.md`.
+  - **`struktur.test.mjs` prüft jetzt, was die Namen zusagen** — vorher grün trotz kaputter
+    Datenlage, nachher rot: **(1)** „jede Kategorie ist im Routing erfasst" suchte im **ganzen**
+    Index statt in Teil 1 und blieb grün, nachdem die Routing-Zeile für `ideen-backlog/` gelöscht
+    war (der Name steht auch in der Mapping-Tabelle, in „gehört nicht hierher" fremder Zeilen und
+    in den Teil-2-Überschriften); die Prüfung ist auf den **Abschnitt Teil 1** und eine echte
+    **Tabellenzeile** eingeschränkt, mit Guard gegen eine umbenannte Überschrift. **(2)** Die
+    `PLATZHALTER.md`-Ausnahme galt **unbedingt**, obwohl sie dreifach **bedingt** dokumentiert ist
+    („solange leer"); echtes Wissen entkam der Indexpflicht, indem es so heißt — die Ausnahme gilt
+    jetzt nur, wenn die Datei der **einzige** Eintrag ihres Ordners ist. **(3)** Für
+    `{{ABTEILUNG}}` in `ssot-grundgeruest.md.vorlage` berief sich der Aktualisierungs-Index auf
+    die Invariante „Vorlage ist kein Plugin" — die deckt jetzt **beide** Vorlagendateien ab.
+    Keine neue Testdatei, keine neue Testzahl: 93 Tests, weiterhin grün.
+  - **Zusage „`kern-plugin-bau.md` trägt per `git mv` die Historie" zurückgenommen** (vier lebende
+    Fundstellen). Git speichert kein Rename; die Zuordnung fällt inhaltsbasiert beim Lesen, und
+    der größere Textanteil liegt in `abteilungs-plugin-bau.md` (43 %) — bei der Standardschwelle
+    erkennt Git gar kein Rename. `git log --follow` auf die Kernhälfte liefert nur den
+    Zweiteilungs-Commit. Die Stellen nennen jetzt den Weg, der die Vorgeschichte wirklich liefert
+    (`git log --oneline` auf den alten Pfad); die Abweichung von AP1.1/E2 steht als
+    **Plan-Nachtrag N4** im Bauplan. Kein History-Rewrite (rote Linie §7).
+  - **Kern-Manifest:** `description` sagte „6 Skills", ausgeliefert werden **7**
+    (`start`, `save-session`, `journal`, `setup`, `doku-sync`, `os-info`, `skill-builder` — so auch
+    Registry, `AGENTS.md` und der neue `kern-plugin-bau.md` §1); das Team liest diesen Text im
+    Installationsdialog. Korrigiert, kein zusätzlicher Bump nötig (0.7.0 ist Teil dieses Zyklus).
+  — *Claude (Opus 5, Review-Agent)*
 
 ### Offen bis zum Merge
 

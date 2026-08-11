@@ -14,6 +14,68 @@
 
 ## Einträge
 
+### 2026-08-12 — Drei Wächter-Invarianten prüften weniger, als ihr Name zusagte
+
+- **Symptom:** `plugins/nc/tests/struktur.test.mjs` meldete grün für Datenlagen, die die
+  jeweilige Regel klar verletzen. Drei Fälle, alle mit Gegenprobe belegt:
+  **(a)** Die neue Invariante „jede Kategorie ist im Routing erfasst" blieb grün, **nachdem** die
+  Teil-1-Routing-Zeile für `ideen-backlog/` gelöscht war. **(b)** Zwei Dateien mit echtem Inhalt,
+  benannt `PLATZHALTER.md`, in den **nicht** leeren Kategorien `grundwissen/` und
+  `standardprozesse/` liefen an der Indexpflicht vorbei. **(c)** Für den Platzhalter
+  `{{ABTEILUNG}}` in `vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage` beruft sich der
+  Aktualisierungs-Index auf die Invariante „Vorlage ist kein Plugin" — die prüfte ihn nie.
+- **Ursache:** **(a)** Volltextsuche nach dem in Backticks gesetzten Kategorienamen über die
+  **ganze** Index-Datei statt über den Abschnitt Teil 1. Ein Kategoriename steht dort mehrfach: in der
+  Mapping-Tabelle, in der Spalte „gehört nicht hierher" fremder Zeilen und in den
+  Teil-2-Überschriften — jede dieser Nennungen hielt den Test grün. **(b)** Die
+  `PLATZHALTER.md`-Ausnahme war **unbedingt** implementiert, obwohl sie an drei Stellen
+  **bedingt** dokumentiert ist („solange leer" · „sobald das erste Dokument hier liegt, wird
+  diese Datei gelöscht" · „`PLATZHALTER.md` entfernen, sobald die erste echte Idee liegt").
+  **(c)** Der Test las nur `plugin.json.vorlage`; die zweite Vorlagendatei war nie erfasst.
+- **Wirkung:** Alle drei sind stille Ausfälle — die Suite bleibt grün, während die Regel
+  praktisch verschwindet. Bei (b) kommt eine Umgehung hinzu: Wissen entkommt der Indexpflicht,
+  indem es `PLATZHALTER.md` heißt; die Triage sieht es nie.
+- **Fix:** (a) Prüfung auf den Abschnitt Teil 1 eingeschränkt und auf eine echte
+  **Tabellenzeile** verschärft (Zeilenanfang `|` plus Kategoriename), plus Guard, der rot wird,
+  falls die Überschrift „## Teil 1 …" verschwindet (sonst prüfte die Invariante wieder nichts). (b) Ausnahme gilt nur, wenn
+  `PLATZHALTER.md` der **einzige** Eintrag seines Ordners ist — damit erzwingt der Test die
+  dokumentierte Bedingung. (c) Die Vorlagen-Invariante deckt jetzt beide Vorlagendateien ab.
+- **Beleg:** Gegenprobe je Fall vor und nach dem Fix, Ausgabe zitiert: vorher „✔ … Kategorie ist
+  im Routing erfasst" bzw. „✔ … jede Wissensdatei ist indiziert" trotz kaputter Datenlage;
+  nachher „✖ Kategorie ohne Routing-Zeile in Teil 1: ideen-backlog" bzw. „✖ nicht im
+  SSOT-Document-Index.md erfasst: grundwissen/PLATZHALTER.md, standardprozesse/PLATZHALTER.md"
+  bzw. „✖ ssot-grundgeruest.md.vorlage ohne Platzhalter {{ABTEILUNG}}". Volllauf danach:
+  93 Tests grün.
+- **Präventionsregel:** Eine neue Invariante wird **mit** ihrer Gegenprobe geliefert: Datenlage
+  gezielt verletzen, roten Lauf zitieren, zurücksetzen. Und: Prüft ein Test einen Textabschnitt,
+  wird der Abschnitt **abgegrenzt** und seine Existenz mitgeprüft — eine Volltextsuche über ein
+  Dokument, das denselben Begriff mehrfach führt, prüft die Regel nicht, sondern nur das Vokabular.
+
+### 2026-08-12 — Vier lebende Dokumente sagten zu, `kern-plugin-bau.md` trage die Git-Historie
+
+- **Symptom:** `AGENTS.md`, `CHANGELOG.md`, `SSOT-Document-Index.md` und der Kopf von
+  `kern-plugin-bau.md` behaupteten, die Kernhälfte der Zweiteilung trage „per `git mv` die
+  Historie" des früheren `plugin-bau.md`. `git log --follow` auf die Datei liefert **nur** den
+  Zweiteilungs-Commit.
+- **Ursache:** Git speichert kein Rename; die Zuordnung entsteht **inhaltsbasiert beim Lesen**.
+  Der größere Textanteil des Vorgängers liegt in `abteilungs-plugin-bau.md` (Rename-Erkennung:
+  43 %), der Kernteil ist überwiegend neu geschrieben. Bei der Standardschwelle (50 %) erkennt
+  Git gar kein Rename — dann gilt `plugin-bau.md` als gelöscht. `git mv` ist Komfort für
+  `mv` + `git add` und sichert nichts zu.
+- **Wirkung:** Der Prüfbefehl, den die Drift-Regel in `AGENTS.md` vorschreibt, widerlegt die
+  eigene Zusage. Wer die Vorgeschichte einer Kernregel sucht, geht mit leerem Ergebnis weg.
+- **Fix:** Alle vier Fundstellen auf den belegten Zustand korrigiert und um den Weg ergänzt, der
+  die Historie wirklich liefert (`git log --oneline -- knowledge-base/standardprozesse/plugin-bau.md`);
+  Abweichung von AP1.1/E2 als **Plan-Nachtrag N4** dokumentiert. Kein History-Rewrite (rote Linie
+  §7) — und eine Rename-Zuordnung ließe sich ohnehin nicht verordnen.
+- **Beleg:** `git log --follow --oneline -- .../kern-plugin-bau.md` → ein Commit ·
+  `git diff origin/main HEAD --summary -M -- knowledge-base/standardprozesse/` → `create`/`delete`,
+  kein Rename · `... -M5% --summary` → `rename {plugin-bau.md => abteilungs-plugin-bau.md} (43%)` ·
+  `git log --oneline -- .../plugin-bau.md` → vollständige Kette bis `b04cc0d`.
+- **Präventionsregel:** „Trägt die Historie" ist keine planbare Eigenschaft eines `git mv`, sondern
+  ein Messergebnis. Nach dem Commit mit `git log --follow` prüfen und das **Ergebnis** hinschreiben,
+  nie die Absicht.
+
 ### 2026-08-11 — Vorbild-Regel „ref/SHA-Pin klont nur das Plugin-Subverzeichnis" ist falsch
 
 - **Symptom:** Der Prozesskorpus des Vorbilds (`Onsite.ai-OS@5d335a7`,
