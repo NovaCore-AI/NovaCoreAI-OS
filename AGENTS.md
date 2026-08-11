@@ -27,9 +27,11 @@
    Änderung nachzuziehen ist.
 6. **Aufgabenspezifisch nachladen** (Glossar unten): Skill-Arbeit →
    `plugins/nc/referenz/skill-authoring.md` · Plugin-/Marketplace-Arbeit →
-   `knowledge-base/standardprozesse/plugin-bau.md` (neue Abteilung §3 · Satellit-Extraktion
-   §3a · **eigenständiges Kollegen-/Abteilungs-OS §3b** — pilotiert 2026-07-28 mit
-   `nc-felix`, inkl. Install-Fallen) · Workflow-Logik →
+   `knowledge-base/standardprozesse/abteilungs-plugin-bau.md` (neue Abteilung §3 ·
+   Satellit-Extraktion §3a · **eigenständiges Kollegen-/Abteilungs-OS §3b** — pilotiert
+   2026-07-28 mit `nc-felix`, inkl. Install-Fallen) bzw. `kern-plugin-bau.md` bei Arbeit am
+   Kern · Wissensbasis-Arbeit → `knowledge-base/standardprozesse/ssot-aufbau.md` ·
+   Workflow-Logik →
    `plugins/nc/wp-rahmen.md` (Rahmen WP0–WP8) und `plugins/nc-development/workflow.md`
    (Fachablauf) · Methodenfragen → `knowledge-base/standardprozesse/os-bau-methode.md`.
 
@@ -75,8 +77,10 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 |---|---|---|
 | **`SSOT-Document-Index.md`** (Wurzel) | **Master-Index** der Wissensbasis: Teil 1 Ordner-Routing (wohin gehört ein Dokument), Teil 2 Quellen-Triage („Relevant wenn …") über alle Bestandsdateien. **Einzige Datei auf Wurzelebene** (testerzwungen) | **zuerst** — vor dem Griff in eine Kategorie und vor dem Anlegen/Verschieben/Löschen einer Wissensdatei |
 | `grundwissen/` | Produktvision, Begriffsnormen (SSOT-, Gates-, CLAUDE-Ebenen-Definition), Design-Specs und Pläne (Datumspräfix; jüngste Datei = Planungsstand) | Vision-/Architektur-Fragen; vor Design-Entscheidungen; Planungsarbeit; wenn ein Begriff (SSOT, Gate, CLAUDE-Ebene) erklärt oder abgegrenzt werden muss |
-| `standardprozesse/` | verbindliche Abläufe: `aktualisierungs-index.md` (**„ich ändere X — was muss ich anfassen"**, Langfassung der Sync-Matrix + Prüfzyklus + Selbsttest), `plugin-bau.md` (Plugin-/Marketplace-Ebene), `os-bau-methode.md` (Gesamt-Methode, an die Firmenphilosophie anpassbar) | vor **jeder** inhaltlichen Änderung am Plugin oder Repo — zuerst prüfen, ob ein Standardprozess existiert |
-| `debugging-findings/` | `agent-learnings.md` — Agenten-Fehlerprotokoll (append-only Pflicht) | bei Debugging; nach jedem eigenen Fehler; vor neuen Aufgaben (eigene Fehlermuster) |
+| `standardprozesse/` | verbindliche Abläufe: `aktualisierungs-index.md` (**„ich ändere X — was muss ich anfassen"**, Langfassung der Sync-Matrix + Prüfzyklus + Selbsttest), `kern-plugin-bau.md` (Kern-Plugin, Governance-Schichten, Doks-Autosync), `abteilungs-plugin-bau.md` (Abteilungen und Satelliten, Auslieferungsgrenze), `ssot-aufbau.md` (Aufbau der Wissensbasis, Struktur-Vererbung an Satelliten), `sync-nachzug-bauzyklus.md` (gebündelte Nachzüge je Bauzyklus), `os-bau-methode.md` (Gesamt-Methode, an die Firmenphilosophie anpassbar) | vor **jeder** inhaltlichen Änderung am Plugin oder Repo — zuerst prüfen, ob ein Standardprozess existiert |
+| `bauplan-archiv/` | abgeschlossene oder verworfene Baupläne, **unverändert** übernommen — **terminal**: keine Quelle Richtung Kern oder Satelliten, keine Kandidaten-Queue | wenn nachvollzogen werden soll, wie ein abgeschlossenes Vorhaben lief; **Pflicht-Verschiebung** dorthin, sobald ein Plan abgeschlossen oder verworfen ist |
+| `ideen-backlog/` | Ideen ohne aktuellen Auftrag, je Idee ein Dokument | beim Festhalten einer Idee ohne Arbeitspaket; wird sie beauftragt, entsteht ein Bauplan in `grundwissen/`, der auf sie verweist — die Idee bleibt stehen |
+| `debugging-findings/` | `agent-learnings.md` — Agenten-Fehlerprotokoll (**eigene** Fehler, append-only Pflicht) · `debug-log.md` — Debug-Log (**gefundene** Bugs und Fehlbefunde, auch an fremdem Material, append-only Pflicht) | bei Debugging; nach jedem eigenen Fehler; nach jedem gefundenen Bug; vor neuen Aufgaben (eigene Fehlermuster) und vor jeder Fehlersuche (bekannte Symptome) |
 
 **Zwei Indizes, zwei Fragen** — beide gehören zum Ablauf, in dieser Reihenfolge:
 `SSOT-Document-Index.md` beantwortet *„welches Dokument existiert, wohin gehört es, wann
@@ -115,7 +119,7 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Marker-Begrüßung, FFG mit Felix-Härtungen + Onsite-`exitCode`-Fix, CI/`release.yml`
   nach Onsite-Standard. Arbeitsmodul-Konvention reserviert: `controlling` (`ctrl`),
   `medizinisches` (`mdzn`), `dokumentation-daily-work` (`doc` + `day` — ein Modul, zwei
-  Präfixe). Pilotierter Ablauf als `plugin-bau.md` **§3b** formalisiert; Felix-Tags/
+  Präfixe). Pilotierter Ablauf als `abteilungs-plugin-bau.md` **§3b** formalisiert; Felix-Tags/
   -Releases nachgezogen, Pin auf `v0.2.1`. Spec-Nachtrag: jüngste Design-Spec, §11.
 - **Gebaut (Kern v0.6.0, 2026-08-10): Onsite-Align-Umbau** nach Bauplan
   `grundwissen/2026-08-10-onsite-align-umbau-bauplan.md` (AP1–AP8). **Gate 2
@@ -135,6 +139,24 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Fast-Forward aktuell; nach dem Livetest korrigiert (PR #13, Nachtrag N1).
   **Bewusst ausgeschlossen:** Queue-Logik/SSOT-Abstufung des Vorbilds und jeder
   Memory-Share zwischen Satelliten (Maintainer-Entscheid; siehe SSOT-Definition).
+- **Gebaut (Kern v0.7.0, 2026-08-11): Prozesskorpus-Nachzug** nach Bauplan
+  `grundwissen/2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md` (AP1–AP5).
+  Aus `plugin-bau.md` wurden **vier** Standardprozesse: `kern-plugin-bau.md` (Scope,
+  **Governance-Zwei-Schichten-Tabelle §1a**,
+  **Autosync-Standardprozess §2a**, Mindest-Client-Schwellen), `abteilungs-plugin-bau.md`
+  (Architektur, **Auslieferungsgrenze §1a**, Mechanik-Fakten, §3/§3a/§3b),
+  **`ssot-aufbau.md`** (sieben Grundbausteine, §4 Struktur-Vererbung an Satelliten,
+  **§4a Isolations-Invariante**) und **`sync-nachzug-bauzyklus.md`** (gebündelte Nachzüge je
+  Bauzyklus samt Konfliktzonen-Regel). Dazu die Vorlage
+  `vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage`, das zweite Protokoll
+  `debugging-findings/debug-log.md` und **zehn neue Änderungsarten** im
+  Aktualisierungs-Index. **Nachtrag N3 korrigiert eine Mechanik-Behauptung des Vorbilds:**
+  Der sparse clone hängt am Source-Typ `git-subdir`, nicht am `ref`/`sha`-Pin — die reale
+  Auslieferungsgrenze ist die Kopie des **Plugin-Verzeichnisses** in den Cache.
+  **Nachtrag N4:** Die Git-Historie des alten `plugin-bau.md` hängt an **keiner** der beiden
+  Hälften — Vorgeschichte über den alten Pfad lesen
+  (`git log --oneline -- knowledge-base/standardprozesse/plugin-bau.md`).
+  Minor-Bump, weil neue normative Prozesse hinzukommen.
 - **Gebaut (Kern v0.6.1, 2026-08-11):** `/nc:setup` heilt **Sparse-Relikte der
   Erstfassung** — eine unveränderte Sparse-Kopie wird vor dem Pull per
   `git sparse-checkout disable` zum vollen Arbeitsbaum erweitert und explizit gemeldet
@@ -174,7 +196,9 @@ Stand-Aussagen immer gegen **drei** Ebenen prüfen: Vision ↔ Spec ↔ gebaute 
 - **Keine personenbezogenen Pfade/Annahmen** — Team-Tool, nicht Einzelperson-Setup.
 - **SKILL.md-Format:** strikt nach `plugins/nc/referenz/skill-authoring.md` (inkl.
   **YAML-Falle**: `description` mit „Trigger-Begriffe: …" immer als `>-`-Block).
-- **Plugin-/Marketplace-Arbeit:** strikt nach `knowledge-base/standardprozesse/plugin-bau.md`.
+- **Plugin-/Marketplace-Arbeit:** strikt nach
+  `knowledge-base/standardprozesse/abteilungs-plugin-bau.md` (Abteilung/Satellit) bzw.
+  `kern-plugin-bau.md` (Kern).
 - **Version-Bump:** ausschließlich in `plugins/<name>/.claude-plugin/plugin.json` (beim Kern
   zusätzlich `VERSION` + Registry) + CHANGELOG-Eintrag.
 - **Kleine Dateien:** eine Datei pro Skill; Detailwissen als Referenzdatei daneben.
@@ -231,7 +255,7 @@ Repo-Struktur, Manifeste, `CHANGELOG.md` und Spec.
    | Agent macht selbst einen Fehler | `debugging-findings/agent-learnings.md` (sofort, append-only) |
    | Skill neu / entfernt / umbenannt | Skill-Tabelle (README + Plugin-README), Trigger-Matrix (`workflow.md`), CHANGELOG, Registry |
    | Neues Modul | Registry, README, CHANGELOG, Repo-Karte (hier) |
-   | **Neues Abteilungsplugin** | Standardprozess `plugin-bau.md` befolgen (Marketplace, Registry, hier, README, CHANGELOG, Install-Probe) |
+   | **Neues Abteilungsplugin** | Standardprozess `abteilungs-plugin-bau.md` befolgen (Marketplace, Registry, hier, README, CHANGELOG, Install-Probe) |
    | Version-Bump | nur `plugin.json` (Kern: + `VERSION` + Registry) + CHANGELOG — **nie** im Marketplace-Eintrag |
    | Design-Entscheidung geändert | **zuerst** Spec-Nachtrag in `grundwissen/`, dann hier/README |
 

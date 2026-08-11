@@ -10,6 +10,192 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
+### Added
+
+- **Bauplan `2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md`** (Weisung
+  Maintainer 2026-08-11: „alles zum Bau und zu Standardprozessen aus der Onsite-Wissensbasis
+  gilt 1:1 für NovaCore-OS und das Felix-Plugin"). Erhoben gegen
+  `onsite-ai-devs/Onsite.ai-OS@5d335a7` und den Satelliten `Onsite.ai-OS-Marketing@a9d8658`;
+  erweitert den Onsite-Align-Umbau (2026-08-10) um den **Bau- und Prozesskorpus** und um die
+  **Struktur-Vererbung an die Satelliten**. Inhalt: Delta-Tabelle des Prozesskorpus
+  (Zweiteilung `plugin-bau`, fehlender Standardprozess `ssot-aufbau`, fehlender
+  `sync-nachzug-bauzyklus`, fehlende Vorlage `ssot-grundgeruest`, 10 fehlende Zeilen im
+  Aktualisierungs-Index, fehlendes Protokoll `debug-log.md`), der Befund „Felix trägt 0 von 6
+  SSOT-Bausteinen" samt Mechanik-Rückstand (fehlendes Gate 2, `process.exit(0)` im FFG-Port),
+  die Invarianten **I1–I7** mit Review-Fokus auf der **Isolation der Satelliten-SSOT** und dem
+  korrekten Fail-open, elf Arbeitspakete in drei Spuren (Kern · Felix · Biggi), 16 nummerierte
+  Testfälle write-first sowie der verbindliche Delegationsschnitt für **externen Parallelbau
+  mit Kimi K3** (Plan-Sandwich-Vertrag, Konfliktzonen, Implementierer ≠ Reviewer). Der
+  Ausschluss aus dem Vorgängerplan §0.2 gilt unverändert: keine Queue, keine Promotion, kein
+  Memory-Share — die SSOT eines Satelliten ist **terminal**; I1 begründet das positiv: ein
+  Satellit schreibt nie in Kerndokumente, damit ist eine Queue nicht „später", sondern
+  gegenstandslos (auch `bauplan-archiv/` ist Historie, keine Staging-Fläche).
+  **Entscheidungen E1–E3 vom 2026-08-11 eingearbeitet:** Onsite-Fünferstruktur wörtlich (neue
+  Kategorien `bauplan-archiv/` und `ideen-backlog/` im Kern **und** in den Satelliten,
+  Pflicht-Verschiebung abgeschlossener Pläne — **Nachtrag N1** revidiert dafür die „kein eigener
+  Ordner"-Regel des Vorgängerplans, ohne ihn in-place umzuschreiben) · Zweiteilung von
+  `plugin-bau.md` · Kimi-Pakete K-1 bis K-3 freigegeben mit geführtem Review-Zyklus (§5a) und
+  Baureihenfolge (§8a). Verifizierter Nebenbefund: `struktur.test.mjs` kennt heute keine
+  `PLATZHALTER.md`-Ausnahme — ohne diesen Nachzug würde die Index-Invariante an leeren
+  Kategorien scheitern (AP3.6). — *Claude (Opus 5)*
+- **Wissensbasis: zwei neue Kategorien nach dem Vorbild-Schnitt** (Bauplan AP3, Entscheid E1).
+  `knowledge-base/bauplan-archiv/` nimmt abgeschlossene oder verworfene Pläne auf — der
+  abgeschlossene `2026-07-28-umbau-plan.md` ist per `git mv` (Historie erhalten) dorthin
+  gewandert; `knowledge-base/ideen-backlog/` ist angelegt und noch leer (`PLATZHALTER.md`).
+  `SSOT-Document-Index`: Mapping-Tabelle, Teil-1-Routing (inkl. **Pflicht-Verschiebung**
+  abgeschlossener Pläne und der Terminal-Klarstellung: das Archiv ist **keine**
+  Kandidaten-Queue) und Teil-2-Tabellen beider Kategorien nachgezogen. `struktur.test.mjs`:
+  `PLATZHALTER.md` von der Indexpflicht ausgenommen (strukturell, kein Wissen) und **neue
+  Invariante** „jede Kategorie unter `knowledge-base/` ist in Teil 1 geroutet" — eine
+  Kategorie ohne Routing-Zeile ist ein Ablageort ohne Regel. Suite: 93 Tests grün.
+  — *Claude (Opus 5)*
+- **Prozesskorpus des Vorbilds nachgezogen — vier Standardprozesse statt einem** (Bauplan AP1,
+  AP2, AP4; Entscheid E2). Jede Quelldatei wurde aus `origin/main` des Vorbilds gelesen
+  (`git show "origin/main:<pfad>"`), nicht rekonstruiert.
+  - **`plugin-bau.md` zweigeteilt:** `standardprozesse/kern-plugin-bau.md` und neu
+    `standardprozesse/abteilungs-plugin-bau.md` (die Git-Historie des Vorgängers hängt an keiner
+    der beiden Hälften — Plan-Nachtrag **N4**). Der Kernteil bekommt die
+    **Governance-Zwei-Schichten-Tabelle §1a** (team-shared ↔ individuell, samt Prüfungs-Eigentum
+    und der Begründung, warum ein Satellit eigene Gate-Kopien tragen darf, ohne die Regel zu
+    verletzen), den **Autosync-Standardprozess §2a** und die **Mindest-Client-Schwellen** als
+    einzige Stelle im Repo. Der Abteilungsteil bekommt die **Auslieferungsgrenze §1a**, die
+    Zeile „ein eigenständiger Satellit führt eine eigene Wissensbasis" und in §3b.1 den Baustein
+    „eigene Wissensbasis samt Wächter".
+    Der Autosync-Abschnitt ist **nach dem realen Hook-Code** geschrieben, nicht nach dem
+    Vorbild-Text: NovaCore trägt dort zwei Härtungen mehr (atomarer Write über Temp-Datei plus
+    `rename`, und eine Sicherung, die nie durch eine schlechtere ersetzt wird). Ebenso bleibt
+    „Hooks nur im Kern" die NovaCore-Regel — die Lockerung des Vorbilds (Abteilungs-Hooks nach
+    einem Sequenzierungs-Gate) wurde **nicht** übernommen, weil `struktur.test.mjs` sie erzwingt.
+  - **Neu `standardprozesse/ssot-aufbau.md`:** Zielbild, die sieben Grundbausteine,
+    Aufbau-Ablauf, Anti-Drift-Prinzipien, Replikationsanleitung. Der Abschnitt
+    „Plugin-Verknüpfungsvorbereitung" des Vorbilds ist **ersetzt** durch §4 Struktur-Vererbung
+    plus **§4a Isolations-Invariante** — Kandidaten-Queue, Promotion-Pipeline, Kurationslauf und
+    Cross-Satelliten-Zugriff existieren nicht und werden auch nicht reserviert. Abnahme belegt:
+    `grep -in "queue\|promotion\|kuration"` trifft ausschließlich diese Ausschluss-Erklärung.
+  - **Neu `standardprozesse/sync-nachzug-bauzyklus.md`:** Nachzüge werden je Bauzyklus
+    protokolliert statt verstreut erledigt und am Zyklusende gebündelt abgearbeitet, mit Review
+    und deterministischer Gegenprobe. Ergänzt um die **Konfliktzonen-Regel** für Parallelbau
+    (welche Dateien kein Paketagent anfasst).
+  - **Neu `vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage`:** die fünf Pflichtbausteine
+    auf den NovaCore-Ordnerschnitt gemappt, beide Protokollköpfe wörtlich, Platzhalter
+    `{{ABTEILUNG}}`, `PLATZHALTER.md`-Regel, Auslieferungshinweis und die sieben Pflichten des
+    mechanischen Wächters. **Zwei begründete Streichungen** gegenüber dem Vorbild: die Zeile
+    „Bauplan-Archiv = einzige Quelle Richtung Kern" und der Abschnitt „Reserviert" — ersetzt
+    durch den Absatz „Isolation". `VORLAGE.md` um Inhalts-, Variablen- und Kopierzeile ergänzt.
+  - **Verweis-Sweep** über das ganze Repo: `AGENTS.md`, `README.md`, `CLAUDE.md`,
+    `os-bau-methode.md`, `aktualisierungs-index.md`, `marketplace.json`, `nc-sync.md`,
+    `README.md.vorlage` und der `SSOT-Document-Index` zeigen jetzt auf das jeweils richtige der
+    zwei Dokumente. Historische Dokumente (CHANGELOG-Alteinträge, append-only-Protokolle,
+    archivierte Pläne) blieben unverändert. Suite: 93 Tests grün · `validate .`,
+    `validate plugins/nc --strict` und `validate plugins/nc-development --strict` bestanden.
+  — *Claude (Opus 5)*
+- **Zweites Protokoll `debugging-findings/debug-log.md`** (Bauplan AP3.2) — Gegenstück zum
+  Fehlerprotokoll: dort die **eigenen** Fehler, hier die **gefundenen** Bugs und Fehlbefunde,
+  auch an fremdem Material. Append-only, Format Datum · Symptom · Ursache · Fix · Beleg; ein
+  widerlegter Eintrag wird nie umgeschrieben, sondern bekommt einen neuen, der auf ihn verweist.
+  Index- und `aktualisierungs-index`-Zeilen in derselben Änderung. — *Claude (Opus 5)*
+- **Aktualisierungs-Index: zehn neue Änderungsarten** (Bauplan AP3.1) — **Satelliten-SSOT
+  geändert** und **Satelliten-Wissensbasis neu angelegt** (beide mit der ausdrücklichen Mechanik
+  „kein Nachzug im OS-Repo — die Satelliten-SSOT ist terminal"), Bauplan abgeschlossen oder
+  verworfen (Pflicht-Verschiebung ins Archiv), Idee ohne Auftrag, Idee wird beauftragt (die Idee
+  bleibt stehen, der Plan verweist auf sie), Abteilungs-/Plugin-CLAUDE geändert,
+  Fremdsystem/Konnektor/MCP dokumentiert, Satelliten-Hook/Gate geändert, Protokolleintrag
+  fällig, Vorlage `ssot-grundgeruest` geändert. Dazu `debug-log.md` in der Protokoll-Tabelle §4,
+  im Prüfzyklus §5 und im Selbsttest §6. — *Claude (Opus 5)*
+- **Affiliate `mneme-kimi-code` in den Marketplace aufgenommen** (Bauplan
+  `2026-08-10-onsite-align-umbau-bauplan.md`, AP7; Blocker aus dem 0.6.0-Eintrag aufgelöst).
+  Der fehlende annotierte Tag `v2.0.24` ist jetzt im externen Repo `ArchiDoxx/mneme-kimi-code`
+  gesetzt und gepusht (Maintainer-Freigabe 2026-08-11); der Eintrag pinnt per `ref` + Full-SHA
+  auf dessen Commit (`406c9f2`). Damit ist die Konvertierung zum Claude-Code-Plugin
+  (`.claude-plugin/plugin.json`, `hooks/hooks.json` mit allen sieben Events, `.mcp.json` für
+  den FastMCP-Server) über den Marketplace installierbar. Wie `kimi-code-plugin-cc`: Kategorie
+  `affiliate`, keine Registry-Zeile, keine Kern-Dependency; Host-Anforderung `uv` steht in der
+  Marketplace-Beschreibung (das Team liest sie im Installationsdialog). `README.md`
+  (Statuszeile + Plugin-Tabelle) in derselben Änderung. — *Kimi (K3, Kimi Code CLI)*
+
+### Fixed
+
+- **Falsche Mechanik-Begründung des Vorbilds nicht übernommen** (Plan-Nachtrag **N3**, Eintrag
+  im neuen `debug-log.md`). Das Vorbild begründet die Auslieferungsgrenze eines Satelliten
+  damit, ein `ref`/`sha`-Pin löse einen **sparse clone nur des Plugin-Subverzeichnisses** aus.
+  Gegen die offizielle Doku gehalten (`plugin-marketplaces`, abgerufen 2026-08-11 über
+  `code.claude.com` — die alte Adresse antwortet mit `301`): Der sparse clone hängt am
+  Source-Typ **`git-subdir`** bzw. am Flag `--sparse`, **nicht** am Pin; ein `github`-Source
+  klont das ganze Repo. Die reale Grenze entsteht **beim Install**, der nur **das
+  Plugin-Verzeichnis** nach `~/.claude/plugins/cache` kopiert. Die Schlussfolgerungen des
+  Bauplans bleiben damit gültig (der Kern liefert `knowledge-base/` nie aus, ein Satellit
+  schon), die Begründung ist jetzt belegt statt geerbt. Invariante I3 wird dadurch präziser,
+  I1 bleibt unberührt. — *Claude (Opus 5)*
+- **Externes Review (Kimi K3, read-only, 2026-08-11): Verdikt `request_changes`**, keine
+  CRITICAL/HIGH. Die Invarianten I1 (Isolation, eigener Sweep), I2 („Hooks nur im Kern"
+  unverändert testerzwungen), I3 und I5 wurden unabhängig bestätigt, ebenso die Deckungsgleichheit
+  des Autosync-Abschnitts §2a mit dem realen Hook-Code. Eingearbeitet:
+  **MEDIUM 1** — die Formulierung „diese Schwellen stehen ausschließlich hier" in
+  `kern-plugin-bau.md` §3 verbot wörtlich, was die Änderungs-Matrix §2.3 **gebietet**
+  (`≥ 2.1.193` gehört als Produktstand nach `README`, `ONBOARDING`, `AGENTS`); der Satz ist
+  jetzt gescopet — Einzelschwellen samt Begründung nur hier, die nackte Team-Anforderung bleibt
+  gewollter Pflicht-Spiegel. **LOW 2** — der Verweis-Sweep hatte
+  `grundwissen/2026-07-28-multi-plugin-architektur-design.md` übergangen, weil datiert; die Spec
+  ist aber als **lebend** indiziert. Statt sie in-place umzuschreiben (Norm-Nachtragsprinzip)
+  trägt sie jetzt **Nachtrag §12** mit der Lesehilfe alt → neu. **LOW 3/LOW 5** — Kopfzahl
+  „fünf Bausteine" gegen sechs Tabellenzeilen erklärt; der Debug-Log-Kopf deklariert die fünf
+  Felder als **Minimum** mit erlaubten Zusatzfeldern.
+  **Zurückgewiesen: LOW 1** — das Zitat „Git-based marketplaces clone the entire repository"
+  sei nicht in der Doku. Es steht dort, im Troubleshooting-Abschnitt „Relative paths don't
+  resolve" der am 2026-08-11 abgerufenen Fassung; die Fundstelle ist jetzt im Text benannt,
+  zusammen mit dem `git-subdir`-Kontrast als zweitem Beleg. Suite nach den Fixes: 93 Tests grün.
+  — Agent: Claude (Opus 5), Review: Kimi K3
+
+### Changed
+
+- **Kern-Bump `0.6.1 → 0.7.0`** (AP5) — Minor, weil vier neue **normative** Standardprozesse
+  hinzukommen; ohne Bump erreicht das Team sie nicht. Version an den drei testerzwungenen
+  Spiegelstellen: `plugins/nc/.claude-plugin/plugin.json`, `VERSION`,
+  `plugins/nc/module-registry.json`. Der Marketplace-Eintrag trägt weiterhin **kein**
+  `version`-Feld.
+- **Lebende Doku nachgezogen:** `AGENTS.md` (Produktstand-Eintrag v0.7.0, Wissensbasis-Tabelle
+  um `bauplan-archiv/` und `ideen-backlog/` ergänzt, Repo-Karte und Pflicht-Einstieg auf die
+  vier Standardprozesse umgebogen) · `README.md` (Statuszeile, Plugin-Tabelle, Prozessliste) ·
+  `SSOT-Document-Index` (Mapping-Tabelle, Teil-1-Routing, vier neue Teil-2-Zeilen) ·
+  `CLAUDE.md`, `os-bau-methode.md`, `marketplace.json`, `nc-sync.md`, `VORLAGE.md`,
+  `README.md.vorlage`. Historische Dokumente blieben unverändert; die als **lebend** indizierte
+  Design-Spec bekam statt einer In-place-Änderung den **Nachtrag §12** mit der Lesehilfe
+  alt → neu. — *Claude (Opus 5)*
+- **Adversariales Review des PR (2026-08-12): drei Wächter-Invarianten gehärtet, eine falsche
+  Historien-Zusage korrigiert.** Beide Befunde stehen mit Gegenprobe im `debug-log.md`.
+  - **`struktur.test.mjs` prüft jetzt, was die Namen zusagen** — vorher grün trotz kaputter
+    Datenlage, nachher rot: **(1)** „jede Kategorie ist im Routing erfasst" suchte im **ganzen**
+    Index statt in Teil 1 und blieb grün, nachdem die Routing-Zeile für `ideen-backlog/` gelöscht
+    war (der Name steht auch in der Mapping-Tabelle, in „gehört nicht hierher" fremder Zeilen und
+    in den Teil-2-Überschriften); die Prüfung ist auf den **Abschnitt Teil 1** und eine echte
+    **Tabellenzeile** eingeschränkt, mit Guard gegen eine umbenannte Überschrift. **(2)** Die
+    `PLATZHALTER.md`-Ausnahme galt **unbedingt**, obwohl sie dreifach **bedingt** dokumentiert ist
+    („solange leer"); echtes Wissen entkam der Indexpflicht, indem es so heißt — die Ausnahme gilt
+    jetzt nur, wenn die Datei der **einzige** Eintrag ihres Ordners ist. **(3)** Für
+    `{{ABTEILUNG}}` in `ssot-grundgeruest.md.vorlage` berief sich der Aktualisierungs-Index auf
+    die Invariante „Vorlage ist kein Plugin" — die deckt jetzt **beide** Vorlagendateien ab.
+    Keine neue Testdatei, keine neue Testzahl: 93 Tests, weiterhin grün.
+  - **Zusage „`kern-plugin-bau.md` trägt per `git mv` die Historie" zurückgenommen** (vier lebende
+    Fundstellen). Git speichert kein Rename; die Zuordnung fällt inhaltsbasiert beim Lesen, und
+    der größere Textanteil liegt in `abteilungs-plugin-bau.md` (43 %) — bei der Standardschwelle
+    erkennt Git gar kein Rename. `git log --follow` auf die Kernhälfte liefert nur den
+    Zweiteilungs-Commit. Die Stellen nennen jetzt den Weg, der die Vorgeschichte wirklich liefert
+    (`git log --oneline` auf den alten Pfad); die Abweichung von AP1.1/E2 steht als
+    **Plan-Nachtrag N4** im Bauplan. Kein History-Rewrite (rote Linie §7).
+  - **Kern-Manifest:** `description` sagte „6 Skills", ausgeliefert werden **7**
+    (`start`, `save-session`, `journal`, `setup`, `doku-sync`, `os-info`, `skill-builder` — so auch
+    Registry, `AGENTS.md` und der neue `kern-plugin-bau.md` §1); das Team liest diesen Text im
+    Installationsdialog. Korrigiert, kein zusätzlicher Bump nötig (0.7.0 ist Teil dieses Zyklus).
+  — *Claude (Opus 5, Review-Agent)*
+
+### Offen bis zum Merge
+
+- **AP10** (Marketplace-Pin auf den neuen Felix-Stand, Registry-Statuszeile, Gates-Definition)
+  steht noch aus: Er setzt ein **echtes Felix-Release** voraus — Tag und Release liegen beim
+  Maintainer, nicht beim Agenten.
+- Der Satellit `nc-felix` steht auf **0.4.0** (Gate 2, eigene Wissensbasis, CI/Release), ist
+  aber noch nicht getaggt; der Pin zeigt weiterhin auf `v0.2.1`.
+
 ## [0.6.1] — 2026-08-11
 
 Onsite-Align-Umbau nach dem Bauplan

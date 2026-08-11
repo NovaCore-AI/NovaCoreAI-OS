@@ -266,9 +266,37 @@ Registry-Eintrag mit `repository` und satelliten-relativem `repoSkillsPath`, Ker
 0.4.0 → 0.5.0 (Registry-Erweiterung). Zusätzlich Release-Hygiene im Felix-Satelliten
 nachgezogen (annotierte Tags `v0.2.0`/`v0.2.1` + GitHub-Releases; Pin auf `v0.2.1`).
 
+## §12 — Nachtrag 2026-08-11: `plugin-bau.md` ist zweigeteilt
+
+**Anlass:** Der Bauplan `2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md` (AP1,
+Entscheid E2) hat den Standardprozess `knowledge-base/standardprozesse/plugin-bau.md` in zwei
+Dokumente geteilt. Der Text oberhalb nennt an mehreren Stellen noch den alten Dateinamen; er
+wird nach dem **Norm-Nachtragsprinzip nicht in-place umgeschrieben** — stattdessen gilt dieser
+Nachtrag.
+
+**Der alte Name ist in diesem Dokument wie folgt zu lesen:**
+
+| Alte Nennung | Gilt heute |
+|---|---|
+| `plugin-bau.md` §1, §2 (Architektur, Mechanik-Fakten) | `abteilungs-plugin-bau.md` §1, §2 |
+| `plugin-bau.md` §3, §3a, §3b (neue Abteilung, Extraktion, eigenständiges Kollegen-OS) | `abteilungs-plugin-bau.md` §3, §3a, §3b |
+| `plugin-bau.md` als Ordnerinhalt von `standardprozesse/` (Baumdarstellungen, Aufzählungen) | `kern-plugin-bau.md` **und** `abteilungs-plugin-bau.md`, dazu neu `ssot-aufbau.md` und `sync-nachzug-bauzyklus.md` |
+| Regeln, die den **Kern** binden (Leitversion, Basis-Gate, Mindest-Client) | `kern-plugin-bau.md` — dieser Stoff war vorher mit dem Abteilungsteil vermischt |
+
+**Was inhaltlich neu ist** und im Text oberhalb deshalb noch fehlt: die
+Governance-Zwei-Schichten-Tabelle (`kern-plugin-bau.md` §1a), der Autosync-Standardprozess
+(§2a), die belegte **Auslieferungsgrenze** (`abteilungs-plugin-bau.md` §1a — Kopie des
+Plugin-Verzeichnisses in den Cache, **nicht** sparse clone; Begründung im Bauplan-Nachtrag N3)
+sowie der Baustein „ein eigenständiger Satellit führt eine eigene Wissensbasis" (§3b.1).
+
+**Unberührt bleibt** die Architektur-Entscheidung dieses Dokuments: ein Marketplace, ein Plugin
+je Abteilung, Version nur in `plugin.json`, Satelliten per `ref` + Full-SHA gepinnt.
+
 ---
 
 *Spec-Version 0.2.0 · 2026-07-28 · erstellt in der Nachtschicht-Session (Fable), Review durch
 Maintainer steht aus — dieser Umbau ist als PR zur Abnahme vorgelegt, nicht gemergt.
 Nachtrag §10 ergänzt 2026-07-28 (Abteilung felix, erster Satellit).
-Nachtrag §11 ergänzt 2026-08-05 (Abteilung biggi, zweiter Satellit, Onsite-Leitlinie).*
+Nachtrag §11 ergänzt 2026-08-05 (Abteilung biggi, zweiter Satellit, Onsite-Leitlinie).
+Nachtrag §12 ergänzt 2026-08-11 (Zweiteilung `plugin-bau.md`) — Claude (Opus 5), veranlasst
+durch das externe Review von Kimi K3 (Befund LOW 2).*

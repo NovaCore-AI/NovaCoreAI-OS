@@ -4,9 +4,10 @@
 **Familie von Claude-Code-Plugins** aus einem Marketplace: eine Methode für alle statt
 vieler Privat-Setups.
 
-**Status: Kern `nc` v0.6.1 · Abteilung `nc-development` v0.1.0 · Abteilung `nc-felix`
+**Status: Kern `nc` v0.7.0 · Abteilung `nc-development` v0.1.0 · Abteilung `nc-felix`
 v0.2.1 (erster Satellit, eigenständiges Felix-OS) · Abteilung `nc-biggi` v0.1.1 (zweiter
-Satellit, eigenständiges Biggi-OS) · Affiliate `kimi-code-plugin-cc` v1.4.0 (extern) —
+Satellit, eigenständiges Biggi-OS) · Affiliate `kimi-code-plugin-cc` v1.4.0 (extern) ·
+Affiliate `mneme-kimi-code` v2.0.24 (extern) —
 Multi-Plugin-Architektur (Umbau 2026-07-28), Kontroll-Schicht mit Gate 1 + Gate 2
 (Onsite-Align-Umbau 2026-08-10).** Historie: [CHANGELOG.md](CHANGELOG.md) · Normativ für
 Agenten: [AGENTS.md](AGENTS.md) · Wissens-Triage:
@@ -22,11 +23,12 @@ bringen ihren Kern als **Modul** selbst mit:
 
 | Plugin | Rolle | Namespace | Version |
 |---|---|---|---|
-| `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Infrapflege-Skills, Kontroll-Schicht (Gate 1 + Gate 2), Doks-Autosync, WP-Rahmen, Registry, Formatregeln, `nc-sync.md` | `/nc:` | 0.6.1 (= `VERSION`) |
+| `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Infrapflege-Skills, Kontroll-Schicht (Gate 1 + Gate 2), Doks-Autosync, WP-Rahmen, Registry, Formatregeln, `nc-sync.md` | `/nc:` | 0.7.0 (= `VERSION`) |
 | `nc-development` | Abteilung development — Module `fe` / `be` / `flc` / `wzs` | `/nc-development:` | 0.1.0 |
 | `nc-felix` | Abteilung felix — **eigenständiges Felix-OS** (erster Satellit, privates Repo `NovaCore-AI/Felix-OS`): Kernmodul mit 6 Skills + eigene FFG-Kontrollschicht, hängt **nicht** am Kern | `/nc-felix:` | 0.2.1 |
 | `nc-biggi` | Abteilung biggi — **eigenständiges Biggi-OS** (zweiter Satellit, privates Repo `NovaCore-AI/Biggi-OS`): Kernmodul mit 6 Skills + Kontroll-Schicht (FFG + Session-Start-Zwang nach Onsite-Vorbild), hängt **nicht** am Kern; Arbeitsmodul-Konvention `ctrl` / `mdzn` / `doc`+`day` reserviert | `/nc-biggi:` | 0.1.1 |
 | `kimi-code-plugin-cc` | **Affiliate** (keine Abteilung) — externes MIT-Plugin `ArchiDoxx/Kimi-code-Plugin-CC`: bindet headless CLI-Agenten (Kimi Code) als Zweitmeinung ein (Review-/Planning-Loops, adversariale Dual-Reviews). Host-Anforderungen: `uv` + `kimi`-CLI | `/kimi-code-plugin-cc:` | 1.4.0 (extern) |
+| `mneme-kimi-code` | **Affiliate** (keine Abteilung) — externes AGPL-3.0-Plugin `ArchiDoxx/mneme-kimi-code`: persistentes Projekt-Gedächtnis über Sessions hinweg (7 Hooks → lokale SQLite, Rückholung per Skill `mem-search` + MCP-Tools; Claude Code und Kimi Code). Host-Anforderung: `uv` | `/mneme-kimi-code:` | 2.0.24 (extern) |
 
 - **Plugin-Grenze = Abteilungsgrenze:** Wer eine Abteilung installiert, bekommt den Kern
   transitiv mit (`dependencies: ["nc"]`). Ausnahme: die eigenständigen Kollegen-OS
@@ -38,7 +40,7 @@ bringen ihren Kern als **Modul** selbst mit:
   OS-Repo.
 - **Satelliten:** `nc-felix` und `nc-biggi` leben in eigenen privaten Repos (das Repo IST
   das Plugin); der Marketplace-Eintrag pinnt per GitHub-Source auf einen Commit-SHA
-  (`plugin-bau.md` §3a/§3b — der `sha` ist der effektive Pin).
+  (`abteilungs-plugin-bau.md` §3a/§3b — der `sha` ist der effektive Pin).
 - **Kategorie `affiliate` — firmenintern vs. affiliate:** Der Marketplace verteilt neben
   Kern und Abteilungen auch persönliche bzw. externe Werkzeuge. Sie sind **keine
   Abteilungen**: keine Zeile in der `module-registry.json`, keine Kern-Dependency, **kein
@@ -133,8 +135,11 @@ claude plugin validate plugins/nc --strict      # Manifest + Skills (je Plugin!)
 claude plugin validate plugins/nc-development --strict
 ```
 
-Verbindliche Prozesse: [`knowledge-base/standardprozesse/plugin-bau.md`](knowledge-base/standardprozesse/plugin-bau.md)
-(Plugin-Ebene) und [`knowledge-base/standardprozesse/os-bau-methode.md`](knowledge-base/standardprozesse/os-bau-methode.md)
+Verbindliche Prozesse: [`kern-plugin-bau.md`](knowledge-base/standardprozesse/kern-plugin-bau.md)
+(Kern-Plugin) · [`abteilungs-plugin-bau.md`](knowledge-base/standardprozesse/abteilungs-plugin-bau.md)
+(Abteilungen und Satelliten) · [`ssot-aufbau.md`](knowledge-base/standardprozesse/ssot-aufbau.md)
+(Wissensbasis) · [`sync-nachzug-bauzyklus.md`](knowledge-base/standardprozesse/sync-nachzug-bauzyklus.md)
+(Nachzüge je Bauzyklus) · [`os-bau-methode.md`](knowledge-base/standardprozesse/os-bau-methode.md)
 (Gesamt-Methode). Skill-Format: `plugins/nc/referenz/skill-authoring.md`.
 
 ## Versionsmodell

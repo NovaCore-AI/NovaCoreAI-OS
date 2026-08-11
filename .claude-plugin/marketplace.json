@@ -26,7 +26,7 @@
         "ref": "v0.2.1",
         "sha": "a8407fafdbf95a7229db3bf99a0d862e0234ff93"
       },
-      "description": "Abteilung felix: eigenständiges Felix-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder) und eigener Kontroll-Schicht (FFG-Port). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-biggi betreiben. Satelliten-Repo (Standardprozess plugin-bau.md §3b).",
+      "description": "Abteilung felix: eigenständiges Felix-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder) und eigener Kontroll-Schicht (FFG-Port). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-biggi betreiben. Satelliten-Repo (Standardprozess abteilungs-plugin-bau.md §3b).",
       "category": "abteilung"
     },
     {
@@ -37,7 +37,7 @@
         "ref": "v0.1.1",
         "sha": "edd5ad06a546508f1c36ae844b65a8c03e8c5ff9"
       },
-      "description": "Abteilung biggi: eigenständiges Biggi-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder; Arbeitsmodul-Konvention reserviert: controlling/ctrl, medizinisches/mdzn, dokumentation-daily-work/doc+day — ein Modul, zwei Präfixe) und eigener Kontroll-Schicht (FFG mit Review-Härtungen + Session-Start-Zwang nach Onsite-Vorbild, Opt-outs NC_FFG=off / NC_START_GATE=off). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-felix betreiben. Satelliten-Repo (Standardprozess plugin-bau.md §3b).",
+      "description": "Abteilung biggi: eigenständiges Biggi-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder; Arbeitsmodul-Konvention reserviert: controlling/ctrl, medizinisches/mdzn, dokumentation-daily-work/doc+day — ein Modul, zwei Präfixe) und eigener Kontroll-Schicht (FFG mit Review-Härtungen + Session-Start-Zwang nach Onsite-Vorbild, Opt-outs NC_FFG=off / NC_START_GATE=off). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-felix betreiben. Satelliten-Repo (Standardprozess abteilungs-plugin-bau.md §3b).",
       "category": "abteilung"
     },
     {
@@ -49,6 +49,17 @@
         "sha": "159cd9d059b5e2e918a0333693a59f3620fdf61a"
       },
       "description": "Affiliate-Werkzeug (kein Abteilungs-OS): bindet headless CLI-Agenten — vor allem Kimi Code — als externe Zweitmeinung in Claude Code ein. Liefert Review-Loops, Planning-Loops und adversariale Dual-Reviews (santa) für heterogene Besetzung: Implementierer und Reviewer sind verschiedene Modelle. HOST-ANFORDERUNGEN: das Plugin bringt einen MCP-Server via stdio mit und startet ihn über `uv run` — `uv` muss installiert sein, die `kimi`-CLI ebenfalls (samt eigenem Zugang). Lizenz MIT, externes Repo (nicht von NovaCore gepflegt), gepinnt auf den Commit des annotierten Tags v1.4.0. Hängt an keinem NovaCore-Plugin und trägt keine Abteilungs-Registry-Zeile.",
+      "category": "affiliate"
+    },
+    {
+      "name": "mneme-kimi-code",
+      "source": {
+        "source": "github",
+        "repo": "ArchiDoxx/mneme-kimi-code",
+        "ref": "v2.0.24",
+        "sha": "406c9f281d4eb8771a6d76d055b633d4d59d5d29"
+      },
+      "description": "Affiliate-Werkzeug (kein Abteilungs-OS): persistentes, projektbezogenes Gedächtnis über Sessions hinweg — sieben Hooks (SessionStart, UserPromptSubmit, PostToolUse, PostToolUseFailure, PreCompact, PostCompact, SessionEnd) schreiben Beobachtungen in eine lokale SQLite-Datenbank; der Skill mem-search und die MCP-Werkzeuge (search/timeline/get) holen sie nach dem Prinzip der progressiven Offenlegung wieder heraus. Läuft in Claude Code und Kimi Code; alles bleibt lokal auf dem Rechner. HOST-ANFORDERUNGEN: `uv` muss installiert sein — Hooks und der MCP-Server (stdio, FastMCP) laufen über `uv run --project ${CLAUDE_PLUGIN_ROOT}`. Lizenz AGPL-3.0, externes Repo (nicht von NovaCore gepflegt), gepinnt auf den Commit des annotierten Tags v2.0.24. Hängt an keinem NovaCore-Plugin und trägt keine Abteilungs-Registry-Zeile.",
       "category": "affiliate"
     }
   ]
