@@ -168,11 +168,22 @@ Bauplans) dokumentiert die einzige Abweichung.
   auf eine bestehende Kopie, gab es nur `pull --ff-only`: `core.sparseCheckout` blieb
   stehen, die Kopie blieb amputiert, und das Skript meldete trotzdem „aktualisiert", weil
   der Wissenspfad-Check im Sparse-Ausschnitt besteht — ein stiller Falscherfolg. Jetzt wird
-  ein Sparse-Relikt vor dem Pull per `git sparse-checkout disable` zum Vollklon erweitert
+  ein Sparse-Relikt vor dem Pull per `git sparse-checkout disable` erweitert
   (offizielle git-Doku, abgerufen 2026-08-11: deaktiviert den Schalter und stellt den
-  vollen Working Tree wieder her) und im Ergebnis explizit gemeldet. Der Regressionstest
-  stellt das Relikt exakt so nach, wie die Erstfassung es anlegte (Suite: 90 → 91).
-  Bauplan-Nachtrag N2. — Agent: Claude (Fable 5)
+  vollen Working Tree wieder her) und im Ergebnis explizit gemeldet — erweitert wird der
+  **Arbeitsbaum**; der Partial-Clone-Filter bleibt, Alt-Historie lädt bei Bedarf lazy nach.
+  **Review-Iteration (Opus-Review: 0×CRITICAL/HIGH; beide MEDIUM eingearbeitet):** Eine
+  lokal **veränderte** Sparse-Kopie wird weiterhin nie angefasst, kommt jetzt aber als
+  `lokal-veraendert` **samt Sparse-Hinweis** zurück — vorher blieb genau dieser Fall still
+  amputiert; Doku-Zusagen entsprechend präzisiert. Migrations-Meldung testgesichert. Die
+  Sparse-Erkennung liest bewusst den `--worktree`-Scope: moderne gits legen den Schalter
+  per `extensions.worktreeConfig` in der Worktree-Config ab, die `--local` nicht liest;
+  ungescoped hätte ein global gesetztes `core.sparseCheckout` jeden Vollklon als Relikt
+  gemeldet (git-Doku + git 2.52 verifiziert). Migrations-Info überlebt einen nachfolgenden
+  Pull-Fehler; das Test-Origin erlaubt den Filter (`uploadpack.allowFilter`), damit der
+  echte Lazy-Fetch-Pfad geübt wird; Ausgabe-Spalte für `lokal-veraendert` entklemmt.
+  Zwei Regressionstests stellen Relikt und Relikt-mit-unversicherter-Arbeit exakt nach
+  (Suite: 90 → 92). Bauplan-Nachtrag N2. — Agent: Claude (Fable 5)
 - **`/nc:setup` nach dem Livetest korrigiert** (PR #13, Review-Iteration Kimi Code). Zwei
   Fehler der Erstfassung: (a) **„Verlinken" war gar nicht gebaut** — der Zeiger `index.json`
   wurde geschrieben, aber von niemandem gelesen, und alle SSOT-Verweise sind relative Pfade,

@@ -175,5 +175,7 @@ erscheint nur, wenn die Plugin-Version in `plugin.json` gebumpt wurde.
   fehlt.
 - **Nach `/nc:setup` liegt im Klon fast nur `knowledge-base/`:** Sparse-Relikt der
   Erstfassung des Skills (vor Kern 0.6.1). `/plugin update`, dann `/nc:setup` erneut
-  ausführen — der Lauf erweitert die Kopie automatisch zum Vollklon und meldet das.
+  ausführen — der Lauf erweitert die Kopie automatisch zum vollen Arbeitsbaum und meldet
+  das. Kommt stattdessen `lokal-veraendert` zurück, liegen eigene Dateien oder Änderungen
+  im Klon: sichern oder entfernen, dann `/nc:setup` erneut.
 - **`Permission denied (publickey)` bei der Installation:** siehe SSH-Hinweis oben.

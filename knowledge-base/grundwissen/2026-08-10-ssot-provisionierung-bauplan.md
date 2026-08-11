@@ -134,8 +134,13 @@ plus Wurzeldateien. Drei Punkte werden nachgezogen:
    `core.sparseCheckout` auf `true`, läuft vor dem Pull `git sparse-checkout disable`
    (offizielle git-Doku, abgerufen 2026-08-11: deaktiviert den Schalter und stellt den
    vollen Working Tree wieder her); das Ergebnis trägt eine explizite Migrations-Meldung.
-   Der Regressionstest stellt das Relikt exakt so nach, wie die Erstfassung es anlegte
-   (Suite 90 → 91).
+   Review-Iteration (Opus-Review PR #14): Eine lokal **veränderte** Sparse-Kopie wird nie
+   angefasst, kommt aber als `lokal-veraendert` samt Sparse-Hinweis zurück; die Erkennung
+   liest den `--worktree`-Scope (moderne gits: `extensions.worktreeConfig`; `--local` sähe
+   den Schalter nicht, ungescoped lösten globale Altwerte Fehlalarme aus). Erweitert wird
+   der **Arbeitsbaum** — der Partial-Clone-Filter bleibt bewusst stehen, Alt-Historie lädt
+   lazy nach. Zwei Regressionstests stellen Relikt und Relikt-mit-Arbeit exakt nach
+   (Suite 90 → 92).
 2. **§4/AP5 revidiert — Patch-Bump 0.6.0 → 0.6.1.** „Kein zweiter Bump, 0.6.0 ist
    unveröffentlicht" gilt nicht mehr: Die Erstfassung ist nachweislich im Feld installiert
    (der Feldbefund setzt sie voraus), und ohne Bump erreicht weder der Vollklon-Fix noch

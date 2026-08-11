@@ -44,9 +44,12 @@ Wissensbasis, sondern auch auf Repo-Inhalte daneben (etwa die Formatregeln unter
 wenige Megabyte.
 
 **Sparse-Relikte der Erstfassung werden geheilt.** Die erste Fassung dieses Skills klonte
-nur den Wissenspfad (Sparse-Checkout). Trifft der Lauf auf eine solche Kopie, erweitert er
-sie vor dem Nachziehen automatisch zum Vollklon (`git sparse-checkout disable`) und meldet
-das im Ergebnis — ein erneuter Aufruf von `/nc:setup` genügt also auch als Reparatur.
+nur den Wissenspfad (Sparse-Checkout). Trifft der Lauf auf eine solche **unveränderte**
+Kopie, erweitert er sie vor dem Nachziehen automatisch zum vollen Arbeitsbaum
+(`git sparse-checkout disable`) und meldet das im Ergebnis — ein erneuter Aufruf von
+`/nc:setup` genügt dann als Reparatur. Eine lokal **veränderte** Sparse-Kopie wird nie
+angefasst: Sie kommt als `lokal-veraendert` samt Sparse-Hinweis zurück — Änderungen
+sichern oder entfernen, dann erneut aufrufen.
 
 **Die Verlinkung ist der feste Pfad.** Der Klon landet deterministisch unter
 `~/.nc/ssot/<repo-name>/`, und der Firmen-Block in der globalen `CLAUDE.md` nennt genau
@@ -80,4 +83,6 @@ Kopie divergiert) formuliert das Skript bereits handlungsfähig.
 - Der Zeiger `index.json` liegt in der Ablage und führt je Quelle `pfad`, `commit` und
   `stand_am`.
 - Im Zielpfad liegt der Wissenspfad wirklich auf der Platte, nicht nur ein `.git`.
+- Der Klon trägt Repo-Inhalt auch **außerhalb** des Wissenspfads (etwa `plugins/`) — eine
+  Kopie, die nur den Wissenspfad enthält, ist ein Sparse-Relikt und gehört gemeldet.
 - Der Bericht nennt je Quelle Zustand, Pfad und Commit — oder den wörtlichen Fehlergrund.
