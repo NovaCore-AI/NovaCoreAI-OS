@@ -50,6 +50,17 @@
       },
       "description": "Affiliate-Werkzeug (kein Abteilungs-OS): bindet headless CLI-Agenten — vor allem Kimi Code — als externe Zweitmeinung in Claude Code ein. Liefert Review-Loops, Planning-Loops und adversariale Dual-Reviews (santa) für heterogene Besetzung: Implementierer und Reviewer sind verschiedene Modelle. HOST-ANFORDERUNGEN: das Plugin bringt einen MCP-Server via stdio mit und startet ihn über `uv run` — `uv` muss installiert sein, die `kimi`-CLI ebenfalls (samt eigenem Zugang). Lizenz MIT, externes Repo (nicht von NovaCore gepflegt), gepinnt auf den Commit des annotierten Tags v1.4.0. Hängt an keinem NovaCore-Plugin und trägt keine Abteilungs-Registry-Zeile.",
       "category": "affiliate"
+    },
+    {
+      "name": "mneme-kimi-code",
+      "source": {
+        "source": "github",
+        "repo": "ArchiDoxx/mneme-kimi-code",
+        "ref": "v2.0.24",
+        "sha": "406c9f281d4eb8771a6d76d055b633d4d59d5d29"
+      },
+      "description": "Affiliate-Werkzeug (kein Abteilungs-OS): persistentes, projektbezogenes Gedächtnis über Sessions hinweg — sieben Hooks (SessionStart, UserPromptSubmit, PostToolUse, PostToolUseFailure, PreCompact, PostCompact, SessionEnd) schreiben Beobachtungen in eine lokale SQLite-Datenbank; der Skill mem-search und die MCP-Werkzeuge (search/timeline/get) holen sie nach dem Prinzip der progressiven Offenlegung wieder heraus. Läuft in Claude Code und Kimi Code; alles bleibt lokal auf dem Rechner. HOST-ANFORDERUNGEN: `uv` muss installiert sein — Hooks und der MCP-Server (stdio, FastMCP) laufen über `uv run --project ${CLAUDE_PLUGIN_ROOT}`. Lizenz AGPL-3.0, externes Repo (nicht von NovaCore gepflegt), gepinnt auf den Commit des annotierten Tags v2.0.24. Hängt an keinem NovaCore-Plugin und trägt keine Abteilungs-Registry-Zeile.",
+      "category": "affiliate"
     }
   ]
 }

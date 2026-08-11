@@ -6,7 +6,8 @@ vieler Privat-Setups.
 
 **Status: Kern `nc` v0.6.1 · Abteilung `nc-development` v0.1.0 · Abteilung `nc-felix`
 v0.2.1 (erster Satellit, eigenständiges Felix-OS) · Abteilung `nc-biggi` v0.1.1 (zweiter
-Satellit, eigenständiges Biggi-OS) · Affiliate `kimi-code-plugin-cc` v1.4.0 (extern) —
+Satellit, eigenständiges Biggi-OS) · Affiliate `kimi-code-plugin-cc` v1.4.0 (extern) ·
+Affiliate `mneme-kimi-code` v2.0.24 (extern) —
 Multi-Plugin-Architektur (Umbau 2026-07-28), Kontroll-Schicht mit Gate 1 + Gate 2
 (Onsite-Align-Umbau 2026-08-10).** Historie: [CHANGELOG.md](CHANGELOG.md) · Normativ für
 Agenten: [AGENTS.md](AGENTS.md) · Wissens-Triage:
@@ -27,6 +28,7 @@ bringen ihren Kern als **Modul** selbst mit:
 | `nc-felix` | Abteilung felix — **eigenständiges Felix-OS** (erster Satellit, privates Repo `NovaCore-AI/Felix-OS`): Kernmodul mit 6 Skills + eigene FFG-Kontrollschicht, hängt **nicht** am Kern | `/nc-felix:` | 0.2.1 |
 | `nc-biggi` | Abteilung biggi — **eigenständiges Biggi-OS** (zweiter Satellit, privates Repo `NovaCore-AI/Biggi-OS`): Kernmodul mit 6 Skills + Kontroll-Schicht (FFG + Session-Start-Zwang nach Onsite-Vorbild), hängt **nicht** am Kern; Arbeitsmodul-Konvention `ctrl` / `mdzn` / `doc`+`day` reserviert | `/nc-biggi:` | 0.1.1 |
 | `kimi-code-plugin-cc` | **Affiliate** (keine Abteilung) — externes MIT-Plugin `ArchiDoxx/Kimi-code-Plugin-CC`: bindet headless CLI-Agenten (Kimi Code) als Zweitmeinung ein (Review-/Planning-Loops, adversariale Dual-Reviews). Host-Anforderungen: `uv` + `kimi`-CLI | `/kimi-code-plugin-cc:` | 1.4.0 (extern) |
+| `mneme-kimi-code` | **Affiliate** (keine Abteilung) — externes AGPL-3.0-Plugin `ArchiDoxx/mneme-kimi-code`: persistentes Projekt-Gedächtnis über Sessions hinweg (7 Hooks → lokale SQLite, Rückholung per Skill `mem-search` + MCP-Tools; Claude Code und Kimi Code). Host-Anforderung: `uv` | `/mneme-kimi-code:` | 2.0.24 (extern) |
 
 - **Plugin-Grenze = Abteilungsgrenze:** Wer eine Abteilung installiert, bekommt den Kern
   transitiv mit (`dependencies: ["nc"]`). Ausnahme: die eigenständigen Kollegen-OS

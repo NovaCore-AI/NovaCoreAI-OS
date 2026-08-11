@@ -10,6 +10,19 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
+### Added
+
+- **Affiliate `mneme-kimi-code` in den Marketplace aufgenommen** (Bauplan
+  `2026-08-10-onsite-align-umbau-bauplan.md`, AP7; Blocker aus dem 0.6.0-Eintrag aufgelöst).
+  Der fehlende annotierte Tag `v2.0.24` ist jetzt im externen Repo `ArchiDoxx/mneme-kimi-code`
+  gesetzt und gepusht (Maintainer-Freigabe 2026-08-11); der Eintrag pinnt per `ref` + Full-SHA
+  auf dessen Commit (`406c9f2`). Damit ist die Konvertierung zum Claude-Code-Plugin
+  (`.claude-plugin/plugin.json`, `hooks/hooks.json` mit allen sieben Events, `.mcp.json` für
+  den FastMCP-Server) über den Marketplace installierbar. Wie `kimi-code-plugin-cc`: Kategorie
+  `affiliate`, keine Registry-Zeile, keine Kern-Dependency; Host-Anforderung `uv` steht in der
+  Marketplace-Beschreibung (das Team liest sie im Installationsdialog). `README.md`
+  (Statuszeile + Plugin-Tabelle) in derselben Änderung. — *Kimi (K3, Kimi Code CLI)*
+
 ## [0.6.1] — 2026-08-11
 
 Onsite-Align-Umbau nach dem Bauplan
