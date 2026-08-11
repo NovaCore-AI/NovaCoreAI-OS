@@ -26,7 +26,7 @@
         "ref": "v0.2.1",
         "sha": "a8407fafdbf95a7229db3bf99a0d862e0234ff93"
       },
-      "description": "Abteilung felix: eigenständiges Felix-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder) und eigener Kontroll-Schicht (FFG-Port). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-biggi betreiben. Satelliten-Repo (Standardprozess plugin-bau.md §3b).",
+      "description": "Abteilung felix: eigenständiges Felix-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder) und eigener Kontroll-Schicht (FFG-Port). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-biggi betreiben. Satelliten-Repo (Standardprozess abteilungs-plugin-bau.md §3b).",
       "category": "abteilung"
     },
     {
@@ -37,7 +37,7 @@
         "ref": "v0.1.1",
         "sha": "edd5ad06a546508f1c36ae844b65a8c03e8c5ff9"
       },
-      "description": "Abteilung biggi: eigenständiges Biggi-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder; Arbeitsmodul-Konvention reserviert: controlling/ctrl, medizinisches/mdzn, dokumentation-daily-work/doc+day — ein Modul, zwei Präfixe) und eigener Kontroll-Schicht (FFG mit Review-Härtungen + Session-Start-Zwang nach Onsite-Vorbild, Opt-outs NC_FFG=off / NC_START_GATE=off). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-felix betreiben. Satelliten-Repo (Standardprozess plugin-bau.md §3b).",
+      "description": "Abteilung biggi: eigenständiges Biggi-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder; Arbeitsmodul-Konvention reserviert: controlling/ctrl, medizinisches/mdzn, dokumentation-daily-work/doc+day — ein Modul, zwei Präfixe) und eigener Kontroll-Schicht (FFG mit Review-Härtungen + Session-Start-Zwang nach Onsite-Vorbild, Opt-outs NC_FFG=off / NC_START_GATE=off). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-felix betreiben. Satelliten-Repo (Standardprozess abteilungs-plugin-bau.md §3b).",
       "category": "abteilung"
     },
     {

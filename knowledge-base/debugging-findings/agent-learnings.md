@@ -10,6 +10,20 @@
 
 ## Einträge
 
+### 2026-08-11 — Gelöschten Rename-Quellpfad als `git add`-Pathspec übergeben
+
+- **Kontext/Aufgabe:** Die vollständig übertragene Prozesskorpus-Arbeit sollte im isolierten
+  Konsolidierungs-Worktree ausschließlich über explizit aufgezählte Pfade gestagt werden.
+- **Was schiefging:** Der Stage-Befehl enthielt neben dem vorhandenen Rename-Ziel auch den nicht
+  mehr vorhandenen Quellpfad `knowledge-base/grundwissen/2026-07-28-umbau-plan.md`. Git brach
+  mit `pathspec ... did not match any files` ab; am Index kamen dadurch keine neuen Pfade hinzu.
+- **Ursache:** Die Annahme, `git add -A -- <alter-pfad>` akzeptiere einen bereits als Rename
+  erkannten, gelöschten Einzelpfad, wurde nicht vorab mit dem realen Dateibaum abgeglichen.
+- **Lernerkenntnis/Präventionsregel:** Vor explizitem Staging jede Pathspec gegen Platte oder
+  Index prüfen. Bei einem bekannten Rename das existierende Ziel explizit stagen und die
+  zugehörige Löschung gezielt per `git add -u -- <enger-elternpfad>` erfassen; danach den
+  staged Namensstatus gegen den vorher inventarisierten Scope vergleichen.
+
 ### 2026-07-28 — Edit auf subagenten-erzeugte Testdatei ohne frischen Read
 
 - **Kontext/Aufgabe:** Regressionstest für die FFG-Glob-Härtung sollte in die von einem

@@ -70,8 +70,11 @@ Bevor der erste fachliche Skill entsteht, existieren:
 1. **`skill-authoring.md`** (im Kern, wird mit ausgeliefert): Frontmatter-Constraints inkl.
    YAML-Falle, Gliederung Zweck/Ablauf/Regeln/Verifikation, Längenlimits, dritte-Person-
    Trigger, Verbot von Pfaden über die Plugin-Grenze, Merge-Checkliste.
-2. **`plugin-bau.md`** (Standardprozess): Architektur-Invarianten, Mechanik-Fakten mit
-   Abrufdatum, Ablauf „neue Abteilung anlegen", Satelliten-Extraktion, Fehlertabelle.
+2. **`kern-plugin-bau.md`** und **`abteilungs-plugin-bau.md`** (Standardprozesse, seit
+   2026-08-11 zweigeteilt): Scope und Governance-Schichten des Kerns samt Autosync-Prozess ·
+   Architektur-Invarianten, Mechanik-Fakten mit Abrufdatum, Auslieferungsgrenze, Ablauf „neue
+   Abteilung anlegen", Satelliten-Extraktion, Fehlertabelle. Daneben **`ssot-aufbau.md`**
+   (Aufbau der Wissensbasis) und **`sync-nachzug-bauzyklus.md`** (gebündelte Nachzüge).
 3. **`wp-rahmen.md`** (im Kern): der Pflicht-Zyklus WP0–WP8 mit roten Linien und
    Freigabe-Politik. Jede Abteilung übersetzt WP1–WP7 in ihrer `workflow.md`.
 4. **Vorlage `vorlagen/abteilungsplugin/`** (`.vorlage`-Endungen, außerhalb `plugins/`):
@@ -126,7 +129,7 @@ Code — sie zuerst, und gegen den echten Parser geprüft.
   anzufassen. Bewährtes wandert per **Fork-back** ins OS — so entsteht nur, was ein realer
   Use Case verlangt.
 - **Neue Abteilung:** Vorlage instanzieren → Marketplace-Eintrag → Registry → Validierung
-  beider Ebenen → Install-Probe → Doku-Sync (Standardprozess `plugin-bau.md`).
+  beider Ebenen → Install-Probe → Doku-Sync (Standardprozess `abteilungs-plugin-bau.md`).
 - **Satellit:** Wächst eine Abteilung aus dem Zentral-Repo heraus (eigenes Team, eigene
   Vertraulichkeit), zieht sie in ein eigenes privates Repo; der Marketplace pinnt per
   GitHub-Source mit vollem Commit-SHA (`ref` nur zur Lesbarkeit). SSH-Falle beim Rollout

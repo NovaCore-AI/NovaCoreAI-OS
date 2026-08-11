@@ -27,4 +27,5 @@ Modul-Zuschnitt und Skill-Kandidaten mit dem Fachbereich festlegen, dann nach
 `referenz/skill-authoring.md` des Kern-Plugins bauen. Sobald WP1–WP7 auf den realen Zyklus
 dieser Abteilung abgebildet sind, entsteht daneben eine `workflow.md` (Vorbild:
 `plugins/nc-development/workflow.md` im OS-Repo); der Rahmen WP0–WP8 bleibt im Kern.
-Ablauf im Standardprozess `knowledge-base/standardprozesse/plugin-bau.md` des OS-Repos.
+Ablauf im Standardprozess `knowledge-base/standardprozesse/abteilungs-plugin-bau.md` des
+OS-Repos.

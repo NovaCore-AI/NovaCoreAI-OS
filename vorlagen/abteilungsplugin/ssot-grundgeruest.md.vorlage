@@ -1,0 +1,95 @@
+# Wissensbasis-Grundgerüst des Satelliten {{ABTEILUNG}} (Vorlage)
+
+> Beim Anlegen eines **eigenständigen Satelliten** (oder beim Nachrüsten eines bestehenden)
+> entsteht unter `knowledge-base/` **genau diese Fünfer-Struktur** — nicht mehr:
+> `standardprozesse/` und die Produktdefinitionen bleiben rein zentral im OS-Repo (Drift-Schutz
+> der Kerndokumente). Platzhalter `{{…}}` beim Instanzieren ersetzen; je noch leerem Ordner eine
+> `PLATZHALTER.md` (hält den Ordner in Git und ist von der Indexpflicht ausgenommen).
+>
+> **Gilt nicht für repo-interne Abteilungsplugins** — für die ist die Wissensbasis des OS-Repos
+> zuständig. Verbindlicher Kontext: Standardprozesse `ssot-aufbau.md` §4 und
+> `abteilungs-plugin-bau.md` §3b im OS-Repo.
+
+## Die fünf Pflichtbausteine
+
+*(Fünf Bausteine = vier Kategorien plus der Index. `debugging-findings/` steht unten in zwei
+Zeilen, weil es **zwei** Protokolle trägt — die Tabelle hat deshalb sechs Zeilen.)*
+
+| Ordner/Datei | Zweck | Lebenszyklus |
+|---|---|---|
+| `grundwissen/` | laufende Vorhaben des Satelliten (je Vorhaben ein Dokument mit Datumspräfix `YYYY-MM-DD-`) **und** dauerhafte eigene Referenzdokumente ohne Datumspräfix | Referenzen lebend. Ein datierter Plan wird nie rückwirkend umgeschrieben; nach Abschluss **Pflicht-Verschiebung** ins Archiv (`git mv`) |
+| `bauplan-archiv/` | abgeschlossene oder verworfene Pläne, **unverändert übernommen** | historisch und **terminal** — reine Nachvollziehbarkeit im Satelliten, **keine** Quelle Richtung OS-Repo (siehe „Isolation") |
+| `debugging-findings/agent-learnings.md` | Fehlerprotokoll: eigene Fehler der KI bei der Arbeit (Format im Dateikopf) | **append-only** — nie rückdatieren, nie umschreiben |
+| `debugging-findings/debug-log.md` | Debug-Log: gefundene und behobene Bugs, was/wann/wie | **append-only** |
+| `ideen-backlog/` | Ideen ohne aktuellen Auftrag, **je Idee ein Dokument** | wird eine Idee beauftragt, entsteht ein Bauplan in `grundwissen/`, der auf sie verweist |
+| `SSOT-Document-Index.md` | **einziges** Dokument auf der Wurzelebene der Wissensbasis: Teil 1 Ordner-Routing, Teil 2 Quellen-Triage („Relevant wenn …") | lebend; jede neue, verschobene oder gelöschte Wissensdatei zieht ihre Index-Zeile in **derselben** Änderung nach (testerzwungen) |
+
+## Protokollköpfe (wörtlich in die zwei Protokolldateien übernehmen)
+
+```markdown
+# Fehlerprotokoll {{ABTEILUNG}} — append-only
+> Jeder eigene Fehler sofort als Eintrag: Datum · was falsch war · Ursache ·
+> Lernerkenntnis/Präventionsregel. Nie rückdatieren, nie umschreiben.
+```
+
+```markdown
+# Debug-Log {{ABTEILUNG}} — append-only
+> Gefundene/behobene Bugs: Datum · Symptom · Ursache · Fix · Beleg. Nie umschreiben.
+```
+
+**Nicht vorbefüllen.** Der erste Eintrag in `agent-learnings.md` entsteht beim ersten echten
+Fehler, der erste in `debug-log.md` beim ersten gefundenen Bug. Erfundene Beispieleinträge
+entwerten das Protokoll.
+
+## Isolation — warum es hier keine Warteschlange gibt
+
+Die Wissensbasis dieses Satelliten ist **terminal**: Er **schreibt nie in Dokumente des
+OS-Repos**, weder direkt noch über eine Vorstufe. Deshalb existiert **keine Kandidaten-Queue,
+keine Promotion-Pipeline, keine Kriterienliste und kein reservierter Platz für so etwas** — nicht
+als „kommt später", sondern gegenstandslos: Eine Warteschlange steht vor einem Schreibvorgang;
+fällt der weg, hat sie keinen Gegenstand. Ein reservierter Platz wäre eine halbe Warteschlange
+und lüde zum Auffüllen ein.
+
+Ebenso gilt **in beide Richtungen keine Leseanweisung über die Repo-Grenze**:
+
+- Ausgelieferte Dateien dieses Repos (`skills/**`, `hooks/**`, Wurzel-`*.md`) enthalten **keinen
+  Maschinenpfad** auf einen Checkout des OS-Repos. Das OS-Repo wird ausschließlich als
+  **Quellenangabe** genannt („die Standardprozesse im OS-Repo").
+- Kein Artefakt des OS-Repos liest diese Wissensbasis. Das OS-Repo kennt von diesem Satelliten
+  nur den Marketplace-Pin und seine Registry-Zeile.
+
+Was bleibt, ist Redaktionsdisziplin ohne Mechanik: **dieselbe Sache wird nicht zweimal
+ausformuliert.**
+
+## Auslieferung
+
+Beim Satelliten **ist das Repo das Plugin** — die Wissensbasis fährt beim Install also mit in den
+Plugin-Cache. Sie ist deshalb **Arbeitsmaterial des Repos und nie Laufzeit-Abhängigkeit eines
+Skills**: Ein Skill, der eine Datei aus `knowledge-base/` zum Funktionieren braucht, ist falsch
+gebaut — was er zur Laufzeit liest, gehört neben ihn ins Plugin.
+
+## Mechanischer Wächter (Pflicht, nicht optional)
+
+`test/wissensbasis.test.mjs` im Satelliten erzwingt mindestens:
+
+1. Der Index existiert und ist die **einzige** `.md`-Datei direkt in `knowledge-base/`.
+2. Jede `.md` unterhalb hat eine Index-Zeile (`PLATZHALTER.md` ausgenommen).
+3. Kein Index-Link zeigt ins Leere.
+4. **Alle vier** Kategorien existieren und sind in Teil 1 geroutet.
+5. Beide Protokolle existieren und tragen ihren append-only-Kopf.
+6. **Isolation:** kein Pfad und kein Dateiname unter `knowledge-base/` deutet auf eine
+   Warteschlangen-Mechanik hin; keine ausgelieferte Datei führt einen Maschinenpfad ins OS-Repo.
+7. **Plugin-Grenze:** keine `../`-Verweise in `skills/**` und `hooks/**`.
+
+## Instanzieren
+
+1. `knowledge-base/` mit den fünf Bausteinen anlegen, `PLATZHALTER.md` in jeden noch leeren
+   Ordner.
+2. `SSOT-Document-Index.md` schreiben: Kopf (Zweck, Benutzung, Verhältnis zum OS-Repo **als
+   Quellenangabe**, Pflegeregel testerzwungen, Auslieferungshinweis), Teil 1 Routing mit
+   Lebenszyklus je Ordner inklusive Pflicht-Verschiebung ins Archiv, Teil 2 Triage.
+3. Beide Protokollköpfe übernehmen, `{{ABTEILUNG}}` ersetzen.
+4. `test/wissensbasis.test.mjs` anlegen und grün fahren.
+5. `AGENTS.md` des Satelliten um Pflicht-Einstieg, Abschluss-Checkliste und Protokollzwang
+   ergänzen.
+6. Kontrolle: `grep -r "{{" knowledge-base test` liefert keine Treffer.

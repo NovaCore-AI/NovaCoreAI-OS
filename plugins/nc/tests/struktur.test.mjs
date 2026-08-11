@@ -274,6 +274,9 @@ function wissensDateien() {
       const full = path.join(cur, entry.name);
       if (entry.isDirectory()) { stack.push(full); continue; }
       if (full === INDEX_DATEI) continue;
+      // PLATZHALTER.md haelt eine noch leere Kategorie in Git (Vorbild-Muster) und ist
+      // bewusst NICHT indexpflichtig — sie traegt kein Wissen, nur Struktur.
+      if (entry.name === 'PLATZHALTER.md') continue;
       out.push(path.relative(WISSEN, full).split(path.sep).join('/'));
     }
   }
@@ -300,6 +303,18 @@ test('SSOT-Document-Index: kein Eintrag zeigt ins Leere', () => {
   const tot = indexZiele().filter((ziel) => !fs.existsSync(path.join(WISSEN, ...ziel.split('/'))));
   assert.deepEqual(tot, [],
     `toter Verweis im SSOT-Document-Index.md: ${tot.join(', ')} — Pfade sind relativ zu "knowledge-base/"`);
+});
+
+test('SSOT-Document-Index: jede Kategorie ist im Routing erfasst', () => {
+  // Entscheid E1 (2026-08-11): Der Kern fuehrt die Fuenferstruktur des Vorbilds. Eine
+  // Kategorie ohne Routing-Zeile in Teil 1 ist ein Ablageort ohne Regel — genau die Luecke,
+  // durch die Dokumente am falschen Ort landen.
+  const index = fs.readFileSync(INDEX_DATEI, 'utf8');
+  const kategorien = fs.readdirSync(WISSEN, { withFileTypes: true })
+    .filter((e) => e.isDirectory()).map((e) => e.name).sort();
+  const ungeroutet = kategorien.filter((k) => !index.includes('`' + k + '/`'));
+  assert.deepEqual(ungeroutet, [],
+    `Kategorie ohne Routing-Zeile in Teil 1: ${ungeroutet.join(', ')} — als \`<name>/\` im Index nennen`);
 });
 
 test('Wissensbasis-Wurzel: nur der Index liegt oben', () => {
