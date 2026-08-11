@@ -104,11 +104,26 @@ function schreibeIndex(quellenStand) {
   fs.renameSync(tmp, indexDatei());
 }
 
+// Sparse erkennen, wie git es selbst tut: ueber core.sparseCheckout. `config --get`
+// endet mit Exit 1, wenn der Schluessel fehlt — den Throw faengt das try ab, und
+// "kein Schluessel" heisst schlicht "kein Sparse-Klon". Scope BEWUSST --worktree,
+// nicht --local und nicht ungescoped (beides verifiziert, git-Doku + git 2.52):
+// moderne gits legen den Schalter per extensions.worktreeConfig in der
+// Worktree-Config ab, die --local NICHT liest; ohne die Extension faellt --worktree
+// auf --local zurueck. Ungescoped laese auch global/system mit — ein dort gesetztes
+// core.sparseCheckout (Alt-Anleitungen vor git 2.25) meldete dann jeden Vollklon
+// faelschlich als Relikt (Review-Fund PR #14).
+function istSparseKlon(ziel) {
+  try { return git(['-C', ziel, 'config', '--worktree', '--get', 'core.sparseCheckout']) === 'true'; }
+  catch (_) { return false; }
+}
+
 /** Eine Quelle bereitstellen: klonen oder per Fast-Forward nachziehen. */
 function bereitstellen(quelle) {
   const ziel = path.join(basisVerzeichnis(), verzeichnisName(quelle.repo));
   const wissen = path.join(ziel, ...quelle.wissenspfad.split('/'));
   const istKlon = fs.existsSync(path.join(ziel, '.git'));
+  let sparseMigriert = false;
 
   try {
     if (!istKlon) {
@@ -120,14 +135,44 @@ function bereitstellen(quelle) {
       // braucht, soll das Repo lokal haben.
       git(['clone', quelle.repo, ziel]);
     } else {
-      // Lokale Aenderungen NIE ueberschreiben — melden und in Ruhe lassen.
+      // Lokale Aenderungen NIE ueberschreiben — melden und in Ruhe lassen. Ist die
+      // veraenderte Kopie ZUSAETZLICH ein Sparse-Relikt, muss das mit in die Meldung:
+      // sonst folgt der Nutzer dem Troubleshooting, bekommt "lokal-veraendert" ohne
+      // Bezug zum Sparse-Problem und bleibt amputiert (Review-Fund PR #14, MEDIUM).
       if (git(['-C', ziel, 'status', '--porcelain'])) {
-        return { ...quelle, pfad: ziel, zustand: 'lokal-veraendert' };
+        return {
+          ...quelle, pfad: ziel, zustand: 'lokal-veraendert',
+          ...(istSparseKlon(ziel)
+            ? {
+              meldung: 'Zusaetzlich Sparse-Relikt der Erstfassung: die Kopie ist '
+                + 'unvollstaendig. Lokale Aenderungen sichern oder entfernen und '
+                + '/nc:setup erneut ausfuehren — erst dann laeuft die Erweiterung '
+                + 'zum vollen Arbeitsbaum.'
+            }
+            : {})
+        };
+      }
+      // Sparse-Relikt der Erstfassung heilen (Bauplan-Nachtrag N2): die klonte per
+      // --sparse nur den Wissenspfad, und ein blosses `pull` liesse die Kopie fuer
+      // immer amputiert — bei gleichzeitiger Erfolgsmeldung, weil der Wissenspfad-Check
+      // unten ja besteht. `sparse-checkout disable` schaltet core.sparseCheckout ab und
+      // stellt den vollen Working Tree wieder her (offizielle git-Doku, abgerufen
+      // 2026-08-11); fehlende Blobs eines Partial-Clone-Relikts holt git dabei nach.
+      if (istSparseKlon(ziel)) {
+        git(['-C', ziel, 'sparse-checkout', 'disable']);
+        sparseMigriert = true;
       }
       git(['-C', ziel, 'pull', '--ff-only']);
     }
   } catch (error) {
-    return { ...quelle, pfad: ziel, zustand: 'fehler', meldung: fehlerText(error) };
+    return {
+      ...quelle, pfad: ziel, zustand: 'fehler',
+      // Eine bereits gelungene Migration nicht verschweigen, nur weil der Pull danach
+      // scheitert — die Information ist fuer die Diagnose wertvoll (Review-Fund PR #14).
+      meldung: fehlerText(error) + (sparseMigriert
+        ? ' (Die Kopie wurde zuvor bereits zum vollen Arbeitsbaum erweitert.)'
+        : '')
+    };
   }
 
   if (!fs.existsSync(wissen)) {
@@ -142,7 +187,10 @@ function bereitstellen(quelle) {
   return {
     ...quelle, pfad: ziel, commit,
     zustand: istKlon ? 'aktualisiert' : 'angelegt',
-    stand_am: new Date().toISOString()
+    stand_am: new Date().toISOString(),
+    ...(sparseMigriert
+      ? { meldung: 'Sparse-Relikt der Erstfassung zum vollen Arbeitsbaum erweitert.' }
+      : {})
   };
 }
 
@@ -216,7 +264,9 @@ function main() {
   if (alsJson) {
     process.stdout.write(JSON.stringify(ausgabe, null, 2) + '\n');
   } else {
-    const zeilen = ausgabe.quellen.map((q) => '  ' + q.zustand.padEnd(16) + q.name
+    // padEnd(18): 'lokal-veraendert' ist exakt 16 Zeichen — mit 16 klebte der Zustand
+    // am Quellnamen und erschwerte genau die Diagnose, um die es geht (Review-Fund).
+    const zeilen = ausgabe.quellen.map((q) => '  ' + q.zustand.padEnd(18) + q.name
       + ' (' + q.art + ') → ' + q.pfad + (q.meldung ? '\n      ' + q.meldung : ''));
     process.stdout.write('SSOT-Ablage: ' + ausgabe.ablage + '\n' + zeilen.join('\n') + '\n');
   }

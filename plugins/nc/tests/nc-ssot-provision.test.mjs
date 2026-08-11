@@ -40,6 +40,10 @@ function origin({ wissenspfad = 'knowledge-base', mitWissen = true } = {}) {
   git(dir, ['init', '-q', '-b', 'main']);
   git(dir, ['config', 'user.email', 't@t']);
   git(dir, ['config', 'user.name', 't']);
+  // Ohne allowFilter ignoriert der file://-Transport `--filter` nur mit Warnung und
+  // liefert voll aus — der Sparse-Relikt-Test soll aber den ECHTEN Partial-Clone-Pfad
+  // ueben (lazy fetch beim Erweitern), wie im Feld gegen GitHub (Review-Fund PR #14).
+  git(dir, ['config', 'uploadpack.allowFilter', 'true']);
   if (mitWissen) {
     fs.mkdirSync(path.join(dir, ...wissenspfad.split('/')), { recursive: true });
     fs.writeFileSync(path.join(dir, ...wissenspfad.split('/'), 'index.md'), 'stand eins\n', 'utf8');
@@ -130,6 +134,59 @@ test('Neuer Stand im Origin wird per Fast-Forward nachgezogen', () => {
   assert.equal(
     liesText(path.join(quelle(r, 'nc').pfad, 'knowledge-base', 'index.md')),
     'stand zwei\n', 'der neue Stand ist nicht angekommen');
+});
+
+test('Sparse-Relikt der Erstfassung wird beim Lauf zum Vollklon erweitert', () => {
+  const o = origin();
+  const ablage = tmp('nc-ssot-ablage-');
+
+  // Relikt exakt so anlegen, wie die Erstfassung (PR #12) es hinterliess: echter
+  // Partial-Sparse-Klon (das Origin-Fixture erlaubt den Filter), nur der Wissenspfad
+  // materialisiert — die Erweiterung unten muss fehlende Blobs also wirklich nachholen.
+  const ziel = path.join(ablage, path.basename(o.dir));
+  git(ablage, ['clone', '-q', '--filter=blob:none', '--sparse', o.url, ziel]);
+  git(ziel, ['sparse-checkout', 'set', 'knowledge-base']);
+  assert.equal(fs.existsSync(path.join(ziel, 'grossordner')), false,
+    'Vorbedingung kaputt: das angelegte Relikt ist gar nicht sparse');
+
+  const r = run(pluginWurzel(o.url), ablage);
+
+  assert.equal(r.status, 0, r.stderr);
+  const q = quelle(r, 'nc');
+  assert.equal(q.zustand, 'aktualisiert');
+  // Kern der Migration: der Repo-Inhalt ausserhalb des Wissenspfads ist jetzt da …
+  assert.equal(fs.existsSync(path.join(q.pfad, 'grossordner', 'gross.md')), true,
+    'das Sparse-Relikt blieb sparse — die Migration zum vollen Arbeitsbaum fehlt');
+  // … der Sparse-Modus ist wirklich abgeschaltet (strikt auf 'false': ein leeres
+  // stdout eines gescheiterten config-Aufrufs darf nicht als Erfolg durchgehen) …
+  const cfg = spawnSync('git', ['-C', ziel, 'config', '--worktree', '--get', 'core.sparseCheckout'], { encoding: 'utf8' });
+  assert.equal((cfg.stdout || '').trim(), 'false',
+    'core.sparseCheckout sollte nach der Migration explizit false sein');
+  // … und die zugesagte Migrations-Meldung steht im Ergebnis (SKILL.md/ONBOARDING
+  // versprechen sie dem Nutzer — ohne Assertion braeche das lautlos).
+  assert.match(q.meldung || '', /Sparse-Relikt/);
+});
+
+test('Sparse-Relikt mit unversicherter Arbeit: melden, nicht anfassen', () => {
+  const o = origin();
+  const ablage = tmp('nc-ssot-ablage-');
+  const ziel = path.join(ablage, path.basename(o.dir));
+  git(ablage, ['clone', '-q', '--filter=blob:none', '--sparse', o.url, ziel]);
+  git(ziel, ['sparse-checkout', 'set', 'knowledge-base']);
+  // Unversicherte Arbeit im Relikt — eine einzige untracked Datei genuegt.
+  fs.writeFileSync(path.join(ziel, 'NOTIZ.md'), 'unversichert\n', 'utf8');
+
+  const r = run(pluginWurzel(o.url), ablage);
+
+  const q = quelle(r, 'nc');
+  assert.equal(q.zustand, 'lokal-veraendert');
+  // Der Nutzer muss den Sparse-Bezug in der Meldung sehen — sonst folgt er dem
+  // Troubleshooting, bekommt nur "lokal-veraendert" und bleibt amputiert.
+  assert.match(q.meldung || '', /Sparse-Relikt/);
+  // Nichts wurde angefasst: weiterhin sparse, die Notiz unversehrt.
+  assert.equal(fs.existsSync(path.join(ziel, 'grossordner')), false,
+    'eine lokal veraenderte Kopie darf nie automatisch migriert werden');
+  assert.equal(fs.readFileSync(path.join(ziel, 'NOTIZ.md'), 'utf8'), 'unversichert\n');
 });
 
 test('Lokale Aenderungen werden gemeldet, NICHT ueberschrieben', () => {

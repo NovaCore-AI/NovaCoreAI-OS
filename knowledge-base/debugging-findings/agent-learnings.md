@@ -99,6 +99,23 @@
   wiedergibt, die ein Test mechanisch prüft, prüft zuerst, ob die eigene Formulierung
   selbst darunter fällt.
 
+### 2026-08-11 — Review-Finding ungeprüft übernommen: `--local` sah den Sparse-Schalter nicht
+
+- **Kontext/Aufgabe:** PR #14 (Sparse-Relikt-Migration in `/nc:setup`); ein LOW-Finding des
+  Opus-Reviews empfahl `git config --local --get core.sparseCheckout`, um Fehlalarme durch
+  global gesetzte Werte zu vermeiden.
+- **Was schiefging:** Der Scope-Wechsel wurde direkt eingebaut; beide Sparse-Tests wurden
+  rot, weil moderne gits den Schalter per `extensions.worktreeConfig` in der
+  **Worktree-Config** ablegen, die `--local` nicht liest — die Erkennung fand nie etwas.
+- **Ursache:** Ein plausibles Review-Finding wurde wie ein verifizierter Fakt behandelt;
+  die Source-of-Truth-Pflicht (git-Doku **vor** der Änderung abrufen) wurde für den
+  vermeintlichen Einzeiler übersprungen.
+- **Lernerkenntnis/Präventionsregel:** Review-Vorschläge sind Hypothesen, keine Belege —
+  auch Einzeiler erst gegen offizielle Doku plus Empirie prüfen (richtig ist `--worktree`:
+  liest die Worktree-Datei, fällt ohne Extension auf `--local` zurück, nie global/system).
+  Der Fehler wurde nur sofort sichtbar, weil die Assertions **vor** dem Einbau standen —
+  Testabdeckung vor Review-Einarbeitung beibehalten.
+
 ### 2026-08-10 — Neue Invariante deckte Altbestand auf; erster Impuls war, sie zu entschärfen
 
 - **Kontext/Aufgabe:** Onsite-Align-Umbau, AP6 — Port der Release-Tag-Invariante
