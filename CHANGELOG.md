@@ -10,6 +10,8 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
+## [0.6.1] — 2026-08-11
+
 Onsite-Align-Umbau nach dem Bauplan
 `knowledge-base/grundwissen/2026-08-10-onsite-align-umbau-bauplan.md` (Arbeitspakete
 AP1–AP8, Auftrag Maintainer 2026-08-10; Plan verfasst von Claude Fable 5, Umsetzung Claude
