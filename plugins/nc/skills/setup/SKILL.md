@@ -43,6 +43,11 @@ Wissensbasis, sondern auch auf Repo-Inhalte daneben (etwa die Formatregeln unter
 `referenz/`). Ein Ausschnitt würde genau diese Verweise brechen — und das ganze Repo sind
 wenige Megabyte.
 
+**Sparse-Relikte der Erstfassung werden geheilt.** Die erste Fassung dieses Skills klonte
+nur den Wissenspfad (Sparse-Checkout). Trifft der Lauf auf eine solche Kopie, erweitert er
+sie vor dem Nachziehen automatisch zum Vollklon (`git sparse-checkout disable`) und meldet
+das im Ergebnis — ein erneuter Aufruf von `/nc:setup` genügt also auch als Reparatur.
+
 **Die Verlinkung ist der feste Pfad.** Der Klon landet deterministisch unter
 `~/.nc/ssot/<repo-name>/`, und der Firmen-Block in der globalen `CLAUDE.md` nennt genau
 diesen Pfad als Einstieg. Dadurch lösen die relativen Pfadangaben der Skills auf, ohne dass

@@ -52,6 +52,14 @@ Wissensbasis veraltet ist — automatisch geschieht das **nicht**.
 - **Satelliten brauchen das nicht:** Bei `nc-felix`/`nc-biggi` ist das Repo das Plugin —
   ihr Wissen reist im Paket mit und aktualisiert sich über den Marketplace.
 
+> **WSL zählt als eigener Rechner.** Windows und WSL haben getrennte Home-Verzeichnisse,
+> getrennte `~/.claude`-Konfigurationen und getrennte Git-Credentials. Wer Claude Code
+> (auch) in WSL nutzt, führt Installation (§1) und `/nc:setup` dort **einmal separat**
+> aus; die Voraussetzungen gelten je Umgebung — Node.js, `git` und Zugang zum privaten
+> Repo (z. B. `gh auth login` innerhalb von WSL). `NC_SSOT_DIR` nie auf einen
+> `/mnt/c/…`-Pfad legen: zwei Umgebungen teilten sich sonst einen Klon mit
+> unterschiedlichem Locking- und Zeilenenden-Verhalten.
+
 ## 1b. Kollegen-OS installieren (Satelliten `nc-felix` / `nc-biggi`)
 
 Die eigenständigen Abteilungs-OS installieren sich aus demselben Marketplace:
@@ -165,4 +173,7 @@ erscheint nur, wenn die Plugin-Version in `plugin.json` gebumpt wurde.
 - **FFG blockt einen Aufruf:** Das ist das erwartete Verhalten — geforderte Fakten im
   Antworttext nennen und denselben Aufruf wiederholen. Gate-Texte erklären genau, was
   fehlt.
+- **Nach `/nc:setup` liegt im Klon fast nur `knowledge-base/`:** Sparse-Relikt der
+  Erstfassung des Skills (vor Kern 0.6.1). `/plugin update`, dann `/nc:setup` erneut
+  ausführen — der Lauf erweitert die Kopie automatisch zum Vollklon und meldet das.
 - **`Permission denied (publickey)` bei der Installation:** siehe SSH-Hinweis oben.

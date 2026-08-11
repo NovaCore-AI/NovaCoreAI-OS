@@ -120,9 +120,19 @@ Bauplans) dokumentiert die einzige Abweichung.
   markerlos, Opt-out `NC_START_GATE=off`); Abschnitt 2 um den Biggi-Hinweis ergänzt.
   Fund des Frische-Instanz-Reviews nach dem 0.5.0-Release: die Ersteinrichtungs-Doku
   kannte die Satelliten bis dahin nicht. — Agent: Claude (Opus 5)
+- **ONBOARDING: WSL-Hinweis (§1a)** — WSL zählt als eigener Rechner (getrenntes Home,
+  eigene Credentials, eigenes `~/.claude`): Installation und `/nc:setup` dort einmal
+  separat ausführen; `NC_SSOT_DIR` nie auf `/mnt/c/…` legen. Eine eigene
+  WSL-Spezifikation braucht es nicht — Skript und Pfade sind plattformneutral, die CI
+  testet Ubuntu (Bauplan-Nachtrag N2). — Agent: Claude (Fable 5)
 
 ### Changed
 
+- **Kern `nc` 0.6.0 → 0.6.1** (`VERSION` + Registry gespiegelt): Fix —
+  Sparse-Relikt-Migration in `/nc:setup` plus WSL-Hinweis im ONBOARDING. Der Bump ist
+  Pflicht, obwohl 0.6.0 nie getaggt wurde: Die Erstfassung ist im Feld installiert, und
+  ohne Bump erreicht kein Fix ein installiertes Plugin (Bauplan-Nachtrag N2 revidiert
+  AP5). — Agent: Claude (Fable 5)
 - **Kern `nc` 0.5.0 → 0.6.0** (`VERSION` + Registry gespiegelt): Neuerung — Gate 2,
   Doks-Autosync, drei Skills.
 - **FFG-Angleich (AP1), ohne Sicherheitsabbau:** Die Session-Schlüssel-Ableitung
@@ -152,6 +162,17 @@ Bauplans) dokumentiert die einzige Abweichung.
 
 ### Fixed
 
+- **`/nc:setup` heilt jetzt Sparse-Relikte der Erstfassung** (Feldbefund 2026-08-11: ein
+  Teammitglied behielt nach dem Setup einen Klon, in dem außer `knowledge-base/` fast
+  nichts lag). Der Vollklon-Fix aus PR #13 stellte nur den **Erstlauf** um — traf der Lauf
+  auf eine bestehende Kopie, gab es nur `pull --ff-only`: `core.sparseCheckout` blieb
+  stehen, die Kopie blieb amputiert, und das Skript meldete trotzdem „aktualisiert", weil
+  der Wissenspfad-Check im Sparse-Ausschnitt besteht — ein stiller Falscherfolg. Jetzt wird
+  ein Sparse-Relikt vor dem Pull per `git sparse-checkout disable` zum Vollklon erweitert
+  (offizielle git-Doku, abgerufen 2026-08-11: deaktiviert den Schalter und stellt den
+  vollen Working Tree wieder her) und im Ergebnis explizit gemeldet. Der Regressionstest
+  stellt das Relikt exakt so nach, wie die Erstfassung es anlegte (Suite: 90 → 91).
+  Bauplan-Nachtrag N2. — Agent: Claude (Fable 5)
 - **`/nc:setup` nach dem Livetest korrigiert** (PR #13, Review-Iteration Kimi Code). Zwei
   Fehler der Erstfassung: (a) **„Verlinken" war gar nicht gebaut** — der Zeiger `index.json`
   wurde geschrieben, aber von niemandem gelesen, und alle SSOT-Verweise sind relative Pfade,

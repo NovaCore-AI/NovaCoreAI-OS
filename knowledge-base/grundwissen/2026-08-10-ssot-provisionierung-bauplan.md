@@ -121,6 +121,34 @@ hiermit **revidiert** (Spec-Nachtrag statt stiller Abweichung):
    Funktionsverlust für nichts. Jetzt `git clone` ohne `--filter`/`--sparse`; der
    Regressionstest verlangt, dass Repo-Inhalt außerhalb der Wissensbasis mit ankommt.
 
+## 8. Nachtrag N2 (2026-08-11, Feldbefund nach dem Vollklon-Fix)
+
+Feldbefund: Ein Teammitglied hatte `/nc:setup` mit der Erstfassung (PR #12) ausgeführt und
+behielt dauerhaft einen Sparse-Klon unter `~/.nc/ssot/<repo-name>/` — nur `knowledge-base/`
+plus Wurzeldateien. Drei Punkte werden nachgezogen:
+
+1. **N1.2 ergänzt — der Vollklon-Fix heilt Bestandskopien jetzt mit.** PR #13 stellte nur
+   den **Erstlauf** um; bei vorhandenem Klon lief nur `pull --ff-only`, `core.sparseCheckout`
+   blieb stehen, und das Skript meldete trotzdem „aktualisiert" — ein stiller Falscherfolg,
+   weil der Wissenspfad-Check im Sparse-Ausschnitt besteht. Jetzt: steht
+   `core.sparseCheckout` auf `true`, läuft vor dem Pull `git sparse-checkout disable`
+   (offizielle git-Doku, abgerufen 2026-08-11: deaktiviert den Schalter und stellt den
+   vollen Working Tree wieder her); das Ergebnis trägt eine explizite Migrations-Meldung.
+   Der Regressionstest stellt das Relikt exakt so nach, wie die Erstfassung es anlegte
+   (Suite 90 → 91).
+2. **§4/AP5 revidiert — Patch-Bump 0.6.0 → 0.6.1.** „Kein zweiter Bump, 0.6.0 ist
+   unveröffentlicht" gilt nicht mehr: Die Erstfassung ist nachweislich im Feld installiert
+   (der Feldbefund setzt sie voraus), und ohne Bump erreicht weder der Vollklon-Fix noch
+   die Migration ein installiertes Plugin — kein Bump = kein Auto-Update. 0.6.0 wurde nie
+   getaggt; der Tag-/Release-Schnitt liegt damit erst bei 0.6.1.
+3. **WSL braucht keine eigene Spezifikation** (Maintainer-Frage 2026-08-11). Skript und
+   Pfade sind plattformneutral (`os.homedir()`, tilde-relativer Pfad im Firmen-Block), die
+   CI testet Ubuntu. Festgehalten wird nur die Betriebsregel als ONBOARDING-Hinweis:
+   **WSL zählt als eigener Rechner** — eigenes Home, eigene Credentials, eigenes
+   `~/.claude`; Installation und `/nc:setup` laufen dort einmal separat, `NC_SSOT_DIR`
+   nie auf `/mnt/c/…`.
+
 ---
 *Angelegt 2026-08-10 durch Claude (Opus 5, Claude Code) auf Weisung Lucas Vöhringer.*
 *Nachtrag N1: 2026-08-11, Livetest-Befunde durch das NovaCore-Team, Doku-Nachzug Kimi Code.*
+*Nachtrag N2: 2026-08-11, Feldbefund durch das NovaCore-Team, Fix und Doku Claude (Fable 5).*

@@ -135,6 +135,12 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Fast-Forward aktuell; nach dem Livetest korrigiert (PR #13, Nachtrag N1).
   **Bewusst ausgeschlossen:** Queue-Logik/SSOT-Abstufung des Vorbilds und jeder
   Memory-Share zwischen Satelliten (Maintainer-Entscheid; siehe SSOT-Definition).
+- **Gebaut (Kern v0.6.1, 2026-08-11):** `/nc:setup` heilt **Sparse-Relikte der
+  Erstfassung** — eine bestehende Sparse-Kopie wird vor dem Pull per
+  `git sparse-checkout disable` zum Vollklon erweitert und explizit gemeldet (vorher:
+  stiller Falscherfolg „aktualisiert"). ONBOARDING um den WSL-Hinweis ergänzt („WSL zählt
+  als eigener Rechner"). Patch-Bump, weil die Erstfassung im Feld installiert ist — ohne
+  Bump erreicht kein Fix ein installiertes Plugin (Bauplan-Nachtrag N2).
 - **Noch nicht gebaut:** Gate 3 (Safety-Gate mit echtem Freigabedialog), Gate 4
   (Sitzungsabschluss als Hook), CLAUDE-Ebene 0 und 2, weitere fe-/be-Skills, Module
   `architecture`/`incident-support`. Übersicht:

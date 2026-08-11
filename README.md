@@ -4,7 +4,7 @@
 **Familie von Claude-Code-Plugins** aus einem Marketplace: eine Methode für alle statt
 vieler Privat-Setups.
 
-**Status: Kern `nc` v0.6.0 · Abteilung `nc-development` v0.1.0 · Abteilung `nc-felix`
+**Status: Kern `nc` v0.6.1 · Abteilung `nc-development` v0.1.0 · Abteilung `nc-felix`
 v0.2.1 (erster Satellit, eigenständiges Felix-OS) · Abteilung `nc-biggi` v0.1.1 (zweiter
 Satellit, eigenständiges Biggi-OS) · Affiliate `kimi-code-plugin-cc` v1.4.0 (extern) —
 Multi-Plugin-Architektur (Umbau 2026-07-28), Kontroll-Schicht mit Gate 1 + Gate 2
@@ -22,7 +22,7 @@ bringen ihren Kern als **Modul** selbst mit:
 
 | Plugin | Rolle | Namespace | Version |
 |---|---|---|---|
-| `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Infrapflege-Skills, Kontroll-Schicht (Gate 1 + Gate 2), Doks-Autosync, WP-Rahmen, Registry, Formatregeln, `nc-sync.md` | `/nc:` | 0.6.0 (= `VERSION`) |
+| `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Infrapflege-Skills, Kontroll-Schicht (Gate 1 + Gate 2), Doks-Autosync, WP-Rahmen, Registry, Formatregeln, `nc-sync.md` | `/nc:` | 0.6.1 (= `VERSION`) |
 | `nc-development` | Abteilung development — Module `fe` / `be` / `flc` / `wzs` | `/nc-development:` | 0.1.0 |
 | `nc-felix` | Abteilung felix — **eigenständiges Felix-OS** (erster Satellit, privates Repo `NovaCore-AI/Felix-OS`): Kernmodul mit 6 Skills + eigene FFG-Kontrollschicht, hängt **nicht** am Kern | `/nc-felix:` | 0.2.1 |
 | `nc-biggi` | Abteilung biggi — **eigenständiges Biggi-OS** (zweiter Satellit, privates Repo `NovaCore-AI/Biggi-OS`): Kernmodul mit 6 Skills + Kontroll-Schicht (FFG + Session-Start-Zwang nach Onsite-Vorbild), hängt **nicht** am Kern; Arbeitsmodul-Konvention `ctrl` / `mdzn` / `doc`+`day` reserviert | `/nc-biggi:` | 0.1.1 |
@@ -58,7 +58,7 @@ bringen ihren Kern als **Modul** selbst mit:
 | `/nc:start` | WP0 | Session-Start: Stand, Journal, Git-Lage laden — kein Blind-Start; setzt zum Abschluss den Fakten-Stempel, der Gate 2 öffnet |
 | `/nc:save-session` | WP8 | Session-Ende: Journal schreiben, Stand konsolidieren |
 | `/nc:journal` | laufend | Einzelne Ereignisse sofort festhalten |
-| `/nc:setup` | einmal pro Rechner | Stellt die Wissensbasis lokal bereit (voller Klon nach `~/.nc/ssot/<repo-name>/`, Verlinkung über den festen Pfad im Firmen-Block) und hält sie per Fast-Forward aktuell — der Marketplace liefert nur das Plugin aus, nicht die Wissensbasis |
+| `/nc:setup` | einmal pro Rechner | Stellt die Wissensbasis lokal bereit (voller Klon nach `~/.nc/ssot/<repo-name>/`, Verlinkung über den festen Pfad im Firmen-Block) und hält sie per Fast-Forward aktuell; Sparse-Relikte der Erstfassung werden automatisch zum Vollklon erweitert — der Marketplace liefert nur das Plugin aus, nicht die Wissensbasis |
 | `/nc:doku-sync` | vor Commit | Lebende Doku nach der Sync-Matrix nachziehen, CHANGELOG + Versions-Gleichstand prüfen, Prüfstempel setzen |
 | `/nc:os-info` | jederzeit | Erklärt das OS **auf Basis der realen Installation** — Plugins, Module, nutzbare Skills, Gate-Status |
 | `/nc:skill-builder` | jederzeit | Führt durch den Bau eines Skills nach den OS-Regeln (Sandbox oder OS-Beitrag, inkl. Fork-back) |

@@ -104,11 +104,20 @@ function schreibeIndex(quellenStand) {
   fs.renameSync(tmp, indexDatei());
 }
 
+// Sparse erkennen, wie git es selbst tut: ueber core.sparseCheckout. `config --get`
+// endet mit Exit 1, wenn der Schluessel fehlt — den Throw faengt das try ab, und
+// "kein Schluessel" heisst schlicht "kein Sparse-Klon".
+function istSparseKlon(ziel) {
+  try { return git(['-C', ziel, 'config', '--get', 'core.sparseCheckout']) === 'true'; }
+  catch (_) { return false; }
+}
+
 /** Eine Quelle bereitstellen: klonen oder per Fast-Forward nachziehen. */
 function bereitstellen(quelle) {
   const ziel = path.join(basisVerzeichnis(), verzeichnisName(quelle.repo));
   const wissen = path.join(ziel, ...quelle.wissenspfad.split('/'));
   const istKlon = fs.existsSync(path.join(ziel, '.git'));
+  let sparseMigriert = false;
 
   try {
     if (!istKlon) {
@@ -123,6 +132,16 @@ function bereitstellen(quelle) {
       // Lokale Aenderungen NIE ueberschreiben — melden und in Ruhe lassen.
       if (git(['-C', ziel, 'status', '--porcelain'])) {
         return { ...quelle, pfad: ziel, zustand: 'lokal-veraendert' };
+      }
+      // Sparse-Relikt der Erstfassung heilen (Bauplan-Nachtrag N2): die klonte per
+      // --sparse nur den Wissenspfad, und ein blosses `pull` liesse die Kopie fuer
+      // immer amputiert — bei gleichzeitiger Erfolgsmeldung, weil der Wissenspfad-Check
+      // unten ja besteht. `sparse-checkout disable` schaltet core.sparseCheckout ab und
+      // stellt den vollen Working Tree wieder her (offizielle git-Doku, abgerufen
+      // 2026-08-11); fehlende Blobs eines Partial-Clone-Relikts holt git dabei nach.
+      if (istSparseKlon(ziel)) {
+        git(['-C', ziel, 'sparse-checkout', 'disable']);
+        sparseMigriert = true;
       }
       git(['-C', ziel, 'pull', '--ff-only']);
     }
@@ -142,7 +161,10 @@ function bereitstellen(quelle) {
   return {
     ...quelle, pfad: ziel, commit,
     zustand: istKlon ? 'aktualisiert' : 'angelegt',
-    stand_am: new Date().toISOString()
+    stand_am: new Date().toISOString(),
+    ...(sparseMigriert
+      ? { meldung: 'Sparse-Relikt der Erstfassung zum Vollklon erweitert.' }
+      : {})
   };
 }
 

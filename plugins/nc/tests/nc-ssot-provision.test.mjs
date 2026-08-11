@@ -132,6 +132,33 @@ test('Neuer Stand im Origin wird per Fast-Forward nachgezogen', () => {
     'stand zwei\n', 'der neue Stand ist nicht angekommen');
 });
 
+test('Sparse-Relikt der Erstfassung wird beim Lauf zum Vollklon erweitert', () => {
+  const o = origin();
+  const ablage = tmp('nc-ssot-ablage-');
+
+  // Relikt exakt so anlegen, wie die Erstfassung (PR #12) es hinterliess: Sparse-Klon,
+  // nur der Wissenspfad materialisiert. `--filter=blob:none` quittiert der lokale
+  // Transport mit einer Warnung und holt voll — wie im Feld bei file://-Remotes; die
+  // Sparse-Wirkung (nur der Wissenspfad liegt auf der Platte) ist dieselbe.
+  const ziel = path.join(ablage, path.basename(o.dir));
+  git(ablage, ['clone', '-q', '--filter=blob:none', '--sparse', o.url, ziel]);
+  git(ziel, ['sparse-checkout', 'set', 'knowledge-base']);
+  assert.equal(fs.existsSync(path.join(ziel, 'grossordner')), false,
+    'Vorbedingung kaputt: das angelegte Relikt ist gar nicht sparse');
+
+  const r = run(pluginWurzel(o.url), ablage);
+
+  assert.equal(r.status, 0, r.stderr);
+  const q = quelle(r, 'nc');
+  assert.equal(q.zustand, 'aktualisiert');
+  // Kern der Migration: der Repo-Inhalt ausserhalb des Wissenspfads ist jetzt da …
+  assert.equal(fs.existsSync(path.join(q.pfad, 'grossordner', 'gross.md')), true,
+    'das Sparse-Relikt blieb sparse — die Migration zum Vollklon hat nicht stattgefunden');
+  // … und der Sparse-Modus ist wirklich abgeschaltet, nicht nur zufaellig ausgecheckt.
+  const cfg = spawnSync('git', ['-C', ziel, 'config', '--get', 'core.sparseCheckout'], { encoding: 'utf8' });
+  assert.notEqual((cfg.stdout || '').trim(), 'true', 'core.sparseCheckout steht noch auf true');
+});
+
 test('Lokale Aenderungen werden gemeldet, NICHT ueberschrieben', () => {
   const o = origin();
   const ablage = tmp('nc-ssot-ablage-');
