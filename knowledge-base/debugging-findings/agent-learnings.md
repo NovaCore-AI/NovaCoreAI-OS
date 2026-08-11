@@ -10,6 +10,27 @@
 
 ## Einträge
 
+### 2026-08-12 — Exitcode hinter einer Pipe geprüft: Positivkontrolle „fehlgeschlagen" gemeldet, obwohl sie bestand
+
+- **Kontext/Aufgabe:** Im Review von PR #15 sollte die Positivkontrolle des Validators aus
+  `ci.yml` lokal nachgestellt werden (absichtlich defekter Wegwerf-Skill **muss**
+  `claude plugin validate --strict` rot machen, intakte Kontrollgruppe bleibt grün).
+- **Was schiefging:** Die Prüfung war als `if claude plugin validate … | tail -6; then …`
+  geschrieben. Der Validator meldete korrekt `✘ Validation failed`, mein Skript aber
+  „POSITIVKONTROLLE FEHLGESCHLAGEN: Validator prueft keine Skills" — ein **Fehlalarm gegen
+  fremdes Material**, der ohne zweiten Blick als Befund im Bericht gelandet wäre.
+- **Ursache:** Falsche Annahme über die Shell: Der Exitcode einer Pipeline ist der des
+  **letzten** Glieds. `tail` gelingt immer, also war die `if`-Bedingung unabhängig vom
+  Validator-Ergebnis wahr. Die Vorlage in `ci.yml` prüft bewusst **ohne** Pipe — ich habe beim
+  Nachstellen ein `| tail` „zur Lesbarkeit" hinzugefügt und damit die Semantik zerstört.
+- **Lernerkenntnis/Präventionsregel:** Wird ein Befehl **wegen seines Exitcodes** ausgeführt, darf
+  nichts dahinter gehängt werden: erst `cmd; rc=$?` (oder `cmd` direkt in `if`), Ausgabe getrennt
+  betrachten — oder `set -o pipefail` bzw. `${PIPESTATUS[0]}`. Und: Beim Nachstellen eines
+  CI-Schritts wird die Befehlsform **wörtlich** übernommen; jede „Verschönerung" ist eine
+  Änderung der Prüfung. Gegenprobe gegen den eigenen Prüfstand: Ein Urteil, das dem sichtbaren
+  Werkzeug-Output widerspricht (hier `✘ Validation failed` bei gemeldetem „prüft nicht"), ist
+  bis zum Gegenbeweis mein Fehler, nicht der des Werkzeugs.
+
 ### 2026-08-11 — Gelöschten Rename-Quellpfad als `git add`-Pathspec übergeben
 
 - **Kontext/Aufgabe:** Die vollständig übertragene Prozesskorpus-Arbeit sollte im isolierten
