@@ -14,6 +14,36 @@
 
 ## Einträge
 
+### 2026-08-14 — Start-Gate blockte seinen eigenen Pflicht-Einstieg (Read-only-Git-Allowlist zu eng)
+
+- **Symptom:** `/nc:start` (WP0) war in einer Linux-Session nicht ausführbar: das
+  Start-Gate lehnte selbst read-only Git-Aufrufe ab — kombinierte Befehle, Befehle mit
+  Pfadwechsel (`cd <repo> && git status`, `git -C <dir> status`), `git worktree list`
+  und `git status -sb`. Nur nacktes `git status` im aktuellen Verzeichnis ging durch.
+- **Ursache:** `isReadOnlyGitIntrospection()` in `plugins/nc/hooks/lib/bash-analyse.js`
+  (geteilt von FFG und Start-Gate) lehnte jede Kommandozeile mit `;&|` pauschal ab,
+  las das Subkommando blind als `tokens[1]` (globale Optionen wie `-C <dir>` brachen
+  die Erkennung, obwohl `findGitSubcommand()` dafür existierte) und kannte `worktree`
+  sowie kombinierte Kurzflags (`-sb`) nicht. Die Allowlist war gegen den Upstream-Stand
+  gehärtet, aber nie gegen den **eigenen** Pflicht-Einstieg aus `AGENTS.md` geprüft
+  worden (`git worktree list` + `git status --short` je Worktree).
+- **Fix:** Segmentweise Prüfung (quote-aware Zerlegung an unquoted `;`, `&`, Newline):
+  jedes Segment muss reiner Pfadwechsel (`cd <pfad>`, ein Argument, keine Flags) oder
+  allowlistetes Git-Kommando sein; Subkommando-Ermittlung über `findGitSubcommand()`;
+  `worktree list` und Kurzflags aus {s, b} ergänzt; Pipes/Redirects/Substitutionen
+  bleiben per unquoted-Scan ausgeschlossen. Kern 0.7.1.
+- **Beleg:** Reproduktion per `node -e` vor dem Fix (6 von 9 Pflicht-Einstieg-Formen
+  geblockt); write-first-Tests in `nc-ffg.test.mjs`/`nc-start-gate.test.mjs` (vor Fix
+  rot, nach Fix grün); Negativproben (`git -C … push`, `worktree remove`, Verkettung
+  mit `rm -rf`, Pipe, Redirect) gaten weiter; Suite 97/97 grün.
+- **Wirkung:** Der Bug saß auch im FFG-Durchlass (gleiche Lib) — dort fiel er nur
+  nicht auf, weil das Routine-Gate ohnehin einmal je Session feuert. Die Satelliten
+  (`nc-felix`, `nc-biggi`) tragen eigene FFG-Kopien mit demselben Stand: **je eigener
+  Fix-Vorgang dort** (kein Rück-Nachzug vom Kern).
+- **Präventionsregel:** Allowlist-Härtungen an Sicherheitsgates immer gegen die
+  **eigene** vorgeschriebene Nutzung testen (hier: der Pflicht-Einstieg aus
+  `AGENTS.md`), nicht nur gegen den Upstream-Befund.
+
 ### 2026-08-12 — Drei Wächter-Invarianten prüften weniger, als ihr Name zusagte
 
 - **Symptom:** `plugins/nc/tests/struktur.test.mjs` meldete grün für Datenlagen, die die

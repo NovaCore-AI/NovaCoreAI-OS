@@ -115,6 +115,27 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ### Fixed
 
+- **Start-Gate/FFG blockten ihren eigenen Pflicht-Einstieg** (Bugreport 2026-08-14 aus einer
+  Linux-Session, Eintrag im `debug-log.md`): `isReadOnlyGitIntrospection()`
+  (`plugins/nc/hooks/lib/bash-analyse.js`) ließ nur nackte Einzelkommandos im aktuellen
+  Verzeichnis durch. Geblockt wurden `cd <dir> && git status` (die Trenner-Regex lehnte
+  `;&|` pauschal ab), `git -C <dir> status` (globale Optionen wurden nicht übersprungen,
+  obwohl `findGitSubcommand()` dafür existiert), verkettete Read-only-Kommandos,
+  `git worktree list` (Pflicht-Einstieg laut `AGENTS.md`, fehlte komplett in der
+  Allowlist) und kombinierte Kurzflags wie `git status -sb`. Damit war der in `AGENTS.md`
+  vorgeschriebene Session-Einstieg vor dem Fakten-Stempel faktisch nicht ausführbar.
+  Der Umbau prüft jetzt **segmentweise** (quote-aware Zerlegung an unquoted `;`, `&`,
+  Zeilenumbruch): jedes Segment muss ein reiner Pfadwechsel (`cd <pfad>`, ein Argument,
+  keine Flags) oder ein allowlistetes Git-Kommando sein; Pipes, Redirects,
+  Substitutionen und Klammer-Gruppen bleiben per unquoted-Scan hart ausgeschlossen, die
+  Subkommando-Ermittlung läuft über `findGitSubcommand()`. Neu allowlistet: `worktree
+  list` (exakt) und status-Kurzflags aus {s, b}. Sicherheitsrelevante Design-Entscheidung:
+  die Erweiterung öffnet ausschließlich **read-only**-Formen — `git -C <dir> push`,
+  `git worktree remove` und jede Verkettung mit einem nicht-allowlisteten Segment gaten
+  weiter (Negativproben in `nc-ffg.test.mjs`/`nc-start-gate.test.mjs`, Suite: 97 Tests
+  grün). **Folge-Vorgang:** die Satelliten (`nc-felix`, `nc-biggi`) tragen eigene
+  FFG-Kopien mit demselben Stand — dort entsteht je ein eigener Fix-Vorgang (kein
+  Rück-Nachzug vom Kern aus). — *Kimi (K3, Kimi Code CLI)*
 - **Falsche Mechanik-Begründung des Vorbilds nicht übernommen** (Plan-Nachtrag **N3**, Eintrag
   im neuen `debug-log.md`). Das Vorbild begründet die Auslieferungsgrenze eines Satelliten
   damit, ein `ref`/`sha`-Pin löse einen **sparse clone nur des Plugin-Subverzeichnisses** aus.
@@ -148,6 +169,11 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ### Changed
 
+- **Kern-Bump `0.7.0 → 0.7.1`** — Patch (Bugfix der Read-only-Git-Erkennung, siehe Fixed).
+  Version an den drei testerzwungenen Spiegelstellen: `plugins/nc/.claude-plugin/plugin.json`,
+  `VERSION`, `plugins/nc/module-registry.json`. Spiegel-Nachzug: `hooks/hooks.json`
+  (`description`), `NovaCore-OS-Gates-Definition.md` (Status Gate 1/2), `README.md`
+  (Hook-Tabelle), `AGENTS.md` (Produktstand). — *Kimi (K3, Kimi Code CLI)*
 - **Kern-Bump `0.6.1 → 0.7.0`** (AP5) — Minor, weil vier neue **normative** Standardprozesse
   hinzukommen; ohne Bump erreicht das Team sie nicht. Version an den drei testerzwungenen
   Spiegelstellen: `plugins/nc/.claude-plugin/plugin.json`, `VERSION`,

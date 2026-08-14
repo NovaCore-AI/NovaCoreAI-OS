@@ -287,6 +287,39 @@ test('Read-only-Git: log -N und die rev-parse-Formen des Fakten-Stempels', () =>
   }
 });
 
+// Erweiterung 2026-08-14 (Bugfix: Start-Gate/FFG blockten den eigenen Pflicht-Einstieg,
+// Bugreport Linux-Session): Pfadwechsel (`cd` / `git -C`), Verkettung mehrerer
+// Read-only-Kommandos, `git worktree list` (Pflicht-Einstieg laut AGENTS.md) und
+// kombinierte status-Kurzflags sind rein lesend und muessen frei sein.
+test('Read-only-Git: Pfadwechsel, Verkettung, worktree list und -sb', () => {
+  const d = freshDirs();
+  for (const command of [
+    'cd /tmp/irgendwo && git status',
+    'git -C /tmp/irgendwo status',
+    'git -C /tmp/irgendwo log --oneline -10',
+    'git status && git log --oneline -5',
+    'git worktree list',
+    'git status -sb'
+  ]) {
+    assert.equal(run(inputFor('t-ro5', 'Bash', { command }), d.env), '', command + ' darf nicht gaten');
+  }
+});
+
+// Negativkontrolle zur Erweiterung: Pfadwechsel und Verkettung duerfen die Allowlist
+// nicht aufweichen — schreibende/unbekannte Formen gaten weiter.
+test('Read-only-Git-Allowlist bleibt eng bei Pfadwechsel und Verkettung', () => {
+  for (const command of [
+    'cd /tmp/irgendwo && rm -rf y',
+    'git -C /tmp/irgendwo push',
+    'git worktree remove foo',
+    'git status | grep x',
+    'git status > out.txt'
+  ]) {
+    const d = freshDirs();
+    assert.notEqual(run(inputFor('t-ro6', 'Bash', { command }), d.env), '', command + ' muss gegated werden');
+  }
+});
+
 // Negativkontrolle zur Erweiterung: die Allowlist bleibt eng — nicht abgedeckte bzw.
 // angehaengte Formen laufen weiter ins Routine- bzw. Destruktiv-Gate.
 test('Read-only-Git-Allowlist bleibt eng: unbekannte rev-parse-/log-Formen gaten weiter', () => {
