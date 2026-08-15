@@ -79,11 +79,23 @@ test('Vorlagen-Invariante: beispiel-agent.md.vorlage traegt Platzhalter und Allo
   assert.match(inhalt, /\{\{ZWECK\}\}/, 'Vorlage ohne Platzhalter {{ZWECK}} — wurde sie ausgefuellt?');
   assert.match(inhalt, /^model:/m,
     'Vorlage ohne model-Feld — die Modellwahl ist Pflichtfeld (Allowlist-Norm 2026-08-15)');
-  const toolsZeile = inhalt.match(/^tools:[ \t]*(.*)$/m);
-  assert.ok(toolsZeile,
+  // Seit Baustein 1.4.0 (Codex-Review): den GESAMTEN Feldwert lesen (Inline- wie
+  // YAML-Listenform) und POSITIV pruefen — eine mehrzeilige Liste mit Write/Bash/
+  // PowerShell darf nicht unbemerkt bleiben, und nur lesende Built-ins sind zulaessig.
+  const zeilen = inhalt.split(/\r?\n/);
+  const idx = zeilen.findIndex((l) => /^tools:/.test(l));
+  assert.notEqual(idx, -1,
     'Vorlage ohne tools-Feld — die Allowlist ist Pflichtfeld (Allowlist-Norm 2026-08-15)');
-  assert.doesNotMatch(toolsZeile[1], /\b(Bash|Write|Edit|MultiEdit|NotebookEdit)\b/,
-    'Vorlage muss die Read-only-Variante vorgeben — keine Schreib-Werkzeuge und kein Bash in tools');
+  const teile = [zeilen[idx].replace(/^tools:[ \t]*/, '')];
+  for (let i = idx + 1; i < zeilen.length && (/^\s/.test(zeilen[i]) || zeilen[i] === ''); i++) {
+    teile.push(zeilen[i]);
+  }
+  const tokens = teile.join(',').split(',')
+    .map((t) => t.replace(/^[-\s]+|[\s]+$/g, '')).filter(Boolean);
+  const LESE_BUILTINS = new Set(['Read', 'Grep', 'Glob', 'WebFetch', 'WebSearch']);
+  const unzulaessig = tokens.filter((t) => !t.startsWith('mcp__') && !LESE_BUILTINS.has(t));
+  assert.deepEqual(unzulaessig, [],
+    `Vorlage muss die Read-only-Variante vorgeben — unzulaessige tools-Eintraege: ${unzulaessig.join(', ')}`);
   assert.match(inhalt, /^## Defense-Baseline[ \t]*$/m,
     'Vorlage ohne Defense-Baseline-Block — Pflichtbaustein seit 2026-08-15');
 });

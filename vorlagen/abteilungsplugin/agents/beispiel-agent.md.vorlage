@@ -80,5 +80,7 @@ der Prompt bleibt kurz und direktiv (agent-authoring.md, Längen-Disziplin).
 ## Rückgabe an die Haupt-Session
 
 [Nummeriertes Pflichtformat — eine kurze, belegte Zusammenfassung, kein Vollabzug des
-Subagenten-Kontexts: 1. Befund/Ergebnis, 2. Belege mit Dateipfaden, 3. unklare Punkte
-mit dem jeweils fehlenden Beleg.]
+Subagenten-Kontexts: 1. Befund/Ergebnis (bei Prüfaufträgen je Prüfpunkt mit Status
+erledigt/fehlgeschlagen/nicht geprüft), 2. Belege mit Dateipfaden, 3. unklare Punkte
+mit dem jeweils fehlenden Beleg, 4. expliziter Gegenprobe-Auftrag an den Parent
+(Diff sichten · Suite ausführen · Freigabe einholen).]

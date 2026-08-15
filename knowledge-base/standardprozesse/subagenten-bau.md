@@ -47,7 +47,7 @@ geführter Ablauf in der Haupt-Session → **Skill**. **Im Zweifel Skill.**
 
 | Richtung | Wann | NovaCore-Beispiele |
 |---|---|---|
-| **Skill** | Die Session geht jeden Schritt mit · Zwischen-Entscheide · kleine fokussierte Checks · Rückfragen an den Menschen sind Teil des Ablaufs | `/nc:start`, `/nc:save-session`, `/nc:doku-sync`, `/nc:skill-builder` |
+| **Skill** | Die Session geht jeden Schritt mit · Zwischen-Entscheide · kleine fokussierte Checks · Rückfragen an den Menschen sind Teil des Ablaufs | `/nc:start`, `/nc:end-session`, `/nc:doku-sync`, `/nc:skill-builder` |
 | **Agent** | Der Haupt-Kontext würde fluten oder ein eigener Kontext ist nötig · bulkige Lese-/Schreibarbeit · klar umrissener Auftrag mit Zusammenfassungs-Rückgabe · unabhängige Zweitdiagnose | `sync-nachzug-executor` — gebündelte Doku-Nachzüge am Zyklusende (AP-D1) |
 
 Ein Agent kostet einen Delegations-Schritt und liefert nur eine **Zusammenfassung** zurück,
@@ -309,10 +309,14 @@ Peer-Review. Plattform-Realität: Es gibt keinen nativen Review-Mechanismus zwis
 nur Orchestrierungs-Konvention — deshalb Prozessnorm, kein Hook. Drei Stufen, aufsteigend
 nach Eingriffstiefe:
 
-1. **Stufe 1 — Strukturierte Selbstauskunft (jeder Agent):** Die Rückgabe benennt je
-   Prüf-/Arbeitspunkt den Status (`erledigt`/`fehlgeschlagen`/`nicht geprüft`) plus den
-   expliziten **Gegenprobe-Auftrag an den Parent** (Diff sichten · Suite ausführen ·
-   Freigabe einholen). Das Rückgabeformat ist Pflichtbestandteil jeder Agent-Datei.
+1. **Stufe 1 — Strukturierte Selbstauskunft (jeder Agent):** Die Rückgabe weist je
+   Arbeits-/Prüfpunkt den Ausgang aus — bei Prüfaufträgen mit expliziten Statuswerten
+   (`erledigt`/`fehlgeschlagen`/`nicht geprüft`), bei Arbeitsaufträgen über die
+   Pflichtrubriken **Ergebnis · Abweichungen · unklare Punkte** (nichts wird still
+   ausgelassen; Referenzmuster: Rückgabeformat des `sync-nachzug-executor`) — und endet
+   mit dem expliziten **Gegenprobe-Auftrag an den Parent** (Diff sichten · Suite
+   ausführen · Freigabe einholen). Das Rückgabeformat ist Pflichtbestandteil jeder
+   Agent-Datei (Muster: `agent-authoring.md`, Gliederung).
 2. **Stufe 2 — Abnahme durch den Führenden (jeder Agent, verpflichtend):** Der führende
    Agent sichtet das Ergebnis **persönlich** gegen den Auftrag (Diff bzw. Befund), gibt
    Feedback zur Neuiteration oder nimmt ab. Commit-Hoheit bleibt beim führenden

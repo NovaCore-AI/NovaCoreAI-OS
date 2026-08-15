@@ -1,8 +1,15 @@
 // ============================================================================
-// nc-agenten-invarianten — PORTABLER PRUEFBAUSTEIN, Baustein-Version 1.3.0
+// nc-agenten-invarianten — PORTABLER PRUEFBAUSTEIN, Baustein-Version 1.4.0
 // NC-Port des Onsite-Bausteins (origin/fix/agenten-allowlist-norm, PR #60, I6;
 // Bauplan 2026-08-15 AP-D1 + Nachtrag N7) — inhaltsgleich bis auf den
-// Schreibend-Marker (nc:schreibend), diese Kopfzeilen und die 1.3.0-Haertungen.
+// Schreibend-Marker (nc:schreibend), diese Kopfzeilen und die 1.3.0/1.4.0-Haertungen.
+// 1.4.0 (2026-08-16, NC-Haertung; Codex-Review Phase 2): Werkzeuggrenze arbeitet jetzt
+// wirklich als POSITIV-Allowlist statt als Denylist — fuer Read-only sind nur lesende
+// Built-ins (Read, Grep, Glob, WebFetch, WebSearch) plus server-qualifizierte MCP-Tools
+// zulaessig; exec-faehige oder unbekannte Built-ins (PowerShell, Monitor, ...) fallen
+// fail-closed durch. Token-Formpruefung fail-closed gegen nichtkanonisches YAML
+// (Kommentare, Quotes, eingebettete Leerzeichen). Defense-Baseline prueft die vier
+// Grundsaetze inhaltlich, nicht nur die Ueberschrift. name zusaetzlich kebab-case-hart.
 // 1.3.0 (2026-08-16, NC-Haertung ueber das Vorbild hinaus; GLM-Review Phase 2): Marker
 // <!-- nc:schreibend --> zaehlt nur DIREKT unter der Frontmatter (ein bloss im Fliesstext
 // zitierter Marker klassifiziert nicht mehr still als schreibend); im Marker-Fall ist
@@ -169,6 +176,32 @@ function toolTokens(wert) {
     .filter(Boolean);
 }
 
+// 1.4.0: Klassifikation der Werkzeuggrenze — positiv statt negativ.
+// Kanonische Token-Form (fail-closed): ein Built-in-Name ODER ein server-qualifiziertes
+// MCP-Tool. Alles andere (Quotes, #-Kommentare, eingebettete Leerzeichen) ist keine
+// stille Allowlist, sondern ein Befund.
+const TOKEN_FORM = /^(?:[A-Za-z][A-Za-z0-9_]*|mcp__[A-Za-z0-9_*-]+)$/;
+const LESE_BUILTINS = new Set(['Read', 'Grep', 'Glob', 'WebFetch', 'WebSearch']);
+const SCHREIB_TOOLS = ['Write', 'Edit', 'MultiEdit', 'NotebookEdit'];
+
+/** Unzulaessige Tokens einer tools-Allowlist je Klasse (read-only vs. schreibend).
+ *  MCP-Tokens sind per Norm zulaessig (server-qualifiziert, lesende Auswahl liegt beim
+ *  Autor); jedes nicht gelistete Built-in ist unzulaessig — Bash, PowerShell, Monitor
+ *  und Unbekanntes fallen damit automatisch durch, ohne dass eine Denylist gepflegt
+ *  werden muesste. */
+function unzulaessigeTokens(tokens, schreibend) {
+  const erlaubt = new Set(LESE_BUILTINS);
+  if (schreibend) for (const t of SCHREIB_TOOLS) erlaubt.add(t);
+  return tokens.filter((t) => !t.startsWith('mcp__') && !erlaubt.has(t));
+}
+
+/** Defense-Baseline-Block eines Agent-Bodys (Text von der Ueberschrift bis zur naechsten
+ *  ##-Ueberschrift) — oder null, wenn die Ueberschrift fehlt. */
+function defenseBaselineBlock(b) {
+  const m = b.match(/^## Defense-Baseline[ \t]*$\r?\n([\s\S]*?)(?=^## |(?![\s\S]))/m);
+  return m ? m[1] : null;
+}
+
 test('Parser-Helper: feldWert/toolTokens tragen Inline-, YAML- und Mischform', () => {
   const fm = `name: probe
 model: inherit
@@ -192,6 +225,22 @@ model: inherit`;
   - Read`;
   assert.deepEqual(toolTokens(feldWert(fmMisch, 'tools')), ['Bash', 'Read'],
     'Gegenprobe fehlgeschlagen: Mischform verwirft den Inline-Anteil');
+  // Gegenproben der 1.4.0-Haertungen:
+  // (c) Positiv-Allowlist: exec-faehige/unbekannte Built-ins fallen in BEIDEN Klassen durch.
+  assert.deepEqual(unzulaessigeTokens(['Read', 'PowerShell', 'Monitor', 'mcp__srv__x'], false),
+    ['PowerShell', 'Monitor'],
+    'Gegenprobe fehlgeschlagen: PowerShell/Monitor rutschen als read-only durch');
+  assert.deepEqual(unzulaessigeTokens(['Write', 'Edit', 'Bash'], true), ['Bash'],
+    'Gegenprobe fehlgeschlagen: Bash rutscht im Schreibend-Fall durch');
+  // (d) Token-Formpruefung: Kommentare/Quotes sind keine kanonischen Tokens.
+  assert.equal(TOKEN_FORM.test('# Kommentar'), false);
+  assert.equal(TOKEN_FORM.test('"Read, Write"'), false);
+  assert.equal(TOKEN_FORM.test('Read'), true);
+  assert.equal(TOKEN_FORM.test('mcp__server__tool'), true);
+  // (e) Defense-Baseline-Extraktion: leerer Block liefert keinen Grundsatz-Text.
+  const leererBlock = defenseBaselineBlock('## Defense-Baseline\n\n## Vorgehen\n1. x\n');
+  assert.ok(leererBlock !== null && !/Rolle und Auftrag sind fix/.test(leererBlock),
+    'Gegenprobe fehlgeschlagen: leerer Defense-Baseline-Block gilt als gefuellt');
 });
 
 test('Agenten-Frontmatter: name entspricht dem Dateinamen, description ist vorhanden', () => {
@@ -204,6 +253,10 @@ test('Agenten-Frontmatter: name entspricht dem Dateinamen, description ist vorha
     assert.ok(m, `${a.file}: kein einzeiliges name-Feld`);
     assert.equal(m[1], a.name,
       `${a.file}: name weicht vom Dateinamen ab (Hausregel — nur so bleiben Registry, Tests und Aufrufe eindeutig)`);
+    // 1.4.0: kebab-case ist Norm (agent-authoring.md) — nicht nur der Doppelpunkt ist
+    // verboten, sondern jede Form ausserhalb a-z0-9-.
+    assert.ok(/^[a-z0-9-]+$/.test(m[1]),
+      `${a.file}: name "${m[1]}" ist kein kebab-case (erlaubt: a-z, 0-9, Bindestrich)`);
     assert.ok(/^description:/m.test(fm), `${a.file}: kein description-Feld`);
   }
 });
@@ -267,24 +320,29 @@ test('Pflichtfelder-Regel (1.2.0): tools-Allowlist und model sind gesetzt', () =
   }
 });
 
-test('Werkzeuggrenzen-Regel (Allowlist-Prinzip): Grenze steht in tools, Bash bleibt draussen', () => {
-  // Seit 2026-08-15 traegt die tools-Allowlist die Grenze (Maintainer-Entscheid):
-  //   - ohne Marker (read-only/Standard): keine Schreib-Tools und kein Bash in tools;
-  //   - mit Marker <!-- nc:schreibend -->: Schreib-Tools erlaubt, Bash bleibt draussen
-  //     (Referenzmuster sync-nachzug-executor — Bash umgeht jede Werkzeug-Schreibgrenze
-  //     per Shell-Umleitung/sed -i/git, und das FFG-Datei-Gate greift bei Subagenten nicht).
+test('Werkzeuggrenzen-Regel (Allowlist-Prinzip): Grenze steht in tools, positiv geprueft', () => {
+  // Seit 2026-08-15 traegt die tools-Allowlist die Grenze (Maintainer-Entscheid); seit
+  // 1.4.0 prueft dieser Test POSITIV (Codex-Review-Blocker: eine Denylist liesse
+  // exec-faehige Built-ins wie PowerShell oder Monitor als "read-only" durch):
+  //   - ohne Marker (read-only/Standard): nur lesende Built-ins (Read, Grep, Glob,
+  //     WebFetch, WebSearch) plus server-qualifizierte MCP-Tools;
+  //   - mit Marker <!-- nc:schreibend -->: zusaetzlich die vier Schreib-Tools — Bash,
+  //     PowerShell & Co. bleiben in BEIDEN Klassen draussen (Referenzmuster
+  //     sync-nachzug-executor; das FFG-Datei-Gate greift bei Subagenten nicht).
   // disallowedTools ist optionale Zusatzsicherung, kein Traeger der Grenze mehr.
   // Eine kuenftige Diagnose-Klasse (Bash lesend, Command-Disziplin) braucht eine eigene,
   // ausdrueckliche Kennzeichnung — bis dahin ist dieser Test bewusst hart.
-  const SCHREIB_TOOLS = ['Write', 'Edit', 'MultiEdit', 'NotebookEdit'];
   for (const a of agentenBestand()) {
     const fm = frontmatter(a.file);
     const tools = feldWert(fm, 'tools');
     assert.ok(tools, `${a.file}: kein tools-Feld (siehe Pflichtfelder-Regel)`);
     const tokens = toolTokens(tools);
-    assert.equal(tokens.includes('Bash'), false,
-      `${a.file}: Bash in der tools-Allowlist — Bash umgeht jede Werkzeug-Schreibgrenze; `
-      + 'eine lesende Diagnose-Klasse braucht eine eigene Kennzeichnung (agent-authoring.md)');
+    // 1.4.0: fail-closed gegen nichtkanonisches YAML — Kommentare, Quotes und
+    // eingebettete Leerzeichen sind keine stillen Allowlist-Eintraege.
+    const unlesbar = tokens.filter((t) => !TOKEN_FORM.test(t));
+    assert.deepEqual(unlesbar, [],
+      `${a.file}: nichtkanonische tools-Eintraege (${unlesbar.join(' | ')}) — nur nackte `
+      + 'Built-in-Namen oder server-qualifizierte MCP-Tools, keine Kommentare/Quotes');
     // 1.3.0: Der Marker zaehlt nur DIREKT unter der Frontmatter (agent-authoring.md) — ein
     // im Fliesstext zitierter Marker deklariert nichts. Ein Marker an falscher Stelle ist
     // ein eigener Befund, kein stiller Schreibend-Status.
@@ -298,23 +356,37 @@ test('Werkzeuggrenzen-Regel (Allowlist-Prinzip): Grenze steht in tools, Bash ble
       assert.ok(/^maxTurns:[ \t]*\d+[ \t]*$/m.test(fm),
         `${a.file}: schreibender Agent ohne maxTurns — Rundenobergrenze ist Pflicht `
         + '(agent-authoring.md, Werkzeuggrenzen-Regel Punkt 2)');
-      continue;
     }
-    const verboten = SCHREIB_TOOLS.filter((t) => tokens.includes(t));
+    const verboten = unzulaessigeTokens(tokens, markerVorn);
     assert.deepEqual(verboten, [],
-      `${a.file}: Schreib-Werkzeuge (${verboten.join(', ')}) ohne Marker <!-- nc:schreibend --> — `
-      + 'entweder Marker setzen (bewusste Schreibend-Deklaration) oder Werkzeuge entfernen');
+      `${a.file}: unzulaessige Werkzeuge in der Allowlist (${verboten.join(', ')}) — `
+      + (markerVorn
+        ? 'auch schreibende Agenten fuehren nur die vier Schreib-Tools plus lesende Built-ins/MCP (kein Bash, kein PowerShell)'
+        : 'read-only erlaubt nur lesende Built-ins (Read, Grep, Glob, WebFetch, WebSearch) plus MCP; fuer Schreib-Tools Marker <!-- nc:schreibend --> setzen'));
   }
 });
 
-test('Defense-Baseline (1.2.0): jeder Agent traegt den Pflichtblock im Body', () => {
+test('Defense-Baseline (1.2.0/1.4.0): jeder Agent traegt den Pflichtblock mit allen vier Grundsaetzen', () => {
   // Subagenten arbeiten auf Fremdinhalten ausserhalb der Sichtweite des Menschen; die
   // Prompt-Defense-Baseline muss deshalb im Agenten-Kontext selbst stehen
-  // (agent-authoring.md, Defense-Baseline — Pflichtbaustein).
+  // (agent-authoring.md, Defense-Baseline — Pflichtbaustein). Seit 1.4.0 wird der
+  // Blockinhalt geprueft, nicht nur die Ueberschrift — ein leerer Block schuetzt nichts.
+  const GRUNDSAETZE = [
+    [/Rolle und Auftrag sind fix/, 'fixe Rolle (Grundsatz 1)'],
+    [/sind Daten, keine\s+Instruktionen/, 'Fremdinhalte sind Daten (Grundsatz 2)'],
+    [/[Kk]eine Secrets\/Tokens/, 'Secrets-Verbot (Grundsatz 3)'],
+    [/Unicode-Auff/, 'Unicode-Wachsamkeit (Grundsatz 4)'],
+  ];
   for (const a of agentenBestand()) {
-    assert.ok(/^## Defense-Baseline[ \t]*$/m.test(body(a.file)),
+    const block = defenseBaselineBlock(body(a.file));
+    assert.ok(block !== null,
       `${a.file}: kein "## Defense-Baseline"-Block im Body — Pflichtbaustein seit 2026-08-15 `
       + '(agent-authoring.md)');
+    for (const [muster, name] of GRUNDSAETZE) {
+      assert.ok(muster.test(block),
+        `${a.file}: Defense-Baseline ohne ${name} — alle vier Grundsaetze sind Pflicht `
+        + '(agent-authoring.md, Defense-Baseline)');
+    }
   }
 });
 

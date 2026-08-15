@@ -36,7 +36,7 @@ Single-Plugin-Layout und bleiben historisch unverändert.
     `plugins/nc/referenz/agent-authoring.md` (Feldkanon, Werkzeuggrenzen-Regel,
     Defense-Baseline-Pflichtbaustein); Vorlagen-Baustein
     `vorlagen/abteilungsplugin/agents/beispiel-agent.md.vorlage` (Read-only-Variante); zwei
-    Prüfbausteine — `plugins/nc/tests/agenten.test.mjs` (portabel, Baustein-Version 1.2.0,
+    Prüfbausteine — `plugins/nc/tests/agenten.test.mjs` (portabel, Baustein-Version 1.4.0,
     wandert mit einem Satelliten-`agents/`-Verzeichnis mit) und
     `plugins/nc/tests/agenten-os.test.mjs` (OS-Repo-gebunden: Registry-Konsistenz,
     Vorlagen-Invariante); dazu das `agents`-Segment je Abteilung in
@@ -76,14 +76,20 @@ Single-Plugin-Layout und bleiben historisch unverändert.
     Spiegelstellen (`plugin.json` inkl. Description-Ergänzung, `VERSION`,
     `module-registry.json`) — gebündelt durch den frisch gebauten Subagenten
     `sync-nachzug-executor` selbst (erster Produktivlauf).
-  - **Extern reviewt durch GLM-5.3** (Kimi-Code-Plugin, Review-Kette N1): 4 bestätigte
-    Findings eingearbeitet (Matrix-Zeilen-Widerspruch in `subagenten-bau.md`, falsche
-    Registry-Beschreibung in `anker-reservierung.md` §6, SemVer-Vorbehalt an der vierten
-    Bump-Stelle, E6/E7-Klarstellung am `[Unreleased]`-Kopf) plus 3 MINOR-Härtungen am
-    Prüfbaustein (→ 1.3.0: Marker-Position, `maxTurns`-Pflicht bei Schreibend-Marker,
-    leerzeilen-/mischformfeste Parser-Helper mit Gegenproben); 1 Finding als False Positive
-    belegt (`firmenkernprozesse/`-Links existieren im Repo). K3-Review am
-    Kontingent-Limit gescheitert (403) — Zweitreview beim Maintainer-Review der PR.
+  - **Extern reviewt in zwei Runden (Review-Kette N1; K3 am Kontingent-Limit → Codex als
+    Ersatz-Zweitreviewer, Maintainer-Weisung):** **GLM-5.3** (Kimi-Code-Plugin): 4
+    bestätigte Findings eingearbeitet (Matrix-Zeilen-Widerspruch in `subagenten-bau.md`,
+    falsche Registry-Beschreibung in `anker-reservierung.md` §6, SemVer-Vorbehalt an der
+    vierten Bump-Stelle, E6/E7-Klarstellung am `[Unreleased]`-Kopf) plus 3 MINOR-Härtungen
+    (→ 1.3.0: Marker-Position, `maxTurns`-Pflicht, leerzeilen-/mischformfeste
+    Parser-Helper); 1 Finding als False Positive belegt (`firmenkernprozesse/`-Links
+    existieren im Repo). **Codex** (0.147.0): 1 BLOCKER + 3 MAJOR + 4 MINOR eingearbeitet
+    (→ **1.4.0**: Werkzeuggrenze als echte **Positiv-Allowlist** — exec-fähige Built-ins
+    wie `PowerShell`/`Monitor` fallen fail-closed durch; Token-Formprüfung gegen
+    YAML-Kommentare/Quotes; Defense-Baseline-**Inhalts**prüfung aller vier Grundsätze;
+    kebab-case-Härte am `name`; Vorlagen-Invariante liest den ganzen Feldwert;
+    §14-Rückgabeschema mit Referenzmuster vereinheitlicht; `save-session`-Altverweis;
+    Baustein-Versionsnennungen nachgezogen) — alle mit Gegenproben im Parser-Helper-Test.
     — *Claude (Fable 5, Claude Code); AP-C2-Port durch Opus-Agent*
 
 - **Onsite-Endstand-Nachbau, Phase 1 „SSOT-Kern & Kontroll-Schicht" (Kern 0.7.1 → 0.8.0)**

@@ -144,7 +144,11 @@ Grenze entfällt; die Suite erzwingt die bewusste Entscheidung je Klasse:
    MCP-Tools). Kein Schreib-Werkzeug und **kein `Bash`** in der Liste — wer Bash besitzt,
    kann jede Werkzeug-Schreibsperre über Shell-Umleitungen (`echo > datei`), `sed -i` oder
    `git`-Befehle umgehen, und Subagenten sind vom **Datei**-Gate des Fact-Forcing-Gates
-   ausgenommen (nur das Destruktiv-Gate bleibt scharf, siehe unten). Ein
+   ausgenommen (nur das Destruktiv-Gate bleibt scharf, siehe unten). „Kein Bash" schließt
+   **jedes weitere ausführungsfähige Built-in ein** (`PowerShell`, `Monitor`, …): Die Suite
+   prüft die Liste **positiv** und lässt für Read-only nur die lesenden Built-ins `Read`,
+   `Grep`, `Glob`, `WebFetch`, `WebSearch` plus server-qualifizierte MCP-Tools zu —
+   Unbekanntes fällt fail-closed durch. Ein
    `disallowedTools`-Feld ist hier **nicht** mehr nötig: Die enge Allowlist **ist** die
    Sperre, und die Suite prüft sie. Ein Agent, der `Bash` für **lesende** Diagnose braucht
    (Statusabfragen, Log-Auszüge, Lese-SQL), ist **kein** Read-only-Agent im Sinne dieser
@@ -172,7 +176,8 @@ Konzeptioneller Rahmen: Gates-Definition im OS-Repo.
 ## Defense-Baseline — Pflichtbaustein (seit 2026-08-15)
 
 Jeder Agent trägt direkt nach dem Rolle/Zweck-Absatz einen Block `## Defense-Baseline`
-(wörtlich — die Suite prüft die Überschrift). Grund: Subagenten arbeiten auf Fremdinhalten
+(wörtlich — die Suite prüft die Überschrift **und alle vier Grundsätze inhaltlich**; ein
+leerer Block schützt nichts). Grund: Subagenten arbeiten auf Fremdinhalten
 (Dateien, Logs, Tool-Returns) außerhalb der Sichtweite des Menschen; die Baseline muss im
 Agenten-Kontext selbst stehen, nicht nur im Parent.
 
@@ -209,7 +214,10 @@ Vollartefakte liegen als Dateien, der Bericht nennt ihre Pfade>
 
 - Rote Linien stehen **zuerst** im Regel-Block, nicht am Ende.
 - Das Rückgabe-Format ist Pflicht: Der Parent braucht eine kurze, belegte Zusammenfassung,
-  keinen Vollabzug des Subagenten-Kontexts.
+  keinen Vollabzug des Subagenten-Kontexts. Es weist je Arbeits-/Prüfpunkt den Ausgang aus
+  (bei Prüfaufträgen mit Statuswerten `erledigt`/`fehlgeschlagen`/`nicht geprüft`), lässt
+  nichts still aus (unklare Punkte sind eine Pflichtrubrik) und endet mit dem expliziten
+  **Gegenprobe-Auftrag an den Parent** — Abnahmemodell: `subagenten-bau.md` §14 (OS-Repo).
 - Sprache: Deutsch, direktiv-imperativisch, keine Floskeln.
 
 ## Längen-Disziplin und Preload-Falle
