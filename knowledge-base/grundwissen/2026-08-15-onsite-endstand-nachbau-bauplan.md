@@ -557,6 +557,50 @@ Platte geprüft): der `ssot-provision.js`-Aufruf trägt im Original den vollen
 `/nc:update-doks` (Maintainer-Reparatur/Konsistenzlauf) sind zwei verschiedene, beide
 existierende Skills.
 
+### N6 — Firmenspezifikation aus der Maintainer-Befragung (2026-08-15, nach Merge PR #19)
+
+Phase 1 ist gemergt (PR #19, `main@82ba963`). Für die Anpassung an die reale Firma wurden
+die firmenspezifischen Slots des Vorbilds per Befragung erhoben — **normative Grundlage
+für Phase 2/3**, die die generischen Mapping-Regeln in §2 konkretisiert:
+
+- **Team & Review-Kette:** drei Personen — Maintainer (CEO/CTO, Admin: Abnahme + Merge)
+  und zwei Devs mit PR-Recht (Feld 1: Design/Frontend/UX · Feld 2: Automatisierung/
+  Hardware/Prozessoptimierung). Kette: Dev implementiert → zweiter Dev bzw. Agenten-Review
+  (Opus/K3/GLM, Implementierer ≠ Reviewer) → Admin nimmt ab und merged.
+  **Public-Repo-Regel:** ausgelieferte Payloads tragen **Rollen, keine Klarnamen**
+  (Abweichung vom privaten Vorbild-Repo, I9).
+- **Werkzeuge:** GitHub-Organisation `NovaCore-AI` (Repos, Issues, PRs, Actions-CI) +
+  Atlassian **Jira** mit **Zwei-Stufen-Regel** (Lesen frei · Stufe 1
+  Transitionen/Felder nur mit Einzelfreigabe · Stufe 2 kundensichtbare Freitexte nur
+  Mensch). *Offen: Jira-Projekt-Key(s) nachreichen.* Confluence wird künftig durch das
+  „Firmenkernwissen" gefüllt → `firmenwissen-suche` bleibt zurückgestellt (E5 bestätigt).
+- **Verteilung:** Claude-**Team-Workspace vorhanden**, Maintainer ist Admin — Ebene 0
+  (Org-Instructions) ist bespielbar; `team-distribution.md` (Phase 2) beschreibt den
+  Workspace-Weg + die Marketplace-Installation übers öffentliche Repo. Ebene-0-Textentwurf
+  liefert Phase 2 zur Freigabe.
+- **Sprachregeln (Onsite-Muster):** In Arbeits-/Kundenrepos sind Code-Artefakte
+  (Branches, Commits, PR-Titel/-Texte, Code-Kommentare) **englisch**, Kommunikation/
+  Tickets/Doku **deutsch**; das OS-Repo selbst bleibt durchgängig deutsch (Bestand).
+- **Abteilungs-Roadmap:** intern `development` (Bestand) + **reserviert**: `ui-ux` und
+  `automation` — zunächst nur Namens-/Registry-Reservierung (Anker in Phase 2), Bau bei
+  Bedarf. Affiliate-/Kollegen-OS (Felix, Biggi) unverändert isoliert (E1/I8).
+- **Queue-Betrieb (Phase 3):** **14-tägiger** Rhythmus, 14-Tage-Fälligkeits-Hook,
+  +1 Tag Versatz zwischen den Stationen; Kurator/Merger beider Stationen = Admin, Devs
+  stellen die Abteilungs-PRs.
+- **Produktivsystem:** **WZS** (Empfehlungssystem) ist das reale Kundenprodukt — Deploys,
+  DB-Eingriffe und Webhook-Änderungen dort sind Mensch-only rote Linien (Payload/Ebene 2,
+  Phase 2/3); die `wzs-*`-Invarianten-Skills bleiben deren Referenz. *Offen:
+  Deploy-Mechanik-Details nachreichen.*
+- **E7 — Release-Politik (ersetzt die Empfehlung in E6-Ausführung):** Tag + GitHub-Release
+  erst **nach Abschluss des Gesamtumbaus**, nicht je Phase; die Kern-Bumps je Phase (E6)
+  bleiben. Bewusste Folge für die Umbauzeit: `main` trägt ungetaggte Versionen, das
+  Team-Auto-Update greift erst mit dem End-Release — der Struktur-Test klammert die
+  jüngste Version aus, ältere ungetaggte Zwischenstände sind vor dem End-Release
+  gesammelt zu taggen oder der Test entsprechend zu behandeln (Phase-2-Prüfpunkt).
+- **Weitere offene Punkte:** GLM-5.3-Review wartet auf erneuerten z.ai-Key in
+  `~/.kimi-code/config.toml` (`[providers.zai-coding-plan] api_key`) · Livetests
+  Reconciler/PreCompact (Maintainer).
+
 ---
 
 *Angelegt 2026-08-15 durch Claude (Fable 5, Claude Code) auf Weisung Lucas Vöhringer.
