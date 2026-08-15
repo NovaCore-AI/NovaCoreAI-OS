@@ -140,7 +140,7 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   **Bewusst ausgeschlossen:** Queue-Logik/SSOT-Abstufung des Vorbilds und jeder
   Memory-Share zwischen Satelliten (Maintainer-Entscheid; siehe SSOT-Definition).
 - **Gebaut (Kern v0.7.0, 2026-08-11): Prozesskorpus-Nachzug** nach Bauplan
-  `grundwissen/2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md` (AP1–AP5).
+  `grundwissen/2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md` (AP1–AP5, AP10).
   Aus `plugin-bau.md` wurden **vier** Standardprozesse: `kern-plugin-bau.md` (Scope,
   **Governance-Zwei-Schichten-Tabelle §1a**,
   **Autosync-Standardprozess §2a**, Mindest-Client-Schwellen), `abteilungs-plugin-bau.md`
@@ -156,6 +156,10 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   **Nachtrag N4:** Die Git-Historie des alten `plugin-bau.md` hängt an **keiner** der beiden
   Hälften — Vorgeschichte über den alten Pfad lesen
   (`git log --oneline -- knowledge-base/standardprozesse/plugin-bau.md`).
+  **AP10 nachgezogen (2026-08-12):** Der Satellit `nc-felix` ist als **0.4.1** annotiert getaggt
+  und released; der Marketplace-Pin steht auf `ref: v0.4.1` + Full-SHA `ed41f22…`, Registry- und
+  README-Statuszeile, Gates-Definition und `ONBOARDING.md` sind nachgezogen — **beide** Satelliten
+  tragen jetzt Gate 1 **und** Gate 2, markerlos.
   Minor-Bump, weil neue normative Prozesse hinzukommen.
 - **Gebaut (Kern v0.6.1, 2026-08-11):** `/nc:setup` heilt **Sparse-Relikte der
   Erstfassung** — eine unveränderte Sparse-Kopie wird vor dem Pull per

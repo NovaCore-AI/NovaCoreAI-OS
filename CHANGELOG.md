@@ -188,13 +188,25 @@ Single-Plugin-Layout und bleiben historisch unverändert.
     Installationsdialog. Korrigiert, kein zusätzlicher Bump nötig (0.7.0 ist Teil dieses Zyklus).
   — *Claude (Opus 5, Review-Agent)*
 
-### Offen bis zum Merge
+### Changed — AP10: Satelliten-Pin auf das Felix-Release
 
-- **AP10** (Marketplace-Pin auf den neuen Felix-Stand, Registry-Statuszeile, Gates-Definition)
-  steht noch aus: Er setzt ein **echtes Felix-Release** voraus — Tag und Release liegen beim
-  Maintainer, nicht beim Agenten.
-- Der Satellit `nc-felix` steht auf **0.4.0** (Gate 2, eigene Wissensbasis, CI/Release), ist
-  aber noch nicht getaggt; der Pin zeigt weiterhin auf `v0.2.1`.
+- **`nc-felix` von `v0.2.1` auf `v0.4.1` umgepinnt** — `ref: v0.4.1` plus Full-SHA
+  `ed41f224a7451736ad1504f221c1c5b44e2ea20c`. Laut offizieller `plugin-marketplaces`-Doku ist bei
+  gesetztem `ref` **und** `sha` der **`sha` der wirksame Pin**; der `ref` bleibt als lesbare
+  Herkunft stehen. Die Vorbedingung aus AP10 ist erfüllt: Der Satellit ist am 2026-08-12 als
+  **0.4.1** annotiert getaggt (`ed41f22`) und das Release ist erzeugt — Tag und Freigabe lagen wie
+  vorgesehen beim Maintainer. **Ohne dieses Umpinnen hätte das Team weiterhin 0.2.1 installiert.**
+- **Mitgezogen, wie der Aktualisierungs-Index für „Satellit aktualisiert" (Zeile 65) und
+  „Satelliten-Hook/Gate geändert" (Zeile 71) verlangt:** Marketplace-Beschreibung auf den
+  Ist-Stand (sieben Kernmodul-Skills inklusive `doku-sync`, Gate 1 **und** Gate 2 markerlos,
+  eigene isolierte Wissensbasis) — das Team liest diesen Text im Installationsdialog;
+  Registry-Statuszeile und Modul-Skillliste; `README.md`-Statuszeile auf v0.4.1;
+  `AGENTS.md`-Produktstand (v0.7.0-Block, AP10); `NovaCore-OS-Gates-Definition.md`, wo der
+  Satelliten-Abschnitt bisher „Biggi zusätzlich Gate 2" sagte — **beide** Satelliten tragen es
+  jetzt. In `ONBOARDING.md` entfällt an **zwei** Stellen die Marker-Ausnahme des Felix-OS: sie
+  behauptete, nur Felix trage noch den marker-gebundenen Begrüßungs-Hook an einer `.nc-os`-Datei
+  — mit 0.4.1 ist Felix markerlos. Reiner Pin-Nachzug, deshalb **kein** Kern-Bump: Version und
+  Release zählen im Satelliten-Repo. — *Claude (Opus 5)*
 
 ## [0.6.1] — 2026-08-11
 

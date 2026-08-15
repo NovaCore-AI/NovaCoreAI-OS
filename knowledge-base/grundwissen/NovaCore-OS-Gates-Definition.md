@@ -72,8 +72,9 @@ Ehrliche Reichweite, damit die Tabelle oben nicht mehr verspricht, als der Code 
 ## Satelliten (Kollegen-OS)
 
 Die eigenständigen Satelliten (`nc-felix`, `nc-biggi`) tragen **eigene Kopien** von Gate 1
-(Biggi zusätzlich Gate 2) in ihren Plugins; sie hängen nicht am Kern. Deshalb gilt:
-**nie parallel zum Kern `nc` betreiben** — sonst feuern die Gates doppelt.
+**und** Gate 2 in ihren Plugins — Felix seit `nc-felix` 0.4.1 (Pin nachgezogen 2026-08-12),
+markerlos wie der Kern; sie hängen nicht am Kern. Deshalb gilt: **nie parallel zum Kern `nc`
+und nie zwei Satelliten gleichzeitig betreiben** — sonst feuern die Gates doppelt.
 
 ---
 
