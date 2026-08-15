@@ -85,58 +85,6 @@ function tokenize(segment) {
   return segment.split(/\s+/).filter(Boolean);
 }
 
-// Tokenizer fuer allowgelistete Kurzkommandos, der quoted Argumente erhaelt.
-// Bewusst kleiner als ein voller Shell-Parser: der Aufrufer weist
-// Shell-Steuerzeichen vorher ab.
-function tokenizeAllowlistedShellWords(input) {
-  const tokens = [];
-  let current = '';
-  let quote = null;
-  let escaped = false;
-
-  for (const char of String(input || '')) {
-    if (escaped) {
-      current += char;
-      escaped = false;
-      continue;
-    }
-
-    if (char === '\\') {
-      escaped = true;
-      continue;
-    }
-
-    if (quote) {
-      if (char === quote) {
-        quote = null;
-      } else {
-        current += char;
-      }
-      continue;
-    }
-
-    if (char === '"' || char === "'") {
-      quote = char;
-      continue;
-    }
-
-    if (/\s/.test(char)) {
-      if (current) {
-        tokens.push(current);
-        current = '';
-      }
-      continue;
-    }
-
-    current += char;
-  }
-
-  if (escaped) current += '\\';
-  if (quote) return null;
-  if (current) tokens.push(current);
-  return tokens;
-}
-
 // Fuehrenden Pfad und `.exe` abstreifen: `/usr/bin/git`, `git.exe`, `GIT` → `git`.
 function commandBasename(token) {
   if (!token) return '';
@@ -475,35 +423,60 @@ function isDestructiveBash(command) {
   return false;
 }
 
-// Read-only-Allowlist: reine Git-Introspektion (status/log/diff/show/branch/
+// Read-only-Allowlist: reine Git-Introspektion (status/log/diff/show/branch/worktree list/
 // rev-parse in engen Formen) wird nie gegated — weder destruktiv noch routine.
-function isReadOnlyGitIntrospection(command) {
-  const trimmed = String(command || '').trim();
-  if (!trimmed || /[\r\n;&|><`$()]/.test(trimmed)) {
-    return false;
+// Erweiterung 2026-08-14 (Bugfix, Bugreport Linux-Session): das Start-Gate blockte seinen
+// eigenen Pflicht-Einstieg, sobald der Befehl einen Pfadwechsel (`cd … && git …`,
+// `git -C <dir> …`) oder eine Verkettung read-only-Kommandos enthielt, und kannte
+// `git worktree list` (Pflicht-Einstieg laut AGENTS.md) gar nicht. Die Pruefung laeuft
+// jetzt SEGMENTweise: die Kommandozeile wird quote-aware an unquoted `;`, `&` und
+// Zeilenumbruechen zerlegt, und JEDES Segment muss zulaessig sein — entweder ein reiner
+// Pfadwechsel oder ein allowlistetes Git-Kommando. Pipes, Redirects, Substitutionen und
+// Klammer-Gruppen bleiben hart ausgeschlossen (unquoted-Scan); das Subkommando wird ueber
+// findGitSubcommand ermittelt, damit globale Optionen (`-C <dir>`, `--git-dir=…`) vor dem
+// Subkommando stehen duerfen.
+
+// Unquoted verbotene Zeichen: Pipes, Redirects, Command-Substitution und
+// Subshell-/Brace-Klammern — in Quotes sind sie Daten, ausserhalb Steuerung.
+function hasForbiddenUnquotedChar(input) {
+  const s = String(input || '');
+  let quote = null;
+  let escaped = false;
+  for (let i = 0; i < s.length; i += 1) {
+    const ch = s[i];
+    if (escaped) { escaped = false; continue; }
+    if (ch === '\\') { escaped = true; continue; }
+    if (quote) {
+      if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'") { quote = ch; continue; }
+    if (ch === '|' || ch === '<' || ch === '>' || ch === '`' || ch === '(' || ch === ')') return true;
+    if (ch === '$' && s[i + 1] === '(') return true;
+  }
+  return false;
+}
+
+// Ein einzelnes Segment: reiner Pfadwechsel (`cd <pfad>`, genau ein Argument, keine
+// Flags) oder ein allowlistetes read-only Git-Kommando.
+function isReadOnlySegment(words) {
+  const base = commandBasename(words[0]);
+  if (base === 'cd') {
+    return words.length === 2 && !words[1].startsWith('-');
+  }
+  if (base !== 'git') return false;
+
+  const sub = findGitSubcommand(words);
+  if (!sub) return false;
+  const args = sub.rest;
+
+  if (sub.command === 'status') {
+    // Lange Formen sowie kombinierte Kurzflags aus {s, b} (`-s`, `-b`, `-sb`, `-bs`).
+    return args.every(arg =>
+      ['--porcelain', '--short', '--branch'].includes(arg) || /^-[sb]+$/.test(arg));
   }
 
-  const segments = splitCommandSegments(trimmed);
-  if (segments.length !== 1) {
-    return false;
-  }
-
-  const tokens = tokenizeAllowlistedShellWords(trimmed);
-  if (!tokens) {
-    return false;
-  }
-  if (commandBasename(tokens[0]) !== 'git' || tokens.length < 2) {
-    return false;
-  }
-
-  const subcommand = tokens[1].toLowerCase();
-  const args = tokens.slice(2);
-
-  if (subcommand === 'status') {
-    return args.every(arg => ['--porcelain', '--short', '--branch'].includes(arg));
-  }
-
-  if (subcommand === 'diff') {
+  if (sub.command === 'diff') {
     // `git diff` ohne Argumente ist reine Introspektion; erlaubte Flags nach
     // Upstream-Stand: --name-only, --name-status, --cached, --staged, --stat.
     const allowedDiffArgs = new Set(['--name-only', '--name-status', '--cached', '--staged', '--stat']);
@@ -511,14 +484,14 @@ function isReadOnlyGitIntrospection(command) {
     return args.length <= 2 && args.every(arg => allowedDiffArgs.has(arg));
   }
 
-  if (subcommand === 'log') {
+  if (sub.command === 'log') {
     // `-N` (z. B. -10) ergaenzt 2026-08-10 (Bauplan Onsite-Align-Umbau, AP1): die Kurzform
     // ist der in AGENTS.md dokumentierte Pflicht-Einstieg (`git log --oneline -10`) und
     // rein lesend.
     return args.every(arg => arg === '--oneline' || /^--max-count=\d+$/.test(arg) || /^-\d+$/.test(arg));
   }
 
-  if (subcommand === 'show') {
+  if (sub.command === 'show') {
     // Erlaubt: `git show <ref>`, `git show --stat|--name-only`,
     // `git show <ref> --stat|--name-only` (Upstream-Stand).
     if (args.length === 0) return false;
@@ -532,11 +505,11 @@ function isReadOnlyGitIntrospection(command) {
     return false;
   }
 
-  if (subcommand === 'branch') {
+  if (sub.command === 'branch') {
     return args.length === 1 && args[0] === '--show-current';
   }
 
-  if (subcommand === 'rev-parse') {
+  if (sub.command === 'rev-parse') {
     // Erlaubt: `--abbrev-ref HEAD` (Branch) sowie seit 2026-08-10 (Bauplan Onsite-Align-
     // Umbau, AP1) `--short HEAD` und blankes `HEAD` (Commit-Hash) — die Formen des
     // Fakten-Stempels aus Gate 2, rein lesend.
@@ -545,7 +518,24 @@ function isReadOnlyGitIntrospection(command) {
     return args.length === 1 && /^head$/i.test(args[0]);
   }
 
+  if (sub.command === 'worktree') {
+    // `git worktree list` ist Teil des Pflicht-Einstiegs (AGENTS.md) und rein lesend;
+    // alle anderen worktree-Subkommandos (add/remove/…) bleiben gegated.
+    return args.length === 1 && args[0] === 'list';
+  }
+
   return false;
+}
+
+function isReadOnlyGitIntrospection(command) {
+  const trimmed = String(command || '').trim();
+  if (!trimmed || hasForbiddenUnquotedChar(trimmed)) {
+    return false;
+  }
+  const segments = quoteAwareSegments(trimmed);
+  // Leere Kommandozeile (nur Trenner) ist keine Introspektion; jedes Segment muss
+  // zulaessig sein — ein einziges fremdes Segment kippt den Durchlass.
+  return segments.length > 0 && segments.every(isReadOnlySegment);
 }
 
 module.exports = { isDestructiveBash, isReadOnlyGitIntrospection };

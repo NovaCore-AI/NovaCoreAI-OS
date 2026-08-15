@@ -92,6 +92,31 @@ test('Read-only-Git-Introspektion bleibt frei (sie IST der Pflicht-Einstieg)', (
   }
 });
 
+// Bugfix 2026-08-14 (Bugreport Linux-Session): das Gate blockte den eigenen
+// Pflicht-Einstieg, sobald der Befehl einen Pfadwechsel oder eine Verkettung
+// read-only-Kommandos enthielt — nur nacktes `git status` im cwd ging durch.
+test('Read-only-Git mit Pfadwechsel und Verkettung bleibt frei', () => {
+  const state = stateDir();
+  for (const command of [
+    'cd /tmp/irgendwo && git status',
+    'git -C /tmp/irgendwo status',
+    'git -C /tmp/irgendwo log --oneline -10',
+    'git status && git log --oneline -5',
+    'git worktree list',
+    'git status -sb'
+  ]) {
+    const r = runGate(fixture(), state, { tool: 'Bash', toolInput: { command } });
+    assert.equal(r.stdout, '', command + ' darf nicht gegated werden');
+  }
+});
+
+// Negativkontrolle: schreibendes Git hinter einem Pfadwechsel darf die
+// Read-only-Freistellung nicht mitnehmen.
+test('Schreibendes Git hinter Pfadwechsel bleibt gegated', () => {
+  const grund = denyReason(runGate(fixture(), stateDir(), { tool: 'Bash', toolInput: { command: 'git -C /tmp/irgendwo push' } }));
+  assert.match(grund, /\[Start-Gate\]/);
+});
+
 test('Beliebige andere Bash wird vor dem Stempel abgelehnt', () => {
   const grund = denyReason(runGate(fixture(), stateDir(), { tool: 'Bash', toolInput: { command: 'npm test' } }));
   assert.match(grund, /\[Start-Gate\]/);

@@ -168,6 +168,15 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Sparse-Hinweis gemeldet, nie angefasst. ONBOARDING um den WSL-Hinweis ergänzt („WSL
   zählt als eigener Rechner"). Patch-Bump, weil die Erstfassung im Feld installiert ist —
   ohne Bump erreicht kein Fix ein installiertes Plugin (Bauplan-Nachtrag N2).
+- **Gebaut (Kern v0.7.1, 2026-08-14):** Bugfix der Read-only-Git-Erkennung
+  (`hooks/lib/bash-analyse.js`) — Start-Gate und FFG blockten ihren eigenen
+  Pflicht-Einstieg, sobald der Befehl einen Pfadwechsel (`cd … && git …`,
+  `git -C <dir> …`) oder eine Verkettung read-only-Kommandos enthielt; `git worktree
+  list` (Pflicht-Einstieg) fehlte ganz. Die Erkennung prüft jetzt segmentweise
+  (quote-aware): jedes Segment muss reiner Pfadwechsel oder allowlistetes
+  Git-Kommando sein; Pipes/Redirects/Substitutionen bleiben ausgeschlossen.
+  Negativproben testerzwungen. Folge-Vorgang: die Satelliten-FFG-Kopien
+  (`nc-felix`, `nc-biggi`) tragen denselben Stand — je eigener Fix dort.
 - **Noch nicht gebaut:** Gate 3 (Safety-Gate mit echtem Freigabedialog), Gate 4
   (Sitzungsabschluss als Hook), CLAUDE-Ebene 0 und 2, weitere fe-/be-Skills, Module
   `architecture`/`incident-support`. Übersicht:
