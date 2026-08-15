@@ -48,7 +48,7 @@ sind der wichtigste Hebel gegen lange, ungleichmäßige Reviews. Der Skill läuf
   nicht.
 - Slice-Grenzen nur entlang real vorhandener Strukturen ziehen; Module, Endpunkte oder Tabellen
   nur benennen, wenn sie im Arbeits-Repo belegt sind.
-- Der bestätigte Plan wird von `/nc:save-session` ins Journal übernommen — ihn deshalb in einer
+- Der bestätigte Plan wird von `/nc:end-session` ins Journal übernommen — ihn deshalb in einer
   zitierbaren, nummerierten Form hinterlassen.
 
 ## Verifikation

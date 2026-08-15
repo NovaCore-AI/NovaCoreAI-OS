@@ -12,6 +12,97 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ### Added
 
+- **Onsite-Endstand-Nachbau, Phase 1 „SSOT-Kern & Kontroll-Schicht" (Kern 0.7.1 → 0.8.0)**
+  nach Bauplan `grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md`
+  (AP-A1–A4 + AP-B1–B2; jede Port-Datei aus `Onsite.ai-OS origin/feat/queue-flow@c55085f`
+  gelesen, Invariante I6). Umsetzung arbeitsteilig: Fable (Hooks, Autosync-Umbau,
+  Reconciler-Design, Executor-Lauf) + drei Opus-Pakete unter Plan-Sandwich-Vertrag
+  (Tests-Port, Session-Skills+Rename, update-doks).
+  - **PreCompact-Mahnung des Sitzungsabschlusses** (AP-B1): `nc-end-mahnung.js` blockt die
+    **erste** Kompaktierung einer Sitzung ohne abgeschlossenes `/nc:end-session` — Blockade
+    ausschließlich über top-level JSON `{"decision":"block"}` bei Exit 0 (Grund erreicht
+    das Modell; kein Exit-Code-Risiko), Registrierung ohne Matcher (manual **und** auto);
+    die zweite Kompaktierung läuft **immer** durch (Loop-Schutz gegen
+    Auto-Compact-Sackgassen). Abschluss-Stempel `nc-end-stempel.js` als Selbstauskunft
+    (bewusst kein Fakten-Stempel — kein prüfbares Außen); Marker verfallen nach 30 Min
+    **Inaktivität** (60-s-Heartbeat, Onsite-Lehre 0.18.1); State unter
+    `os.tmpdir()/nc-end-gate` (bewusst ohne `CLAUDE_PLUGIN_DATA`, Onsite-Lehre 0.11.1),
+    Override `NC_END_STATE_DIR`. **Gegensätzliche Fehlerrichtungen als
+    Sicherheitsentscheid:** defekter Abschluss-Stempel = „nicht gestempelt" (harmlos, eine
+    Mahnung zu viel), defekter Mahn-Marker = „schon gemahnt" (nie Dauerblockade).
+    Subagenten ausgenommen, Opt-out `NC_PRECOMPACT=off`. **Ausdrücklich nicht Gate 4**
+    (bleibt auf Eis). 19 Tests portiert (`nc-end-mahnung.test.mjs`).
+  - **Doks-Autosync Ebene 1b** (AP-B2): `nc-doks-autosync.js` synct jetzt **zwei** Ziele
+    unabhängig — Ebene 1 (Firmen-Block, unverändert inkl. NC-Härtungen atomarer Write +
+    Backup-Schutz) und neu Ebene 1b `~/.claude/nc-teamsync.md` als Ganzdatei mit
+    Versions-Stempel in Zeile 1. **Payload ist `plugins/nc/nc-sync.md` direkt**
+    (Bauplan-Nachtrag N2: kein `doks/`-Umzug — über zehn ausgelieferte Referenzen, eine
+    Kopie wäre Doppelpflege); geladen per `@~/.claude/nc-teamsync.md`-Import im
+    Firmen-Block. **CRLF-Härtung über das Vorbild hinaus** (Opus-Review-Finding 4):
+    Identitätsvergleich zeilenenden-normalisiert — inhaltsgleiche CRLF-Ziele erzeugen
+    keinen Rewrite-/Backup-Churn mehr; ONBOARDING empfiehlt zusätzlich
+    `core.autocrlf input`. Zweiter Test-Override `NC_AUTOSYNC_TEAMSYNC_TARGET`
+    (Review-Finding 1 — ohne ihn wäre die rote Linie „Tests fassen `nc-teamsync.md` nie
+    an" nicht einhaltbar). Autosync-Testdatei 12 → 22 Tests inkl. CRLF-Fixtures und
+    Ebene-1b-Backup-Schutz; Mutations-Gegenprobe belegt, dass die neuen Tests bei
+    entfernter Härtung rot werden.
+  - **`/nc:setup` → Reconciler S0–S6** (AP-A1, L1-Priorität des Maintainers): prüft
+    Voraussetzungen (S0) und Plugin-Stand (S1), stellt die SSOT-Lesekopie bereit (S2 —
+    `ssot-provision.js` unverändert inkl. Sparse-Heilung; Lagebild dreiwertig auf
+    **Lesekopie-Semantik**), legt das Sitzungswissen-Gerüst im Arbeits-Repo **vollständig**
+    an (S4, Onsite-Zirkelverweis-Lehre 0.18.2), verifiziert die CLAUDE-Lokaldokumente
+    (S5) und schreibt zuletzt die Infra-Registry `~/.claude/nc/infra.json` Schema v1 (S3 —
+    absolute Pfade, fremde Felder erhalten; neue Referenz `skills/setup/infra-registry.md`).
+    **Gate-Lage als Schritt 0** (bricht unter ungestempeltem Start-Gate sauber ab —
+    `debug-log.md`-Lehre 2026-08-14). Korrigiert die falsche ausgelieferte Aussage „das
+    OS-Repo ist privat" (Repo ist PUBLIC, `gh repo view` belegt). Nachtrag N3: S3/S4
+    bleiben skill-geführt wie im Vorbild.
+  - **`/nc:save-session` → `/nc:end-session`** (AP-A3, **BREAKING** — Onsite-0.18.0-Parität):
+    Rename per `git mv` + Sweep über Kern- und Abteilungs-Plugin (Registry/Marketplace/
+    README/AGENTS/ONBOARDING vom Executor nachgezogen; historische Dokumente unverändert).
+    Umfang gehoben: Roll-up (`roll-up.md`, Mehrtages-Überblick), Offene-Stränge-Register
+    (append-only), **Projekt-Memory-Spiegel** (`~/.claude/projects/<slug>/memory/` als
+    commit-unabhängige Pflichtquelle), Abschluss-Stempel als letzter Schritt.
+    Queue-Klassifikation bewusst ausgespart (folgt mit Phase 3). `/nc:start` liest neu:
+    Projekt-Memory (Pflichtquelle), Register, Roll-up, Infra-Registry (tolerant),
+    Team-Sync-Stempel. Wohnort bleibt `.nc/erinnerung/` — **Entscheid E2a:** dieses Repo
+    ist öffentlich, die Onsite-Residenzpflicht (`sitzungswissen/` in der Wissensbasis)
+    gilt erst für private Repos.
+  - **Neuer Maintainer-Skill `/nc:update-doks`** (AP-A4): F1 repariert/synct die
+    CLAUDE-Ziele der Ebenen 1/1b über **denselben** Autosync-Code (kein zweiter
+    Chirurgie-Pfad; härter als das Vorbild: der Skill schreibt **nie** selbst in die
+    Ziele — Reparaturvorschlag + Mensch + Hook), F2 index-geführter Konsistenzlauf mit
+    Drift-Bericht (Ist/Soll/Quelle), Fixes nur nach Freigabe.
+  - **Nachzüge:** `hooks.json`-description (Prosa-Zustand der ganzen Kontroll-Schicht),
+    Gates-Definition (PreCompact-Abgrenzung, Familien-Abschnitt), CLAUDE-Ebenen-Definition
+    (Ebene 1b gebaut, Payload-Ort), Aktualisierungs-Index (Payload-Zeile beidziel-fähig,
+    Override-Korrektur), README (Skill- + Hook-Tabelle, Env-Liste), AGENTS (Repo-Karte,
+    Produktstand, Workflow-Zeile), ONBOARDING (Reconciler, Rename, `core.autocrlf`).
+    Testsuite 97 → **126** (alle grün). — *Claude (Fable 5, Claude Code) mit drei
+    Opus-Subagenten*
+
+- **Bauplan `2026-08-15-onsite-endstand-nachbau-bauplan.md`** (Weisung Maintainer 2026-08-15:
+  Onsite-OS ist final fertig, „1:1 in NovaCore-OS umsetzen mit Anpassungen wo nötig";
+  Leitplanken: SSOT-Kern zuerst absichern, Skills außerhalb des Kerns ganz am Ende). Erhoben
+  gegen Onsite `origin/feat/queue-flow@c55085f` (Kern 0.22.0, PR #58 ungemergt) und
+  `origin/main@efd90c1` (0.21.0) durch vier parallele Sonnet-Explorationsagenten plus eigene
+  Verifikation (Testsuite 97/97 grün; `~/.nc/` fehlte auf der Maintainer-Maschine —
+  `/nc:setup` war nie gelaufen, Probelauf von `ssot-provision.js` erfolgreich). Inhalt:
+  Sync-Punkt-Forensik (`5d335a7` = Onsite 0.15.0; alles ab 0.16.0 fehlt), Mechanik-Delta
+  (PreCompact-Mahnung, Autosync-Ebene 1b, Subagenten-Apparat, Queue-Flow, `init`-Reconciler
+  S0–S6, `update-doks`), Prozesskorpus-Delta (4 Karten fehlen komplett), Invarianten I1–I9
+  mit Review-Fokus **Härtungs-Erhalt** (NC-Vorsprünge wie die Start-Gate-Regex-Härtung nie
+  verschlechtern), sechs Bauphasen A–F, Testfälle T1–T21, Delegationsschnitt
+  (Plan-Sandwich + Konfliktzonen) und sechs offene Maintainer-Entscheide E1–E6 — darunter
+  die saubere Auflösung der Kollision zwischen dem Queue-Ausschluss von 2026-08-11 und dem
+  neuen 1:1-Auftrag (E1) sowie die Sitzungswissen-Frage im öffentlichen Repo (E2).
+  Adversarial reviewt durch einen Opus-Agenten (2026-08-15): Faktencheck aller Versions-,
+  PR- und Datei-Belege bestanden; 20 Findings (1 CRITICAL: fehlender Test-Override
+  `NC_AUTOSYNC_TEAMSYNC_TARGET`; 5 HIGH, u. a. CRLF-Autosync-Falle, abgeschwächte
+  `disallowedTools`-Regel, Gate-Kollision des Reconcilers, T19 wäre gegen den Bestand rot;
+  11 MEDIUM; 3 LOW) — alle im Plan eingearbeitet, Urteil „freigabereif nach Fixes" damit
+  erfüllt. Kein Plugin-Bump (reines Planungsdokument). — *Claude (Fable 5, Claude Code)*
+
 - **Kategorie `firmenkernprozesse/` in der Wissensbasis** (Weisung Maintainer 2026-08-15):
   23 extern geführte Prozess- und Produktdokumente des Onsite.ai-OS-Vorbilds und der
   Firmenebene aufgenommen — die Prozesskarten-Sammlung (13 Dokumente unter
@@ -21,6 +112,26 @@ Single-Plugin-Layout und bleiben historisch unverändert.
   Referenz für Ausrichtung und Abgleich, nicht normativ; `SSOT-Document-Index` Teil 1
   (Routing-Zeile) und Teil 2 (Triage je Dokument) sowie das AGENTS.md-Glossar sind
   nachgezogen. — *Kimi (Kimi Code)*
+
+- **Wissensbasis: `ideen-backlog/` gefüllt** (Weisung Maintainer 2026-08-15: „alles was in den
+  ordnern ist 1 zu 1 inhaltlich zu kopieren … wichtig ist auch das idea backlog"). Sieben Ideen aus
+  dem Onsite-Vorbild portiert: Anti-Drift-Prüfung der Indizes · Release-Branch-Modell
+  (Live-/Entwicklungslinie) · Extraktion `nc-development` in ein Satelliten-Repo ·
+  FFG-Nachbesserungen (Upstream-Drift, Windows-Destruktivmuster, `NotebookEdit`) ·
+  Executor-Delegation + fremde Agenten-CLIs · Web-GUI `/nc:web` (Design-Spec v0.1/v0.2 **und**
+  Nachtrag v0.3 SDK-Pivot). `PLATZHALTER.md` entfallen, `SSOT-Document-Index` Teil 1 (Routing +
+  Mapping-Tabelle) und Teil 2 (neue Tabelle mit sieben „Relevant wenn …"-Zeilen) nachgezogen.
+  **Umfangsentscheid:** Übernommen wurde ausschließlich der **generische** Teil des
+  Vorbild-Backlogs. Ideen und Manuals mit Bezug auf fremde Organisationen, deren Kunden, Geräte
+  oder Zugänge bleiben im Vorbild — dessen Repo ist privat, dieses ist öffentlich; dazu zählen
+  PartSens-SSH-Onboarding, GitLab-/offsite-Interna, die Marketing-Konnektoren und der
+  offsite-Doku-Patch. **Keine wörtliche Kopie:** Terminologie auf NovaCore gemappt (`oai`→`nc`,
+  Pfade, Env-Namen), Fremdmarken entfernt, und jede übernommene Code-Aussage gegen dieses Repo
+  nachverifiziert — die drei FFG-Lücken sind gegen `plugins/nc/hooks/hooks.json` (Matcher Zeile 22
+  vs. 32), `nc-ffg.js:385` und die 26 Tests in `nc-ffg.test.mjs` belegt; bei der
+  Executor-Delegation zeigte der Abgleich, dass Teil A bei uns **bereits** Standardprozess ist
+  (`sync-nachzug-bauzyklus.md` §2), was im Dokument korrigiert statt kopiert wurde. Kein
+  Plugin-Bump (die Wissensbasis wird nicht ausgeliefert).
 
 - **Bauplan `2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md`** (Weisung
   Maintainer 2026-08-11: „alles zum Bau und zu Standardprozessen aus der Onsite-Wissensbasis

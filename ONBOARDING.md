@@ -38,11 +38,19 @@ verweist auf sie. Deshalb nach der Installation **einmal**:
 /nc:setup
 ```
 
-Der Skill klont die nötigen Quellen vollständig nach `~/.nc/ssot/<repo-name>/`. Die
-Verlinkung läuft über diesen festen Pfad, den der Firmen-Block in der globalen `CLAUDE.md`
-als Einstieg nennt. Er ist idempotent: bei jedem
-weiteren Aufruf zieht er nur per Fast-Forward nach. Später erneut aufrufen, wenn die
-Wissensbasis veraltet ist — automatisch geschieht das **nicht**.
+Der Skill ist seit Kern 0.8.0 ein **Reconciler über sechs Soll-Schichten S0–S6**: Er prüft
+Voraussetzungen und Plugin-Stand, klont die nötigen Quellen vollständig nach
+`~/.nc/ssot/<repo-name>/` (die Verlinkung läuft über diesen festen Pfad, den der
+Firmen-Block in der globalen `CLAUDE.md` als Einstieg nennt), legt das
+Sitzungswissen-Gerüst im Arbeits-Repo an, verifiziert die CLAUDE-Lokaldokumente und
+schreibt die Infra-Registry `~/.claude/nc/infra.json`. Er ist idempotent: bei jedem
+weiteren Aufruf zieht er nur per Fast-Forward nach und überspringt Erledigtes. Später
+erneut aufrufen, wenn die Wissensbasis veraltet ist — automatisch geschieht das **nicht**.
+
+> **Windows-Hinweis:** `git config --global core.autocrlf input` setzen. Der
+> Doks-Autosync vergleicht seine Ziele inzwischen zeilenenden-normalisiert (kein
+> Dauer-Rewrite mehr durch CRLF), aber einheitliche LF-Zeilenenden ersparen Diff-Rauschen
+> in allen anderen Werkzeugen.
 
 - **Voraussetzung:** `git` im PATH **und** Zugriff auf das private OS-Repo (z. B. per
   `gh auth login` oder Git-Credential-Helper). Fehlt eines von beidem, sagt der Skill das
@@ -147,7 +155,7 @@ Stempel-Befehl nennt — Lesen, Fragen und Read-only-Git bleiben jederzeit frei.
 | Review durchführen | `/nc-development:fe-review` bzw. `/nc-development:be-review` |
 | WZS-Arbeit | `/nc-development:wzs-…` (Attribution, Blocker-Gate, Reward-Guard, …) |
 | Zwischendurch | `/nc:journal` (Ereignis sofort festhalten) |
-| Session-Ende | `/nc:save-session` |
+| Session-Ende | `/nc:end-session` (bis Kern 0.7.x: `/nc:save-session`) |
 
 Der Rahmen WP0–WP8 steht in `wp-rahmen.md` des Kern-Plugins, der Fachablauf in
 `workflow.md` der Abteilung.

@@ -23,9 +23,9 @@ Plugins immer mitinstalliert und mitaktiviert wird.
 | WP5 | Selbst-Review + PR | Gesamtdiff gegen `main` reviewen, PR-Text entwerfen, pushen und PR anlegen | `flc-pr` | Push und PR-Anlage: nur nach expliziter Freigabe |
 | WP6 | Review | Fremden oder eigenen Diff prüfen, Befunde nach Severity belegen, Review-Kommentar entwerfen | `fe-review`, `be-review`; `wzs-*` bei WZS-Berührung | Approven/Resolven/Posten: nur der Mensch |
 | WP7 | QS & Live-Test | Verhalten in der Zielumgebung prüfen, Befunde reproduzierbar festhalten | **noch ohne eigenen Skill** — manuell nach Verifikationsdisziplin | Jede Freigabe, jedes Deployment: Mensch |
-| WP8 | Session-Ende | Stand sichern, Entscheidungen protokollieren | `/nc:save-session` *(Kern)* | — |
+| WP8 | Session-Ende | Stand sichern, Entscheidungen protokollieren | `/nc:end-session` *(Kern)* | — |
 
-**Kern-Abhängigkeit:** WP0/WP8 laufen über die Kern-Skills `/nc:start` und `/nc:save-session`;
+**Kern-Abhängigkeit:** WP0/WP8 laufen über die Kern-Skills `/nc:start` und `/nc:end-session`;
 einzelne Ereignisse hält `/nc:journal` fest. Sie arbeiten auf dem Sitzungsgedächtnis unter
 `.nc/erinnerung/`. Da der Kern als `dependencies`-Eintrag dieses Plugins immer mitkommt, kann
 WP0/WP8 nicht fehlen.

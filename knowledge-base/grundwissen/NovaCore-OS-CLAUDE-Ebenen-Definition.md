@@ -19,6 +19,7 @@ Instruktionsebene).
 |---|---|---|---|---|---|
 | **0 — Org-Instructions** | Team-Plan-Admin-Settings (server-managed) | zentral, ohne Sync-Mechanik | die SSOT (Verweis) | Admin | **nicht genutzt** |
 | **1 — Globale CLAUDE.md** | `~/.claude/CLAUDE.md` | firmengeführter Block per SessionStart-Autosync + Privat-Zone | Kern-SSOT | Firma (Block) / Mitarbeiter (Zone) | **gebaut** (2026-08-10, AP3) |
+| **1b — Team-Sync-Datei** | `~/.claude/nc-teamsync.md` | SessionStart-Autosync als **Ganzdatei** (Versions-Stempel Zeile 1, keine Marker, keine Privat-Zone); geladen per `@`-Import im Firmen-Block | Kern-SSOT (Methodik/Conventions) | Firma (vollständig) | **gebaut** (2026-08-15, Bauplan Onsite-Endstand AP-B2) |
 | **2 — Abteilungs-CLAUDE** | im Abteilungsplugin-Verzeichnis | Marketplace-Auto-Update (Plugin-Cache) | Abteilungs-SSOT | Abteilung | **offen** |
 | **3 — Projekt-CLAUDE** | Arbeitsrepo (`CLAUDE.md`/`AGENTS.md`) | Git | Repo-Wissen (`.nc/erinnerung/`) | Repo-Team | aktiv |
 | **3b — OS-Repo-Doku** | dieses Repo: getrackte `AGENTS.md` + un-getrackte lokale `CLAUDE.md` | Git (nur `AGENTS.md`) | Aktualisierungs-Index, SSOT-Document-Index, CHANGELOG | Kern-Maintainer | aktiv |
@@ -49,6 +50,27 @@ Instruktionsebene).
   Ziel-Override `NC_AUTOSYNC_TARGET`.
 - **Grenzen:** „Höchste CLAUDE-Anweisungsebene" ist **normative Konvention, keine
   Harness-Mechanik** — siehe Präzedenzregel.
+
+## Ebene 1b — Team-Sync-Datei (seit 2026-08-15)
+
+- **Ort:** `~/.claude/nc-teamsync.md` — maschinenweit im Home-`.claude`-Ordner, **nicht**
+  im projektlokalen `.claude/`.
+- **Funktion in der SSOT:** die vollständig firmengeführte Methodik-/Conventions-/
+  Safety-Anweisung (Verhaltens-Defaults, DoD, Review-Pflicht) für alle Agenten — ohne
+  Privat-Zone; wer eigene Regeln braucht, nutzt die Privat-Zone der Ebene 1.
+- **Owner:** Firma (vollständig). **Update-Kanal:** derselbe SessionStart-Autosync
+  `nc-doks-autosync.js` als **Ganzdatei-Ersatz**: Versions-Stempel
+  `<!-- NC:TEAMSYNC:VERSION <kern-version> -->` in der ersten Zeile, No-op bei
+  (zeilenenden-normalisiert) identischem Stand, Backup vor jedem Schreiben; beide Ziele
+  (1 und 1b) laufen unabhängig — ein defektes nimmt das andere nicht mit. Opt-out
+  `NC_AUTOSYNC=off` (ein Schalter für beide), Test-Override `NC_AUTOSYNC_TEAMSYNC_TARGET`.
+- **Payload:** `plugins/nc/nc-sync.md` — bewusst **keine** Kopie unter `doks/`
+  (Doppelpflege-Verbot; Bauplan 2026-08-15, Nachtrag N2). Geladen wird die Zieldatei über
+  die `@`-Import-Zeile `@~/.claude/nc-teamsync.md` im Firmen-Block und als Lese-Schritt
+  in `/nc:start`.
+- **Grenzen:** In der Präzedenzkette wird 1b nicht gesondert gerankt — sie ordnet sich im
+  Update-Kanal zwischen 1 und 2 ein und trägt denselben Methodik-Rang wie der
+  Firmen-Block.
 
 ## Ebene 2 — Abteilungs-CLAUDE
 

@@ -43,7 +43,7 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
    versioniert je Plugin, Auto-Update fürs Team
 2. **Wissen (SSOT)** — `nc-sync.md` (Global-Anweisung, im Kern ausgeliefert),
    Projekt-CLAUDEs, Projekt-Memory `.nc/erinnerung/` je Arbeits-Repo
-3. **Pflicht-Workflow** — `/nc:start` → WP-Gates → `/nc:save-session`; Rahmen WP0–WP8
+3. **Pflicht-Workflow** — `/nc:start` → WP-Gates → `/nc:end-session`; Rahmen WP0–WP8
    normativ in `plugins/nc/wp-rahmen.md`, Fachablauf je Abteilung in deren `workflow.md`
 4. **Abteilungen** — **je Abteilung ein Plugin** (`plugins/nc-<abteilung>/`, Kern als
    Dependency); Module = Skill-Präfix-Gruppen. Ständig: `gemeinsam` im Kern; fachlich zuerst:
@@ -64,7 +64,7 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | `VERSION` | Produkt-Leitversion (SemVer) = Version des Kern-Plugins |
 | `.claude-plugin/marketplace.json` | Marketplace `novacore-os` — Einträge ohne `version`-Feld (die steht allein in der jeweiligen `plugin.json`); die Repo-Wurzel ist **nur** Marketplace-Wurzel, kein Plugin |
 | `.github/workflows/` | `ci.yml` (Ubuntu+Windows × Node 20/22/24, Suite + Validator-Positivkontrolle) und `release.yml` (Tag `nc--v*` → GitHub-Release aus dem CHANGELOG-Abschnitt) |
-| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`save-session`/`journal`/`setup`/`doku-sync`/`os-info`/`skill-builder`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; dazu `nc-doks-autosync.js`) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `nc-sync.md`, `tests/` |
+| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`end-session`/`journal`/`setup`/`doku-sync`/`os-info`/`skill-builder`/`update-doks`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; PreCompact-Mahnung: `nc-end-mahnung.js` + `nc-end-stempel.js`; dazu `nc-doks-autosync.js` — Ebenen 1 + 1b) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `nc-sync.md` (zugleich Ebene-1b-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `skills/setup/infra-registry.md` (Infra-Registry-Referenz), `tests/` |
 | `plugins/nc-development/` | Abteilung `development` (Namespace `/nc-development:`): 11 Skills in 4 Modulen (`fe`/`be`/`flc`/`wzs`, flaches Layout) + `workflow.md` (Fachablauf WP1–WP7) |
 | `vorlagen/abteilungsplugin/` | Vorlage für neue Abteilungsplugins — **kein Plugin** (`.vorlage`-Endungen) |
 | `knowledge-base/` | Wissensbasis — Glossar im nächsten Abschnitt |
@@ -178,9 +178,27 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Git-Kommando sein; Pipes/Redirects/Substitutionen bleiben ausgeschlossen.
   Negativproben testerzwungen. Folge-Vorgang: die Satelliten-FFG-Kopien
   (`nc-felix`, `nc-biggi`) tragen denselben Stand — je eigener Fix dort.
+- **Gebaut (Kern v0.8.0, 2026-08-15): Onsite-Endstand-Nachbau Phase 1** nach Bauplan
+  `grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md` (AP-A1–A4 + AP-B1–B2,
+  „SSOT-Kern & Kontroll-Schicht"): **`/nc:setup` ist jetzt Reconciler S0–S6** (Referenz
+  `skills/setup/infra-registry.md`; Infra-Registry `~/.claude/nc/infra.json` Schema v1;
+  `ssot-provision.js` unverändert als S2-Baustein) · **`/nc:save-session` →
+  `/nc:end-session`** (BREAKING, Rename-Sweep; Umfang gehoben: Roll-up,
+  Offene-Stränge-Register, Projekt-Memory-Spiegel, Abschluss-Stempel) · `/nc:start` liest
+  Memory/Register/Roll-up/Infra-Registry/Team-Sync · neuer Maintainer-Skill
+  **`/nc:update-doks`** (F1 Marker-Reparatur über den Autosync-Code, F2 index-geführter
+  Konsistenzlauf) · **PreCompact-Mahnung** (`nc-end-mahnung.js` + `nc-end-stempel.js`,
+  Heartbeat, Loop-Schutz, `NC_PRECOMPACT=off`) · **Doks-Autosync Ebene 1b**
+  (`~/.claude/nc-teamsync.md` als Ganzdatei, Payload `nc-sync.md` — Nachtrag N2, kein
+  doks/-Umzug; CRLF-normalisierter Vergleich; Overrides `NC_AUTOSYNC_TARGET`/
+  `NC_AUTOSYNC_TEAMSYNC_TARGET`). Wohnort des Sitzungswissens bleibt `.nc/erinnerung/`
+  (E2a — dieses Repo ist öffentlich). Phasen 2 (Prozesskorpus/CLAUDE-Netz/Subagenten) und
+  3 (Queue-Flow nur Kern ↔ interne Abteilungen; Kollegen-OS bleiben isoliert)
+  folgen nach Bauplan.
 - **Noch nicht gebaut:** Gate 3 (Safety-Gate mit echtem Freigabedialog), Gate 4
-  (Sitzungsabschluss als Hook), CLAUDE-Ebene 0 und 2, weitere fe-/be-Skills, Module
-  `architecture`/`incident-support`. Übersicht:
+  (Sitzungsabschluss als Hook — die PreCompact-Mahnung ist ausdrücklich nicht Gate 4),
+  CLAUDE-Ebene 0 und 2, Subagenten-Apparat, Anker-Reservierung, Queue-Flow, weitere
+  fe-/be-Skills, Module `architecture`/`incident-support`. Übersicht:
   `grundwissen/NovaCore-OS-Gates-Definition.md`.
 - **Versionsmodell:** **Je Plugin eine Version, genau an einer Stelle:**
   `plugins/<name>/.claude-plugin/plugin.json`. Marketplace-Einträge tragen **kein**

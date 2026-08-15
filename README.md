@@ -58,9 +58,10 @@ bringen ihren Kern als **Modul** selbst mit:
 | Skill | WP | Zweck |
 |---|---|---|
 | `/nc:start` | WP0 | Session-Start: Stand, Journal, Git-Lage laden — kein Blind-Start; setzt zum Abschluss den Fakten-Stempel, der Gate 2 öffnet |
-| `/nc:save-session` | WP8 | Session-Ende: Journal schreiben, Stand konsolidieren |
+| `/nc:end-session` | WP8 | Session-Ende (bis 0.7.x `save-session`): Journal schreiben, Stand + Roll-up + Offene-Stränge-Register konsolidieren, Projekt-Memory spiegeln; letzter Schritt setzt den Abschluss-Stempel, der die PreCompact-Mahnung der Sitzung abschaltet |
 | `/nc:journal` | laufend | Einzelne Ereignisse sofort festhalten |
-| `/nc:setup` | einmal pro Rechner | Stellt die Wissensbasis lokal bereit (voller Klon nach `~/.nc/ssot/<repo-name>/`, Verlinkung über den festen Pfad im Firmen-Block) und hält sie per Fast-Forward aktuell; Sparse-Relikte der Erstfassung werden automatisch zum vollen Arbeitsbaum erweitert — der Marketplace liefert nur das Plugin aus, nicht die Wissensbasis |
+| `/nc:setup` | einmal pro Rechner, danach bei Bedarf | Reconciler über sechs Soll-Schichten S0–S6 (seit 0.8.0): Voraussetzungen + Plugin-Stand prüfen, Wissensbasis als Lesekopie bereitstellen (voller Klon nach `~/.nc/ssot/<repo-name>/`, Fast-Forward, Sparse-Heilung), Sitzungswissen-Gerüst im Arbeits-Repo anlegen, CLAUDE-Lokaldokumente verifizieren, Infra-Registry `~/.claude/nc/infra.json` schreiben — mehrfach ausführbar, kein Schritt legt doppelt an |
+| `/nc:update-doks` | Maintainer, bei Bedarf | F1: repariert/synct die CLAUDE-Ziele der Ebenen 1/1b über denselben Autosync-Code (schreibt nie selbst in Privat-Zonen); F2: index-geführter Konsistenzlauf mit Drift-Bericht — Fixes nur nach Freigabe |
 | `/nc:doku-sync` | vor Commit | Lebende Doku nach der Sync-Matrix nachziehen, CHANGELOG + Versions-Gleichstand prüfen, Prüfstempel setzen |
 | `/nc:os-info` | jederzeit | Erklärt das OS **auf Basis der realen Installation** — Plugins, Module, nutzbare Skills, Gate-Status |
 | `/nc:skill-builder` | jederzeit | Führt durch den Bau eines Skills nach den OS-Regeln (Sandbox oder OS-Beitrag, inkl. Fork-back) |
@@ -95,7 +96,8 @@ Rahmen WP0–WP8: [`plugins/nc/wp-rahmen.md`](plugins/nc/wp-rahmen.md).
 | `nc-ffg` (Gate 1, Fact-Forcing-Gate) | PreToolUse (Write/Edit/MultiEdit/Bash) | Fakten **vor** der Aktion: Datei-Gate je Zieldatei, Destruktiv-Gate je Kommando (quote-aware), Routine-Bash einmal je Session; Read-only-Git nie. **Markerlos aktiv**, Opt-out nur per Env `NC_FFG=off`; Betreiber-Schalter: `NC_FFG_EXEMPT_GLOBS`, `NC_FFG_FULL_DENIALS`, `NC_FFG_EXTRA_DESTRUCTIVE`. Fail-open bei internen Fehlern. |
 | `nc-session-start` (Gate 2, Teil 1) | SessionStart | Injiziert Pflicht-Einstieg, **lebenden Projektstand** (VERSION, Branch, Commits, Working Tree, `[Unreleased]`, laufende Vorhaben, Abteilungen) und den exakten Stempel-Befehl. **Markerlos** — ein Gate, das man vergessen kann, ist kein Gate. Kann laut Doku nicht blocken. |
 | `nc-start-gate` (Gate 2, Teil 2) | PreToolUse (Write/Edit/MultiEdit/NotebookEdit/Bash) | Lehnt jede **schreibende** Aktion ab, bis `/nc:start` mit dem Fakten-Stempel abgeschlossen ist. Der Stempel (`nc-start-stempel.js`) verifiziert `--branch`/`--head` gegen die Git-Lage des **Projektverzeichnisses** und vermerkt, ob überhaupt etwas zu prüfen war — ein ungeprüft gesetzter Stempel öffnet nicht in einem Git-Baum. Lesen, Read-only-Git (auch mit Pfadwechsel per `cd`/`git -C`, Verkettung und `worktree list`) und die Stempel-Invokation selbst bleiben frei; Subagenten ausgenommen. Opt-out `NC_START_GATE=off` — **ein** Schalter für beide Gate-2-Teile. Reichweite und Grenzen: [Gates-Definition](knowledge-base/grundwissen/NovaCore-OS-Gates-Definition.md). |
-| `nc-doks-autosync` | SessionStart | Hält den Firmen-Block in `~/.claude/CLAUDE.md` per Marker-Chirurgie (`NC:BLOCK:…`) auf dem Stand des installierten Kerns. **Die Privat-Zone außerhalb der Marker wird nie verändert**; Backup vor jedem Schreiben; bei defekten Markern wird nichts geschrieben. Opt-out `NC_AUTOSYNC=off`, Ziel-Override `NC_AUTOSYNC_TARGET`. |
+| `nc-doks-autosync` | SessionStart | Hält **zwei** Ziele unabhängig voneinander auf dem Stand des installierten Kerns: Ebene 1 — Firmen-Block in `~/.claude/CLAUDE.md` per Marker-Chirurgie (`NC:BLOCK:…`), **Privat-Zone außerhalb der Marker wird nie verändert**, bei defekten Markern wird nichts geschrieben; Ebene 1b — Team-Sync-Datei `~/.claude/nc-teamsync.md` als Ganzdatei mit Versions-Stempel in Zeile 1 (Payload: `nc-sync.md`). Backup vor jedem Schreiben (intakte Sicherungen werden nie verschlechtert), atomarer Write, zeilenenden-normalisierter Identitätsvergleich (kein CRLF-Churn). Opt-out `NC_AUTOSYNC=off` (beide Ziele), Test-Overrides `NC_AUTOSYNC_TARGET` / `NC_AUTOSYNC_TEAMSYNC_TARGET`. |
+| `nc-end-mahnung` (PreCompact-Mahnung) | PreCompact (ohne Matcher: manual + auto) | Blockt die **erste** Kompaktierung einer Sitzung ohne abgeschlossenes `/nc:end-session` (Blockade über top-level JSON `decision`, Exit bleibt 0) und nennt den Abschluss-Stempel `nc-end-stempel.js`; die zweite Kompaktierung läuft immer durch (Loop-Schutz). Marker verfallen nach 30 Min **Inaktivität** (Heartbeat). Subagenten ausgenommen. Opt-out `NC_PRECOMPACT=off`, State-Override `NC_END_STATE_DIR`. **Nicht Gate 4** — das bleibt auf Eis. |
 
 Gate 3 (Safety-Gate mit echtem Freigabedialog) und Gate 4 (Sitzungsabschluss) sind **nicht
 gebaut** — Übersicht und Abgrenzungen:
@@ -154,7 +156,8 @@ Auto-Update.
 Eigene Namespaces `nc:`/`nc-development:`/`nc-felix:`/`nc-biggi:`, keine Kollision mit
 `uni:` oder ECC. Die Kontroll-Schicht des Kerns ist **markerlos** in jeder Session aktiv,
 in der der Kern installiert ist: FFG (`NC_FFG=off`), Session-Start-Zwang
-(`NC_START_GATE=off`), Doks-Autosync (`NC_AUTOSYNC=off`). Die eigenständigen `nc-felix` und
+(`NC_START_GATE=off`), Doks-Autosync (`NC_AUTOSYNC=off`), PreCompact-Mahnung
+(`NC_PRECOMPACT=off`). Die eigenständigen `nc-felix` und
 `nc-biggi` tragen eigene Kopien dieser Hooks mit denselben Env-Schaltern — deshalb `nc`,
 `nc-felix` und `nc-biggi` **nie parallel** in derselben Session betreiben (die Gates feuern
 sonst doppelt). Affiliate-Plugins wie `kimi-code-plugin-cc` bringen keine Gates mit und
