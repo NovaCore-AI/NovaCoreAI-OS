@@ -21,7 +21,9 @@ Referenzdatei `infra-registry.md` neben dieser SKILL.md) und stellt nur her, was
 dadurch ist jeder Wiederholungslauf nach Abbruch, Userfehler oder fehlender Abhängigkeit
 sicher. Läuft nach `/nc:start` (WP0) und vor jeder fachlichen Arbeit auf einer neuen
 Maschine. (Vorbild: `/oai:init` des Onsite-OS; die frühere NC-Fassung deckte nur den
-Klon-Schritt S2 — Bauplan 2026-08-15, AP-A1.)
+Klon-Schritt S2 — Bauplan 2026-08-15, AP-A1.) **S-Nummern bezeichnen Schichten, nicht
+Reihenfolge** — ausgeführt wird in der nummerierten Schrittfolge unten (S3 bewusst
+zuletzt).
 
 Der Marketplace liefert **nur das Plugin** aus: Hooks, Skills, Formatregeln, WP-Rahmen,
 Registry. Die **Wissensbasis liegt im OS-Repo außerhalb des Plugin-Verzeichnisses** und
@@ -69,12 +71,15 @@ lokale Kopie. S2 schließt genau diese Lücke.
    („die Lesekopie wird nicht bearbeitet — Änderungen sichern oder entfernen, dann
    erneut"), **nie überschreiben** · `fehler` = den genannten Grund **wörtlich**
    weitergeben. Die Verlinkung ist der feste Pfad `~/.nc/ssot/<repo-name>/`, den der
-   Firmen-Block nennt.
+   Firmen-Block nennt (Ablage-Override für Tests/Sonderfälle: `NC_SSOT_DIR` — Standard
+   bleibt `~/.nc/ssot/`).
 5. **S4 Sitzungswissen-Gerüst im Arbeits-Repo reconcilen:** Im aktuellen Arbeits-Repo
    fehlende Bausteine unter `.nc/erinnerung/` **alle** anlegen (Onsite-Lehre 0.18.2:
    halbe Gerüste erzeugen Folgefehler): `stand.md` · `journal/` ·
-   `offene-straenge-register.md` · `roll-up.md` — leer mit Kopf-Blockquote, nie
-   Bestandsdateien überschreiben. Fehlt der `.gitignore`-Eintrag `.nc/`, darauf hinweisen
+   `offene-straenge-register.md` · `roll-up.md` — je Datei mit Kopf-Blockquote **und der
+   Struktur, die `/nc:end-session` erwartet** (Register: Tabelle
+   `Datum · Strang · Verbleib · Nächster Schritt · Status`; Roll-up: eine Zeile je
+   Arbeitstag, jüngster oben), nie Bestandsdateien überschreiben. Fehlt der `.gitignore`-Eintrag `.nc/`, darauf hinweisen
    (die Datei gehört dem Arbeits-Repo; Änderung nur nach Zustimmung). Läuft der Skill
    außerhalb eines Arbeits-Repos, ist S4 **nicht anwendbar** (nicht „grün").
 6. **S5 CLAUDE-Lokaldokumente verifizieren:** `NC:BLOCK`-Marker + Versions-Stempel in

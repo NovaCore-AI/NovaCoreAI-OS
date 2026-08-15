@@ -30,9 +30,14 @@ Gedächtnis — genau der Blind-Start, den das OS verhindert.
    **unabhängig vom Commit-Zyklus** geschrieben und überlebt damit genau die Fälle, in denen der
    reguläre Sitzungsabschluss ausfiel (Abbruch, Kompaktierung, Nachtarbeit). Deshalb wird es
    **vor** der commit-getakteten Repo-Ablage gelesen.
-   - **Pfad bestimmen:** den Projekt-Slug aus dem Arbeitsverzeichnis vorwärts ableiten; schlägt
-     das fehl, das Verzeichnis unter `~/.claude/projects/` mit der **jüngsten**
-     `memory/`-Änderung wählen. Ist beides nicht möglich, wird das **gemeldet**, nicht geraten.
+   - **Pfad bestimmen:** den Projekt-Slug aus dem Arbeitsverzeichnis vorwärts ableiten — der
+     Slug ist der **absolute Projektpfad, in dem jedes Trennzeichen (`\`, `/`, `:`) durch `-`
+     ersetzt ist** (Beispiel: `C:\Users\x\Repo` → `C--Users-x-Repo`). Schlägt das fehl, kommt
+     als Rückfallweg nur ein Verzeichnis unter `~/.claude/projects/` in Frage, **dessen Name
+     den Repo-Namen des Arbeitsverzeichnisses enthält** — davon das mit der jüngsten
+     `memory/`-Änderung; ein fremdes Projekt-Memory wird **nie** geladen (fremdes Wissen
+     dürfte sonst den Repo-Stand überstimmen). Ist beides nicht möglich, wird das
+     **gemeldet**, nicht geraten.
    - **Das jüngste, nicht irgendeins:** Stand-Dateien lösen sich per Verweis ab. Maßgeblich ist
      die jüngste Fassung; abgelöste Vorgänger bleiben liegen und werden ignoriert.
    - **Den Dateikörper lesen, nicht nur `MEMORY.md`:** Der Index-Einzeiler ist verlustbehaftet —

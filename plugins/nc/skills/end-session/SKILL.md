@@ -35,10 +35,12 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
    die eigenen Arbeitsschritte — was wurde entschieden, gefunden, gebaut, verworfen.
 2. **Ablage sicherstellen:** Wohnort des Sitzungswissens ist `.nc/erinnerung/` des
    Arbeits-Repos; `.nc/erinnerung/journal/` anlegen, falls es fehlt. Prüfen, dass `.nc/` in der
-   `.gitignore` des Arbeits-Repos steht; fehlt der Eintrag, ihn ergänzen und ausdrücklich darauf
-   hinweisen. *(Ein **privates** Arbeits-Repo mit eigener Wissensbasis kann sein Sitzungswissen
-   stattdessen als versionierte Kategorie `sitzungswissen/` führen — für dieses öffentliche
-   OS-Repo ist der Weg ausgeschlossen und hier nicht gebaut.)*
+   `.gitignore` des Arbeits-Repos steht; fehlt der Eintrag, ihn **vorschlagen und ausdrücklich
+   darauf hinweisen — geändert wird die Datei nur nach Zustimmung** (dieselbe Politik wie in
+   `/nc:start` und `/nc:setup`: die `.gitignore` gehört dem Arbeits-Repo). *(Ausnahme nach
+   Maintainer-Entscheid E2a, Bauplan 2026-08-15: Ein **privates** Arbeits-Repo mit eigener
+   Wissensbasis darf sein Sitzungswissen als versionierte Kategorie `sitzungswissen/` führen —
+   für dieses **öffentliche** OS-Repo ist der Weg ausgeschlossen und hier nicht gebaut.)*
 3. **Journal fortschreiben:** Eintrag an `.nc/erinnerung/journal/<YYYY-MM-DD>.md` **anhängen**
    (Datei mit Datumsüberschrift anlegen, falls sie fehlt). Inhalt: Uhrzeit, bearbeitete
    Aufgaben, getroffene Entscheidungen mit Begründung, offene Punkte, nächste Schritte.
@@ -85,7 +87,8 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
     `--session`-Schlüssel wie beim Start-Stempel**: Er steht in der Session-Start-Injektion und
     wird in jeder Gate-Ablehnung wörtlich wiederholt — er wird nie geraten und nie neu erfunden.
     Ohne vorangegangene Mahnung liegt das Skript im `hooks/`-Verzeichnis dieses Kern-Plugins `nc`.
-    Erst **nach** den Schritten 3–8 stempeln — der Stempel bezeugt den erledigten Abschluss.
+    Erst **nach** den Schritten 3–9 stempeln — der Stempel ist der letzte Handgriff der Sitzung
+    und bezeugt den erledigten Abschluss samt ausgegebener Übergabe.
 
 ## Regeln
 
@@ -109,8 +112,9 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
   Verlustschutz genauso bewusst aus wie per Opt-out. Umgekehrt darf er nie fehlen, und die
   ausbleibende Mahnung ist kein Freibrief: Gemahnt wird nur die **erste** Kompaktierung einer
   Sitzung, danach geht ungesichertes Wissen still verloren.
-- **Kein Marker nötig** — die Kontroll-Schicht ist markerlos aktiv, wo der Kern installiert
-  ist. Der Skill sichert den Stand in jedem Arbeits-Repo.
+- **Kein `.nc-os`-Repo-Marker nötig** (Altbestand vor Kern 0.6.0) — die Kontroll-Schicht ist
+  markerlos aktiv, wo der Kern installiert ist. Der Skill sichert den Stand in jedem
+  Arbeits-Repo; mit den Stempel-Dateien der Gates hat diese Regel nichts zu tun.
 
 ## Verifikation
 
@@ -126,7 +130,8 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
   Diff belegen).
 - Das Register enthält für jeden in der Übergabe genannten ausgelagerten Strang eine Zeile mit
   Verbleib und nächstem Schritt.
-- `git status --short` zeigt **keine** `.nc/`-Pfade (Ignore greift).
+- `git status --short` zeigt **keine** `.nc/`-Pfade (Ignore greift) — sonst wird der fehlende
+  `.gitignore`-Eintrag samt Vorschlag gemeldet (geändert nur nach Zustimmung).
 - Die Übergabe listet jede geschriebene Datei mit vollem Pfad.
 - Der **Abschluss-Stempel ist gesetzt** (Bestätigungszeile „Abschluss-Stempel gesetzt" des
   Stempel-Skripts liegt vor) — er ist der einzige Nachweis, dass WP8 lief; die Mahnung kommt

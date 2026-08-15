@@ -498,6 +498,65 @@ in S3 („jeden Pfad gegen S2 re-checken"), nicht Skript-Unit-Test. Die Onsite-Z
 „lokal erweitert" gehören zu Arbeitsklonen und existieren in NC nicht — die Lesekopie
 meldet `lokal-veraendert` als Warnung (E1-Kontext: kein Arbeitsklon-Konzept vor Phase E).
 
+### N4 — Externes K3-Code-Review der Phase-1-Hooks (2026-08-15)
+
+Review-Kette nach N1: Kimi K3 (`kimi-code/k3` über das Kimi-Code-Plugin, read-only)
+reviewte die vier Kontroll-Schicht-Artefakte (`nc-end-stempel.js`, `nc-end-mahnung.js`,
+`nc-doks-autosync.js`, `hooks.json`-Registrierung). **Ergebnis: kein BLOCKER, kein
+MAJOR** — Fail-Richtungen, Marker-Chirurgie, Parallelität (zwei SessionStart-Prozesse),
+Pfad-Handling und PreCompact-Registrierung ausdrücklich als sauber bestätigt. Die fünf
+kleineren Findings, alle geprüft:
+
+1. *(MINOR, Security)* Session-Key im vorgeschlagenen Stempel-Befehl unsaniert —
+   **bereits mitigiert:** `resolveSessionKey()` liefert konstruktionsbedingt nur
+   `[a-zA-Z0-9_-]` (≤64) oder `prefix-hex24`-Hashes (`lib/session-key.js` Z. 13–22,
+   Review-Härtung 2026-07-28); Shell-Metazeichen können den Mahntext nie erreichen.
+2. *(MINOR, TOCTOU)* Race zwischen Verfalls-`unlink` und parallelem Stempel-Write —
+   **akzeptiert wie im Vorbild:** Worst Case ist exakt die designte harmlose
+   Fehlerrichtung (eine Mahnung zu viel); PreCompact läuft selten.
+3. *(MINOR)* Marker-Writes nicht atomar — **akzeptiert wie im Vorbild:** ein
+   korrupter Marker landet per Design in der jeweils harmlosen Fehlerrichtung
+   (Stempel→„nicht gestempelt", Mahn-Marker→„schon gemahnt"); Atomarität brächte hier
+   keinen Sicherheitsgewinn.
+4. *(NIT)* verwaiste `.nc-autosync-tmp-<pid>`-Datei bei Kill zwischen Write und Rename —
+   akzeptiert (eine Kleindatei, vom nächsten erfolgreichen Lauf funktional ersetzt).
+5. *(NIT)* Arg-Parser des Stempel-Skripts ignoriert unbekannte Flags still —
+   akzeptiert wie im Vorbild; die Fehlermeldung nennt den korrekten Befehl wörtlich.
+
+GLM-5.3 (zweiter vorgesehener externer Reviewer) war nicht erreichbar: der
+`zai-coding-plan`-Provider-Token ist abgelaufen (401) — Re-Auth ist Maintainer-Sache.
+Ein ChatGPT-Plugin war in der Session nicht vorhanden. Als zweiter externer Durchgang
+lief stattdessen ein K3-Konsistenz-Review der Skill-Dokumente (Ergebnis: N5).
+
+### N5 — Externes K3-Konsistenz-Review der Phase-1-Skills (2026-08-15)
+
+Zweiter K3-Durchgang über `end-session`, `start` und `setup` (SKILL.md) gegen die
+Hook-Mechanik als Ground Truth. **Kein BLOCKER**; die Hook-Beschreibungen aller drei
+Dokumente wurden als mechanik-treu bestätigt. Iterierte Findings (alle behoben):
+
+1. *(MAJOR)* `.gitignore`-Politik widersprüchlich — `end-session` änderte eigenmächtig,
+   `start`/`setup` nur mit Zustimmung → auf **Zustimmungspflicht vereinheitlicht**
+   (Vorschlag + Hinweis, Änderung nur nach Freigabe; Verifikationszeile angepasst).
+2. *(MAJOR)* `sitzungswissen/`-Alternative wirkte wie ein offenes Schlupfloch → explizit
+   als **Maintainer-Entscheid E2a** verortet (nur private Repos, hier ausgeschlossen).
+3. *(MAJOR)* Memory-Rückfallweg in `start` konnte ein **fremdes** Projekt-Memory wählen
+   und die Slug-Ableitung war unterspezifiziert → Slug exakt definiert (Pfad mit
+   Trennzeichen→`-`), Rückfall auf Repo-Namens-Match beschränkt, fremdes Memory nie laden.
+4. *(MINOR)* Stempel-Reihenfolge „nach Schritten 3–8" vs. „letzter Schritt" → „nach den
+   Schritten 3–9" präzisiert.
+5. *(MINOR)* „Kein Marker nötig" ohne Referent → als historischer `.nc-os`-Repo-Marker
+   benannt, Abgrenzung zu Gate-Stempeln ergänzt.
+6. *(MINOR)* `NC_SSOT_DIR` nur in den Regeln erwähnt → auch im S2-Schritt dokumentiert.
+7. *(MINOR)* Register-Vorlage divergierte zwischen `setup` S4 und `end-session` Schritt 7
+   → auf eine Struktur vereinheitlicht (Kopf-Blockquote + Tabelle).
+8. *(NIT)* S-Nummern ≠ Reihenfolge klargestellt.
+
+**Als Fehlbefunde zurückgewiesen** (Artefakte der komprimierten Review-Vorlage, gegen die
+Platte geprüft): der `ssot-provision.js`-Aufruf trägt im Original den vollen
+`<skills-pfad>`-Platzhalter; `/nc:doku-sync` (Pre-Commit-Sync im Arbeits-Repo) und
+`/nc:update-doks` (Maintainer-Reparatur/Konsistenzlauf) sind zwei verschiedene, beide
+existierende Skills.
+
 ---
 
 *Angelegt 2026-08-15 durch Claude (Fable 5, Claude Code) auf Weisung Lucas Vöhringer.
