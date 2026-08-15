@@ -204,7 +204,7 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   `sync-nachzug-executor` (schreibend, Marker `nc:schreibend`, `sonnet`, ohne `Bash`),
   ausgelieferte Referenz `referenz/agent-authoring.md`, Vorlagen-Baustein
   `agents/beispiel-agent.md.vorlage`, zwei Prüfbausteine (`agenten.test.mjs` portabel,
-  Baustein-Version 1.4.0; `agenten-os.test.mjs` OS-Repo-gebunden), Registry-`agents`-Segment.
+  Baustein-Version 1.4.1; `agenten-os.test.mjs` OS-Repo-gebunden), Registry-`agents`-Segment.
   **Allowlist-Norm-Nachzug** von Onsite PR #60 (Bauplan-Nachtrag N7): `tools`/`model`
   Pflichtfelder, Defense-Baseline-Block Pflicht, Werkzeuggrenze in der `tools`-Allowlist statt
   `disallowedTools`. **Anker-Mechanik** zweistufig: frühe `reserve/*`-Tag-Reservierung

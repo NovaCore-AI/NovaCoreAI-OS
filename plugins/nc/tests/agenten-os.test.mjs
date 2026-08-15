@@ -93,7 +93,10 @@ test('Vorlagen-Invariante: beispiel-agent.md.vorlage traegt Platzhalter und Allo
   const tokens = teile.join(',').split(',')
     .map((t) => t.replace(/^[-\s]+|[\s]+$/g, '')).filter(Boolean);
   const LESE_BUILTINS = new Set(['Read', 'Grep', 'Glob', 'WebFetch', 'WebSearch']);
-  const unzulaessig = tokens.filter((t) => !t.startsWith('mcp__') && !LESE_BUILTINS.has(t));
+  // MCP nur in den dokumentierten server-qualifizierten Formen — das globale mcp__* und
+  // Wildcard-Streuformen sind auch in der Vorlage unzulaessig (Baustein 1.4.1).
+  const MCP_FORM = /^mcp__[A-Za-z0-9-]+(?:__(?:\*|[A-Za-z0-9_-]+))?$/;
+  const unzulaessig = tokens.filter((t) => !MCP_FORM.test(t) && !LESE_BUILTINS.has(t));
   assert.deepEqual(unzulaessig, [],
     `Vorlage muss die Read-only-Variante vorgeben — unzulaessige tools-Eintraege: ${unzulaessig.join(', ')}`);
   assert.match(inhalt, /^## Defense-Baseline[ \t]*$/m,

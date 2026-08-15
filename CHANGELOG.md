@@ -36,7 +36,7 @@ Single-Plugin-Layout und bleiben historisch unverändert.
     `plugins/nc/referenz/agent-authoring.md` (Feldkanon, Werkzeuggrenzen-Regel,
     Defense-Baseline-Pflichtbaustein); Vorlagen-Baustein
     `vorlagen/abteilungsplugin/agents/beispiel-agent.md.vorlage` (Read-only-Variante); zwei
-    Prüfbausteine — `plugins/nc/tests/agenten.test.mjs` (portabel, Baustein-Version 1.4.0,
+    Prüfbausteine — `plugins/nc/tests/agenten.test.mjs` (portabel, Baustein-Version 1.4.1,
     wandert mit einem Satelliten-`agents/`-Verzeichnis mit) und
     `plugins/nc/tests/agenten-os.test.mjs` (OS-Repo-gebunden: Registry-Konsistenz,
     Vorlagen-Invariante); dazu das `agents`-Segment je Abteilung in
@@ -83,14 +83,26 @@ Single-Plugin-Layout und bleiben historisch unverändert.
     vierten Bump-Stelle, E6/E7-Klarstellung am `[Unreleased]`-Kopf) plus 3 MINOR-Härtungen
     (→ 1.3.0: Marker-Position, `maxTurns`-Pflicht, leerzeilen-/mischformfeste
     Parser-Helper); 1 Finding als False Positive belegt (`firmenkernprozesse/`-Links
-    existieren im Repo). **Codex** (0.147.0): 1 BLOCKER + 3 MAJOR + 4 MINOR eingearbeitet
-    (→ **1.4.0**: Werkzeuggrenze als echte **Positiv-Allowlist** — exec-fähige Built-ins
+    existieren im Repo). **Codex** (0.147.0, zwei Runden): 1 BLOCKER + 3 MAJOR + 6 MINOR
+    eingearbeitet
+    (→ **1.4.1**: Werkzeuggrenze als echte **Positiv-Allowlist** — exec-fähige Built-ins
     wie `PowerShell`/`Monitor` fallen fail-closed durch; Token-Formprüfung gegen
     YAML-Kommentare/Quotes; Defense-Baseline-**Inhalts**prüfung aller vier Grundsätze;
     kebab-case-Härte am `name`; Vorlagen-Invariante liest den ganzen Feldwert;
     §14-Rückgabeschema mit Referenzmuster vereinheitlicht; `save-session`-Altverweis;
-    Baustein-Versionsnennungen nachgezogen) — alle mit Gegenproben im Parser-Helper-Test.
+    Baustein-Versionsnennungen nachgezogen; Runde 2: MCP-Tokenform exakt auf die
+    dokumentierten server-qualifizierten Varianten begrenzt, Defense-Grundsatz 4
+    semantisch verankert, „Abweichungen"-Rubrik in der Vorlagen-Rückgabe) — alle mit
+    Gegenproben im Parser-Helper-Test.
     — *Claude (Fable 5, Claude Code); AP-C2-Port durch Opus-Agent*
+
+- **Bauplan `2026-08-16-novacore-agent-sdk-gui-architektur.md`** (parallele
+  Maintainer-Arbeit, 2026-08-16): Konzeption der eigenen Desktop-/Web-UI-Plattform
+  `nc-web` mit Claude Code als eingebettetem Runtime-Motor — 4-Schichten-Modell,
+  Prozess-Lifecycle, dynamische Modell-/Thinking-Budget-Wahl, `canUseTool`-Brücke,
+  Gate-Fidelity, Invarianten INV-01–INV-14; Index-Zeile gesetzt. Reines
+  Planungsdokument, kein Bump. — *Lucas Vöhringer (Konzeption) / Eintrag nachgetragen
+  von Claude (Fable 5, Claude Code)*
 
 - **Onsite-Endstand-Nachbau, Phase 1 „SSOT-Kern & Kontroll-Schicht" (Kern 0.7.1 → 0.8.0)**
   nach Bauplan `grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md`
