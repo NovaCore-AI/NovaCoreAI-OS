@@ -105,7 +105,7 @@ NovaCoreAI-OS/
 ├── .claude-plugin/marketplace.json     # Marketplace "novacore-os", Einträge OHNE version-Feld
 ├── plugins/nc/                         # Kern-Plugin: ständige Abteilung "gemeinsam"
 │   ├── .claude-plugin/plugin.json      #   Leitversion des Produkts, KEINE dependencies
-│   ├── skills/<name>/SKILL.md          #   start, save-session, journal
+│   ├── skills/<name>/SKILL.md          #   start, end-session, journal
 │   ├── hooks/                          #   FFG + SessionStart — Hooks liegen NUR im Kern
 │   ├── tests/*.test.mjs                #   Hook-Tests + Struktur-Invarianten
 │   ├── wp-rahmen.md                    #   Pflicht-Zyklus WP0–WP8 (normativ)
@@ -181,7 +181,7 @@ Der verbindliche Rahmen steht in `wp-rahmen.md` des Kern-Plugins `nc` (WP0–WP8
    postet und entscheidet.
 4. **Jederzeit:** `/nc:journal` — einzelne Entscheidungen, Funde und Blocker sofort festhalten,
    statt sie bis zum Sitzungsende zu sammeln.
-5. **Session-Ende (WP8):** `/nc:save-session` — append-only ins Journal, Stand konsolidieren,
+5. **Session-Ende (WP8):** `/nc:end-session` — append-only ins Journal, Stand konsolidieren,
    Übergabe schreiben.
 
 ---

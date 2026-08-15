@@ -36,6 +36,14 @@ Fehlt das Verzeichnis, ist die Wissensbasis auf diesem Rechner noch nicht bereit
 einmal `/nc:setup` ausführen. Bis dahin gilt — Aussagen, die die Wissensbasis bräuchten,
 werden als **nicht belegbar** gekennzeichnet, nicht geraten.
 
+## Team-Sync (Ebene 1b)
+
+Teamweite Methodik, Conventions und Safety stehen in der vollständig firmengeführten
+Datei `nc-teamsync.md` im `.claude`-Ordner (vom Doks-Autosync des Kerns aktuell
+gehalten). Sie wird hier geladen:
+
+@~/.claude/nc-teamsync.md
+
 ---
 
 Alles außerhalb der NC-Marker ist persönliche Zone des Mitarbeiters und wird von Updates

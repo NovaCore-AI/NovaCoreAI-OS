@@ -1,8 +1,8 @@
 {
   "name": "nc",
   "displayName": "NovaCore-OS (Kern)",
-  "version": "0.7.1",
-  "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam (7 Skills — Session-Zyklus, Journal, Infrapflege), Kontroll-Schicht mit Gate 1 (FFG, Fact-Forcing-Gate) und Gate 2 (Session-Start-Zwang: Injektion + Start-Gate mit Fakten-Stempel), Doks-Autosync der team-globalen CLAUDE-Anteile, WP-Rahmen WP0–WP8 und Abteilungs-Registry. Jedes Abteilungsplugin setzt diesen Kern als Dependency voraus — wer eine Abteilung installiert, bekommt ihn transitiv aktiviert.",
+  "version": "0.8.0",
+  "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam (8 Skills — Session-Zyklus start/end-session, Journal, Infrapflege setup/doku-sync/os-info/skill-builder/update-doks), Kontroll-Schicht mit Gate 1 (FFG, Fact-Forcing-Gate), Gate 2 (Session-Start-Zwang: Injektion + Start-Gate mit Fakten-Stempel) und PreCompact-Mahnung des Sitzungsabschlusses (nc-end-mahnung + Abschluss-Stempel), Doks-Autosync der team-globalen CLAUDE-Anteile (Ebene 1 Firmen-Block + Ebene 1b Team-Sync-Ganzdatei), WP-Rahmen WP0–WP8 und Abteilungs-Registry. Jedes Abteilungsplugin setzt diesen Kern als Dependency voraus — wer eine Abteilung installiert, bekommt ihn transitiv aktiviert.",
   "author": {
     "name": "NovaCore AI"
   },

@@ -26,7 +26,7 @@ liefert die Disziplin als Prozessbestandteil, nicht als Appell.
 | WP5 | Selbst-Review + Übergabe | Eigenen Diff prüfen, Übergabe vorbereiten | Abteilung |
 | WP6 | Review | Fremdprüfung vorbereiten, durchführen, einarbeiten | Abteilung |
 | WP7 | QS & Abnahme | Ergebnis in der Realität prüfen, Feedback-Schleife bis zur Abnahme | Abteilung |
-| WP8 | Session-Ende | Stand sichern, Entscheidungen protokollieren, Übergabe schreiben | Kern: `/nc:save-session` |
+| WP8 | Session-Ende | Stand sichern, Entscheidungen protokollieren, Übergabe schreiben | Kern: `/nc:end-session` |
 
 Ergänzend jederzeit: **`/nc:journal`** hält **einzelne** Ereignisse fest, sobald sie anfallen,
 statt sie bis WP8 zu sammeln — Entscheidung, Fund, Blocker, Erledigtes, jeweils mit Beleg.

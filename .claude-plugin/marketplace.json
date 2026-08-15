@@ -9,7 +9,7 @@
     {
       "name": "nc",
       "source": "./plugins/nc",
-      "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam (start, save-session, journal), Kontroll-Hook FFG, WP-Rahmen WP0–WP8, Abteilungs-Registry. Wird von jedem Abteilungsplugin vorausgesetzt.",
+      "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam (start, end-session, journal), Kontroll-Hook FFG, WP-Rahmen WP0–WP8, Abteilungs-Registry. Wird von jedem Abteilungsplugin vorausgesetzt.",
       "category": "kern"
     },
     {

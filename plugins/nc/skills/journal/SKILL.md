@@ -12,7 +12,7 @@ description: >-
 
 ## Zweck
 
-Gedächtnis **während** der Arbeit, nicht erst am Ende. Wo `/nc:save-session` die Sitzung
+Gedächtnis **während** der Arbeit, nicht erst am Ende. Wo `/nc:end-session` die Sitzung
 abschließend zusammenfasst und den Stand konsolidiert (WP8 im WP-Rahmen `wp-rahmen.md` dieses
 Kern-Plugins `nc`), hält dieser Skill **einzelne** Ereignisse fest, sobald sie eintreten: eine
 getroffene Entscheidung, ein belegter Fund, ein Blocker, ein erledigter Punkt. Damit überlebt
@@ -67,7 +67,7 @@ Leere Felder weglassen — kein „N/A"-Platzhalter.
   automatischen Pushes, Merges, Posts, Releases oder Deployments ohne explizite Nutzerfreigabe.
   Im Team-Modus liegt die Datei im Git-Tree; der Commit bleibt Sache des Menschen.
 - **Kein Ersatz für den Sitzungsabschluss.** Journaleinträge entbinden nicht von
-  `/nc:save-session` — der konsolidierte Stand entsteht nur dort.
+  `/nc:end-session` — der konsolidierte Stand entsteht nur dort.
 
 ## Verifikation
 

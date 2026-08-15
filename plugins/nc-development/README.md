@@ -7,7 +7,7 @@ diesen Zyklus.
 
 **Aufruf:** `/nc-development:<skill>` (z. B. `/nc-development:flc-plan`). Der Kern `nc` ist als
 Dependency dieses Plugins eingetragen und wird bei Installation und Aktivierung transitiv
-mitgezogen — die Kern-Skills `/nc:start`, `/nc:save-session` und `/nc:journal` stehen damit
+mitgezogen — die Kern-Skills `/nc:start`, `/nc:end-session` und `/nc:journal` stehen damit
 immer zur Verfügung und können nicht fehlen.
 
 ## Module und Skills
@@ -44,7 +44,7 @@ verletzt werden könnten; Skills bleiben kleine Checklisten, keine Prosa-Wüsten
 
 ```
 /nc:start → flc-feature-start → flc-plan → (umsetzen, Test-First)
-          → flc-commit-prep → flc-pr → fe-review / be-review → /nc:save-session
+          → flc-commit-prep → flc-pr → fe-review / be-review → /nc:end-session
 ```
 
 Bei Arbeit am Wasserzisterne-Empfehlungssystem laufen die passenden `wzs-*`-Checklisten

@@ -474,6 +474,30 @@ verfügbar) → alle nicht-kosmetischen Findings iterieren → PR des Feature-Br
 E6 gilt damit sinngemäß ENTSCHIEDEN (ein Bump je Großphase, am Ende); E4 ist **vertagt**
 (in Phase 1/2 nicht benötigt); E5 ist **vertagt auf Phase 2**.
 
+### N2 — Ebene-1b-Payload bleibt `plugins/nc/nc-sync.md` (Umsetzung AP-B2, 2026-08-15)
+
+AP-B2 sah als Payload `doks/nc-teamsync.md` mit „Umzug" von `nc-sync.md` vor. Beim Bau
+zeigte der Verweis-Sweep: `nc-sync.md` wird von **über zehn ausgelieferten Dateien**
+referenziert (Skills des Kerns und der Abteilung, `workflow.md`, `skill-authoring.md`,
+Standardprozesse, AGENTS/README) — ein Umzug bräche sie alle, eine Kopie nach `doks/`
+wäre verbotene Doppelpflege. Entscheid der Umsetzung: Der Autosync liest
+`plugins/nc/nc-sync.md` **direkt** als Ebene-1b-Payload (`TEAMSYNC_PAYLOAD`); die Datei
+bleibt die eine Quelle an ihrem eingeführten Ort. Abweichung vom Onsite-Layout
+(`doks/oai-teamsync.md`) ist im Hook-Kopf dokumentiert. Ziel-Dateiname beim Nutzer bleibt
+`~/.claude/nc-teamsync.md` (wie Vorbild).
+
+### N3 — Reconciler-Schichten S3/S4 bleiben skill-geführt (Umsetzung AP-A1, 2026-08-15)
+
+Wie im Vorbild (`/oai:init` hat kein Registry-Skript) schreiben S3 (Infra-Registry) und
+S4 (Sitzungswissen-Gerüst) skill-geführt nach den harten Feldregeln der Referenzdatei
+`setup/infra-registry.md`; einziges Skript bleibt `ssot-provision.js` (S2, unverändert
+inkl. Sparse-Heilung). Testfälle T1/T2 werden entsprechend gelesen: T1 (Idempotenz) gilt
+für das S2-Skript (bestandsgetestet in `nc-ssot-provision.test.mjs`) plus die
+Skip-Semantik des Skill-Ablaufs; T2 (absolute Pfade) ist Regelwerk der Referenz + Prüfung
+in S3 („jeden Pfad gegen S2 re-checken"), nicht Skript-Unit-Test. Die Onsite-Zustände
+„lokal erweitert" gehören zu Arbeitsklonen und existieren in NC nicht — die Lesekopie
+meldet `lokal-veraendert` als Warnung (E1-Kontext: kein Arbeitsklon-Konzept vor Phase E).
+
 ---
 
 *Angelegt 2026-08-15 durch Claude (Fable 5, Claude Code) auf Weisung Lucas Vöhringer.

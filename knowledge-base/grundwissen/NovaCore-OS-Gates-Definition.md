@@ -19,7 +19,7 @@ per Env **je Gate**. Alle Hooks liegen im Kern `nc`.
 | **1** | **FFG** (Fact-Forcing-Gate) — im Kern als domänen-freies **Basis-Gate**; drei Sub-Gates („FFG 1–3") | Fakten **vor** schreibenden Aktionen: **(1) Datei-Gate** je Zieldatei (Edit/Write/MultiEdit), **(2) Destruktiv-Gate** je Kommando (`rm -rf`, Force-Push, `reset --hard`, SQL-DDL, `find -exec` …), **(3) Routine-Bash-Gate** einmal je Session; Read-only-Git nie | PreToolUse (`nc-ffg.js`); Ablehnung mit Investigations-Text, Durchlass nach Faktenvorlage; quote-aware Bash-Analyse (GHSA-4v57-ph3x-gf55-Härtung), verankerte Exempt-Globs, plattformbewusstes Case-Folding, Session-Key-Hashing bei jeder Zeichen-Ersetzung | **Nie** — es verlangt Fakten und lässt danach den normalen Permission-Flow laufen | **gebaut** (v2; Review-Härtungen 2026-07-28, Lib-Extraktion + `exitCode`-Fix 2026-08-10, Read-only-Git-Erkennung segmentweise korrigiert 2026-08-14) | `NC_FFG=off` | Design-Spec 2026-07-28 §5; Bauplan 2026-08-10 AP1 |
 | **2** | **Session-Start-Zwang** | Kein Blind-Start: Pflicht-Einstieg + lebender Projektstand zu Sessionbeginn; die **erste schreibende Aktion** erst, nachdem `/nc:start` gelaufen und der Fakten-Stempel gesetzt ist — Lesen und Fragen bleiben frei | zweiteilig („Zangen-Prinzip"): SessionStart-**Injektion** (`nc-session-start.js`; kann plattformbedingt nicht blocken) + PreToolUse-**Erzwingungs-Begleiter** (`nc-start-gate.js`) mit Fakten-Stempel (`nc-start-stempel.js`, verifiziert `--branch`/`--head` gegen die Git-Lage des **Projektverzeichnisses**) | Nein | **gebaut** mit dem Umbau 2026-08-10 (vorher: markergebundener Begrüßungs-Hinweis, kein Gate); Read-only-Git-Erkennung segmentweise korrigiert 2026-08-14 (Pfadwechsel/Verkettung/`worktree list` wieder frei) | `NC_START_GATE=off` (ein Schalter für beide Teile) | Bauplan 2026-08-10 AP2, Nachtrag N2 |
 | **3** | **Safety-Gate** | Echte **menschliche Freigabe** vor Aktionen mit Außen- oder Infrastrukturwirkung: Infra/Deploy/Prod **und** kundensichtbare Schreibaktionen — Vorlagepflicht: Empfänger/Zielort + **wörtlicher** Text | PreToolUse mit `permissionDecision: "ask"` → echter Freigabedialog; semantische Schreib-Marker auch für `mcp__*`-Tools (manifest-unabhängig); Fehlalarm-Schutz als Abnahmekriterium | **Ja — genau dafür existiert es** (das einzige Gate mit Dialog) | **nicht gebaut** (wie im Vorbild) | vorgesehen, analog je Gate | offen |
-| **4** | **Sitzungsabschluss** | Kein Wissensverlust am Sessionende: ungesicherte substanzielle Arbeit wird angemahnt, Erinnerung/Journal und Logs werden gepflegt | vorgesehen dreiteilig: PostToolUse-**Akkumulator** + **Stop**-Hook (blockt **einmal** je Turn-Kette, Schleifenschutz) + SessionEnd-Protokoll; menschliches Gegenstück ist `/nc:save-session` | Nein — es mahnt und blockt einmal, entscheidet nicht | **nicht gebaut** — nur der Skill `/nc:save-session` existiert | vorgesehen, analog je Gate | offen |
+| **4** | **Sitzungsabschluss** | Kein Wissensverlust am Sessionende: ungesicherte substanzielle Arbeit wird angemahnt, Erinnerung/Journal und Logs werden gepflegt | vorgesehen dreiteilig: PostToolUse-**Akkumulator** + **Stop**-Hook (blockt **einmal** je Turn-Kette, Schleifenschutz) + SessionEnd-Protokoll; menschliches Gegenstück ist `/nc:end-session` | Nein — es mahnt und blockt einmal, entscheidet nicht | **nicht gebaut** — es existieren der Skill `/nc:end-session` und (seit Kern 0.8.0) die **PreCompact-Mahnung**, die ausdrücklich **nicht** Gate 4 ist (siehe unten) | vorgesehen, analog je Gate | offen |
 
 ## Abgrenzungen, die Verwechslungen verhindern
 
@@ -33,7 +33,24 @@ per Env **je Gate**. Alle Hooks liegen im Kern `nc`.
   trotzdem Verschiedenes — das ist gewollt, nicht redundant.
 - **Gate 2 vs. Gate 4:** Der Start-Zwang sichert den **Anfang** (richtiger Kontext, bevor
   geschrieben wird), der Sitzungsabschluss das **Ende** (nichts geht verloren). Ihre
-  menschlichen Gegenstücke sind `/nc:start` und `/nc:save-session`.
+  menschlichen Gegenstücke sind `/nc:start` und `/nc:end-session` (bis Kern 0.7.x
+  `save-session`).
+- **PreCompact-Mahnung vs. Gate 4 (seit Kern 0.8.0):** `nc-end-mahnung.js` blockt die
+  **erste** Kompaktierung einer Sitzung ohne abgeschlossenes `/nc:end-session` (top-level
+  JSON `decision`, Exit 0) und lässt die zweite immer durch (Loop-Schutz gegen
+  Auto-Compact-Sackgassen); Abschluss-Stempel `nc-end-stempel.js` ist reine
+  Selbstauskunft, Marker verfallen nach 30 Min **Inaktivität** (Heartbeat). Das ist
+  **kein** Gate 4: Es mahnt nur vor der Kompaktierung, nie am Sitzungsende, und
+  entscheidet nichts. Opt-out `NC_PRECOMPACT=off`, Test-Override `NC_END_STATE_DIR`.
+
+## Weitere Mitglieder der Kontroll-Schicht (keine Gates)
+
+- **Doks-Autosync** (`nc-doks-autosync.js`, SessionStart): hält seit Kern 0.8.0 **zwei**
+  Ziele unabhängig aktuell — Ebene 1 (Firmen-Block, Marker-Chirurgie, fail-safe bei
+  defekten Markern) und Ebene 1b (`~/.claude/nc-teamsync.md`, Ganzdatei mit
+  Versions-Stempel). Details: `NovaCore-OS-CLAUDE-Ebenen-Definition.md`.
+- **PreCompact-Mahnung** (`nc-end-mahnung.js` + `nc-end-stempel.js`): siehe Abgrenzung
+  oben.
 
 ## Was Gate 2 deterministisch prüft — und was nicht
 

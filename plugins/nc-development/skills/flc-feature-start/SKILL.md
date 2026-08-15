@@ -38,7 +38,7 @@ Kleinständerungen — direkt die Umsetzung.
    Slicing; bei Kleinständerungen direkt implementieren und mit
    `/nc-development:flc-commit-prep` abschließen.
 7. **Ergebnis festhalten:** Anforderung, offene Fragen und Branch-Name kompakt zusammenfassen,
-   damit `/nc:save-session` sie ins Journal übernehmen kann.
+   damit `/nc:end-session` sie ins Journal übernehmen kann.
 
 ## Regeln
 
