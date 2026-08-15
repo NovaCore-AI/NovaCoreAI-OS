@@ -4,7 +4,7 @@
 **Familie von Claude-Code-Plugins** aus einem Marketplace: eine Methode für alle statt
 vieler Privat-Setups.
 
-**Status: Kern `nc` v0.7.0 · Abteilung `nc-development` v0.1.0 · Abteilung `nc-felix`
+**Status: Kern `nc` v0.9.0 · Abteilung `nc-development` v0.1.0 · Abteilung `nc-felix`
 v0.4.1 (erster Satellit, eigenständiges Felix-OS) · Abteilung `nc-biggi` v0.1.1 (zweiter
 Satellit, eigenständiges Biggi-OS) · Affiliate `kimi-code-plugin-cc` v1.4.0 (extern) ·
 Affiliate `mneme-kimi-code` v2.0.24 (extern) —
@@ -23,7 +23,7 @@ bringen ihren Kern als **Modul** selbst mit:
 
 | Plugin | Rolle | Namespace | Version |
 |---|---|---|---|
-| `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Infrapflege-Skills, Kontroll-Schicht (Gate 1 + Gate 2), Doks-Autosync, WP-Rahmen, Registry, Formatregeln, `nc-sync.md` | `/nc:` | 0.7.0 (= `VERSION`) |
+| `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Infrapflege-Skills, Kontroll-Schicht (Gate 1 + Gate 2), Doks-Autosync, WP-Rahmen, Registry, Formatregeln, `nc-sync.md`, Subagenten (`agents/`) | `/nc:` | 0.9.0 (= `VERSION`) |
 | `nc-development` | Abteilung development — Module `fe` / `be` / `flc` / `wzs` | `/nc-development:` | 0.1.0 |
 | `nc-felix` | Abteilung felix — **eigenständiges Felix-OS** (erster Satellit, privates Repo `NovaCore-AI/Felix-OS`): Kernmodul mit 7 Skills, eigene Kontroll-Schicht mit Gate 1 + Gate 2 (markerlos) und eigene isolierte Wissensbasis, hängt **nicht** am Kern | `/nc-felix:` | 0.4.1 |
 | `nc-biggi` | Abteilung biggi — **eigenständiges Biggi-OS** (zweiter Satellit, privates Repo `NovaCore-AI/Biggi-OS`): Kernmodul mit 6 Skills + Kontroll-Schicht (FFG + Session-Start-Zwang nach Onsite-Vorbild), hängt **nicht** am Kern; Arbeitsmodul-Konvention `ctrl` / `mdzn` / `doc`+`day` reserviert | `/nc-biggi:` | 0.1.1 |
@@ -65,6 +65,12 @@ bringen ihren Kern als **Modul** selbst mit:
 | `/nc:doku-sync` | vor Commit | Lebende Doku nach der Sync-Matrix nachziehen, CHANGELOG + Versions-Gleichstand prüfen, Prüfstempel setzen |
 | `/nc:os-info` | jederzeit | Erklärt das OS **auf Basis der realen Installation** — Plugins, Module, nutzbare Skills, Gate-Status |
 | `/nc:skill-builder` | jederzeit | Führt durch den Bau eines Skills nach den OS-Regeln (Sandbox oder OS-Beitrag, inkl. Fork-back) |
+
+**Subagenten (Kern `nc`):** `agents/sync-nachzug-executor.md` — schreibender Executor (Marker
+`nc:schreibend`, `sonnet`, ohne `Bash`), bündelt am Bauzyklus-Ende die abgeleiteten
+Doku-Nachzüge aus dem Protokoll des führenden Agenten. Format-Referenz (ausgeliefert):
+`plugins/nc/referenz/agent-authoring.md` (Feldkanon, Werkzeuggrenzen-Regel,
+Defense-Baseline-Pflichtbaustein).
 
 **Abteilung `nc-development`:**
 
@@ -142,7 +148,13 @@ Verbindliche Prozesse: [`kern-plugin-bau.md`](knowledge-base/standardprozesse/ke
 (Abteilungen und Satelliten) · [`ssot-aufbau.md`](knowledge-base/standardprozesse/ssot-aufbau.md)
 (Wissensbasis) · [`sync-nachzug-bauzyklus.md`](knowledge-base/standardprozesse/sync-nachzug-bauzyklus.md)
 (Nachzüge je Bauzyklus) · [`os-bau-methode.md`](knowledge-base/standardprozesse/os-bau-methode.md)
-(Gesamt-Methode). Skill-Format: `plugins/nc/referenz/skill-authoring.md`.
+(Gesamt-Methode) · [`claude-netz-bau.md`](knowledge-base/standardprozesse/claude-netz-bau.md)
+(CLAUDE-Ebenen) · [`subagenten-bau.md`](knowledge-base/standardprozesse/subagenten-bau.md)
+(Subagenten) · [`anker-reservierung.md`](knowledge-base/standardprozesse/anker-reservierung.md)
+(Anker bei Parallelbau) · [`abteilungs-inhalts-pruefung.md`](knowledge-base/standardprozesse/abteilungs-inhalts-pruefung.md)
+(Inhalts-Audit je Abteilung) · [`team-distribution.md`](knowledge-base/standardprozesse/team-distribution.md)
+(Team-Rollout). Skill-Format: `plugins/nc/referenz/skill-authoring.md`; Agent-Format:
+`plugins/nc/referenz/agent-authoring.md`.
 
 ## Versionsmodell
 

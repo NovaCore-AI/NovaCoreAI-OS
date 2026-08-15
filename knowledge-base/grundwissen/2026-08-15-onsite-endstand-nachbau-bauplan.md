@@ -160,10 +160,12 @@ Sparse-Heilung in `ssot-provision.js` · Konfliktzonen-Regel im Sync-Nachzug ·
   über die dafür dokumentierten JSON-Felder (`permissionDecision` bzw. PreCompact top-level
   `decision`), nie über Exit-Codes. Opt-out-Env je Hook an drei Orten (Hook-Kopf,
   `hooks.json`-description, README).
-- **I4 — Subagenten-Schreibgrenze hart im Frontmatter.** Read-only-Agenten führen
-  `disallowedTools: Write, Edit, MultiEdit, NotebookEdit, Bash` — **ohne Ausnahme, auch wenn
-  eine enge `tools`-Allowlist faktisch dasselbe sperrte** (Onsite-Regel wörtlich, `agent-
-  authoring.md`); schreibende Agenten nur mit Marker + begründeter Allowlist; verbotene Felder (`hooks`,
+- **I4 — Subagenten-Werkzeuggrenze hart im Frontmatter.** *(Fassung revidiert durch
+  Nachtrag N7 — Onsite stellte die Norm am 2026-08-15 in PR #60 aufs Allowlist-Prinzip um;
+  die frühere `disallowedTools`-Pflicht ist damit überholt.)* `tools` und `model` sind
+  Pflichtfelder; read-only = Allowlist ohne Schreib-Werkzeuge und ohne `Bash`; schreibende
+  Agenten nur mit Marker + begründeter Schreib-Allowlist ohne `Bash`; `disallowedTools` nur
+  noch Zusatzsicherung (Sonderfälle); Defense-Baseline-Block Pflicht; verbotene Felder (`hooks`,
   `mcpServers`, `permissionMode`) kommen nicht vor; `isolation` bleibt gesperrt, bis die
   Team-Mindestversion es trägt. Vor dem ersten Agenten wird die **Gate-Semantik von
   `nc-ffg.js`/`nc-start-gate.js` für Subagenten geklärt und dokumentiert** (Onsite-Befund:
@@ -259,7 +261,7 @@ Sparse-Heilung in `ssot-provision.js` · Konfliktzonen-Regel im Sync-Nachzug ·
   Einzel-Spec mit Fußzeilen-Kette (§2, Zeile Onsite-Spec-§) — bewusster Ausschluss statt
   stiller Lücke.
 - **AP-C3 `standardprozesse/subagenten-bau.md`** + `plugins/nc/referenz/agent-authoring.md`
-  (13-Feld-Kanon, Schreibsperren-Regel nach I4-Wortlaut, gesperrte Felder) — Prozess **vor**
+  (13-Feld-Kanon, Werkzeuggrenzen-Regel nach I4-Wortlaut, gesperrte Felder) — Prozess **vor**
   Mechanik (AP-D1). Inklusive Mitwander-Regel: bekommt ein Satellit ein
   `agents/`-Verzeichnis, wandert der portable Prüfbaustein (AP-D1) im selben Zug mit.
 - **AP-C4 `standardprozesse/abteilungs-inhalts-pruefung.md`** (Karte 10: zwei unabhängige
@@ -600,6 +602,38 @@ für Phase 2/3**, die die generischen Mapping-Regeln in §2 konkretisiert:
 - **Weitere offene Punkte:** GLM-5.3-Review wartet auf erneuerten z.ai-Key in
   `~/.kimi-code/config.toml` (`[providers.zai-coding-plan] api_key`) · Livetests
   Reconciler/PreCompact (Maintainer).
+
+### N7 — Subagenten-Norm-Umstellung des Vorbilds nachgezogen (2026-08-16, Phase 2)
+
+Onsite hat die Subagenten-Norm **nach** unserem Referenzstand `c55085f` weiterentwickelt
+(Maintainer-Weisung 2026-08-16: „achte auf die neuen Änderungen … gerade was Subagenten
+angeht in dessen neuem PR"). Zwei offene, **untereinander divergierende** Upstream-PRs:
+
+1. **PR #60 `fix/agenten-allowlist-norm` (Kern 0.23.0, jüngster Stand — hier ÜBERNOMMEN):**
+   Werkzeuggrenzen-Norm auf **Allowlist-Prinzip** umgestellt — `tools` und `model` werden
+   Pflichtfelder (Routing: `sonnet` Bulk-Executor / `inherit` urteilskritisch), die Grenze
+   steht in der `tools`-Allowlist (read-only ohne Schreib-Tools/Bash; schreibend mit Marker,
+   ohne Bash), `disallowedTools` nur noch Zusatzsicherung (globales `mcp__*`);
+   **Defense-Baseline-Block** wird Pflichtbaustein jedes Agenten-Prompts;
+   `skills:`-Preload doku-verifiziert (nackte Namen, Silent-Skip → Suite prüft Auflösung
+   aufs eigene Plugin); `isolation`-Grenze 2.1.210; portabler Prüfbaustein **1.2.0**.
+   In NovaCore nachgezogen: `agent-authoring.md`, `subagenten-bau.md`,
+   `agenten.test.mjs` (1.2.0-Port), `agenten-os.test.mjs` (Vorlagen-Invariante),
+   `beispiel-agent.md.vorlage`, `sync-nachzug-executor.md` (Defense-Baseline),
+   Aktualisierungs-Index-Agent-Zeile. **I4 entsprechend revidiert** (§3).
+2. **PR #59 `docs/subagenten-spezialisten-garnitur` (upstream offen, NICHT mechanisch
+   übernommen):** Zielbild-Bauplan mit Normen A–C und der Spezialisten-Garnitur für den
+   dev-Satelliten. Übernommen wurde daraus nur **Norm B** (Abnahme-/Peer-Review-Modell,
+   3 Stufen) als additiver §14 in `subagenten-bau.md`. **Nicht** übernommen, weil im
+   Widerspruch zum implementierten PR #60: JSON-Array-Format der Allowlist und
+   `disallowedTools`-Totalverbot (dort Baustein „2.0.0" nur angekündigt). Norm A
+   (Skill-Anbindungs-Abschnitt je Agenten-Spezifikation) ist mechanisch durch die
+   #60-Preload-Regeln gedeckt; ihre Spezifikations-Pflicht und die Spezialisten-Garnitur
+   selbst betreffen die dev-Skills und sind **Phase-3/F-Prüfpunkt**.
+
+**Folge-Prüfpunkt:** Nach dem Upstream-Merge (Onsite entscheidet, wie #59/#60
+zusammengeführt werden) den Endstand gegenlesen und Differenzen per Nachtrag auflösen —
+nicht vorab raten. Metaflow (PR #61/#62) bleibt außerhalb dieses Plans (§0.4).
 
 ---
 

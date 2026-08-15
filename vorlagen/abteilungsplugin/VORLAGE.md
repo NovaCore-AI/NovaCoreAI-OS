@@ -19,9 +19,19 @@ Plugin — die Vorlage bleibt die geprüfte Quelle.
 vorlagen/abteilungsplugin/
   .claude-plugin/plugin.json.vorlage   Manifest-Gerüst mit dependencies ["nc"]
   README.md.vorlage                    Abteilungs-README-Gerüst
+  abteilungs-claude.md.vorlage         Abteilungs-CLAUDE (Ebene 2), zweigeteilt — Pflicht
+  agents/beispiel-agent.md.vorlage     Subagenten-Baustein (Read-only-Variante, Allowlist-Norm) — optional, erst beim ersten Agenten instanzieren
   ssot-grundgeruest.md.vorlage         Wissensbasis-Gerüst — NUR für eigenständige Satelliten
   VORLAGE.md                           diese Anleitung
 ```
+
+Die **Abteilungs-CLAUDE ist Pflichtbestandteil** jedes Abteilungsplugins (Ebene 2 des
+CLAUDE-Netzes — `knowledge-base/grundwissen/NovaCore-OS-CLAUDE-Ebenen-Definition.md`,
+Prozess `knowledge-base/standardprozesse/claude-netz-bau.md`). Zielname beim Instanzieren:
+`{{ABTEILUNG}}-abteilungs-claude.md` an der **Plugin-Wurzel** — nie an der Repo-Wurzel eines
+Satelliten, weil beim Nutzer nur das Plugin-Verzeichnis ankommt (`abteilungs-plugin-bau.md`
+§1a). Sie ist **Prosa-Instruktion**: Fachwissen wird verwiesen, nicht kopiert, und
+ausgelieferte Payloads nennen **Rollen statt Klarnamen** (öffentliches Repo).
 
 Bewusst **nicht** enthalten:
 
@@ -58,6 +68,9 @@ erzwungen.
 
 1. Verzeichnis kopieren nach `plugins/<plugin-name>/`.
 2. `.vorlage`-Endungen entfernen, `VORLAGE.md` **nicht** mitkopieren.
+   **`abteilungs-claude.md.vorlage` wird beim Entfernen der Endung zusätzlich umbenannt** zu
+   `{{ABTEILUNG}}-abteilungs-claude.md` (einzige Datei mit abweichendem Zielnamen); der
+   Bauanleitungs-Blockquote im Kopf wird danach gelöscht.
    **`ssot-grundgeruest.md.vorlage` ebenfalls nicht mitkopieren** — sie ist keine Plugin-Datei,
    sondern die Bauanleitung für die Wissensbasis eines **eigenständigen Satelliten**. Man liest
    sie und legt danach `knowledge-base/` im Satelliten-Repo an; ein repo-internes

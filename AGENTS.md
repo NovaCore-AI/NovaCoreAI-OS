@@ -64,9 +64,9 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | `VERSION` | Produkt-Leitversion (SemVer) = Version des Kern-Plugins |
 | `.claude-plugin/marketplace.json` | Marketplace `novacore-os` — Einträge ohne `version`-Feld (die steht allein in der jeweiligen `plugin.json`); die Repo-Wurzel ist **nur** Marketplace-Wurzel, kein Plugin |
 | `.github/workflows/` | `ci.yml` (Ubuntu+Windows × Node 20/22/24, Suite + Validator-Positivkontrolle) und `release.yml` (Tag `nc--v*` → GitHub-Release aus dem CHANGELOG-Abschnitt) |
-| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`end-session`/`journal`/`setup`/`doku-sync`/`os-info`/`skill-builder`/`update-doks`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; PreCompact-Mahnung: `nc-end-mahnung.js` + `nc-end-stempel.js`; dazu `nc-doks-autosync.js` — Ebenen 1 + 1b) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `nc-sync.md` (zugleich Ebene-1b-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `skills/setup/infra-registry.md` (Infra-Registry-Referenz), `tests/` |
+| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`end-session`/`journal`/`setup`/`doku-sync`/`os-info`/`skill-builder`/`update-doks`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; PreCompact-Mahnung: `nc-end-mahnung.js` + `nc-end-stempel.js`; dazu `nc-doks-autosync.js` — Ebenen 1 + 1b) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `nc-sync.md` (zugleich Ebene-1b-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `referenz/agent-authoring.md` (Subagenten-Formatregeln, ausgeliefert), `agents/` (Subagent `sync-nachzug-executor`), `skills/setup/infra-registry.md` (Infra-Registry-Referenz), `tests/` |
 | `plugins/nc-development/` | Abteilung `development` (Namespace `/nc-development:`): 11 Skills in 4 Modulen (`fe`/`be`/`flc`/`wzs`, flaches Layout) + `workflow.md` (Fachablauf WP1–WP7) |
-| `vorlagen/abteilungsplugin/` | Vorlage für neue Abteilungsplugins — **kein Plugin** (`.vorlage`-Endungen) |
+| `vorlagen/abteilungsplugin/` | Vorlage für neue Abteilungsplugins — **kein Plugin** (`.vorlage`-Endungen); dazu `abteilungs-claude.md.vorlage` (Ebene 2, Pflichtbestandteil jedes Abteilungsplugins) und `agents/beispiel-agent.md.vorlage` (Subagenten-Baustein, Read-only-Variante, optional beim ersten Agenten) |
 | `knowledge-base/` | Wissensbasis — Glossar im nächsten Abschnitt |
 | `docs/superpowers/specs/` | historische v0.1.0-Design-Spec (unverändert lassen) |
 | `_wzs-*-backup-*/` | Alt-Backups vom 2026-07-07 (Aufräum-Kandidat für den Maintainer, nicht anfassen) |
@@ -77,7 +77,7 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 |---|---|---|
 | **`SSOT-Document-Index.md`** (Wurzel) | **Master-Index** der Wissensbasis: Teil 1 Ordner-Routing (wohin gehört ein Dokument), Teil 2 Quellen-Triage („Relevant wenn …") über alle Bestandsdateien. **Einzige Datei auf Wurzelebene** (testerzwungen) | **zuerst** — vor dem Griff in eine Kategorie und vor dem Anlegen/Verschieben/Löschen einer Wissensdatei |
 | `grundwissen/` | Produktvision, Begriffsnormen (SSOT-, Gates-, CLAUDE-Ebenen-Definition), Design-Specs und Pläne (Datumspräfix; jüngste Datei = Planungsstand) | Vision-/Architektur-Fragen; vor Design-Entscheidungen; Planungsarbeit; wenn ein Begriff (SSOT, Gate, CLAUDE-Ebene) erklärt oder abgegrenzt werden muss |
-| `standardprozesse/` | verbindliche Abläufe: `aktualisierungs-index.md` (**„ich ändere X — was muss ich anfassen"**, Langfassung der Sync-Matrix + Prüfzyklus + Selbsttest), `kern-plugin-bau.md` (Kern-Plugin, Governance-Schichten, Doks-Autosync), `abteilungs-plugin-bau.md` (Abteilungen und Satelliten, Auslieferungsgrenze), `ssot-aufbau.md` (Aufbau der Wissensbasis, Struktur-Vererbung an Satelliten), `sync-nachzug-bauzyklus.md` (gebündelte Nachzüge je Bauzyklus), `os-bau-methode.md` (Gesamt-Methode, an die Firmenphilosophie anpassbar) | vor **jeder** inhaltlichen Änderung am Plugin oder Repo — zuerst prüfen, ob ein Standardprozess existiert |
+| `standardprozesse/` | verbindliche Abläufe: `aktualisierungs-index.md` (**„ich ändere X — was muss ich anfassen"**, Langfassung der Sync-Matrix + Prüfzyklus + Selbsttest), `kern-plugin-bau.md` (Kern-Plugin, Governance-Schichten, Doks-Autosync), `abteilungs-plugin-bau.md` (Abteilungen und Satelliten, Auslieferungsgrenze), `ssot-aufbau.md` (Aufbau der Wissensbasis, Struktur-Vererbung an Satelliten), `sync-nachzug-bauzyklus.md` (gebündelte Nachzüge je Bauzyklus), `os-bau-methode.md` (Gesamt-Methode, an die Firmenphilosophie anpassbar), `claude-netz-bau.md` (Instruktions-Schicht der CLAUDE-Ebenen), `subagenten-bau.md` (Bau von Subagenten: Agent-vs-Skill, Scope, Gate-Semantik), `anker-reservierung.md` (frühe `reserve/*`-Tag-Reservierung knapper Bezeichner bei Parallelarbeit), `abteilungs-inhalts-pruefung.md` (wiederkehrendes, read-only Inhalts-Audit je Abteilung/Satellit), `team-distribution.md` (Rollout ans Team über den Claude-Team-Workspace) | vor **jeder** inhaltlichen Änderung am Plugin oder Repo — zuerst prüfen, ob ein Standardprozess existiert |
 | `bauplan-archiv/` | abgeschlossene oder verworfene Baupläne, **unverändert** übernommen — **terminal**: keine Quelle Richtung Kern oder Satelliten, keine Kandidaten-Queue | wenn nachvollzogen werden soll, wie ein abgeschlossenes Vorhaben lief; **Pflicht-Verschiebung** dorthin, sobald ein Plan abgeschlossen oder verworfen ist |
 | `ideen-backlog/` | Ideen ohne aktuellen Auftrag, je Idee ein Dokument | beim Festhalten einer Idee ohne Arbeitspaket; wird sie beauftragt, entsteht ein Bauplan in `grundwissen/`, der auf sie verweist — die Idee bleibt stehen |
 | `debugging-findings/` | `agent-learnings.md` — Agenten-Fehlerprotokoll (**eigene** Fehler, append-only Pflicht) · `debug-log.md` — Debug-Log (**gefundene** Bugs und Fehlbefunde, auch an fremdem Material, append-only Pflicht) | bei Debugging; nach jedem eigenen Fehler; nach jedem gefundenen Bug; vor neuen Aufgaben (eigene Fehlermuster) und vor jeder Fehlersuche (bekannte Symptome) |
@@ -195,11 +195,30 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   (E2a — dieses Repo ist öffentlich). Phasen 2 (Prozesskorpus/CLAUDE-Netz/Subagenten) und
   3 (Queue-Flow nur Kern ↔ interne Abteilungen; Kollegen-OS bleiben isoliert)
   folgen nach Bauplan.
+- **Gebaut (Kern v0.9.0, 2026-08-16): Onsite-Endstand-Nachbau Phase 2** nach Bauplan
+  `grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md` (AP-C1–C5, AP-D1):
+  **Prozesskorpus** — vier neue Standardprozesse (`claude-netz-bau.md`, `subagenten-bau.md`,
+  `team-distribution.md`, `abteilungs-inhalts-pruefung.md`) plus `anker-reservierung.md`
+  samt Definitionsdokument `NovaCore-OS-Anker-Reservierung-Definition.md` (AP-C2).
+  **Subagenten** (AP-D1) als neue Komponentenklasse: `agents/`-Verzeichnis, erster Agent
+  `sync-nachzug-executor` (schreibend, Marker `nc:schreibend`, `sonnet`, ohne `Bash`),
+  ausgelieferte Referenz `referenz/agent-authoring.md`, Vorlagen-Baustein
+  `agents/beispiel-agent.md.vorlage`, zwei Prüfbausteine (`agenten.test.mjs` portabel,
+  Baustein-Version 1.2.0; `agenten-os.test.mjs` OS-Repo-gebunden), Registry-`agents`-Segment.
+  **Allowlist-Norm-Nachzug** von Onsite PR #60 (Bauplan-Nachtrag N7): `tools`/`model`
+  Pflichtfelder, Defense-Baseline-Block Pflicht, Werkzeuggrenze in der `tools`-Allowlist statt
+  `disallowedTools`. **Anker-Mechanik** zweistufig: frühe `reserve/*`-Tag-Reservierung
+  (`anker-reservierung.md`) plus späte Testsuite-Invariante in `struktur.test.mjs` gegen
+  doppelt vergebene CHANGELOG-Versionsüberschriften. Dazu Registry-**Reservierungen**
+  `ui-ux`/`automation` (Bauplan-Nachtrag N6) und die **Abteilungs-CLAUDE-Vorlage** (Ebene 2,
+  Format definiert — Auslieferung folgt mit dem ersten Abteilungs-Bump).
 - **Noch nicht gebaut:** Gate 3 (Safety-Gate mit echtem Freigabedialog), Gate 4
   (Sitzungsabschluss als Hook — die PreCompact-Mahnung ist ausdrücklich nicht Gate 4),
-  CLAUDE-Ebene 0 und 2, Subagenten-Apparat, Anker-Reservierung, Queue-Flow, weitere
-  fe-/be-Skills, Module `architecture`/`incident-support`. Übersicht:
-  `grundwissen/NovaCore-OS-Gates-Definition.md`.
+  CLAUDE-Ebene 0 (Org-Instructions, weiterhin ungenutzt) sowie die tatsächliche Auslieferung
+  von CLAUDE-Ebene 2 in einem echten Abteilungsplugin (Format und Vorlage sind seit Phase 2
+  gebaut — die Lese-Verdrahtung in `/nc:start` entsteht erst mit dem ersten ausgelieferten
+  Exemplar), Queue-Flow, weitere fe-/be-Skills, Module `architecture`/`incident-support`.
+  Übersicht: `grundwissen/NovaCore-OS-Gates-Definition.md`.
 - **Versionsmodell:** **Je Plugin eine Version, genau an einer Stelle:**
   `plugins/<name>/.claude-plugin/plugin.json`. Marketplace-Einträge tragen **kein**
   `version`-Feld (Claude Code nutzt den `plugin.json`-Wert „without warning" — Doku

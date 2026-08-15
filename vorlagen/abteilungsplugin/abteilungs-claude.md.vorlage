@@ -1,0 +1,85 @@
+# {{ABTEILUNG}} — Abteilungs-CLAUDE (Ebene 2)
+
+> **Zielname beim Instanzieren: `{{ABTEILUNG}}-abteilungs-claude.md`**, abgelegt an der
+> **Plugin-Wurzel** (`plugins/{{PLUGIN_NAME}}/`) — nie an der Repo-Wurzel eines Satelliten.
+> Grund: Beim Nutzer kommt das **Plugin-Verzeichnis** an, nichts darüber
+> (Auslieferungsgrenze, `abteilungs-plugin-bau.md` §1a). Die Datei reist im Plugin-Paket und
+> gilt damit in **jedem** Arbeits-Repo, in dem die Abteilung arbeitet.
+>
+> **Zweigeteilt:** Teil 1 gilt für **alle** Sitzungen der Abteilung und wird beim
+> Einstiegs-Ritual (`/nc:start`) aus dem Plugin-Wurzelverzeichnis gelesen. Teil 2 gilt nur,
+> wenn die Sitzung **am Repo der Abteilung selbst baut**.
+>
+> **Abgrenzung:** Diese Datei ist **Prosa-Instruktion** (sie routet und bindet), kein
+> Fachwissen. Fachwissen wird **verwiesen, nie kopiert** (Doppelpflege-Verbot), Kern-Regeln
+> werden nie wiederholt — sie kommen über die Ebenen 1/1b. Ziellänge **unter 100 Zeilen**.
+>
+> **Rollen statt Klarnamen (Pflicht):** Ausgelieferte Payloads dürfen keine personenbezogenen
+> Daten tragen — es wird ausschließlich die **Rolle** benannt („Maintainer/Admin", „Dev Feld 1",
+> „zweiter Reviewer"), nie ein Name, keine Mailadresse, kein Kundenname. Das OS-Repo ist
+> öffentlich (Bauplan-Invariante I9).
+>
+> Prozessgrundlage: `knowledge-base/standardprozesse/claude-netz-bau.md` (Instruktions-Schicht)
+> und `.../abteilungs-plugin-bau.md` (Plugin-Bau). Nach dem Instanzieren diesen Blockquote
+> **löschen** — er ist Bauanleitung, keine Instruktion.
+
+## Teil 1 — Für alle Sessions der Abteilung
+
+### Identität und Auftrag
+
+{{BESCHREIBUNG}} — in einem Absatz: welchen realen Arbeitszyklus die Abteilung abdeckt, mit
+welchen Systemen sie arbeitet und was ausdrücklich **nicht** zu ihr gehört.
+
+### Rote Linien der Domäne
+
+Die roten Linien des OS gelten immer (kein Commit/Push/PR/Merge/Release ohne Freigabe, keine
+Deploys, nichts Kundensichtbares ohne Mensch, keine Secrets in Dateien oder Logs). Zusätzlich,
+domänenspezifisch:
+
+- [je Zeile eine Aktion, die in dieser Domäne **nie** ein Agent ausführt — mit dem Grund]
+- [Beispiel-Muster: Eingriffe am Produktivsystem (Deploy, Datenbank, Webhooks) bleiben
+  Mensch-only]
+
+### Routing in die Wissensbasis
+
+Einstieg ist immer der **Dokuindex** der zuständigen Wissensbasis — erst triagieren, dann lesen.
+
+- **Repo-interne Abteilung:** zuständig ist die Wissensbasis des OS-Repos
+  (`knowledge-base/SSOT-Document-Index.md`); lokal liegt sie als **Lesekopie** unter
+  `~/.nc/ssot/`, angelegt und nachgezogen von `/nc:setup`.
+- **Eigenständiger Satellit (Kollegen-OS):** zuständig ist die **eigene** Wissensbasis des
+  Satelliten-Repos (Fünfer-Struktur nach `ssot-grundgeruest.md.vorlage`). Die Kern-SSOT ist für
+  Satelliten **by design nicht erreichbar** (Rechte-Trennung) — das ist kein Defekt und kein
+  blockierter Skill, sondern der vorgesehene Zustand; es wird gemeldet, nicht umgangen.
+- **Sitzungswissen** (Stand, Journal, offene Stränge) schreiben und lesen `/nc:start` bzw.
+  `/nc:end-session` — Wohnort ist `.nc/erinnerung/` des Arbeits-Repos.
+- **Firmenweites, Kern-Regeln, Produktstand** stehen in den Ebenen 1/1b und werden hier **nicht**
+  wiederholt.
+
+### Fachablauf
+
+Die WP-Zuordnung der Abteilung samt Trigger-Matrix steht in `workflow.md` desselben Plugins; der
+Rahmen WP0–WP8 bleibt im Kern (`wp-rahmen.md`). Diese Datei wiederholt beides nicht.
+
+### Werkzeuge und Konnektoren der Abteilung
+
+- [je Zeile ein System, das die Abteilung nutzt, mit der Freigabestufe: **Lesen frei** ·
+  **schreibende Einzelaktion nur mit Freigabe** · **kundensichtbarer Text nur Mensch**]
+
+## Teil 2 — Werkstatt: wer an diesem Plugin baut
+
+Gilt **nur** für Sitzungen, die am Plugin bzw. Abteilungs-Repo selbst arbeiten (Skills bauen,
+Wissensbasis pflegen, Plugin veröffentlichen) — nicht für die Alltagsarbeit der Abteilung.
+
+- **Schreibmodell:** regulärer Branch-/PR-Fluss; **Merge, Tag und Release bleiben rote Linie**
+  (Maintainer/Admin). Kein Push ohne ausdrückliche Freigabe.
+- **Skill-Bau:** strikt nach `referenz/skill-authoring.md` des Kern-Plugins `nc`; Prozess und
+  Pflichten nach dem Standardprozess für Abteilungsplugins im OS-Repo. Eigene Hooks sind für
+  repo-interne Abteilungen **verboten** (die Kontroll-Schicht liegt im Kern, testerzwungen);
+  eigenständige Satelliten tragen ihre eigene Kopie (§3b desselben Prozesses).
+- **Version:** jede Änderung, die das Team erreichen soll, zählt `.claude-plugin/plugin.json`
+  **dieses** Plugins hoch — plus CHANGELOG-Eintrag. Kein Bump = kein Auto-Update. Beim Satelliten
+  zusätzlich: Commit-SHA-Pin im Marketplace umziehen.
+- **Validierung vor jedem Commit-Vorschlag:** `claude plugin validate <dieses Plugin> --strict`
+  plus die Testsuite des Repos. Änderungen an Kern-Mechanik gehören nicht hierher, sondern als
+  Anforderung an den Kern.

@@ -1,7 +1,7 @@
 {
-  "version": "0.8.0",
+  "version": "0.9.0",
   "marketplace": "novacore-os",
-  "_hinweis": "Reiner Metadaten-SSOT des Produkts: Hierarchie Abteilung → Plugin → Module (Skill-Präfix) → Skills. Die Datei steuert NICHTS aus — was ein Nutzer bekommt, entscheidet allein, welche Plugins er installiert hat; die Abteilungsgrenze ist die Plugin-Grenze. staendig=true heißt: Die Abteilung liegt im Kern und wird über die dependencies jedes Abteilungsplugins immer mitaktiviert, ist also technisch nicht abwählbar. minCoreVersion ist dokumentarisch. repoKnowledgePath ist OPTIONAL und steuert die SSOT-Provisionierung (/nc:setup): Es nennt den Pfad IM SATELLITEN-REPO, unter dem eine Abteilung eigenes Wissen AUSSERHALB ihres Plugin-Anteils führt. Nur Abteilungen, die repository UND repoKnowledgePath setzen, werden lokal geklont. Heute setzt es keine: bei nc-felix/nc-biggi IST das Repo das Plugin, ihr Wissen reist im Paket mit und aktualisiert sich über den Marketplace-Pin — dort gibt es nichts zu klonen. Das Feld ist der dokumentierte Andockpunkt für künftige Abteilungen. repoSkillsPath ist der Pfad IM REPO; zur Laufzeit heißt das Skill-Verzeichnis in jedem Plugin schlicht skills/ (Default-Scan). Kein Verzeichnis-Nesting für Skills: der Plugin-Scanner erwartet skills/<name>/SKILL.md, Module sind Namenspräfixe. Ordner ohne SKILL.md ignoriert der Scanner. AFFILIATE-ABGRENZUNG (Bauplan 2026-08-10, AP7): Der Marketplace führt neben den Kategorien kern/abteilung auch die Kategorie affiliate — persönliche bzw. externe Werkzeuge (heute: kimi-code-plugin-cc). Affiliate-Plugins sind KEINE Abteilungen: sie bekommen keine Zeile in dieser Registry, hängen an keinem NovaCore-Plugin und teilen kein Wissen mit dem Kern oder den Satelliten (Begriffsnorm: knowledge-base/grundwissen/NovaCore-OS-SSOT-Definition.md, Abschnitt firmenintern vs. affiliate).",
+  "_hinweis": "Reiner Metadaten-SSOT des Produkts: Hierarchie Abteilung → Plugin → Module (Skill-Präfix) → Skills — plus je Abteilung ein agents-Objekt (Subagenten-Name → Kurzbeschreibung; leer, wenn die Abteilung keine Agenten führt; testerzwungener Abgleich gegen plugins/<plugin>/agents/, bei Satelliten dokumentarisch) und auf Wurzelebene reservierungen (Abteilungsnamen, die per Maintainer-Entscheid vergeben, aber noch nicht gebaut sind — reine Namensreservierung gegen Doppelvergabe, keine Registry-Abteilung, kein Marketplace-Eintrag). Die Datei steuert NICHTS aus — was ein Nutzer bekommt, entscheidet allein, welche Plugins er installiert hat; die Abteilungsgrenze ist die Plugin-Grenze. staendig=true heißt: Die Abteilung liegt im Kern und wird über die dependencies jedes Abteilungsplugins immer mitaktiviert, ist also technisch nicht abwählbar. minCoreVersion ist dokumentarisch. repoKnowledgePath ist OPTIONAL und steuert die SSOT-Provisionierung (/nc:setup): Es nennt den Pfad IM SATELLITEN-REPO, unter dem eine Abteilung eigenes Wissen AUSSERHALB ihres Plugin-Anteils führt. Nur Abteilungen, die repository UND repoKnowledgePath setzen, werden lokal geklont. Heute setzt es keine: bei nc-felix/nc-biggi IST das Repo das Plugin, ihr Wissen reist im Paket mit und aktualisiert sich über den Marketplace-Pin — dort gibt es nichts zu klonen. Das Feld ist der dokumentierte Andockpunkt für künftige Abteilungen. repoSkillsPath ist der Pfad IM REPO; zur Laufzeit heißt das Skill-Verzeichnis in jedem Plugin schlicht skills/ (Default-Scan). Kein Verzeichnis-Nesting für Skills: der Plugin-Scanner erwartet skills/<name>/SKILL.md, Module sind Namenspräfixe. Ordner ohne SKILL.md ignoriert der Scanner. AFFILIATE-ABGRENZUNG (Bauplan 2026-08-10, AP7): Der Marketplace führt neben den Kategorien kern/abteilung auch die Kategorie affiliate — persönliche bzw. externe Werkzeuge (heute: kimi-code-plugin-cc). Affiliate-Plugins sind KEINE Abteilungen: sie bekommen keine Zeile in dieser Registry, hängen an keinem NovaCore-Plugin und teilen kein Wissen mit dem Kern oder den Satelliten (Begriffsnorm: knowledge-base/grundwissen/NovaCore-OS-SSOT-Definition.md, Abschnitt firmenintern vs. affiliate).",
   "abteilungen": [
     {
       "name": "gemeinsam",
@@ -13,6 +13,9 @@
       "rahmen": "plugins/nc/wp-rahmen.md",
       "module": {
         "core": "Session-Zyklus WP0/WP8 + Journal + Infrapflege: start [gebaut], end-session [gebaut, bis 0.7.x save-session], journal [gebaut], setup [gebaut, seit 0.8.0 Reconciler S0–S6], doku-sync [gebaut], os-info [gebaut], skill-builder [gebaut], update-doks [gebaut] (kein Präfix)"
+      },
+      "agents": {
+        "sync-nachzug-executor": "schreibender Executor (Marker nc:schreibend, sonnet, ohne Bash): bündelt am Bauzyklus-Ende die abgeleiteten Doku-Nachzüge aus dem Protokoll des führenden Agenten [gebaut, seit 0.9.0]"
       }
     },
     {
@@ -29,7 +32,8 @@
         "be": "Backend (WP6): be-review [gebaut]; weitere be-Skills nach Bedarf (Sandbox → Fork-back)",
         "flc": "Feature-Lifecycle (WP1–WP5): flc-feature-start, flc-plan, flc-commit-prep, flc-pr [alle gebaut]",
         "wzs": "Empfehlungssystem WZS (WP3/WP6, produktspezifisch): wzs-attribution, wzs-blocker-gate, wzs-reward-guard, wzs-share-invariant, wzs-webhook-contract [alle gebaut] — Kandidat für spätere Extraktion (Satellit)"
-      }
+      },
+      "agents": {}
     },
     {
       "name": "felix",
@@ -41,7 +45,8 @@
       "repoSkillsPath": "skills",
       "module": {
         "kern": "Kernmodul ohne Präfix: start, save-session, journal, os-info, code-tour, skill-builder, doku-sync [alle gebaut]; Arbeitsmodule folgen (werden mit dem Fachbereich definiert)"
-      }
+      },
+      "agents": {}
     },
     {
       "name": "biggi",
@@ -56,7 +61,12 @@
         "controlling": "Präfix ctrl [geplant — Namenskonvention reserviert, Platzhalter ctrl-uebersicht]",
         "medizinisches": "Präfix mdzn [geplant — Namenskonvention reserviert, Platzhalter mdzn-ablage]",
         "dokumentation-daily-work": "Präfixe doc + day (EIN Modul, ZWEI Präfixe) [geplant — Namenskonvention reserviert, Platzhalter doc-protokoll und day-plan]"
-      }
+      },
+      "agents": {}
     }
-  ]
+  ],
+  "reservierungen": {
+    "ui-ux": "Abteilungsname reserviert (Maintainer-Entscheid 2026-08-15, Bauplan-Nachtrag N6: Feld Design/Frontend/UX) — noch kein Plugin, kein Marketplace-Eintrag; Bau bei Bedarf",
+    "automation": "Abteilungsname reserviert (Maintainer-Entscheid 2026-08-15, Bauplan-Nachtrag N6: Feld Automatisierung/Hardware/Prozessoptimierung) — noch kein Plugin, kein Marketplace-Eintrag; Bau bei Bedarf"
+  }
 }
