@@ -12,6 +12,28 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ### Added
 
+- **Bauplan `2026-08-15-onsite-endstand-nachbau-bauplan.md`** (Weisung Maintainer 2026-08-15:
+  Onsite-OS ist final fertig, „1:1 in NovaCore-OS umsetzen mit Anpassungen wo nötig";
+  Leitplanken: SSOT-Kern zuerst absichern, Skills außerhalb des Kerns ganz am Ende). Erhoben
+  gegen Onsite `origin/feat/queue-flow@c55085f` (Kern 0.22.0, PR #58 ungemergt) und
+  `origin/main@efd90c1` (0.21.0) durch vier parallele Sonnet-Explorationsagenten plus eigene
+  Verifikation (Testsuite 97/97 grün; `~/.nc/` fehlte auf der Maintainer-Maschine —
+  `/nc:setup` war nie gelaufen, Probelauf von `ssot-provision.js` erfolgreich). Inhalt:
+  Sync-Punkt-Forensik (`5d335a7` = Onsite 0.15.0; alles ab 0.16.0 fehlt), Mechanik-Delta
+  (PreCompact-Mahnung, Autosync-Ebene 1b, Subagenten-Apparat, Queue-Flow, `init`-Reconciler
+  S0–S6, `update-doks`), Prozesskorpus-Delta (4 Karten fehlen komplett), Invarianten I1–I9
+  mit Review-Fokus **Härtungs-Erhalt** (NC-Vorsprünge wie die Start-Gate-Regex-Härtung nie
+  verschlechtern), sechs Bauphasen A–F, Testfälle T1–T21, Delegationsschnitt
+  (Plan-Sandwich + Konfliktzonen) und sechs offene Maintainer-Entscheide E1–E6 — darunter
+  die saubere Auflösung der Kollision zwischen dem Queue-Ausschluss von 2026-08-11 und dem
+  neuen 1:1-Auftrag (E1) sowie die Sitzungswissen-Frage im öffentlichen Repo (E2).
+  Adversarial reviewt durch einen Opus-Agenten (2026-08-15): Faktencheck aller Versions-,
+  PR- und Datei-Belege bestanden; 20 Findings (1 CRITICAL: fehlender Test-Override
+  `NC_AUTOSYNC_TEAMSYNC_TARGET`; 5 HIGH, u. a. CRLF-Autosync-Falle, abgeschwächte
+  `disallowedTools`-Regel, Gate-Kollision des Reconcilers, T19 wäre gegen den Bestand rot;
+  11 MEDIUM; 3 LOW) — alle im Plan eingearbeitet, Urteil „freigabereif nach Fixes" damit
+  erfüllt. Kein Plugin-Bump (reines Planungsdokument). — *Claude (Fable 5, Claude Code)*
+
 - **Kategorie `firmenkernprozesse/` in der Wissensbasis** (Weisung Maintainer 2026-08-15):
   23 extern geführte Prozess- und Produktdokumente des Onsite.ai-OS-Vorbilds und der
   Firmenebene aufgenommen — die Prozesskarten-Sammlung (13 Dokumente unter
@@ -21,6 +43,26 @@ Single-Plugin-Layout und bleiben historisch unverändert.
   Referenz für Ausrichtung und Abgleich, nicht normativ; `SSOT-Document-Index` Teil 1
   (Routing-Zeile) und Teil 2 (Triage je Dokument) sowie das AGENTS.md-Glossar sind
   nachgezogen. — *Kimi (Kimi Code)*
+
+- **Wissensbasis: `ideen-backlog/` gefüllt** (Weisung Maintainer 2026-08-15: „alles was in den
+  ordnern ist 1 zu 1 inhaltlich zu kopieren … wichtig ist auch das idea backlog"). Sieben Ideen aus
+  dem Onsite-Vorbild portiert: Anti-Drift-Prüfung der Indizes · Release-Branch-Modell
+  (Live-/Entwicklungslinie) · Extraktion `nc-development` in ein Satelliten-Repo ·
+  FFG-Nachbesserungen (Upstream-Drift, Windows-Destruktivmuster, `NotebookEdit`) ·
+  Executor-Delegation + fremde Agenten-CLIs · Web-GUI `/nc:web` (Design-Spec v0.1/v0.2 **und**
+  Nachtrag v0.3 SDK-Pivot). `PLATZHALTER.md` entfallen, `SSOT-Document-Index` Teil 1 (Routing +
+  Mapping-Tabelle) und Teil 2 (neue Tabelle mit sieben „Relevant wenn …"-Zeilen) nachgezogen.
+  **Umfangsentscheid:** Übernommen wurde ausschließlich der **generische** Teil des
+  Vorbild-Backlogs. Ideen und Manuals mit Bezug auf fremde Organisationen, deren Kunden, Geräte
+  oder Zugänge bleiben im Vorbild — dessen Repo ist privat, dieses ist öffentlich; dazu zählen
+  PartSens-SSH-Onboarding, GitLab-/offsite-Interna, die Marketing-Konnektoren und der
+  offsite-Doku-Patch. **Keine wörtliche Kopie:** Terminologie auf NovaCore gemappt (`oai`→`nc`,
+  Pfade, Env-Namen), Fremdmarken entfernt, und jede übernommene Code-Aussage gegen dieses Repo
+  nachverifiziert — die drei FFG-Lücken sind gegen `plugins/nc/hooks/hooks.json` (Matcher Zeile 22
+  vs. 32), `nc-ffg.js:385` und die 26 Tests in `nc-ffg.test.mjs` belegt; bei der
+  Executor-Delegation zeigte der Abgleich, dass Teil A bei uns **bereits** Standardprozess ist
+  (`sync-nachzug-bauzyklus.md` §2), was im Dokument korrigiert statt kopiert wurde. Kein
+  Plugin-Bump (die Wissensbasis wird nicht ausgeliefert).
 
 - **Bauplan `2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md`** (Weisung
   Maintainer 2026-08-11: „alles zum Bau und zu Standardprozessen aus der Onsite-Wissensbasis
