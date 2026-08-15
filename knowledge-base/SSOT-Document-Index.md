@@ -47,6 +47,7 @@ kennt, findet sich mit dieser Zuordnung zurecht:
 | `ideen-backlog/` | Ideen ohne aktuellen Auftrag — je Idee ein Dokument mit Datumspräfix | beauftragte Vorhaben (→ Bauplan in `grundwissen/`, der auf die Idee verweist) | Lebend. Solange leer, hält `PLATZHALTER.md` den Ordner in Git (nicht indexpflichtig, testerzwungene Ausnahme) |
 | `standardprozesse/` | Die operativen Standardprozesse zum Instandhalten und Erweitern von Repo und Marketplace: Plugin-/Skill-Bau, Satelliten, Versionierung, Doku-Sync — samt der Frage, welche Dokumente voneinander abhängen und was wo mitzuupdaten ist | Verhalten von Fremdsoftware · Einzelvorhaben (→ `grundwissen/`) | Lebend. Fehlt ein wiederkehrender Prozess, wird er **nach der ersten Ausführung** hier dokumentiert |
 | `debugging-findings/` | Die **zwei** laufenden Protokolle in Append-Form mit Kurzinfo „was wann wie": **Fehlerprotokoll** `agent-learnings.md` (eigene Fehler der KI bei der Arbeit) und **Debug-Log** `debug-log.md` (gefundene und behobene Bugs, auch an fremdem Material) | Prozesswissen · Pläne · Ideen | **Append-only** — Einträge werden nie rückdatiert oder umgeschrieben; ein widerlegter Eintrag bekommt einen **neuen**, der auf ihn verweist |
+| `firmenkernprozesse/` | Firmenexterne Prozess- und Produktdokumente des **Onsite.ai-OS-Vorbilds** und der eigenen Firmenebene, die als Referenz für Ausrichtung und Abgleich dienen: Prozesskarten (Bau- und Pflegeprozesse des Vorbilds), Team-Rollout-Infrastruktur, Feature-/Berichts- und Methodik-Dokumente | NovaCore-eigene normative Prozesse (→ `standardprozesse/`) · Pläne (→ `grundwissen/`) · Protokolle (→ `debugging-findings/`) | Lebend, aber **fremdgeführt**: Inhalte werden nicht hier umgeschrieben, sondern bei neuem Vorbild-Stand als Ganzes aktualisiert; bei Widersprüchen zu NovaCore-Doku gilt die NovaCore-Quellen-Hierarchie |
 | `knowledge-base/` (Wurzel) | **Ausschließlich dieser Index.** | alles andere | testerzwungen (Wurzel-Regel) |
 
 ## Teil 2 — Quellen-Triage: wann welche Quelle
@@ -86,6 +87,34 @@ kennt, findet sich mit dieser Zuordnung zurecht:
 | [SSOT-Aufbau](standardprozesse/ssot-aufbau.md) | lebend | eine **Wissensbasis** aufgebaut, erweitert oder repliziert wird — die sieben Grundbausteine, der Aufbau-Ablauf (Kategorien und Routing vor jedem Inhalt), **§4 Struktur-Vererbung an Satelliten** und **§4a die Isolations-Invariante** (warum es keine Warteschlange Richtung Kern gibt), Anti-Drift-Prinzipien, Replikationsanleitung |
 | [Sync-Nachzug je Bauzyklus](standardprozesse/sync-nachzug-bauzyklus.md) | lebend | ein Bauzyklus mehrere abhängige Dokumente betrifft — Protokoll während des Baus, gebündelter Executor-Lauf am Zyklusende, Review mit deterministischer Gegenprobe, und die **Konfliktzonen-Regel** für Parallelbau (welche Dateien kein Paketagent anfasst) |
 | [OS-Bau-Methode](standardprozesse/os-bau-methode.md) | lebend | Methodenfragen zum Gesamtaufbau des OS anstehen — die an die Firmenphilosophie anpassbare Gesamt-Methode |
+
+### `firmenkernprozesse/` — Vorbild- und Firmen-Prozessdokumente (extern geführt)
+
+| Quelle | Status | Relevant wenn … |
+|---|---|---|
+| [Bericht neue Features und Änderungen 2026-08-14](firmenkernprozesse/2026-08-14-Bericht-Neue-Features-und-Aenderungen-Onsite-OS.md) | extern, lebend | der jüngste Feature-Stand des Onsite-Vorbilds gebraucht wird — welche Skills, Gates und Prozesse dort zuletzt gebaut oder geändert wurden |
+| [Entwicklungs-Recap Gesamthistorie 2026-08-15](firmenkernprozesse/2026-08-15-Entwicklungs-Recap-Onsite-OS-Gesamthistorie.md) | extern, lebend | die Entwicklungsgeschichte des Onsite-Vorbilds als Ganzes nachvollzogen werden soll — Etappen, Wendepunkte, gewachsene Entscheidungen |
+| [Vorteile, USPs und Engineering-Methodik 2026-08-15](firmenkernprozesse/2026-08-15-Onsite-OS-Vorteile-USPs-und-Engineering-Methodik.md) | extern, lebend | die Methodik und die Alleinstellungsmerkmale des Vorbilds erklärt oder für die eigene Ausrichtung abgeglichen werden sollen |
+| [Featurekarte Onsite.ai-OS](firmenkernprozesse/Onsite.ai-OS-Featurekarte.md) | extern, lebend | ein Gesamtüberblick über die Features des Vorbilds gebraucht wird — Landkarte statt Einzeldokument |
+| [Prozesskarten — Familie und Verdrahtung](firmenkernprozesse/prozesskarten/00-FAMILIE-UND-VERDRAHTUNG.md) | extern, lebend | die Karten-Familie selbst verstanden werden soll — welche Karte wofür, wie sie zusammenhängen |
+| [Prozesskarte Aktualisierungs-Index](firmenkernprozesse/prozesskarten/01-aktualisierungs-index.md) | extern, lebend | die Vorbild-Fassung der Änderungs-Matrix abgeglichen wird (Gegenstück zu `standardprozesse/aktualisierungs-index.md`) |
+| [Prozesskarte Abteilungs-Plugin-Bau](firmenkernprozesse/prozesskarten/02-abteilungs-plugin-bau.md) | extern, lebend | die Vorbild-Fassung des Abteilungs-/Satelliten-Baus abgeglichen wird (Gegenstück zu `standardprozesse/abteilungs-plugin-bau.md`) |
+| [Prozesskarte Kern-Plugin-Bau](firmenkernprozesse/prozesskarten/03-kern-plugin-bau.md) | extern, lebend | die Vorbild-Fassung des Kern-Plugin-Baus abgeglichen wird (Gegenstück zu `standardprozesse/kern-plugin-bau.md`) |
+| [Prozesskarte Kern-SSOT-Aufbau](firmenkernprozesse/prozesskarten/04-kern-ssot-aufbau.md) | extern, lebend | die Vorbild-Fassung des Wissensbasis-Aufbaus abgeglichen wird (Gegenstück zu `standardprozesse/ssot-aufbau.md`) |
+| [Prozesskarte Claude-Netz-Bau](firmenkernprozesse/prozesskarten/05-claude-netz-bau.md) | extern, lebend | der Aufbau des CLAUDE.md-Ebenen-Netzes im Vorbild nachvollzogen werden soll |
+| [Prozesskarte Claude-Team-Distribution](firmenkernprozesse/prozesskarten/06-claude-team-distribution.md) | extern, lebend | die Verteilung an ein Team im Vorbild nachvollzogen werden soll — Marketplace, Pins, Update-Wege |
+| [Prozesskarte Subagenten-Bau](firmenkernprozesse/prozesskarten/07-subagenten-bau.md) | extern, lebend | Subagenten im Vorbild gebaut oder deren Formatregeln abgeglichen werden sollen |
+| [Prozesskarte Sync-Nachzug Bauzyklus](firmenkernprozesse/prozesskarten/08-sync-nachzug-bauzyklus.md) | extern, lebend | die Vorbild-Fassung des gebündelten Doku-Nachzugs abgeglichen wird (Gegenstück zu `standardprozesse/sync-nachzug-bauzyklus.md`) |
+| [Prozesskarte Anker-Reservierung](firmenkernprozesse/prozesskarten/09-anker-reservierung.md) | extern, lebend | die Namens-/Anker-Reservierung des Vorbilds (Namespaces, Präfixe) nachvollzogen werden soll |
+| [Prozesskarte Abteilungs-Inhalts-Prüfung](firmenkernprozesse/prozesskarten/10-abteilungs-inhalts-pruefung.md) | extern, lebend | die fachliche Inhalts-Prüfung von Abteilungsinhalten im Vorbild nachvollzogen werden soll |
+| [Prozesskarten — Autorenvertrag](firmenkernprozesse/prozesskarten/AUTORENVERTRAG.md) | extern, lebend | die Verbindlichkeitsregeln der Prozesskarten selbst gebraucht werden — wer sie wie pflegt |
+| [Prozesskarten — README](firmenkernprozesse/prozesskarten/README.md) | extern, lebend | der Einstieg in die Prozesskarten-Sammlung gesucht wird |
+| [Rollout — Master-Index und Rollout-Katalog](firmenkernprozesse/team-rollout-infrastruktur/00-MASTER-INDEX-UND-ROLLOUT-KATALOG.md) | extern, lebend | der Rollout an ein Team geplant oder nachvollzogen wird — Katalog aller Rollout-Dokumente |
+| [Rollout — System-Architektur und Infrastruktur](firmenkernprozesse/team-rollout-infrastruktur/01-SYSTEM-ARCHITEKTUR-UND-INFRASTRUKTUR.md) | extern, lebend | die technische Ziel-Architektur des Team-Rollouts (Verzeichnisse, Sync, Registry) gebraucht wird |
+| [Rollout — Feature-, Skill- und Agenten-Katalog](firmenkernprozesse/team-rollout-infrastruktur/02-FEATURE-SKILL-UND-AGENTEN-KATALOG.md) | extern, lebend | ein rolltauglicher Überblick über Skills, Agents und Features des Vorbilds gebraucht wird |
+| [Rollout — Meta-Prozesse und Datenflüsse](firmenkernprozesse/team-rollout-infrastruktur/03-META-PROZESSE-UND-DATENFLUESSE.md) | extern, lebend | die Datenflüsse und Meta-Prozesse hinter dem Rollout (SSOT-Sync, Kandidaten-Queues) verstanden werden sollen |
+| [Rollout — Rollen, Onboarding und Praxis-Workflows](firmenkernprozesse/team-rollout-infrastruktur/04-ROLLEN-ONBOARDING-UND-PRAXIS-WORKFLOWS.md) | extern, lebend | das Onboarding neuer Teammitglieder oder die Praxis-Workflows je Rolle gebraucht werden |
+| [Rollout — Quick-Reference und Cheatsheets](firmenkernprozesse/team-rollout-infrastruktur/05-QUICK-REFERENCE-CHEATSHEETS.md) | extern, lebend | kurze Nachschlagehilfen für das Team gebraucht werden — Befehle, Pfade, Abläufe in Kürze |
 
 ### `debugging-findings/` — Protokolle
 

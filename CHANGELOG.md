@@ -12,6 +12,16 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ### Added
 
+- **Kategorie `firmenkernprozesse/` in der Wissensbasis** (Weisung Maintainer 2026-08-15):
+  23 extern geführte Prozess- und Produktdokumente des Onsite.ai-OS-Vorbilds und der
+  Firmenebene aufgenommen — die Prozesskarten-Sammlung (13 Dokumente unter
+  `prozesskarten/`), die Team-Rollout-Infrastruktur (6 Dokumente unter
+  `team-rollout-infrastruktur/`) sowie vier Einzeldokumente (Featurekarte,
+  Änderungsbericht 2026-08-14, Entwicklungs-Recap und USP-/Methodik-Dokument 2026-08-15).
+  Referenz für Ausrichtung und Abgleich, nicht normativ; `SSOT-Document-Index` Teil 1
+  (Routing-Zeile) und Teil 2 (Triage je Dokument) sowie das AGENTS.md-Glossar sind
+  nachgezogen. — *Kimi (Kimi Code)*
+
 - **Bauplan `2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md`** (Weisung
   Maintainer 2026-08-11: „alles zum Bau und zu Standardprozessen aus der Onsite-Wissensbasis
   gilt 1:1 für NovaCore-OS und das Felix-Plugin"). Erhoben gegen
