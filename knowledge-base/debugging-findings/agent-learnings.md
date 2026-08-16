@@ -167,3 +167,37 @@
   Maintainer-Freigabe), eine **endliche, namentlich gelistete und kommentierte** Ausnahme
   bauen plus Plan-Nachtrag. Eine unbegrenzte Lockerung hätte die Regel für immer stumpf
   gemacht.
+
+### 2026-08-16 — `git add -A` sammelte parallele Maintainer-Arbeit in den Review-Commit ein
+
+- **Kontext/Aufgabe:** Phase-2-Review-Iteration (Codex-Findings) auf
+  `feat/onsite-endstand-phase-2`; der Maintainer arbeitete zeitgleich in einer zweiten
+  Session im **selben Worktree** und legte dort den Bauplan
+  `2026-08-16-novacore-agent-sdk-gui-architektur.md` samt Index-Zeile ab.
+- **Was schiefging:** Der Fix-Commit `1cb346e` wurde mit `git add -A` gestaged — die
+  fremden, thematisch unabhängigen Dateien fuhren unbemerkt mit und wurden gepusht.
+  Bemerkt erst am `create mode`-Eintrag der Commit-Ausgabe.
+- **Ursache:** Pauschales Staging in einem Worktree, von dem **bekannt** war, dass eine
+  Parallel-Session darin arbeitet (das AGENTS.md-„modified on disk"-Signal des Editors kam
+  sogar vorher). Bequemlichkeit schlug Sorgfalt.
+- **Lernerkenntnis/Präventionsregel:** Bei bekannter oder möglicher Parallelarbeit im
+  selben Worktree wird **nie** `git add -A`/`-u` benutzt, sondern die explizite Pfadliste
+  der selbst geänderten Dateien; vor dem Commit `git status --short` gegen die eigene
+  Änderungsliste diffen. Rutscht Fremdarbeit dennoch mit: nicht rückbauen, sondern
+  transparent flaggen (PR-Kommentar), Pflicht-Nachzüge (CHANGELOG/Index) nachziehen —
+  gepushte Maintainer-Arbeit wird nicht ungefragt entfernt. Strukturell ist das der Fall
+  für getrennte Worktrees je Session (`anker-reservierung.md`-Umfeld, Konfliktzonen-Regel).
+
+### 2026-08-16 — PR-Kommentar per Inline-`--body` von der Shell zerschnitten
+
+- **Kontext/Aufgabe:** Abschlusskommentar der Review-Kette auf PR #20 via
+  `gh pr comment --body "…"` mit Markdown-Backticks und Klammern im Text.
+- **Was schiefging:** Bash interpretierte die Backticks als Kommandosubstitution — der
+  Kommentar wurde abgeschnitten gepostet (endete mitten im Text), der Rest der Zeichenkette
+  lief als Shell-Zeilen ins Leere (`syntax error near '('`). Reparatur per
+  `gh api PATCH -F body=@datei`.
+- **Ursache:** Backticks in doppelt gequoteten Shell-Strings sind aktiv; bei langen
+  Markdown-Bodies ist Inline-Quoting grundsätzlich fragil.
+- **Lernerkenntnis/Präventionsregel:** PR-/Issue-Bodies und -Kommentare mit Markdown
+  **immer** über `--body-file <datei>` bzw. `-F body=@datei` übergeben, nie inline —
+  Datei zuerst schreiben, dann posten, dann Ergebnis-Länge gegenprüfen.
