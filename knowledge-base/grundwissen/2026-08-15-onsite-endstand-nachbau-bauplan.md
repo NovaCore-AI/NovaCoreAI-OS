@@ -635,6 +635,44 @@ angeht in dessen neuem PR"). Zwei offene, **untereinander divergierende** Upstre
 zusammengeführt werden) den Endstand gegenlesen und Differenzen per Nachtrag auflösen —
 nicht vorab raten. Metaflow (PR #61/#62) bleibt außerhalb dieses Plans (§0.4).
 
+### N8 — Phase-3-Umsetzung: N7-Folge-Prüfpunkt erledigt, Queue-Flow-Entscheide (2026-08-16)
+
+1. **N7-Folge-Prüfpunkt erledigt:** Onsite #58 (Queue-Flow, 22:17) und #60 (Allowlist-Norm,
+   22:38) sind am 2026-08-15 gemergt; `git log --since=<merge>` über alle Norm- und
+   Queue-Dateien ist leer → der gemergte Endstand ist identisch mit dem portierten PR-Stand,
+   **keine Differenzen**. #59/#61/#62 bleiben upstream offen → Prüfpunkt bleibt bestehen.
+   Quelle der Phase 3 ist damit gemäß I6-Klausel `origin/main@5c2c210`.
+2. **Takt firmenspezifisch umgesetzt (N6):** 14-Tage-Fälligkeit im Hook
+   (`FAELLIG_NACH_MS = 14 Tage`), +1 Tag Versatz; Erinnerungs- und Skill-Texte durchgängig
+   „14-tägig/Zyklus-PR" — testerzwungen (Gegenprobe: 10-Tage-Stand, bei Onsite fällig, muss
+   bei NovaCore schweigen).
+3. **Registry-Andockpunkte statt Onsite-Einzelfeld:** Die Infra-Registry (Schema v1) wird
+   **additiv** um die optionalen Felder `kernRepoPfad` und `abteilungsRepoPfade` (Map passend
+   zur `abteilungen`-Liste) erweitert — dokumentiert in `skills/setup/infra-registry.md`,
+   kein Schema-Bump (keine Registry im Feld, Leser ignorieren unbekannte Felder, der
+   Schreiber erhält Fremdfelder). Satelliten-**Signal** bleibt das `repository`-Feld der
+   `module-registry.json`. Heute unbefüllt: Hook schweigt, Queue-Skills brechen mit
+   Übergangs-Befund ab; real ab dem ersten Abteilungs-Satelliten.
+4. **Stehende PR-Freigabe NICHT portiert:** Das Vorbild trägt sie in seiner Ebene-1-Payload;
+   bei NovaCore gilt die rote Linie „kein Push/PR ohne ausdrückliche Freigabe" unverändert —
+   offener Maintainer-Entscheid (`queue-flow.md` §6); beide Queue-Skills holen bis dahin die
+   Freigabe je Lauf ein.
+5. **Kriterienliste v1 = Abnahme-Gate:** Die Erstfassung (a–d + GF1–GF4 + No-Duplicate,
+   ohne Onsites v1→v2-Ballast) braucht die Maintainer-Abnahme des **Wortlauts**
+   (`kriterien-pflege.md` §2 Schritt 3) — sie ist als eigener Abnahme-Abschnitt im
+   Phasen-PR ausgewiesen; der Merge ist die Abnahme.
+6. **`queue-protokolle/` ist ausschließlich Kern-Ledger** (Onsite-treu, `queue-kern`
+   Schritt 9): Abteilungs-Satelliten führen keine Protokoll-Kategorie — Overseer-Korrektur
+   der ersten 3.1-Fassung der SSOT-Grundgerüst-Vorlage.
+7. **Testfälle der Phase E:** T18 vollständig über die portierte Hook-Suite (45 registrierte
+   Tests, davon 1 POSIX-only übersprungen — 44 aktiv; inklusive dreier NC-Zusatzproben:
+   14-Tage-Schwelle, 14-Tage-Text, Übergangszustand ohne
+   `abteilungsRepoPfade`); T16/T17 sind als harte Skill-Regeln verankert (Station 2 liest
+   nur `origin/<standardbranch>`; Divergenz- und `behind>0`-Abbruch) — ihre **Praxisprobe
+   steht aus** (Dry-Run zuerst; `queue-flow.md` §6). Die Plugin-Grenzen-Invariante der
+   Struktur-Suite akzeptiert seit Phase 3 auch die Qualifizierer „Abteilungs-Repo/-Klon"
+   (Zweck unverändert; konsistent zu `queue-os.test.mjs` T-2).
+
 ---
 
 *Angelegt 2026-08-15 durch Claude (Fable 5, Claude Code) auf Weisung Lucas Vöhringer.

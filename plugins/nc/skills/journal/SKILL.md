@@ -55,6 +55,13 @@ Leere Felder weglassen — kein „N/A"-Platzhalter.
 
 - **Append-only.** Bestehende Zeilen werden nie geändert oder gelöscht; eine Korrektur ist ein
   neuer Eintrag, der auf den alten verweist.
+- **Abteilungs-Sonderregeln anwenden:** Führt das installierte Abteilungsplugin eine
+  `pflege-auspraegung.json` an seiner Plugin-Wurzel (Schema:
+  `referenz/pflege-auspraegung.md` dieses Kern-Plugins `nc`), gelten deren
+  `journalSonderregeln` und `roteLinienDomaene` zusätzlich für jeden Eintrag — sie
+  **verschärfen** nur, die Kern-Regeln dieser Liste sind nicht abwählbar. Fehlt die Datei,
+  gelten allein die Kern-Regeln (kein Fehler). Die **Queue-Klassifikation** leistet nicht
+  dieser Skill, sondern `/nc:end-session` (Station 1 des Queue-Flows).
 - **Belegpflicht.** Jeder Eintrag nennt seine Quelle: `Datei:Zeile`, ausgeführter Befehl samt
   Ergebnis, Ticket oder Doku-Fundstelle. Ohne Beleg wird der Eintrag ausdrücklich als
   **Vermutung** gekennzeichnet.

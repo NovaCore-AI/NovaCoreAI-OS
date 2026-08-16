@@ -7,7 +7,8 @@ description: >-
   Fremdsystem-Verbindungen gehören n8n". Wird bei Arbeit an `app/api/webhooks/*` oder an
   Integrations-Logik (KlickTipp, WooCommerce, Streamendous) angewendet. Kundenspezifisch — gilt
   ausschließlich für das Wasserzisterne-Projekt. Quelle: CLAUDE.md §3/§8/§9, Projektplan v2.3
-  §4.3 des Arbeits-Repos.
+  §4.3 des Arbeits-Repos. Frische: Stand v2.3, abgeglichen 2026-07-07 — vor Nutzung gegen den
+  Projektplan im Arbeits-Repo prüfen.
   Trigger-Begriffe: „Webhook", „Idempotenz", „Signaturprüfung", „Reconciliation",
   „WooCommerce", „KlickTipp", „n8n".
 ---

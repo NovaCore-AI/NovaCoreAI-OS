@@ -5,7 +5,8 @@
 > Session**, in jedem Arbeits-Repo, **unabhängig von der CLI** (Claude Code, Kimi Code CLI,
 > Codex CLI — die Dateinamen `CLAUDE.md` / `AGENTS.md` sind Synonyme). Source of Truth für
 > **Methodik, Conventions, Safety** — nicht für fachliche Use-Case-Inhalte (die liegen im
-> jeweiligen Arbeits-Repo). **Sprache aller Artefakte: Deutsch.**
+> jeweiligen Arbeits-Repo). **Sprache: Deutsch — Code-Artefakte in Arbeits-/Kundenrepos
+> englisch (§6).**
 > **Version:** die des Kern-Plugins `nc` (siehe dessen `plugin.json`).
 
 ---
@@ -188,7 +189,11 @@ Der verbindliche Rahmen steht in `wp-rahmen.md` des Kern-Plugins `nc` (WP0–WP8
 
 ## 6. Verbindliche Regeln
 
-- **Sprache:** Alle Artefakte (Commits, Pull Requests, Doku, Journal) auf Deutsch.
+- **Sprache (präzisiert nach Firmenspezifikation N6, 2026-08-15):** Kommunikation, Tickets,
+  Doku und Journale auf Deutsch. In **Arbeits- und Kundenrepos** sind **Code-Artefakte**
+  (Branch-Namen, Commit-Messages, PR-Titel und -Texte, Code-Kommentare) **englisch**; eine
+  abweichende Regel der CLAUDE/AGENTS des jeweiligen Arbeits-Repos gewinnt. Das **OS-Repo
+  selbst bleibt durchgängig deutsch** (Bestand).
 - **Safety:** Keine automatischen Pushes, Merges, Posts, Releases oder Deployments ohne
   **explizite Nutzerfreigabe**. Durchgesetzt wird das vom **Fact-Forcing-Gate (FFG)** des
   Kern-Plugins mit drei Gates:

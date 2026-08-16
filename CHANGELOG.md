@@ -19,6 +19,107 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ### Added
 
+- **Onsite-Endstand-Nachbau Phase 3 — Queue-Flow & Development-Plugin (Kern 0.9.0 → 0.10.0,
+  nc-development 0.1.0 → 0.2.0)** nach Bauplan
+  `grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md` (AP-E1–E3, AP-F1–F2).
+  - **Queue-Referenz, Kriterienapparat und Format (AP-E1):**
+    `plugins/nc/referenz/pflege-auspraegung.md` (Schema v1 der `pflege-auspraegung.json`,
+    Queue-Format v1 — append-only Fünf-Spalten-Tabelle — und **Kriterienliste v1,
+    Erstfassung**: Kriterien a–d, Gegenkriterien GF1–GF4, No-Duplicate-Regel) sowie die
+    erste reale Ausprägung `plugins/nc-development/pflege-auspraegung.json` (Abteilung
+    `development`, Übergangsregel `uebergang`, die drei WZS-Domänen-roten-Linien). Dazu die
+    Standardprozesse `standardprozesse/queue-flow.md` (acht Stationen, Verantwortliche,
+    QS-Prüfpunkte, 14-Tage-Takt mit einem Tag Versatz) und `standardprozesse/kriterien-pflege.md`,
+    das Definitionsdokument `grundwissen/NovaCore-OS-Kriterienliste-Definition.md` sowie zwei
+    neue Wissensbasis-Kategorien: `kandidaten-queue/` (Übergangs-Queue der Abteilung
+    `development`, `queue.md`) und `queue-protokolle/` (committetes Ledger des
+    Kern-Aufstiegslaufs, heute `PLATZHALTER.md`). **Die Kriterienliste v1 ist Abnahme-Gate
+    dieses Phasen-PRs** — ihr Wortlaut bindet jede Abteilung und wird in einem eigenen
+    PR-Abschnitt zur Abnahme gestellt; der **Merge dieses PRs gilt als die Abnahme des
+    Wortlauts** (Bauplan-Nachtrag N8.5).
+  - **Zwei neue Kern-Skills (AP-E2):** `plugins/nc/skills/queue-abteilung/SKILL.md` (hebt die
+    lokal gesammelten SSOT-Commits samt neuer Queue-Zeilen eines Abteilungs-Satelliten-Klons auf
+    einen Zyklus-Branch und stellt **einen** Abteilungs-PR; harte Pfad- und Format-Prüfung,
+    Secrets-Preflight, Remote-Identitätsprüfung vor jedem Fetch) und
+    `plugins/nc/skills/queue-kern/SKILL.md` (liest die **gemergte** Queue einen Tag später,
+    prüft je Zeile Kriterien und No-Duplicate gegen die Kern-SSOT, entwirft Kern-Dokument samt
+    Index-Zeile und committeter Prüfprotokolldatei, stellt **einen** Promotions-PR; Folgelauf
+    wertet den gemergten Stand aus und schreibt die Marker `befördert (PR #n)` /
+    `abgelehnt (PR #n)` zurück). Beide: kein Auto-Merge, kein Force-Push, **Push und
+    PR-Erstellung sind je Lauf einzeln freigabepflichtig** — anders als im Vorbild hat NovaCore
+    dafür keine stehende Freigabe (offener Maintainer-Entscheid, `queue-flow.md` §6). Heutiger
+    Übergangszustand E1: Ohne Abteilungs-Satelliten brechen beide Skills mit dem
+    Übergangs-Befund ab; wirksam werden sie erst mit dem ersten Abteilungs-Satelliten.
+  - **Fälligkeits-Hook `nc-queue-faelligkeit.js` (AP-E3, dritter SessionStart-Hook des Kerns,
+    ausdrücklich KEIN Gate):** erinnert je Sitzungsstart an zwei Fälligkeiten — nicht
+    eingereichte Wissensbasis-Arbeit im Abteilungs-Klon und offene Zeilen der **gemergten**
+    Abteilungs-Queue — nach dem 14-Tage-Takt plus ein Tag Versatz (Firmenspezifikation N6).
+    **Design-Entscheidungen:** zwei unterschiedliche Fehlerrichtungen (fehlende oder kaputte
+    Infra-Registry, toter Klon-Pfad, unbrauchbares Git → stilles Schweigen, keine geratene
+    Fälligkeit; ein **unlesbarer Lauf-Marker** dagegen ruht dauerhaft und wird genau **einmal
+    je Sitzung** auf stderr gemeldet, Exit 2 laut Hooks-Doku ohne Blockadewirkung); zwei
+    bewusst getrennte Marker-Orte (der **Lauf-Marker** `~/.claude/nc/queue-lauf.json` liegt
+    reboot-fest neben der Infra-Registry, ausdrücklich **nicht** in `os.tmpdir()`; der
+    **Sitzungsmarker** bleibt ephemer in `os.tmpdir()`, Muster der PreCompact-Mahnung); ein
+    Deckel von **höchstens fünf** lokalen Git-Aufrufen mit 2-Sekunden-Timeout und **keinem**
+    Netzzugriff (kein `fetch` im Sitzungsstart); atomare Schreibvorgänge (Temp-Datei + Rename)
+    unter einer kurzen Verzeichnis-Sperre gegen Lost Updates paralleler Läufe. Registrierung in
+    `hooks.json` samt Prosa-Absatz (5) der Kontroll-Schicht-`description`. Opt-out
+    `NC_QUEUE_CHECK=off`; Test-Overrides `NC_QUEUE_STATE_DIR` / `NC_QUEUE_SESSION_DIR` /
+    `NC_QUEUE_PFAD`.
+  - **Synthese-Bauplan `nc-development` (AP-F1):**
+    `grundwissen/2026-08-16-nc-development-modernisierung-bauplan.md` — Erstanwendung des
+    Standardprozesses `abteilungs-inhalts-pruefung.md`: zwei unabhängige Prüfläufe (Soll- und
+    Ist-Inventur) zu einer Drift-Matrix mit zehn Befunden synthetisiert (zwei davon HOCH:
+    fehlende Abteilungs-CLAUDE Ebene 2, WP7 ohne `qs`-/`rel`-Skills), daraus die
+    AP-F2-Arbeitsliste F2.1–F2.8; die wörtlichen Rohdaten beider Prüfläufe sind als Anhänge
+    persistiert.
+  - **AP-F2 — vier neue Skills, zwei neue Module, erste ausgelieferte Abteilungs-CLAUDE
+    (Ebene 2):** `plugins/nc-development/skills/qs-bugfix` und `.../qs-abnahme` (Modul `qs`,
+    WP7 — Fehler zuerst als scheiternden Test reproduzieren und beheben bzw. Abnahmelauf mit
+    Beleg je Punkt) sowie `.../rel-vorbereitung` und `.../rel-verifikation` (Modul `rel`, WP7 —
+    Release-Mappe zusammenstellen bzw. Auslieferung read-only nachweisen; **beide** Skills
+    tragen `disable-model-invocation: true` und sind nur manuell aufrufbar, weil sie an einem
+    Produktivsystem hängen). `plugins/nc-development/development-abteilungs-claude.md` ist das
+    **erste ausgelieferte Exemplar der CLAUDE-Ebene 2** (Teil 1 für jede Sitzung der Abteilung,
+    Teil 2 Werkstatt für Sitzungen, die am Plugin selbst bauen). Dazu die **Lese-Verdrahtung in
+    `/nc:start`** (Schritt 7, Kern-Skill): Für jedes installierte Abteilungsplugin wird dessen
+    `<abteilung>-abteilungs-claude.md` an der Plugin-Wurzel gelesen und im Lagebericht
+    ausgewiesen — ohne diesen Schritt bliebe eine ausgelieferte Ebene-2-Datei wirkungslos
+    (Auslieferung ≠ Wirkung, `claude-netz-bau.md` des OS-Repos). `nc-development` zählt damit
+    **15 Skills in 6 Modulen** (`fe`/`be`/`flc`/`wzs`/`qs`/`rel`).
+  - **`nc-sync.md` §6 — Sprachregel präzisiert (Firmenspezifikation N6, Ebene-1b-Payload):**
+    Kommunikation/Doku/Journale bleiben Deutsch; in Arbeits- und Kundenrepos sind
+    **Code-Artefakte** (Branch-Namen, Commit-Messages, PR-Titel/-Texte, Code-Kommentare)
+    **englisch**, eine abweichende Regel der CLAUDE/AGENTS des jeweiligen Arbeits-Repos gewinnt;
+    das OS-Repo selbst bleibt durchgängig Deutsch. **Payload-Review-Vermerk:** `nc-sync.md` ist
+    zugleich die Ebene-1b-Payload (`nc-teamsync.md`, Ganzdatei ohne Privat-Zone) — diese Änderung
+    reist mit dem Kern-Bump automatisch per Doks-Autosync auf jede Team-Maschine; der geänderte
+    Payload-Inhalt sollte vor dem Merge dieses PRs vom Menschen gegengelesen werden.
+  - **Nachzüge:** README (Skill-Kataloge beider Plugins, Kontroll-Hook-Tabelle um
+    `nc-queue-faelligkeit.js`), AGENTS.md (Repo-Karte, Glossar, Produktstand — Queue-Flow aus
+    „Noch nicht gebaut" gestrichen, Ebene-2-Klausel aktualisiert), `SSOT-Document-Index`
+    (Ordner-Mapping-Zeilen `Kandidaten-Queue/`/`Queue-Protokolle/`), `module-registry.json`
+    (Abteilung `gemeinsam`: `queue-abteilung`/`queue-kern` [gebaut]; Abteilung `development`:
+    Status „15 Skills in 6 Modulen", Module `qs`/`rel`, `minCoreVersion` → 0.10.0,
+    `_hinweis`-Satz zur `pflege-auspraegung.json`), Kern-Bump `0.9.0 → 0.10.0` an den drei
+    Spiegelstellen (`plugin.json`, `VERSION`, `module-registry.json`), nc-development-Bump
+    `0.1.0 → 0.2.0` (`plugin.json` inkl. Description) — gebündelt durch den Subagenten
+    `sync-nachzug-executor`.
+  - **Review-Runde 2 und Abschluss:** Nach Session-Abbruch bei Kontingentlimit fertiggestellt
+    (Restfixes claude-netz-bau §4/PLATZHALTER/N8.5-Wortlaut). Externe Runde 2 gegen das
+    Review-Paket: GLM-5.3 (3 MINOR/1 NIT) und Codex (2 MAJOR/4 MINOR) — **alle Findings
+    eingearbeitet**, u. a. queue-kern-Erstlauf löscht die `PLATZHALTER.md` und stellt den
+    Kategorie-Index um (geplante Pflichtänderungen), PR-Body-Fallback für jeden nicht lesbaren
+    PR-Head mit Fail-closed bei Unklarheit, Dirty-Worktree-Baseline in Schritt 4/10,
+    Hook-Sperre schließt ungeschützten Read-modify-write (mit Negativprobe),
+    Sofort-Pfad×GF1-Klarstellung in Referenz + `/nc:end-session`, Marker-Identität
+    (Datum + Einzeiler) im Transitionswächter mit adversarialer Gegenprobe.
+  - **Testsuite:** 192 Tests / 191 bestanden / 1 übersprungen (POSIX-only) — +52 gegenüber
+    Phase 2.
+    — *Claude (Fable 5, Overseer) mit Opus-Bauagenten und Sonnet-Executor; Abschluss und
+    Review-Runde 2: Kimi (K3, Kimi Code CLI)*
+
 - **Onsite-Endstand-Nachbau Phase 2 — Prozesskorpus, CLAUDE-Netz & Subagenten (Kern 0.8.0 → 0.9.0)**
   nach Bauplan `grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md` (AP-C1–C5, AP-D1;
   Bauplan-Nachtrag N7 für den Onsite-PR-#60-Nachzug).

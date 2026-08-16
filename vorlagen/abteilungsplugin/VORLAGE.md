@@ -21,7 +21,10 @@ vorlagen/abteilungsplugin/
   README.md.vorlage                    Abteilungs-README-Gerüst
   abteilungs-claude.md.vorlage         Abteilungs-CLAUDE (Ebene 2), zweigeteilt — Pflicht
   agents/beispiel-agent.md.vorlage     Subagenten-Baustein (Read-only-Variante, Allowlist-Norm) — optional, erst beim ersten Agenten instanzieren
-  ssot-grundgeruest.md.vorlage         Wissensbasis-Gerüst — NUR für eigenständige Satelliten
+  ssot-grundgeruest.md.vorlage         Wissensbasis-Gerüst — NUR für eigenständige Satelliten,
+                                        unterscheidet zwei Gattungen (A eigenständiges
+                                        Kollegen-OS ohne Kern-Dependency, B Abteilungs-Satellit
+                                        mit Kern-Dependency)
   VORLAGE.md                           diese Anleitung
 ```
 
@@ -32,6 +35,13 @@ Prozess `knowledge-base/standardprozesse/claude-netz-bau.md`). Zielname beim Ins
 Satelliten, weil beim Nutzer nur das Plugin-Verzeichnis ankommt (`abteilungs-plugin-bau.md`
 §1a). Sie ist **Prosa-Instruktion**: Fachwissen wird verwiesen, nicht kopiert, und
 ausgelieferte Payloads nennen **Rollen statt Klarnamen** (öffentliches Repo).
+
+**`pflege-auspraegung.json` ist Pflichtbestandteil der Plugin-Wurzel jedes Abteilungsplugins mit
+Kern-Dependency** (repo-intern wie `nc-development` oder ein Abteilungs-Satellit der Gattung B)
+— ohne sie findet `/nc:end-session` die Kandidaten-Queue nicht. Kein eigener Vorlagen-Baustein
+dieses Verzeichnisses (Format, Pflichtfelder und Prüfliste: `referenz/pflege-auspraegung.md`
+des Kern-Plugins `nc`; für Satelliten zusätzlich beschrieben in `ssot-grundgeruest.md.vorlage`,
+Abschnitt „Nur Gattung B").
 
 Bewusst **nicht** enthalten:
 

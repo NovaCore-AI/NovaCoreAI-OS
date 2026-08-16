@@ -51,7 +51,7 @@ damit nicht nur das auffällt, was zuerst ins Auge springt. Er **bewertet**; die
    - **LOW** — Hinweis, optional.
 7. **Review-Kommentar entwerfen:** Befunde nach Severity gruppieren, je Befund Fundstelle,
    Begründung und konkreten Änderungsvorschlag nennen. Den Entwurf ausgeben und ausdrücklich
-   als **Entwurf** kennzeichnen.
+   als **Entwurf** kennzeichnen. Entwurfssprache nach `nc-sync.md` §6 des Kern-Plugins `nc`.
 8. **Übergabe:** Auf die menschliche Entscheidung hinweisen (posten, approven, resolven) und
    auf `/nc:journal` für festzuhaltende Entscheidungen verweisen.
 
@@ -59,6 +59,9 @@ damit nicht nur das auffällt, was zuerst ins Auge springt. Er **bewertet**; die
 
 - **Rote Linie: der Skill approved nie, resolved nie und postet nie selbst.** Er liefert einen
   Entwurf; Posten und Freigabe sind menschliche Handlungen.
+- **Review-Kette (Rollen):** Implementierer ≠ Reviewer — geprüft wird von einem zweiten Dev
+  oder durch dieses Agenten-Review; **abgenommen und gemergt wird von der Rolle
+  Maintainer/Admin**. Ein Eigen-Review ersetzt die Fremdprüfung nicht, es geht ihr voraus.
 - **Kein Befund ohne Beleg.** Jeder Befund nennt `Datei:Zeile` aus dem tatsächlich gelesenen
   Diff. Vermutungen über nicht gelesene Dateien werden als offene Frage formuliert, nicht als
   Befund.

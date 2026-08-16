@@ -6,7 +6,8 @@ description: >-
   Karenz-Übergabe und manueller Fallback. Wird VOR und WÄHREND jeder Arbeit an
   `lib/attribution/` oder `lib/normalize/` (Phase 2) angewendet. Kundenspezifisch — gilt
   ausschließlich für das Wasserzisterne-Projekt. Quelle: Projektplan v2.3 §4/§5, CLAUDE.md §5
-  des Arbeits-Repos.
+  des Arbeits-Repos. Frische: Stand v2.3, abgeglichen 2026-07-07 — vor Nutzung gegen den
+  Projektplan im Arbeits-Repo prüfen.
   Trigger-Begriffe: „Attribution", „Lead-Order-Matching", „match_confidence", „Normalisierung
   E.164", „Zeitfenster 90 Tage", „Mehrfach-Match".
 ---

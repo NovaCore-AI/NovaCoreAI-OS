@@ -61,7 +61,14 @@ Gedächtnis — genau der Blind-Start, den das OS verhindert.
    immer, dazu jedes installierte Abteilungsplugin (z. B. `nc-development`)? Die verfügbaren
    Skill-Namespaces zeigen es. `module-registry.json` dieses Kern-Plugins ist die
    Metadaten-Quelle dafür, welche Module (Skill-Präfixe) zu welcher Abteilung gehören; sie
-   **steuert nichts aus**, sie beschreibt nur.
+   **steuert nichts aus**, sie beschreibt nur. **Abteilungs-CLAUDE (Ebene 2) laden:** Für
+   jedes installierte Abteilungsplugin die Datei `<abteilung>-abteilungs-claude.md` an dessen
+   **Plugin-Root** lesen (heute: `development-abteilungs-claude.md` von `nc-development`) —
+   **Teil 1** gilt für jede Sitzung der Abteilung, **Teil 2** nur für Sitzungen, die am
+   Plugin bzw. Abteilungs-Repo selbst bauen. Fehlt die Datei (Plugin-Stand vor ihrer
+   Auslieferung), ist das **kein Fehler**: als „Ebene 2 nicht vorhanden" ausweisen. Ohne
+   diesen Lese-Schritt wirkt die ausgelieferte Datei nicht — Auslieferung ≠ Wirkung
+   (`claude-netz-bau.md` des OS-Repos).
 8. **Infra-Registry lesen (falls vorhanden):** `~/.claude/nc/infra.json` hält die maschinenlokal
    registrierten Repo-Pfade (Kern-Klon, Satelliten). Existiert sie, löst der Skill Repo-Verweise
    darüber auf statt zu raten; fehlt sie, ist das **kein Fehler** — sie wird als „nicht
@@ -80,7 +87,8 @@ Gedächtnis — genau der Blind-Start, den das OS verhindert.
     beim nächsten Session-Start selbst nach.
 11. **Lagebericht ausgeben:** Branch und Git-Lage · **Frischestand des Projekt-Memory** (jünger
     oder älter als der Repo-Stand) · Stand in drei bis fünf Zeilen · offene Punkte aus dem
-    Journal · **offene Stränge aus dem Register** · aktive Abteilungen/Module ·
+    Journal · **offene Stränge aus dem Register** · aktive Abteilungen/Module samt
+    **geladener Abteilungs-CLAUDE (Ebene 2)** je Abteilung (bzw. „nicht vorhanden") ·
     **vorgeschlagener nächster Workflow-Schritt** mit dem Skill, der ihn trägt.
 12. **Start-Stempel setzen (Gate 2):** Nach dem Lagebericht den Stempel-Befehl ausführen, den
    die Session-Start-Injektion (bzw. die Ablehnung des Start-Gates) wörtlich nennt —
@@ -125,7 +133,9 @@ Gedächtnis — genau der Blind-Start, den das OS verhindert.
 - Offene Stränge aus dem Register sind aufgezählt oder das Register ist ausdrücklich als
   fehlend/leer benannt; ebenso der Befund zum Team-Sync-Stempel, falls er auffällig war.
 - Branch, Anzahl unkommittierter Dateien und jüngster Commit-Hash sind ausgewiesen.
-- Die aktiven Abteilungen sind mit ihren Namespaces gelistet (mindestens `/nc:`).
+- Die aktiven Abteilungen sind mit ihren Namespaces gelistet (mindestens `/nc:`), und je
+  Abteilungsplugin ist die **Abteilungs-CLAUDE (Ebene 2)** als gelesen ausgewiesen — oder
+  ausdrücklich als „nicht vorhanden" benannt (Plugin-Stand vor ihrer Auslieferung).
 - `git status --short` zeigt **keine** `.nc/`-Pfade (Ignore greift) — sonst wird der fehlende
   `.gitignore`-Eintrag im Bericht gemeldet.
 - Der Bericht endet mit genau **einem** vorgeschlagenen nächsten Schritt samt zuständigem Skill.

@@ -51,6 +51,17 @@ per Env **je Gate**. Alle Hooks liegen im Kern `nc`.
   Versions-Stempel). Details: `NovaCore-OS-CLAUDE-Ebenen-Definition.md`.
 - **PreCompact-Mahnung** (`nc-end-mahnung.js` + `nc-end-stempel.js`): siehe Abgrenzung
   oben.
+- **Queue-Fälligkeits-Erinnerung** (`nc-queue-faelligkeit.js`, dritter SessionStart-Hook,
+  seit Kern 0.10.0): erinnert an überfällige Läufe der Queue-Skills
+  `/nc:queue-abteilung`/`/nc:queue-kern` (14-Tage-Takt, +1 Tag Versatz — Bauplan-Nachtrag
+  N6), sobald ein Abteilungs-Satellit registriert ist; im heutigen Übergangszustand (keine
+  Satelliten, Entscheid E1) schweigt er by design. **Ausdrücklich KEIN Gate**: SessionStart
+  kann laut Hooks-Doku nicht blocken — der Hook injiziert höchstens eine Erinnerung je
+  Fälligkeit und Sitzung, fail-open bei jedem defekten State, kein Netzzugriff, höchstens
+  fünf lokale Git-Aufrufe. Lauf-Marker `~/.claude/nc/queue-lauf.json` (reboot-fest, von den
+  Skills selbst gestempelt), Sitzungsmarker ephemer in `os.tmpdir()`. Opt-out
+  `NC_QUEUE_CHECK=off`; Test-Overrides `NC_QUEUE_STATE_DIR`, `NC_QUEUE_SESSION_DIR`,
+  `NC_QUEUE_PFAD`. Details: `standardprozesse/queue-flow.md`.
 
 ## Was Gate 2 deterministisch prüft — und was nicht
 

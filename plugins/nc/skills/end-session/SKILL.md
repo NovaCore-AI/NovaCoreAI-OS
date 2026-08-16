@@ -4,8 +4,10 @@ description: >-
   Sichert am Sitzungsende den Arbeitsstand (WP8) — schreibt den append-only Journal-Eintrag
   des Tages nach .nc/erinnerung/journal/, konsolidiert .nc/erinnerung/stand.md neu, spiegelt
   den Stand commit-unabhängig ins Projekt-Memory von Claude Code, aktualisiert den
-  Mehrtages-Roll-up, pflegt das Offene-Stränge-Register, übergibt offene Punkte samt
-  empfohlenem Einstieg an die nächste Sitzung und setzt den Abschluss-Stempel.
+  Mehrtages-Roll-up, pflegt das Offene-Stränge-Register, klassifiziert firmenrelevante
+  Ergebnisse gegen die Kriterienliste in die Kandidaten-Queue der Abteilung (Queue-Flow,
+  Station 1), übergibt offene Punkte samt empfohlenem Einstieg an die nächste Sitzung und
+  setzt den Abschluss-Stempel.
   Trigger-Begriffe: „Session beenden", „end-session", „Sitzungsabschluss", „Sitzung beenden",
   „Feierabend", „Stand sichern", „WP8", „Sitzung abschließen", „Übergabe", „für heute fertig",
   „vor dem Kompaktieren".
@@ -72,22 +74,58 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
    eingetragen oder aktualisiert; Erledigtes bekommt ein Erledigt-Datum, Zeilen werden nie
    gelöscht. Fehlt die Datei, wird sie mit Kopf-Blockquote (Zweck + Pflege-Regeln) und der
    Tabelle `Datum · Strang · Verbleib · Nächster Schritt · Status` angelegt.
-   *(Klassifikation firmenrelevanter Ergebnisse folgt mit dem Queue-Flow.)*
-8. **Fehlerprotokoll prüfen:** Sind alle eigenen Fehler dieser Sitzung festgehalten? Im OS-Repo
+8. **Klassifikation + Kandidaten-Queue (Queue-Flow, Station 1):** Die Sitzungsergebnisse gegen
+   die **Kriterien a–d** der Pflege-Ausprägung des installierten Abteilungsplugins halten
+   (`pflege-auspraegung.json` an dessen Plugin-Wurzel; Format und Kriterienliste v1:
+   `referenz/pflege-auspraegung.md` dieses Kern-Plugins `nc`) — **und vor dem Anhängen die
+   Gegenkriterien GF1–GF4 anwenden** (Abschnitt 5.2 der Kern-Referenz), sie sind
+   Handlungsanweisung, nicht nur Verweis: **GF1** — Bug/Finding eines **fremden Arbeits-Repos**
+   → **nie** in die OS-Queue, sondern in den Ticket-Prozess des betreffenden Repos; **GF3** —
+   **eigener Agenten-Fehler** → **immer** eine Queue-Zeile, auch ohne a–d-Treffer und
+   zusätzlich zum Fehlerprotokoll-Eintrag (einziger Fall, in dem die Zweifelsregel nicht
+   greift: im Zweifel **ein**tragen); **GF2/GF4** nach Abschnitt 5.2. Je verbleibendem Treffer
+   **eine Zeile** an die `queue.md` der Abteilung **anhängen** — Pfad aus `queuePfad` der
+   Ausprägung, aufgelöst gegen die Klon-Wurzel aus `abteilungsRepoPfade` der Infra-Registry
+   (`~/.claude/nc/infra.json`); append-only, nie umschreiben. **Führt der Registry-Eintrag der
+   Abteilung kein `repository`** (Abteilung ohne eigenen Satelliten — heute jede interne
+   Abteilung), gilt die Regel `uebergang` der Ausprägung: Die Queue-Zeile wandert an den dort
+   genannten Übergangsort und wird über den **regulären Branch/PR-Fluss des betreffenden
+   Repos** eingebracht — **nicht** über `/nc:queue-abteilung`, der ausschließlich
+   Abteilungs-Satelliten-Klone einreicht. Lässt sich der Übergangsort auf dieser Maschine
+   nicht auflösen (kein Arbeitsklon des Ziel-Repos), wird der Kandidat als **nicht abgelegt**
+   mit ausdrücklichem Handlungsbedarf in der Übergabe gemeldet — Verlust ist sichtbar, nicht
+   still; dasselbe gilt, wenn `uebergang` fehlt. **Löst sich `queuePfad` nicht zu einer
+   existierenden Datei auf** (Pfad ins Leere, Kategorie fehlt): **nichts anlegen**, nichts an
+   einem Ersatzort ablegen und nichts raten — der Ist-Zustand wird als Befund gemeldet und auf
+   `/nc:setup` verwiesen (Regel „Platte schlägt Registry" der Kern-Referenz, Abschnitt 3).
+   **Sofort-Pfad-Fälle** (Major-Bug mit Teamwirkung · Sicherheitsvorfall · Release/Tag ·
+   Verstoß gegen rote Linien) kommen zusätzlich als **eigener, deutlich markierter Block in
+   die Übergabe (Schritt 10)** — mit ausdrücklich benanntem Handlungsbedarf an den Menschen;
+   die Queue-Zeile entfällt dadurch **nicht**, sofern nach GF1–GF4 überhaupt ein
+   Queue-Kandidat verbleibt — bis zum offenen Maintainer-Entscheid („Sofort-Pfad × GF1",
+   `queue-flow.md` §6) schlägt **GF1**: Ein Sicherheitsvorfall in einem *fremden* Arbeits-Repo
+   wird gemeldet, bekommt aber **keine** Queue-Zeile. Fehlt die Ausprägung oder die Registry: als
+   **fehlendes Setup** melden und auf `/nc:setup` verweisen — nicht raten, keinen Ersatzort
+   erfinden. Trifft **kein** Kriterium: kein Eintrag — das ist der Normalfall; Session-Agenten
+   überschätzen die eigene Relevanz systematisch.
+9. **Fehlerprotokoll prüfen:** Sind alle eigenen Fehler dieser Sitzung festgehalten? Im OS-Repo
    greift dessen append-only Fehlerprotokoll (`agent-learnings.md` der Wissensbasis), in jedem
    anderen Arbeits-Repo die dort geltende Konvention. Fehlt ein Eintrag: nachholen.
-9. **Übergabe ausgeben:** geschriebene Dateien mit Pfad (Repo-Ablage **und** Projekt-Memory),
-   Kern des Stands, offene Punkte und Register-Änderungen, der empfohlene Einstieg der nächsten
+10. **Übergabe ausgeben:** geschriebene Dateien mit Pfad (Repo-Ablage **und** Projekt-Memory),
+   Kern des Stands, offene Punkte und Register-Änderungen, das Ergebnis der
+   Queue-Klassifikation (angehängte Zeilen mit Kriterium bzw. der Befund „keine Kandidaten";
+   nicht abgelegte Kandidaten mit Handlungsbedarf), ein eventueller **Sofort-Pfad-Block**
+   (Schritt 8), der empfohlene Einstieg der nächsten
    Sitzung — plus der Hinweis auf `/nc:doku-sync`, falls ein Commit ansteht, und darauf, dass
    dieser Commit die Freigabe des Menschen braucht.
-10. **Abschluss-Stempel setzen:** Als **letzten** Schritt den Stempel-Befehl ausführen, den die
+11. **Abschluss-Stempel setzen:** Als **letzten** Schritt den Stempel-Befehl ausführen, den die
     Mahn-Ausgabe des PreCompact-Hooks wörtlich nennt —
     `node "<hooks-Pfad>/nc-end-stempel.js" --session <key>`. Er markiert den Sitzungsabschluss;
     die PreCompact-Mahnung dieser Sitzung entfällt damit. `<key>` ist **derselbe
     `--session`-Schlüssel wie beim Start-Stempel**: Er steht in der Session-Start-Injektion und
     wird in jeder Gate-Ablehnung wörtlich wiederholt — er wird nie geraten und nie neu erfunden.
     Ohne vorangegangene Mahnung liegt das Skript im `hooks/`-Verzeichnis dieses Kern-Plugins `nc`.
-    Erst **nach** den Schritten 3–9 stempeln — der Stempel ist der letzte Handgriff der Sitzung
+    Erst **nach** den Schritten 3–10 stempeln — der Stempel ist der letzte Handgriff der Sitzung
     und bezeugt den erledigten Abschluss samt ausgegebener Übergabe.
 
 ## Regeln
@@ -108,7 +146,7 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
   Releases oder Deployments ohne explizite Nutzerfreigabe — auch nicht „nur schnell den
   Journal-Eintrag".
 - **Der Abschluss-Stempel ist eine Selbstauskunft, kein Nachweis.** Er wird nie gesetzt, solange
-  die Schritte 3–8 nicht wirklich erledigt sind — wer ohne Abschluss stempelt, hebelt den
+  die Schritte 3–9 nicht wirklich erledigt sind — wer ohne Abschluss stempelt, hebelt den
   Verlustschutz genauso bewusst aus wie per Opt-out. Umgekehrt darf er nie fehlen, und die
   ausbleibende Mahnung ist kein Freibrief: Gemahnt wird nur die **erste** Kompaktierung einer
   Sitzung, danach geht ungesichertes Wissen still verloren.
@@ -130,6 +168,10 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
   Diff belegen).
 - Das Register enthält für jeden in der Übergabe genannten ausgelagerten Strang eine Zeile mit
   Verbleib und nächstem Schritt.
+- Die **Queue-Klassifikation ist belegt**: je Kandidat die angehängte Zeile (Diff der
+  Queue-Datei zeigt ausschließlich Anhänge — append-only) samt erfülltem Kriterium — oder der
+  ausdrückliche Befund „keine Kandidaten" bzw. der Übergangs-/Setup-Befund mit
+  Handlungsschritt. Ein Sofort-Pfad-Fall steht als markierter Block in der Übergabe.
 - `git status --short` zeigt **keine** `.nc/`-Pfade (Ignore greift) — sonst wird der fehlende
   `.gitignore`-Eintrag samt Vorschlag gemeldet (geändert nur nach Zustimmung).
 - Die Übergabe listet jede geschriebene Datei mit vollem Pfad.

@@ -207,8 +207,13 @@ test('Plugin-Dateien verweisen nicht ueber die Plugin-Grenze', () => {
             `${full}:${i + 1}: ../-Pfad verlaesst das Plugin-Verzeichnis`);
           if (/knowledge-base\//.test(line)) {
             const context = lines.slice(Math.max(0, i - 2), i + 2).join(' ');
-            assert.match(context, /OS-Repo/,
-              `${full}:${i + 1}: Repo-Pfad ohne "OS-Repo"-Qualifizierung — nach Installation nicht auflösbar`);
+            // Seit Phase 3 (Queue-Flow) ist neben "OS-Repo" auch die Abteilungs-Qualifizierung
+            // zulaessig: Die Queue-Skills nennen die Wissensbasis des ABTEILUNGS-Klons, deren
+            // Pfad zur Laufzeit ueber die Infra-Registry aufgeloest wird (git -C <pfad> ...) —
+            // auch das ist eine Quellenangabe, keine plugin-relative Leseanweisung. Dieselbe
+            // Doppel-Qualifizierung prueft queue-os.test.mjs (T-2) fuer die Queue-Referenz.
+            assert.match(context, /OS-Repo|Abteilungs-Repo|Abteilungs-Klon/,
+              `${full}:${i + 1}: Repo-Pfad ohne "OS-Repo"-/"Abteilungs-Repo"-Qualifizierung — nach Installation nicht auflösbar`);
           }
         });
       }

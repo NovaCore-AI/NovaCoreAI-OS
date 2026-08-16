@@ -45,7 +45,7 @@ Das Netz löst drei Probleme, die eine einzelne `CLAUDE.md` nicht lösen kann:
 | **0** | **org-managed**: die wenigen absoluten Invarianten + Verweis auf die SSOT | Admin-Oberfläche des Team-Workspace / Admin | zentral, ohne Sync-Mechanik | Client holt automatisch, **nicht** abwählbar | **bespielbar, nicht bespielt** (§2.5) |
 | **1** | **global-individuell mit Privat-Zone**: firmengeführter Block IM Nutzer-Dokument | `~/.claude/CLAUDE.md` / Firma (Block) + Mitarbeiter (Zone) | Autosync-Hook, **Marker-Chirurgie** | jede Session, vollständig | **gebaut** (2026-08-10) |
 | **1b** | **team-sync, vollständig geführt**: eigene Datei ohne Privat-Zone, deshalb als Ganzes ersetzbar | `~/.claude/nc-teamsync.md` / Firma allein | Autosync-Hook, Datei-Ersatz statt Chirurgie | `@`-Import aus Ebene 1 — Nutzer-Scope, **ohne Freigabedialog** | **gebaut** (2026-08-15) |
-| **2** | **abteilungs-/plugin-paketiert, zweigeteilt**: Plugin-CLAUDE (ausgeliefert) ≠ Repo-CLAUDE (Werkstatt) | Datei IM Plugin-Verzeichnis / Abteilung | Marketplace-Auto-Update bei Plugin-Bump | Einstiegs-Ritual liest den Plugin-Root — in **jedem** Arbeitsrepo | **Format definiert** (Vorlage vorhanden; Auslieferung + Lese-Verdrahtung mit dem ersten Abteilungs-Bump) |
+| **2** | **abteilungs-/plugin-paketiert, zweigeteilt**: Plugin-CLAUDE (ausgeliefert) ≠ Repo-CLAUDE (Werkstatt) | Datei IM Plugin-Verzeichnis / Abteilung | Marketplace-Auto-Update bei Plugin-Bump | Einstiegs-Ritual liest den Plugin-Root — in **jedem** Arbeitsrepo | **gebaut** (2026-08-16, AP-F2: erstes Exemplar `development-abteilungs-claude.md` in `nc-development`; Lese-Verdrahtung in `/nc:start` Schritt 7) |
 | **3** | **projekt**: Fachfakten des Arbeitsrepos, nichts Firmenweites | Arbeitsrepo / Repo-Team | Git | Verzeichnisbaum-Ladung beim Start | aktiv |
 | **3b** | **Sonderfall Werkstatt**: das Repo, in dem das OS selbst gebaut wird | dieses Repo / Kern-Maintainer | Git (nur `AGENTS.md`) | wie 3 | aktiv — Zweiteilung über **getrackt/un-getrackt** |
 
@@ -133,14 +133,14 @@ Nutzerakzeptanz), und **lieber veraltet als zerstört**.
    **`/context`-Probe**: die erwarteten Dateien stehen unter „Memory files" · **Zwei-Lauf-No-op**:
    der zweite Lauf ändert kein Byte. Keine Behauptung ohne gesehene Ausgabe.
 
-## 4. Pfad-Matrix (NC-Ist, 2026-08-15)
+## 4. Pfad-Matrix (NC-Ist, 2026-08-16)
 
 | Ebene | Quelle im Repo | Zielort auf der Maschine | Leser | Kanal |
 |---|---|---|---|---|
 | 0 | — (Textentwurf zur Freigabe, noch kein Repo-Artefakt) | Admin-Settings des Team-Workspace | jeder Client der Org | zentral, ohne Sync-Mechanik |
 | 1 | `plugins/nc/doks/global-claude-firmenblock.md` | `~/.claude/CLAUDE.md`, Block zwischen `NC:BLOCK`-Markern | jede Session | SessionStart-Autosync `nc-doks-autosync.js` |
 | 1b | `plugins/nc/nc-sync.md` | `~/.claude/nc-teamsync.md` (Ganzdatei) | jede Session per `@`-Import aus Ebene 1, zusätzlich Lese-Schritt in `/nc:start` | derselbe Autosync, Datei-Ersatz |
-| 2 | `vorlagen/abteilungsplugin/abteilungs-claude.md.vorlage` → `plugins/<plugin>/<abteilung>-abteilungs-claude.md` | Plugin-Cache der Maschine | Einstiegs-Ritual `/nc:start` (Lese-Schritt folgt mit dem ersten Abteilungs-Bump) | Marketplace-Auto-Update bei Plugin-Bump |
+| 2 | `vorlagen/abteilungsplugin/abteilungs-claude.md.vorlage` → `plugins/<plugin>/<abteilung>-abteilungs-claude.md` | Plugin-Cache der Maschine | Einstiegs-Ritual `/nc:start` (Schritt 7 liest die Ebene-2-Datei je installiertem Abteilungsplugin; Erstauslieferung `nc-development` 0.2.0) | Marketplace-Auto-Update bei Plugin-Bump |
 | 3 | Arbeitsrepo: `CLAUDE.md` / `AGENTS.md` | dort | Verzeichnisbaum-Ladung beim Start | Git |
 | 3b | dieses Repo: getrackte `AGENTS.md` + un-getrackte lokale `CLAUDE.md` | dort | wer **im** Repo baut | Git (nur `AGENTS.md`) |
 

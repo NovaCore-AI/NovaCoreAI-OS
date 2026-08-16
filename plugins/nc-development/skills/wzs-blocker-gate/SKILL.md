@@ -5,7 +5,8 @@ description: >-
   zugehörige ⛔-Blocker in Plan §11.C nicht dokumentiert entschieden ist, und unterscheidet
   dabei harte von weichen Abhängigkeiten. Wird VOR Beginn jeder Phase und jedes Bau-Schritts
   angewendet. Kundenspezifisch — gilt ausschließlich für das Wasserzisterne-Projekt. Quelle:
-  CLAUDE.md §10, Projektplan v2.3 §11 des Arbeits-Repos.
+  CLAUDE.md §10, Projektplan v2.3 §11 des Arbeits-Repos. Frische: Stand v2.3, abgeglichen
+  2026-07-07 — vor Nutzung gegen den Projektplan im Arbeits-Repo prüfen.
   Trigger-Begriffe: „Phase starten", „Bau-Start", „Blocker A1 bis A5", „offene
   Kundenentscheidung", „Klärungs-Workshop", „darf gebaut werden".
 ---
@@ -53,7 +54,14 @@ erst nach Klärung.
 ### D. Wenn etwas offen ist
 
 - [ ] Nicht raten, nicht Defaults stillschweigend als bestätigt behandeln.
-- [ ] Klärungs-Ticket im Jira (Projekt EP) bewegen oder anlegen.
+- [ ] Klärungs-Ticket **benennen** bzw. den **Anlage-Bedarf formulieren**. Anlage oder
+      Transition im Jira nur mit **Einzelfreigabe** (Stufe 1); kundensichtbare Freitexte nie
+      (Stufe 2 — Mensch). Wo kein Jira-Zugang besteht: **manueller Weg** — Vorgang, Zielstatus
+      und Text als kopierfertigen Block an den Menschen übergeben.
+- [ ] Projekt-Kürzel: `EP` ist eine **unbestätigte Portierungs-Annahme** aus dem Vorbild und
+      keine belegte Fachfakt-Angabe. Vor Nutzung gegen die `CLAUDE.md`/`AGENTS.md` des
+      Arbeits-Repos prüfen; fehlt der Beleg, wird der Key **nicht geraten**, sondern der
+      Vorgang beschrieben und der Key nachgefordert.
 - [ ] Dem Team und der Projektleitung melden; Entscheidung nachtragen lassen, dann erst bauen.
 
 ## Regeln
@@ -68,7 +76,10 @@ erst nach Klärung.
 - **Nicht raten, nachfragen.** Widersprüchliche Angaben zwischen PDF und Plan werden gemeldet,
   nicht harmonisiert.
 - **Rote Linie:** Der Skill legt keine Jira-Vorgänge eigenmächtig an und postet nichts
-  Kundensichtbares — er bereitet den Klärungsbedarf auf, der Mensch kommuniziert.
+  Kundensichtbares — er bereitet den Klärungsbedarf auf, der Mensch kommuniziert. Lesen ist
+  frei; Transitionen und Feldänderungen brauchen eine **Einzelfreigabe je Vorgang**.
+- **Kein geratener Projekt-Key.** Solange die Projekt-Key(s) nicht aus dem Arbeits-Repo belegt
+  sind, wird der Vorgang beschrieben statt benannt (offener Punkt, Maintainer-Nachreichung).
 - **Kundenspezifisch:** gilt ausschließlich im Wasserzisterne-Repo.
 
 ## Verifikation
@@ -80,5 +91,8 @@ erst nach Klärung.
 - Bei einem harten offenen Blocker liegt eine explizite **Nicht-Start-Empfehlung** vor und es
   wurde kein Code der Phase geschrieben (`git status` zeigt keine entsprechenden Änderungen).
 - Bei weichen Blockern ist die Liste der später nachzuziehenden UI-/Logik-Passungen genannt.
-- Für offene Punkte ist das Klärungs-Ticket (Projekt EP) benannt oder der Bedarf zur Anlage ist
-  formuliert.
+- Für offene Punkte ist das Klärungs-Ticket benannt oder der Bedarf zur Anlage formuliert; ist
+  ein Projekt-Key genannt, ist seine Quelle im Arbeits-Repo mitgenannt — sonst steht dort
+  ausdrücklich „Key offen".
+- Zum Jira ist ausgesprochen, was geschah: nur gelesen, mit Einzelfreigabe geändert oder als
+  manueller Schritt an den Menschen übergeben.

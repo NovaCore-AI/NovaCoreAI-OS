@@ -7,6 +7,8 @@ description: >-
   Audit-Log und Pause-Schalter. Wird bei JEDEM Eingriff in `lib/rewards/` oder in das
   Reward-Admin (Phase 2/4) angewendet. Kundenspezifisch — gilt ausschließlich für das
   Wasserzisterne-Projekt. Quelle: CLAUDE.md §6, Projektplan v2.3 §4.4/§6/§9 des Arbeits-Repos.
+  Frische: Stand v2.3, abgeglichen 2026-07-07 — vor Nutzung gegen den Projektplan im
+  Arbeits-Repo prüfen.
   Trigger-Begriffe: „Reward", „Auszahlung", „Doppelzahlung", „Karenz eligible_at", „Refund",
   „Approval-Gate", „Gutschein-Code".
 ---

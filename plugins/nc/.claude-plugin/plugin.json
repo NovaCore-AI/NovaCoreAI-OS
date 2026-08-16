@@ -1,8 +1,8 @@
 {
   "name": "nc",
   "displayName": "NovaCore-OS (Kern)",
-  "version": "0.9.0",
-  "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam (8 Skills — Session-Zyklus start/end-session, Journal, Infrapflege setup/doku-sync/os-info/skill-builder/update-doks), Kontroll-Schicht mit Gate 1 (FFG, Fact-Forcing-Gate), Gate 2 (Session-Start-Zwang: Injektion + Start-Gate mit Fakten-Stempel) und PreCompact-Mahnung des Sitzungsabschlusses (nc-end-mahnung + Abschluss-Stempel), Doks-Autosync der team-globalen CLAUDE-Anteile (Ebene 1 Firmen-Block + Ebene 1b Team-Sync-Ganzdatei), WP-Rahmen WP0–WP8, Abteilungs-Registry sowie Subagenten (agents/, erster Agent sync-nachzug-executor). Jedes Abteilungsplugin setzt diesen Kern als Dependency voraus — wer eine Abteilung installiert, bekommt ihn transitiv aktiviert.",
+  "version": "0.10.0",
+  "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam (10 Skills — Session-Zyklus start/end-session, Journal, Infrapflege setup/doku-sync/os-info/skill-builder/update-doks, Queue-Flow queue-abteilung/queue-kern), Kontroll-Schicht mit Gate 1 (FFG, Fact-Forcing-Gate), Gate 2 (Session-Start-Zwang: Injektion + Start-Gate mit Fakten-Stempel), PreCompact-Mahnung des Sitzungsabschlusses (nc-end-mahnung + Abschluss-Stempel) und Queue-Fälligkeits-Erinnerung (nc-queue-faelligkeit, 14-Tage-Takt, kein Gate), Doks-Autosync der team-globalen CLAUDE-Anteile (Ebene 1 Firmen-Block + Ebene 1b Team-Sync-Ganzdatei), WP-Rahmen WP0–WP8, Abteilungs-Registry sowie Subagenten (agents/, erster Agent sync-nachzug-executor). Jedes Abteilungsplugin setzt diesen Kern als Dependency voraus — wer eine Abteilung installiert, bekommt ihn transitiv aktiviert.",
   "author": {
     "name": "NovaCore AI"
   },
