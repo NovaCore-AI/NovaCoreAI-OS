@@ -10,7 +10,99 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
+> **Sammelabschnitt des Onsite-Endstand-Umbaus (bewusst, E6/E7 — Bauplan 2026-08-15 N1/N6):**
+> Die Kern-Bumps laufen je Großphase (0.7.x → 0.8.0 → 0.9.0, jeweils im Eintrag vermerkt),
+> aber Release-Schnitte, Tags und GitHub-Releases folgen **gesammelt am Umbau-Ende** —
+> erst dann wird dieser Abschnitt in die Versions-Blöcke zerlegt, die `release.yml` je Tag
+> erwartet. Bis dahin ist „höchste CHANGELOG-Überschrift < Kern-Version" der gewollte
+> Zwischenzustand, kein Versäumnis.
+
 ### Added
+
+- **Onsite-Endstand-Nachbau Phase 2 — Prozesskorpus, CLAUDE-Netz & Subagenten (Kern 0.8.0 → 0.9.0)**
+  nach Bauplan `grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md` (AP-C1–C5, AP-D1;
+  Bauplan-Nachtrag N7 für den Onsite-PR-#60-Nachzug).
+  - **Vier neue Standardprozesse + Anker-Reservierung** (AP-C1–C4): `claude-netz-bau.md`
+    (AP-C1, Instruktions-Schicht der CLAUDE-Ebenen), `subagenten-bau.md` (AP-C3,
+    Agent-vs-Skill, Scope, Gate-Semantik), `team-distribution.md` (AP-C5/E5, Übersetzung der
+    Onsite-Prozesskarte 06 auf GitHub + Jira-Zwei-Stufen-Regel + Claude-Team-Workspace),
+    `abteilungs-inhalts-pruefung.md` (AP-C4, Inhalts-Audit je Abteilung, read-only) sowie
+    `anker-reservierung.md` samt Definitionsdokument
+    `NovaCore-OS-Anker-Reservierung-Definition.md` (AP-C2, portiert durch einen
+    Opus-Agenten).
+  - **Subagenten als neue Komponentenklasse** (AP-D1): `agents/`-Verzeichnis je Plugin, erster
+    Agent `plugins/nc/agents/sync-nachzug-executor.md` (schreibend, Marker
+    `<!-- nc:schreibend -->`, `sonnet`, ohne `Bash`, `maxTurns: 30`); ausgelieferte Referenz
+    `plugins/nc/referenz/agent-authoring.md` (Feldkanon, Werkzeuggrenzen-Regel,
+    Defense-Baseline-Pflichtbaustein); Vorlagen-Baustein
+    `vorlagen/abteilungsplugin/agents/beispiel-agent.md.vorlage` (Read-only-Variante); zwei
+    Prüfbausteine — `plugins/nc/tests/agenten.test.mjs` (portabel, Baustein-Version 1.4.2,
+    wandert mit einem Satelliten-`agents/`-Verzeichnis mit) und
+    `plugins/nc/tests/agenten-os.test.mjs` (OS-Repo-gebunden: Registry-Konsistenz,
+    Vorlagen-Invariante); dazu das `agents`-Segment je Abteilung in
+    `plugins/nc/module-registry.json`.
+  - **Allowlist-Norm-Nachzug von Onsite PR #60** (Bauplan-Nachtrag N7): `tools` und `model`
+    sind jetzt Pflichtfelder im Agent-Frontmatter; die Werkzeuggrenze steht in der
+    `tools`-Allowlist statt in einer `disallowedTools`-Sperrliste (`disallowedTools` bleibt
+    zulässige Zusatzsicherung); der Defense-Baseline-Block im Body ist Pflicht;
+    `skills:`-Preload-Einträge müssen auf einen existierenden Skill des eigenen Plugins
+    auflösen (Silent-Skip-Schutz gegen die stille Preload-Lücke der Plattform).
+  - **Abteilungs-CLAUDE-Vorlage (Ebene 2):**
+    `vorlagen/abteilungsplugin/abteilungs-claude.md.vorlage` (zweigeteilt — Teil 1 für alle
+    Sessions der Abteilung, Teil 2 Werkstatt; Zielname `{{ABTEILUNG}}-abteilungs-claude.md` an
+    der Plugin-Wurzel) plus Statusabgleich in
+    `grundwissen/NovaCore-OS-CLAUDE-Ebenen-Definition.md` (Ebene 2 jetzt „Format definiert" —
+    Auslieferung folgt mit dem ersten Abteilungs-Bump, der die Lese-Verdrahtung in
+    `/nc:start` mitbringt).
+  - **Aktualisierungs-Index erweitert:** neue Zeile „Agent (Subagent) neu/geändert" in §2.1,
+    die Anker-Reservierung als §3 Punkt 3 (parallele Arbeitsstränge), eine vierte Bump-Stelle
+    für reine Versionsnummern-Nachzüge (Muster `0.9.1` → `0.9.1.1` aus §3.0, kein
+    Patch-Verbrauch bei reinen Zahlen-Nachzügen).
+  - **Testsuite gehärtet:** `struktur.test.mjs` bekommt die **späte** Anker-Invariante — keine
+    doppelt vergebene CHANGELOG-Versionsüberschrift —, als Gegenstück zur **frühen**
+    `reserve/*`-Tag-Reservierung.
+  - **Registry-Reservierungen `ui-ux`/`automation`** (Bauplan-Nachtrag N6, Feld
+    `reservierungen` in `module-registry.json`): dauerhafte Namensreservierung ohne Plugin
+    oder Marketplace-Eintrag, unabhängig vom kurzlebigen `reserve/*`-Tag.
+  - **`os-bau-methode.md`: Familien-Verdrahtungs-Kapitel** (Entscheid E5) — verweist die fünf
+    neuen Standardprozesse im festen Bau-Takt der Familie, bewusst als Kapitel statt einer
+    eigenen Datei wie im Onsite-Vorbild.
+  - **`team-distribution.md` enthält einen freigabepflichtigen Ebene-0-Textentwurf**
+    (Org-Instructions-Text für den Claude-Team-Workspace) — noch **nicht** in die echten
+    Workspace-Settings eingetragen, reiner Entwurf bis zur ausdrücklichen Freigabe.
+  - **Nachzüge:** README (Subagenten-Nennung, fünf neue Standardprozess-Verweise,
+    Versionsdrift 0.7.0 → 0.9.0 geheilt — Phase 1 hatte den README-Stand nie nachgezogen),
+    AGENTS.md (Repo-Karte, Glossar, Produktstand), Kern-Bump `0.8.0 → 0.9.0` an den drei
+    Spiegelstellen (`plugin.json` inkl. Description-Ergänzung, `VERSION`,
+    `module-registry.json`) — gebündelt durch den frisch gebauten Subagenten
+    `sync-nachzug-executor` selbst (erster Produktivlauf).
+  - **Extern reviewt in zwei Runden (Review-Kette N1; K3 am Kontingent-Limit → Codex als
+    Ersatz-Zweitreviewer, Maintainer-Weisung):** **GLM-5.3** (Kimi-Code-Plugin): 4
+    bestätigte Findings eingearbeitet (Matrix-Zeilen-Widerspruch in `subagenten-bau.md`,
+    falsche Registry-Beschreibung in `anker-reservierung.md` §6, SemVer-Vorbehalt an der
+    vierten Bump-Stelle, E6/E7-Klarstellung am `[Unreleased]`-Kopf) plus 3 MINOR-Härtungen
+    (→ 1.3.0: Marker-Position, `maxTurns`-Pflicht, leerzeilen-/mischformfeste
+    Parser-Helper); 1 Finding als False Positive belegt (`firmenkernprozesse/`-Links
+    existieren im Repo). **Codex** (0.147.0, drei Runden): 1 BLOCKER + 4 MAJOR + 6 MINOR
+    eingearbeitet
+    (→ **1.4.2**: Werkzeuggrenze als echte **Positiv-Allowlist** — exec-fähige Built-ins
+    wie `PowerShell`/`Monitor` fallen fail-closed durch; Token-Formprüfung gegen
+    YAML-Kommentare/Quotes; Defense-Baseline-**Inhalts**prüfung aller vier Grundsätze;
+    kebab-case-Härte am `name`; Vorlagen-Invariante liest den ganzen Feldwert;
+    §14-Rückgabeschema mit Referenzmuster vereinheitlicht; `save-session`-Altverweis;
+    Baustein-Versionsnennungen nachgezogen; Runde 2: MCP-Tokenform exakt auf die
+    dokumentierten server-qualifizierten Varianten begrenzt, Defense-Grundsatz 4
+    semantisch verankert, „Abweichungen"-Rubrik in der Vorlagen-Rückgabe) — alle mit
+    Gegenproben im Parser-Helper-Test.
+    — *Claude (Fable 5, Claude Code); AP-C2-Port durch Opus-Agent*
+
+- **Bauplan `2026-08-16-novacore-agent-sdk-gui-architektur.md`** (parallele
+  Maintainer-Arbeit, 2026-08-16): Konzeption der eigenen Desktop-/Web-UI-Plattform
+  `nc-web` mit Claude Code als eingebettetem Runtime-Motor — 4-Schichten-Modell,
+  Prozess-Lifecycle, dynamische Modell-/Thinking-Budget-Wahl, `canUseTool`-Brücke,
+  Gate-Fidelity, Invarianten INV-01–INV-14; Index-Zeile gesetzt. Reines
+  Planungsdokument, kein Bump. — *Lucas Vöhringer (Konzeption) / Eintrag nachgetragen
+  von Claude (Fable 5, Claude Code)*
 
 - **Onsite-Endstand-Nachbau, Phase 1 „SSOT-Kern & Kontroll-Schicht" (Kern 0.7.1 → 0.8.0)**
   nach Bauplan `grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md`

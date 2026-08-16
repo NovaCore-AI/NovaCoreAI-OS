@@ -152,6 +152,32 @@ und nach zur eigenen macht, ohne die Struktur zu brechen:
 | **Review-Regime** | Wer reviewt was, wann extern/adversarial? | Implementierer ≠ Reviewer; kritischer Pfad dual |
 | **Versions-Schema** | Wann Minor/Patch/Major? | Neuerung → Minor, Fix → Patch, Strukturbruch → groß |
 
+## Familien-Verdrahtung der Standardprozesse (Kurzkarte)
+
+Die Standardprozesse dieses Ordners rufen einander in festem Takt auf (Onsite-Vorbild:
+eigene „Familienkarte"; hier bewusst als Kapitel statt eigener Datei — Entscheid E5,
+Bauplan 2026-08-15):
+
+1. **Bei Parallelität zuerst** [`anker-reservierung.md`](anker-reservierung.md) — knappe
+   Bezeichner (Version, Skill-/Agent-/Hook-Name, Abteilungsname) vor der ersten Zeile
+   reservieren.
+2. **Dann der Bau-Prozess:** [`kern-plugin-bau.md`](kern-plugin-bau.md) ·
+   [`abteilungs-plugin-bau.md`](abteilungs-plugin-bau.md) ·
+   [`subagenten-bau.md`](subagenten-bau.md) · [`claude-netz-bau.md`](claude-netz-bau.md) ·
+   [`ssot-aufbau.md`](ssot-aufbau.md) — je nach Artefakt.
+3. **Während des Baus:** [`aktualisierungs-index.md`](aktualisierungs-index.md) („ich
+   ändere X — was muss ich mitändern") + Protokoll nach
+   [`sync-nachzug-bauzyklus.md`](sync-nachzug-bauzyklus.md).
+4. **Am Zyklusende:** gebündelter Executor-Lauf (`sync-nachzug-bauzyklus.md`), Anker
+   aufräumen (`anker-reservierung.md`), Abschluss-Checkliste (`AGENTS.md`).
+5. **Wiederkehrend:** [`abteilungs-inhalts-pruefung.md`](abteilungs-inhalts-pruefung.md)
+   (Inhalts-Audit je Abteilung) · [`team-distribution.md`](team-distribution.md)
+   (Rollout an Team-Maschinen).
+
+Drei Schichten als Merkbild: **Wissen** (`ssot-aufbau`) · **Instruktion**
+(`claude-netz-bau`) · **Auslieferung** (`kern-`/`abteilungs-plugin-bau`,
+`team-distribution`). Wer wen als Schwester nennt, steht im Kopf der jeweiligen Datei.
+
 ## Pflege dieser Methode
 
 Diese Datei ist selbst ein Artefakt der Methode: Nach jedem OS-Durchlauf (neue Abteilung,

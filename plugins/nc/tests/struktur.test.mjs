@@ -394,6 +394,35 @@ test('Release-Tags: jede veroeffentlichte CHANGELOG-Version ausser der juengsten
     + 'nie vom Versions-Commit trennen)');
 });
 
+// SPAETE ANKER-INVARIANTE (Bauplan 2026-08-15, AP-C2; Onsite-Muster Karte 09 §7):
+// Die fruehe Absicherung gegen parallele Doppelvergabe ist der reserve/*-Tag
+// (standardprozesse/anker-reservierung.md); diese Invariante ist die SPAETE Ebene und
+// faengt, was trotzdem durchrutscht — z. B. wenn zwei Straenge ohne Reservierung dieselbe
+// Versionsueberschrift anlegen und Git die Bloecke konfliktfrei nebeneinander merged.
+// Onsites zweite Invariante (Spec-Fusszeilen-Glied) entfaellt bewusst: NovaCore fuehrt
+// keine Einzel-Spec mit Fusszeilen-Kette (Bauplan Nachtrag, AP-C2).
+// Gegenprobe eingebaut: die Extraktion wird erst gegen eine synthetische Dublette
+// verifiziert — ein Muster-Drift im Regex kann den Test damit nicht still leeren.
+test('CHANGELOG: keine Versionsueberschrift doppelt vergeben (spaete Anker-Invariante)', () => {
+  const extrahiere = (text) =>
+    [...text.matchAll(/^## \[(\d+(?:\.\d+)+)\]/gm)].map((m) => m[1]);
+
+  const synthetisch = '## [0.1.0]\ntext\n## [0.2.0]\ntext\n## [0.1.0]\n';
+  assert.deepEqual(extrahiere(synthetisch), ['0.1.0', '0.2.0', '0.1.0'],
+    'Gegenprobe fehlgeschlagen: die Versions-Extraktion erkennt eine synthetische '
+    + 'Dublette nicht mehr — Regex gegen das CHANGELOG-Muster driftet');
+
+  const versionen = extrahiere(fs.readFileSync(p('CHANGELOG.md'), 'utf8'));
+  assert.ok(versionen.length > 1,
+    'CHANGELOG fuehrt weniger als zwei veroeffentlichte Abschnitte — Muster geaendert?');
+  const gesehen = new Set();
+  const doppelt = versionen.filter((v) => (gesehen.has(v) ? true : (gesehen.add(v), false)));
+  assert.deepEqual(doppelt, [],
+    `doppelt vergebene CHANGELOG-Versionsueberschrift: ${doppelt.join(', ')} — zwei `
+    + 'Straenge haben denselben Anker belegt; Aufloesung nach '
+    + 'standardprozesse/anker-reservierung.md (naechste freie Nummer, Eintraege mergen)');
+});
+
 test('Vorlage ist kein Plugin und enthaelt keine ausgefuellten Werte', () => {
   const dir = p('vorlagen', 'abteilungsplugin');
   assert.equal(fs.existsSync(path.join(dir, '.claude-plugin', 'plugin.json')), false,

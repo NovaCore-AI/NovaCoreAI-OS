@@ -68,6 +68,7 @@ Sonderpflichten. Abschnitt 1 gilt zusätzlich immer, Abschnitte 3–5 ebenso.
 | **Skill-Formatregeln geändert** (`plugins/nc/referenz/skill-authoring.md`) | die Datei selbst · `kern-plugin-bau.md` §2.3 | **alle** vorhandenen `SKILL.md` gegen die neue Regel prüfen (sie wird mit dem Kern ausgeliefert und gilt sofort teamweit) · Verweise in `AGENTS.md` · `CHANGELOG.md` | **Kern-Bump** (+ `VERSION` + Registry) · Achtung: die Datei ist die **einzige Ausnahme** der Plugin-Grenzen-Invariante in `struktur.test.mjs`, und die CI-Positivkontrolle setzt die Frontmatter-Form `description: >-` voraus |
 | **Vorlage geändert** (`vorlagen/abteilungsplugin/`) | `abteilungs-plugin-bau.md` §3 · die Vorlagendateien selbst | Repo-Karte in `AGENTS.md` **und** `README.md` · `CHANGELOG.md` | Zwei Invarianten: „Vorlage ist kein Plugin" (kein echtes `plugin.json`, Platzhalter müssen stehenbleiben) und „keine offenen Platzhalter in ausgelieferten Plugins" |
 | **Vorlage `ssot-grundgeruest` geändert** (`vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage`) | `ssot-aufbau.md` §4 + §4a · `abteilungs-plugin-bau.md` §3b.1 · die Vorlagendatei selbst | `vorlagen/abteilungsplugin/VORLAGE.md` (Inhaltsliste, Variablen, Kopierzeile) · `CHANGELOG.md` | Platzhalter `{{ABTEILUNG}}` muss stehenbleiben (Invariante „Vorlage ist kein Plugin") · **Kein** Rück-Nachzug in bereits gebaute Satelliten — sie sind eigenständige Repos; dort entsteht ein **eigener** Vorgang · kein Bump (die Vorlage wird nicht ausgeliefert) |
+| **Agent (Subagent) neu/geändert** (`agents/`-Verzeichnis eines Plugins) | [`subagenten-bau.md`](subagenten-bau.md) (Faustregel Agent-vs-Skill, Scope, Gate-Semantik) · `plugins/nc/referenz/agent-authoring.md` (Feld-Kanon, Werkzeuggrenzen-Regel) | Agent-Datei · Registry-`agents`-Segment · README (Agenten-Nennung) · `AGENTS.md` (Repo-Karte) · Trigger-/Overlap-Prüfung gegen Agents UND Skills · `CHANGELOG.md` · Kern-Bump (bzw. Bump des tragenden Plugins) | **Werkzeuggrenze hart im Frontmatter** (Allowlist-Prinzip seit 2026-08-15: `tools` + `model` Pflichtfelder; read-only = Allowlist ohne Schreib-Tools und ohne `Bash`; schreibend nur mit Marker + begründeter Schreib-Allowlist ohne `Bash`) · Defense-Baseline-Block Pflicht · verbotene Felder `hooks`/`mcpServers`/`permissionMode` · Praxistest mit **Negativprobe** · portabler Prüfbaustein (`agenten.test.mjs`, Baustein-Version im Kopf) wandert bei Satelliten-Extraktion mit |
 | **Satelliten-Hook/Gate geändert** (Kontroll-Schicht eines eigenständigen OS) | `kern-plugin-bau.md` §1a (Prüfungs-Eigentum) · die **Kern-Fassung** des Hooks als Quelle (`git show`), nie rekonstruiert · [`NovaCore-OS-Gates-Definition.md`](../grundwissen/NovaCore-OS-Gates-Definition.md) | im **Satelliten**: dessen `hooks.json`-`description`, README-Hook-Tabelle, `AGENTS.md`, Tests, `CHANGELOG.md` · **danach hier**: Marketplace-Pin, Registry-Statuszeile, Gates-Definition (Satelliten-Abschnitt), `AGENTS.md` | Der Satellit trägt eine **eigene Kopie**, nie eine abgeschwächte: `process.exitCode = 0` statt `process.exit()` (Truncation-Falle), Opt-out-Env an **drei** Orten, **Negativprobe belegt**. Bump zählt im Satelliten-Repo; hier nur der Pin |
 | **Abteilungs-/Plugin-CLAUDE geändert** (Anweisungsdatei **im** Plugin: `plugins/nc/nc-sync.md`, `<name>-sync.md` im Satelliten) | [`NovaCore-OS-CLAUDE-Ebenen-Definition.md`](../grundwissen/NovaCore-OS-CLAUDE-Ebenen-Definition.md) · die Datei selbst | die Datei · `README.md` des betroffenen Plugins · `AGENTS.md`, falls die Ebene dort beschrieben ist · `CHANGELOG.md` | Sie wird **ausgeliefert** → Bump des betroffenen Plugins, sonst erreicht die Änderung niemanden · Plugin-Grenze: keine Repo-Pfade, keine `../`-Verweise (testerzwungen) · nicht mit dem Ebene-1-Firmenblock verwechseln (eigene Zeile in 2.2) |
 | **Fremdsystem, Konnektor oder MCP-Server dokumentiert** | `SSOT-Document-Index` Teil 1 · die Zeile „Neue Kategorie/Ordner" in 2.2 · bei einem **lokalen** Plugin zusätzlich die MCP-Zeile unten | Fremdsystemwissen entsteht als **eigene Kategorie**, sobald es den ersten realen Inhalt gibt — nicht auf Vorrat (Mapping-Entscheid 2026-08-11) · Routing-Zeile Teil 1 **und** Triage-Tabelle Teil 2 · `AGENTS.md` Glossar · `CHANGELOG.md` | **Nie Zugangsdaten in die Wissensbasis** — Env oder Secret-Store; in der Doku steht ausschließlich der Variablenname · Host-Anforderungen (CLI, Runtime) gehören in `ONBOARDING.md`, nicht in einen Skill-Text |
@@ -111,14 +112,30 @@ Sonderpflichten. Abschnitt 1 gilt zusätzlich immer, Abschnitte 3–5 ebenso.
 **Grundregel:** Kein Bump = kein Auto-Update. Eine Änderung, die das Team erreichen soll,
 zählt die Version des **betroffenen** Plugins hoch.
 
+0. **Vierte Stelle für reine Versionsnummern-Nachzüge:** Ändert ein Nachzug **ausschließlich
+   Versionsnummern-Nennungen** (kein Inhalt, kein Verhalten — z. B. ein Pin- oder
+   Stand-Nachtrag in Doku), darf statt eines Patch-Bumps eine vierte Stelle angehängt werden
+   (`0.9.1` → `0.9.1.1`, Onsite-Muster) — sie signalisiert „nichts Neues, nur Zahlen
+   nachgezogen" und verbrennt keine Patch-Nummer. **Achtung (GLM-Review 2026-08-16, noch
+   unverifiziert):** Vier Stellen sind kein gültiges SemVer (`X.Y.Z`), und `AGENTS.md`
+   definiert die Leitversion als SemVer — **vor der Erstnutzung** deshalb belegen, dass
+   `claude plugin validate --strict` die Form akzeptiert, und die SemVer-Klausel in
+   `AGENTS.md` in derselben Änderung ausdrücklich erweitern; schlägt der Validator sie aus,
+   gilt stattdessen der reguläre Patch-Bump.
 1. **Bump-Schema:** inhaltliche Neuerung → Minor (`0.5.0` → `0.6.0`) · Fix → Patch
    (`0.5.0` → `0.5.1`) · Strukturbruch → Major.
 2. **Ort:** **ausschließlich** `plugins/<name>/.claude-plugin/plugin.json`. Beim **Kern**
    zusätzlich `VERSION` und `plugins/nc/module-registry.json` spiegeln (Leitversion,
    testerzwungen). Im Marketplace-Eintrag steht **nie** eine Version.
-3. **Parallele Arbeitsstränge:** Ist eine Version noch **unveröffentlicht**, dürfen mehrere
-   Änderungen sie gemeinsam nutzen — dann kein zweiter Bump. Ist sie getaggt, ist die nächste
-   Nummer Pflicht.
+3. **Parallele Arbeitsstränge und Anker:** Ist eine Version noch **unveröffentlicht**, dürfen
+   mehrere Änderungen sie gemeinsam nutzen — dann kein zweiter Bump. Ist sie getaggt, ist die
+   nächste Nummer Pflicht. **Sobald mehr als eine Arbeitseinheit gleichzeitig am OS baut**
+   (zwei Sessions, Worktrees oder beauftragte Agenten), wird jeder knappe Bezeichner —
+   Ziel-Version, Skill-/Agent-/Hook-Name, Abteilungsname — **vor der ersten Zeile Arbeit**
+   per `reserve/*`-Tag reserviert: Ablauf, Freigabe-Ausnahme und Aufräum-Pflicht in
+   [`anker-reservierung.md`](anker-reservierung.md). Die frühe Reservierung ersetzt die
+   späte Testsuite-Invariante nicht (keine doppelte CHANGELOG-Versionsüberschrift) — beide
+   Ebenen sind nötig.
 4. **Abteilungsplugins zählen eigenständig** — ein Gleichstand über alle Plugins ist
    ausdrücklich **nicht** gefordert.
 5. **CHANGELOG:** Eintrag unter `[Unreleased]` nach Keep-a-Changelog, **mit Namenszeichnung
