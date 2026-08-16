@@ -64,8 +64,8 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | `VERSION` | Produkt-Leitversion (SemVer) = Version des Kern-Plugins |
 | `.claude-plugin/marketplace.json` | Marketplace `novacore-os` — Einträge ohne `version`-Feld (die steht allein in der jeweiligen `plugin.json`); die Repo-Wurzel ist **nur** Marketplace-Wurzel, kein Plugin |
 | `.github/workflows/` | `ci.yml` (Ubuntu+Windows × Node 20/22/24, Suite + Validator-Positivkontrolle) und `release.yml` (Tag `nc--v*` → GitHub-Release aus dem CHANGELOG-Abschnitt) |
-| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`end-session`/`journal`/`setup`/`doku-sync`/`os-info`/`skill-builder`/`update-doks`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; PreCompact-Mahnung: `nc-end-mahnung.js` + `nc-end-stempel.js`; dazu `nc-doks-autosync.js` — Ebenen 1 + 1b) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `nc-sync.md` (zugleich Ebene-1b-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `referenz/agent-authoring.md` (Subagenten-Formatregeln, ausgeliefert), `agents/` (Subagent `sync-nachzug-executor`), `skills/setup/infra-registry.md` (Infra-Registry-Referenz), `tests/` |
-| `plugins/nc-development/` | Abteilung `development` (Namespace `/nc-development:`): 11 Skills in 4 Modulen (`fe`/`be`/`flc`/`wzs`, flaches Layout) + `workflow.md` (Fachablauf WP1–WP7) |
+| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`end-session`/`journal`/`setup`/`doku-sync`/`os-info`/`skill-builder`/`update-doks`/`queue-abteilung`/`queue-kern`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; PreCompact-Mahnung: `nc-end-mahnung.js` + `nc-end-stempel.js`; dazu `nc-doks-autosync.js` — Ebenen 1 + 1b; dritter SessionStart-Hook `nc-queue-faelligkeit.js` — Queue-Fälligkeits-Erinnerung, kein Gate) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `nc-sync.md` (zugleich Ebene-1b-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `referenz/agent-authoring.md` (Subagenten-Formatregeln, ausgeliefert), `referenz/pflege-auspraegung.md` (Queue-Format v1 + Kriterienliste v1, ausgeliefert), `agents/` (Subagent `sync-nachzug-executor`), `skills/setup/infra-registry.md` (Infra-Registry-Referenz), `tests/` |
+| `plugins/nc-development/` | Abteilung `development` (Namespace `/nc-development:`): 15 Skills in 6 Modulen (`fe`/`be`/`flc`/`wzs`/`qs`/`rel`, flaches Layout) + `workflow.md` (Fachablauf WP1–WP7) + `development-abteilungs-claude.md` (CLAUDE-Ebene 2, erstes ausgeliefertes Exemplar) + `pflege-auspraegung.json` (Queue-Ort, Kriterienverweis, Journal-Sonderregeln, Domänen-rote-Linien, Übergangsregel) |
 | `vorlagen/abteilungsplugin/` | Vorlage für neue Abteilungsplugins — **kein Plugin** (`.vorlage`-Endungen); dazu `abteilungs-claude.md.vorlage` (Ebene 2, Pflichtbestandteil jedes Abteilungsplugins) und `agents/beispiel-agent.md.vorlage` (Subagenten-Baustein, Read-only-Variante, optional beim ersten Agenten) |
 | `knowledge-base/` | Wissensbasis — Glossar im nächsten Abschnitt |
 | `docs/superpowers/specs/` | historische v0.1.0-Design-Spec (unverändert lassen) |
@@ -82,6 +82,8 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | `ideen-backlog/` | Ideen ohne aktuellen Auftrag, je Idee ein Dokument | beim Festhalten einer Idee ohne Arbeitspaket; wird sie beauftragt, entsteht ein Bauplan in `grundwissen/`, der auf sie verweist — die Idee bleibt stehen |
 | `debugging-findings/` | `agent-learnings.md` — Agenten-Fehlerprotokoll (**eigene** Fehler, append-only Pflicht) · `debug-log.md` — Debug-Log (**gefundene** Bugs und Fehlbefunde, auch an fremdem Material, append-only Pflicht) | bei Debugging; nach jedem eigenen Fehler; nach jedem gefundenen Bug; vor neuen Aufgaben (eigene Fehlermuster) und vor jeder Fehlersuche (bekannte Symptome) |
 | `firmenkernprozesse/` | extern geführte Prozess- und Produktdokumente des **Onsite.ai-OS-Vorbilds** und der Firmenebene: Prozesskarten, Team-Rollout-Infrastruktur, Featurekarte, Berichte und Methodik — Referenz für Ausrichtung und Abgleich, **nicht** normativ für dieses Repo | wenn der Vorbild-Stand abgeglichen, die Firmenprozesse nachvollzogen oder Rollout-/Onboarding-Material gebraucht wird; bei Widersprüchen gilt die NovaCore-Quellen-Hierarchie |
+| `kandidaten-queue/` | Übergangs-Queue der repo-internen Abteilung `development` (`queue.md`, append-only) — kernrelevante Sitzungsergebnisse als Einzeiler + Verweis, Format nach `plugins/nc/referenz/pflege-auspraegung.md` Abschnitt 4 | wenn `/nc:end-session` einen Kandidaten klassifiziert oder geprüft wird, was aktuell zum Kern-Aufstieg ansteht; solange `development` keinen eigenen Satelliten hat, läuft die Einreichung über den regulären Branch/PR-Fluss dieses Repos |
+| `queue-protokolle/` | Committete Prüfprotokolle des Kern-Aufstiegslaufs `/nc:queue-kern` — je Lauf ein Dokument `queue-protokoll-<abteilung>-<YYYY-MM-DD>.md`, das Ledger für dessen Folgelauf | wenn ein Aufstiegslauf sein Prüfprotokoll ablegt oder der Folgelauf entschiedene Zeilen gegen den Merge-Stand abgleicht; solange leer: `PLATZHALTER.md` |
 
 **Zwei Indizes, zwei Fragen** — beide gehören zum Ablauf, in dieser Reihenfolge:
 `SSOT-Document-Index.md` beantwortet *„welches Dokument existiert, wohin gehört es, wann
@@ -212,13 +214,32 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   doppelt vergebene CHANGELOG-Versionsüberschriften. Dazu Registry-**Reservierungen**
   `ui-ux`/`automation` (Bauplan-Nachtrag N6) und die **Abteilungs-CLAUDE-Vorlage** (Ebene 2,
   Format definiert — Auslieferung folgt mit dem ersten Abteilungs-Bump).
+- **Gebaut (Kern v0.10.0, 2026-08-16): Onsite-Endstand-Nachbau Phase 3 — Queue-Flow &
+  Development-Plugin** nach Bauplan
+  `grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md` (AP-E1–E3, AP-F1–F2). **Queue-Flow
+  zwischen Kern und internen Abteilungen mit Kern-Dependency** (AP-E1–E3): Referenz und Format
+  (`plugins/nc/referenz/pflege-auspraegung.md`, Schema v1, Queue-Format v1, Kriterienliste v1)
+  samt der ersten realen Ausprägung (`plugins/nc-development/pflege-auspraegung.json`), die
+  Standardprozesse `queue-flow.md`/`kriterien-pflege.md`, zwei neue Skills
+  `/nc:queue-abteilung`/`/nc:queue-kern` (Push/PR je Lauf einzeln freigabepflichtig — offener
+  Maintainer-Entscheid) und der Fälligkeits-Hook `nc-queue-faelligkeit.js` (dritter
+  SessionStart-Hook, kein Gate, 14-Tage-Takt). **Heutiger Übergangszustand E1:** Die Abteilung
+  `development` liegt repo-intern ohne eigenen Satelliten — ihre Übergangs-Queue
+  (`kandidaten-queue/queue.md`) läuft über den regulären Branch/PR-Fluss dieses Repos; beide
+  Queue-Skills werden erst mit dem ersten Abteilungs-Satelliten wirksam. **Modernisierung
+  `nc-development`** (AP-F1–F2, Erstanwendung von `abteilungs-inhalts-pruefung.md`): vier neue
+  Skills (`qs-bugfix`, `qs-abnahme`, `rel-vorbereitung`, `rel-verifikation`) in zwei neuen
+  Modulen `qs`/`rel` — Abteilung zählt jetzt 15 Skills in 6 Modulen — sowie
+  `development-abteilungs-claude.md`, das **erste ausgelieferte Exemplar der CLAUDE-Ebene 2**,
+  gelesen durch die neue Lese-Verdrahtung in `/nc:start`. Stehende offene Punkte: Kriterienliste
+  v1 ist Abnahme-Gate dieses Phasen-PRs (Maintainer-Wortlautabnahme aussteht), Push-Recht und
+  stehende PR-Freigabe des Queue-Flows sind Maintainer-Entscheide (`queue-flow.md` §6).
 - **Noch nicht gebaut:** Gate 3 (Safety-Gate mit echtem Freigabedialog), Gate 4
   (Sitzungsabschluss als Hook — die PreCompact-Mahnung ist ausdrücklich nicht Gate 4),
-  CLAUDE-Ebene 0 (Org-Instructions, weiterhin ungenutzt) sowie die tatsächliche Auslieferung
-  von CLAUDE-Ebene 2 in einem echten Abteilungsplugin (Format und Vorlage sind seit Phase 2
-  gebaut — die Lese-Verdrahtung in `/nc:start` entsteht erst mit dem ersten ausgelieferten
-  Exemplar), Queue-Flow, weitere fe-/be-Skills, Module `architecture`/`incident-support`.
-  Übersicht: `grundwissen/NovaCore-OS-Gates-Definition.md`.
+  CLAUDE-Ebene 0 (Org-Instructions, weiterhin ungenutzt), weitere fe-/be-Skills, Module
+  `architecture`/`incident-support` sowie der Anschluss eines Abteilungs-Satelliten an den
+  Queue-Flow (Skills und Hook sind gebaut, laufen aber ohne Satelliten in den
+  Übergangs-Befund). Übersicht: `grundwissen/NovaCore-OS-Gates-Definition.md`.
 - **Versionsmodell:** **Je Plugin eine Version, genau an einer Stelle:**
   `plugins/<name>/.claude-plugin/plugin.json`. Marketplace-Einträge tragen **kein**
   `version`-Feld (Claude Code nutzt den `plugin.json`-Wert „without warning" — Doku

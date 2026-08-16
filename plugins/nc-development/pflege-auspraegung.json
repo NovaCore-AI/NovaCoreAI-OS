@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "abteilung": "development",
+  "queuePfad": "knowledge-base/kandidaten-queue/queue.md",
+  "kriterienVerweis": "Kriterienliste v1, referenz/pflege-auspraegung.md des Kern-Plugins nc",
+  "journalSonderregeln": [],
+  "roteLinienDomaene": [
+    "Deploys am WZS-Produktivsystem führt ausschließlich der Mensch aus.",
+    "Eingriffe in die Datenbank des WZS-Produktivsystems führt ausschließlich der Mensch aus.",
+    "Änderungen an Webhooks des WZS-Produktivsystems führt ausschließlich der Mensch aus."
+  ],
+  "uebergang": "Solange die Abteilung development keinen eigenen Satelliten hat, lebt ihre Queue als Übergangs-Queue im OS-Repo unter knowledge-base/kandidaten-queue/queue.md und wird über den regulären Branch/PR-Fluss dieses Repos eingebracht, nicht über /nc:queue-abteilung."
+}

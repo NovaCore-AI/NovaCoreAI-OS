@@ -20,7 +20,7 @@ Instruktionsebene).
 | **0 — Org-Instructions** | Team-Plan-Admin-Settings (server-managed) | zentral, ohne Sync-Mechanik | die SSOT (Verweis) | Admin | **nicht genutzt** |
 | **1 — Globale CLAUDE.md** | `~/.claude/CLAUDE.md` | firmengeführter Block per SessionStart-Autosync + Privat-Zone | Kern-SSOT | Firma (Block) / Mitarbeiter (Zone) | **gebaut** (2026-08-10, AP3) |
 | **1b — Team-Sync-Datei** | `~/.claude/nc-teamsync.md` | SessionStart-Autosync als **Ganzdatei** (Versions-Stempel Zeile 1, keine Marker, keine Privat-Zone); geladen per `@`-Import im Firmen-Block | Kern-SSOT (Methodik/Conventions) | Firma (vollständig) | **gebaut** (2026-08-15, Bauplan Onsite-Endstand AP-B2) |
-| **2 — Abteilungs-CLAUDE** | im Abteilungsplugin-Verzeichnis | Marketplace-Auto-Update (Plugin-Cache) | Abteilungs-SSOT | Abteilung | **Format definiert** (Vorlage vorhanden, Auslieferung mit dem ersten Abteilungs-Bump) |
+| **2 — Abteilungs-CLAUDE** | im Abteilungsplugin-Verzeichnis | Marketplace-Auto-Update (Plugin-Cache) | Abteilungs-SSOT | Abteilung | **gebaut** (2026-08-16: `development-abteilungs-claude.md` + Lese-Verdrahtung in `/nc:start`) |
 | **3 — Projekt-CLAUDE** | Arbeitsrepo (`CLAUDE.md`/`AGENTS.md`) | Git | Repo-Wissen (`.nc/erinnerung/`) | Repo-Team | aktiv |
 | **3b — OS-Repo-Doku** | dieses Repo: getrackte `AGENTS.md` + un-getrackte lokale `CLAUDE.md` | Git (nur `AGENTS.md`) | Aktualisierungs-Index, SSOT-Document-Index, CHANGELOG | Kern-Maintainer | aktiv |
 
@@ -80,13 +80,13 @@ Instruktionsebene).
   gelesen beim Session-Start aus dem Plugin-Root — in JEDEM Arbeitsrepo, egal wo die Session
   läuft. Löst das Problem einer Abteilung, die in fremden Repos arbeitet.
 - **Owner:** Abteilung. **Update-Kanal:** Marketplace-Auto-Update bei Plugin-Bump.
-- **Status/Grenzen:** **Format definiert** (Vorlage vorhanden, Auslieferung mit dem ersten
-  Abteilungs-Bump) — Zielname `<abteilung>-abteilungs-claude.md` an der Plugin-Wurzel,
+- **Status/Grenzen:** **gebaut** (2026-08-16, Phase 3/AP-F2: erstes ausgeliefertes Exemplar
+  `development-abteilungs-claude.md` in `nc-development`; die **Lese-Verdrahtung** liest die
+  Datei seitdem in `/nc:start` Schritt 7 aus dem Plugin-Root — Auslieferung ≠ Wirkung ist
+  damit geschlossen). Zielname `<abteilung>-abteilungs-claude.md` an der Plugin-Wurzel,
   zweigeteilt (Teil 1 für alle Sessions der Abteilung, Teil 2 Werkstatt); verbindliche Vorlage
   `vorlagen/abteilungsplugin/abteilungs-claude.md.vorlage`, Bauprozess
-  [`claude-netz-bau.md`](../standardprozesse/claude-netz-bau.md). Offen bleibt allein die
-  **Lese-Verdrahtung** — der Schritt in `/nc:start`, der die Datei aus dem Plugin-Root liest,
-  entsteht mit der ersten ausgelieferten Abteilungs-CLAUDE (Auslieferung ≠ Wirkung). Kein
+  [`claude-netz-bau.md`](../standardprozesse/claude-netz-bau.md). Kein
   Memory-Share zwischen affiliate-Satelliten (siehe SSOT-Definition).
 
 ## Ebene 3 — Projekt-CLAUDE

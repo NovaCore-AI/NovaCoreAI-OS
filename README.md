@@ -4,7 +4,7 @@
 **Familie von Claude-Code-Plugins** aus einem Marketplace: eine Methode für alle statt
 vieler Privat-Setups.
 
-**Status: Kern `nc` v0.9.0 · Abteilung `nc-development` v0.1.0 · Abteilung `nc-felix`
+**Status: Kern `nc` v0.10.0 · Abteilung `nc-development` v0.2.0 · Abteilung `nc-felix`
 v0.4.1 (erster Satellit, eigenständiges Felix-OS) · Abteilung `nc-biggi` v0.1.1 (zweiter
 Satellit, eigenständiges Biggi-OS) · Affiliate `kimi-code-plugin-cc` v1.4.0 (extern) ·
 Affiliate `mneme-kimi-code` v2.0.24 (extern) —
@@ -23,8 +23,8 @@ bringen ihren Kern als **Modul** selbst mit:
 
 | Plugin | Rolle | Namespace | Version |
 |---|---|---|---|
-| `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Infrapflege-Skills, Kontroll-Schicht (Gate 1 + Gate 2), Doks-Autosync, WP-Rahmen, Registry, Formatregeln, `nc-sync.md`, Subagenten (`agents/`) | `/nc:` | 0.9.0 (= `VERSION`) |
-| `nc-development` | Abteilung development — Module `fe` / `be` / `flc` / `wzs` | `/nc-development:` | 0.1.0 |
+| `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Infrapflege-Skills, Queue-Flow-Skills (`queue-abteilung`/`queue-kern`), Kontroll-Schicht (Gate 1 + Gate 2 + Queue-Fälligkeits-Erinnerung), Doks-Autosync, WP-Rahmen, Registry, Formatregeln, `nc-sync.md`, Subagenten (`agents/`) | `/nc:` | 0.10.0 (= `VERSION`) |
+| `nc-development` | Abteilung development — Module `fe` / `be` / `flc` / `wzs` / `qs` / `rel` | `/nc-development:` | 0.2.0 |
 | `nc-felix` | Abteilung felix — **eigenständiges Felix-OS** (erster Satellit, privates Repo `NovaCore-AI/Felix-OS`): Kernmodul mit 7 Skills, eigene Kontroll-Schicht mit Gate 1 + Gate 2 (markerlos) und eigene isolierte Wissensbasis, hängt **nicht** am Kern | `/nc-felix:` | 0.4.1 |
 | `nc-biggi` | Abteilung biggi — **eigenständiges Biggi-OS** (zweiter Satellit, privates Repo `NovaCore-AI/Biggi-OS`): Kernmodul mit 6 Skills + Kontroll-Schicht (FFG + Session-Start-Zwang nach Onsite-Vorbild), hängt **nicht** am Kern; Arbeitsmodul-Konvention `ctrl` / `mdzn` / `doc`+`day` reserviert | `/nc-biggi:` | 0.1.1 |
 | `kimi-code-plugin-cc` | **Affiliate** (keine Abteilung) — externes MIT-Plugin `ArchiDoxx/Kimi-code-Plugin-CC`: bindet headless CLI-Agenten (Kimi Code) als Zweitmeinung ein (Review-/Planning-Loops, adversariale Dual-Reviews). Host-Anforderungen: `uv` + `kimi`-CLI | `/kimi-code-plugin-cc:` | 1.4.0 (extern) |
@@ -57,14 +57,16 @@ bringen ihren Kern als **Modul** selbst mit:
 
 | Skill | WP | Zweck |
 |---|---|---|
-| `/nc:start` | WP0 | Session-Start: Stand, Journal, Git-Lage laden — kein Blind-Start; setzt zum Abschluss den Fakten-Stempel, der Gate 2 öffnet |
-| `/nc:end-session` | WP8 | Session-Ende (bis 0.7.x `save-session`): Journal schreiben, Stand + Roll-up + Offene-Stränge-Register konsolidieren, Projekt-Memory spiegeln; letzter Schritt setzt den Abschluss-Stempel, der die PreCompact-Mahnung der Sitzung abschaltet |
+| `/nc:start` | WP0 | Session-Start: Stand, Journal, Git-Lage laden — kein Blind-Start; liest je installiertem Abteilungsplugin dessen CLAUDE-Ebene 2 (`<abteilung>-abteilungs-claude.md`); setzt zum Abschluss den Fakten-Stempel, der Gate 2 öffnet |
+| `/nc:end-session` | WP8 | Session-Ende (bis 0.7.x `save-session`): Journal schreiben, Stand + Roll-up + Offene-Stränge-Register konsolidieren, Projekt-Memory spiegeln, Sitzungsergebnisse gegen die Kriterienliste in die Kandidaten-Queue der Abteilung klassifizieren (Queue-Flow, Station 1); letzter Schritt setzt den Abschluss-Stempel, der die PreCompact-Mahnung der Sitzung abschaltet |
 | `/nc:journal` | laufend | Einzelne Ereignisse sofort festhalten |
 | `/nc:setup` | einmal pro Rechner, danach bei Bedarf | Reconciler über sechs Soll-Schichten S0–S6 (seit 0.8.0): Voraussetzungen + Plugin-Stand prüfen, Wissensbasis als Lesekopie bereitstellen (voller Klon nach `~/.nc/ssot/<repo-name>/`, Fast-Forward, Sparse-Heilung), Sitzungswissen-Gerüst im Arbeits-Repo anlegen, CLAUDE-Lokaldokumente verifizieren, Infra-Registry `~/.claude/nc/infra.json` schreiben — mehrfach ausführbar, kein Schritt legt doppelt an |
 | `/nc:update-doks` | Maintainer, bei Bedarf | F1: repariert/synct die CLAUDE-Ziele der Ebenen 1/1b über denselben Autosync-Code (schreibt nie selbst in Privat-Zonen); F2: index-geführter Konsistenzlauf mit Drift-Bericht — Fixes nur nach Freigabe |
 | `/nc:doku-sync` | vor Commit | Lebende Doku nach der Sync-Matrix nachziehen, CHANGELOG + Versions-Gleichstand prüfen, Prüfstempel setzen |
 | `/nc:os-info` | jederzeit | Erklärt das OS **auf Basis der realen Installation** — Plugins, Module, nutzbare Skills, Gate-Status |
 | `/nc:skill-builder` | jederzeit | Führt durch den Bau eines Skills nach den OS-Regeln (Sandbox oder OS-Beitrag, inkl. Fork-back) |
+| `/nc:queue-abteilung` | WP8, 14-tägig | Erste Station des Queue-Flows: bündelt die lokal gesammelten SSOT-Commits samt neuer Kandidaten-Queue-Zeilen eines Abteilungs-Satelliten-Klons zu einem Zyklus-PR gegen das Abteilungs-Repo. Push/PR-Anlage je Lauf einzeln freigabepflichtig |
+| `/nc:queue-kern` | WP8, 14-tägig (+1 Tag Versatz) | Zweite Station: prüft die **gemergte** Abteilungs-Queue gegen die Kriterienliste und die Kern-SSOT (No-Duplicate), entwirft Kern-Dokument + Prüfprotokoll und stellt einen Promotions-PR; Folgelauf schreibt die Marker zurück |
 
 **Subagenten (Kern `nc`):** `agents/sync-nachzug-executor.md` — schreibender Executor (Marker
 `nc:schreibend`, `sonnet`, ohne `Bash`), bündelt am Bauzyklus-Ende die abgeleiteten
@@ -80,6 +82,13 @@ Defense-Baseline-Pflichtbaustein).
 | `fe` Frontend | `fe-review` | WP6 |
 | `be` Backend | `be-review` | WP6 |
 | `wzs` Empfehlungssystem WZS | `wzs-attribution` · `wzs-blocker-gate` · `wzs-reward-guard` · `wzs-share-invariant` · `wzs-webhook-contract` | WP3/WP6 |
+| `qs` QS & Abnahme | `qs-bugfix` · `qs-abnahme` | WP7 |
+| `rel` Release-Zyklus | `rel-vorbereitung` · `rel-verifikation` (beide nur manuell aufrufbar) | WP7 |
+
+CLAUDE-Ebene 2 der Abteilung: `plugins/nc-development/development-abteilungs-claude.md`
+(gelesen von `/nc:start`); deklarative Pflege-Ausprägung:
+`plugins/nc-development/pflege-auspraegung.json` (Queue-Ort, Kriterienverweis,
+Journal-Sonderregeln, WZS-Domänen-rote-Linien, Übergangsregel).
 
 **Abteilung `nc-felix` (eigenständiges Felix-OS):** Kernmodul ohne Präfix — `start`,
 `save-session`, `journal`, `os-info`, `code-tour`, `skill-builder`; Arbeitsmodule folgen
@@ -104,6 +113,7 @@ Rahmen WP0–WP8: [`plugins/nc/wp-rahmen.md`](plugins/nc/wp-rahmen.md).
 | `nc-start-gate` (Gate 2, Teil 2) | PreToolUse (Write/Edit/MultiEdit/NotebookEdit/Bash) | Lehnt jede **schreibende** Aktion ab, bis `/nc:start` mit dem Fakten-Stempel abgeschlossen ist. Der Stempel (`nc-start-stempel.js`) verifiziert `--branch`/`--head` gegen die Git-Lage des **Projektverzeichnisses** und vermerkt, ob überhaupt etwas zu prüfen war — ein ungeprüft gesetzter Stempel öffnet nicht in einem Git-Baum. Lesen, Read-only-Git (auch mit Pfadwechsel per `cd`/`git -C`, Verkettung und `worktree list`) und die Stempel-Invokation selbst bleiben frei; Subagenten ausgenommen. Opt-out `NC_START_GATE=off` — **ein** Schalter für beide Gate-2-Teile. Reichweite und Grenzen: [Gates-Definition](knowledge-base/grundwissen/NovaCore-OS-Gates-Definition.md). |
 | `nc-doks-autosync` | SessionStart | Hält **zwei** Ziele unabhängig voneinander auf dem Stand des installierten Kerns: Ebene 1 — Firmen-Block in `~/.claude/CLAUDE.md` per Marker-Chirurgie (`NC:BLOCK:…`), **Privat-Zone außerhalb der Marker wird nie verändert**, bei defekten Markern wird nichts geschrieben; Ebene 1b — Team-Sync-Datei `~/.claude/nc-teamsync.md` als Ganzdatei mit Versions-Stempel in Zeile 1 (Payload: `nc-sync.md`). Backup vor jedem Schreiben (intakte Sicherungen werden nie verschlechtert), atomarer Write, zeilenenden-normalisierter Identitätsvergleich (kein CRLF-Churn). Opt-out `NC_AUTOSYNC=off` (beide Ziele), Test-Overrides `NC_AUTOSYNC_TARGET` / `NC_AUTOSYNC_TEAMSYNC_TARGET`. |
 | `nc-end-mahnung` (PreCompact-Mahnung) | PreCompact (ohne Matcher: manual + auto) | Blockt die **erste** Kompaktierung einer Sitzung ohne abgeschlossenes `/nc:end-session` (Blockade über top-level JSON `decision`, Exit bleibt 0) und nennt den Abschluss-Stempel `nc-end-stempel.js`; die zweite Kompaktierung läuft immer durch (Loop-Schutz). Marker verfallen nach 30 Min **Inaktivität** (Heartbeat). Subagenten ausgenommen. Opt-out `NC_PRECOMPACT=off`, State-Override `NC_END_STATE_DIR`. **Nicht Gate 4** — das bleibt auf Eis. |
+| `nc-queue-faelligkeit` (Queue-Fälligkeits-Erinnerung, **kein Gate**) | SessionStart | Erinnert je Sitzungsstart an zwei Fälligkeiten des Queue-Flows: nicht eingereichte Wissensbasis-Arbeit im Abteilungs-Satelliten-Klon und offene Zeilen der **gemergten** Abteilungs-Queue — 14-Tage-Takt plus ein Tag Versatz. Blockiert nichts, injiziert nur einen Hinweis; höchstens fünf lokale Git-Aufrufe, kein Netzzugriff. Repo-Pfade ausschließlich über die Infra-Registry `~/.claude/nc/infra.json`; fehlt dort ein Abteilungs-Satellit, schweigt der Hook (heutiger Übergangszustand — `development` liegt repo-intern). Subagenten ausgenommen. Opt-out `NC_QUEUE_CHECK=off`, Test-Overrides `NC_QUEUE_STATE_DIR` / `NC_QUEUE_SESSION_DIR` / `NC_QUEUE_PFAD`. |
 
 Gate 3 (Safety-Gate mit echtem Freigabedialog) und Gate 4 (Sitzungsabschluss) sind **nicht
 gebaut** — Übersicht und Abgrenzungen:
@@ -153,8 +163,12 @@ Verbindliche Prozesse: [`kern-plugin-bau.md`](knowledge-base/standardprozesse/ke
 (Subagenten) · [`anker-reservierung.md`](knowledge-base/standardprozesse/anker-reservierung.md)
 (Anker bei Parallelbau) · [`abteilungs-inhalts-pruefung.md`](knowledge-base/standardprozesse/abteilungs-inhalts-pruefung.md)
 (Inhalts-Audit je Abteilung) · [`team-distribution.md`](knowledge-base/standardprozesse/team-distribution.md)
-(Team-Rollout). Skill-Format: `plugins/nc/referenz/skill-authoring.md`; Agent-Format:
-`plugins/nc/referenz/agent-authoring.md`.
+(Team-Rollout) · [`queue-flow.md`](knowledge-base/standardprozesse/queue-flow.md) (Weg eines
+Wissensstücks von der Sitzung in die Kern-SSOT, nur Abteilungen mit Kern-Dependency) ·
+[`kriterien-pflege.md`](knowledge-base/standardprozesse/kriterien-pflege.md)
+(Pflege der Kriterienliste „firmenrelevant"). Skill-Format: `plugins/nc/referenz/skill-authoring.md`;
+Agent-Format: `plugins/nc/referenz/agent-authoring.md`; Queue-/Pflege-Ausprägungs-Format:
+`plugins/nc/referenz/pflege-auspraegung.md`.
 
 ## Versionsmodell
 

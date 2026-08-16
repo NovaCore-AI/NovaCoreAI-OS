@@ -22,7 +22,7 @@ Plugins immer mitinstalliert und mitaktiviert wird.
 | WP4 | Quality-Gate | Format/Lint/Tests/Secrets vor jedem Commit; roter Zustand → erst grün, dann committen | `flc-commit-prep` | Commit-Freigabe durch den Menschen |
 | WP5 | Selbst-Review + PR | Gesamtdiff gegen `main` reviewen, PR-Text entwerfen, pushen und PR anlegen | `flc-pr` | Push und PR-Anlage: nur nach expliziter Freigabe |
 | WP6 | Review | Fremden oder eigenen Diff prüfen, Befunde nach Severity belegen, Review-Kommentar entwerfen | `fe-review`, `be-review`; `wzs-*` bei WZS-Berührung | Approven/Resolven/Posten: nur der Mensch |
-| WP7 | QS & Live-Test | Verhalten in der Zielumgebung prüfen, Befunde reproduzierbar festhalten | **noch ohne eigenen Skill** — manuell nach Verifikationsdisziplin | Jede Freigabe, jedes Deployment: Mensch |
+| WP7 | QS & Abnahme | Fehler reproduzieren und beheben, Ergebnis in der Zielumgebung abnehmen, Auslieferung vorbereiten und nachweisen | `qs-bugfix`, `qs-abnahme`, `rel-vorbereitung`, `rel-verifikation` | Abnahme, Merge, Release und jedes Deployment: Mensch |
 | WP8 | Session-Ende | Stand sichern, Entscheidungen protokollieren | `/nc:end-session` *(Kern)* | — |
 
 **Kern-Abhängigkeit:** WP0/WP8 laufen über die Kern-Skills `/nc:start` und `/nc:end-session`;
@@ -30,12 +30,19 @@ einzelne Ereignisse hält `/nc:journal` fest. Sie arbeiten auf dem Sitzungsgedä
 `.nc/erinnerung/`. Da der Kern als `dependencies`-Eintrag dieses Plugins immer mitkommt, kann
 WP0/WP8 nicht fehlen.
 
-**WP3 und WP7 ehrlich ausgewiesen:** Für WP3 gibt es bewusst keinen Generalisten-Skill — die
-Umsetzung folgt der Test-First-Regel des Kerns, und die `wzs-*`-Skills liefern die
-produktspezifischen Invarianten, sobald das Empfehlungssystem berührt ist. WP7 ist derzeit
-**nicht** durch einen Skill abgedeckt: QS und Live-Test laufen manuell; es gilt die
-Verifikationsdisziplin (Behauptung nur mit Beleg — Command-Output, grüner Test, beobachtetes
-Verhalten), und Befunde gehen als reproduzierbare Beschreibung zurück in WP1.
+**WP3 ehrlich ausgewiesen:** Für WP3 gibt es bewusst keinen Generalisten-Skill — die Umsetzung
+folgt der Test-First-Regel des Kerns, und die `wzs-*`-Skills liefern die produktspezifischen
+Invarianten, sobald das Empfehlungssystem berührt ist.
+
+**WP7 in zwei Zyklen geschnitten:** Der **QS-Zyklus** (`qs-*`) trägt Fehlerbehebung und
+Abnahme — `qs-bugfix` reproduziert einen Fehler zuerst als roten Test und sichert die Behebung
+gegen Rückfall, `qs-abnahme` prüft den fertigen Stand gegen die Anforderung und legt je
+Abnahmepunkt einen Beleg vor. Der **Release-Zyklus** (`rel-*`) trägt die Auslieferung, ohne sie
+auszulösen: `rel-vorbereitung` stellt Stand, Nachweise, Migrations- und Rückweg sowie den
+Freigabenachweis zusammen, `rel-verifikation` belegt nach der vom Menschen ausgelösten
+Auslieferung read-only, dass der erwartete Stand trägt. Für alle vier gilt die
+Verifikationsdisziplin: Behauptung nur mit Beleg — Command-Output, grüner Test, beobachtetes
+Verhalten. Befunde gehen als reproduzierbare Beschreibung zurück in WP1.
 
 ## Module dieser Abteilung
 
@@ -44,6 +51,8 @@ Verhalten), und Befunde gehen als reproduzierbare Beschreibung zurück in WP1.
 | Feature-Lifecycle | `flc-` | trägt WP1, WP2, WP4, WP5 — stack-übergreifend |
 | Frontend | `fe-` | trägt WP6 für UI-nahe Änderungen |
 | Backend | `be-` | trägt WP6 für Server-/API-/Datenänderungen |
+| QS-Zyklus | `qs-` | trägt WP7 für Fehlerbehebung und Abnahme — stack-übergreifend |
+| Release-Zyklus | `rel-` | trägt WP7 für Auslieferungs-Vorbereitung und -Nachweis; beide Skills nur manuell aufrufbar |
 | Empfehlungssystem WZS | `wzs-` | Produkt-Invarianten in WP3 und WP6, kundenspezifisch |
 
 Die `wzs-*`-Skills gelten **ausschließlich** für das Wasserzisterne-Empfehlungssystem. In
@@ -62,7 +71,24 @@ vor, der Mensch handelt. Hier steht, **welcher Skill welche Linie trägt**: Der 
 | Commit ohne Freigabe | `flc-commit-prep` | Bereitet vor und schlägt die Message vor; committet erst nach Bestätigung, nie mit `--no-verify` |
 | Review approven/resolven | `fe-review`, `be-review` | Nur menschliche Reviewer approven und resolven; der Agent liefert Befunde |
 | Kundensichtbares posten (PR-Text, Review-Kommentar) | `flc-pr`, `fe-review`, `be-review` | Agent entwirft Texte, Mensch postet |
+| Abnahme erteilen | `qs-abnahme` | Der Skill legt Belege je Abnahmepunkt vor; abgenommen wird von der Rolle Maintainer/Admin |
+| Release vorbereiten statt auslösen | `rel-vorbereitung` | Stellt Stand, Nachweise, Migrations- und Rückweg zusammen; taggt nicht, releast nicht, deployt nicht — nur manuell aufrufbar |
+| Auslieferung nachweisen ohne Eingriff | `rel-verifikation` | Prüft ausschließlich lesend; empfiehlt den Rückweg, löst ihn nie aus — nur manuell aufrufbar |
 | Merge, Release, Deployment | **kein Skill** — bewusst nicht automatisiert | Kein Skill dieser Abteilung merged, released oder deployt |
+
+### Domänen-rote-Linien der Abteilung (Produktivsystem WZS)
+
+Zusätzlich zu den Linien des Kerns gelten drei Linien der Domäne. Ihre **deklarative Quelle**
+ist `pflege-auspraegung.json` an der Wurzel dieses Plugins (Feld `roteLinienDomaene`, von den
+Pflege-Skills des Kerns gelesen); hier stehen sie wortgleich mit ihrer Skill-Ownership. Ändert
+sich eine Linie, werden beide Orte im selben Zug nachgezogen — dieselben Sätze führt auch die
+Abteilungs-CLAUDE `development-abteilungs-claude.md` dieses Plugins.
+
+| Domänen-rote Linie (wortgleich zur Ausprägung) | Getragen von |
+|---|---|
+| Deploys am WZS-Produktivsystem führt ausschließlich der Mensch aus. | `rel-vorbereitung` (bereitet vor), `rel-verifikation` (prüft lesend nach) |
+| Eingriffe in die Datenbank des WZS-Produktivsystems führt ausschließlich der Mensch aus. | `rel-vorbereitung` (benennt Migrations- und Rückweg), `rel-verifikation` (bestätigt lesend), `wzs-reward-guard` |
+| Änderungen an Webhooks des WZS-Produktivsystems führt ausschließlich der Mensch aus. | `wzs-webhook-contract` (Contract-Prüfung), `rel-vorbereitung` (benennt den Schritt für den Menschen) |
 
 ## Trigger-Abdeckung (QA-Matrix)
 
@@ -75,9 +101,49 @@ wegtriggern:
   „Zugänglichkeit / Web Vitals prüfen" — nie auf das Schreiben von UI-Code
 - `be-*` triggert auf **Backend-Review**: „API-Diff prüfen", „Endpoint reviewen",
   „Migration reviewen", „Fehlerpfade prüfen"
+- `qs-*` triggert auf **Fehlerbehebung und Abnahme nach der Umsetzung**: „Bug reproduzieren /
+  Fehlermeldung nachstellen", „Regressionstest schreiben", „QS-Schleife" (`qs-bugfix`) ·
+  „Abnahme / Abnahmelauf", „Abnahme-Checkliste", „Livetest planen", „Ergebnis in der
+  Zielumgebung prüfen" (`qs-abnahme`) — nie auf das Prüfen eines Diffs, das trägt `fe-`/`be-`
+- `rel-*` triggert auf die **Auslieferung** und wird ausschließlich manuell gerufen (im
+  Frontmatter beider Skills verdrahtet): „Release vorbereiten / Pre-Deploy-Check", „Releasestand
+  fixieren", „Rollback-Weg benennen", „Freigabenachweis zusammenstellen"
+  (`rel-vorbereitung`) · „Post-Deploy-Verifikation", „nach der Auslieferung prüfen", „Release
+  verifizieren", „Smoke-Check nach dem Deploy" (`rel-verifikation`)
 - `wzs-*` triggert ausschließlich auf Wasserzisterne-Fachbegriffe: „Attribution", „Reward /
   Auszahlung", „Share-Kanal / Empfehlungsnachricht", „Webhook / Reconciliation",
   „Phasen-Start / Blocker"
 
+Die Module bleiben gegeneinander trennscharf: `flc-*` endet mit dem Pull Request, `fe-*`/`be-*`
+prüfen **Diffs**, `qs-*` prüft **laufendes Verhalten**, `rel-*` prüft **Auslieferungen**.
 Bei neuen Skills: Matrix ergänzen und Overlap-Prüfung laut Checkliste in
 `referenz/skill-authoring.md` des Kern-Plugins `nc`.
+
+## Wissens-Routing und Queue-Anbindung (SSOT)
+
+Diese Abteilung ist **repo-intern** und führt **keine eigene Wissensbasis**. Zuständig ist die
+Wissensbasis des **OS-Repos**; Einstieg ist immer die Triage über deren Dokuindex
+(`knowledge-base/SSOT-Document-Index.md` im OS-Repo — Teil 1 routet Kategorien, Teil 2 nennt je
+Dokument „Relevant wenn …"), erst triagieren, dann lesen. Lokal liegt die Wissensbasis als
+**Lesekopie** unter `~/.nc/ssot/`, angelegt und nachgezogen von `/nc:setup`. Pfade werden gegen
+den Index bestimmt, nicht geraten.
+
+**Sitzungswissen-Residenz:** Stand, Journal und offene Stränge wohnen unter `.nc/erinnerung/`
+des Arbeits-Repos (in dessen `.gitignore`) und werden von `/nc:start` bzw. `/nc:end-session`
+geschrieben und gelesen. Eine Residenz innerhalb der Wissensbasis gibt es hier nicht — das
+OS-Repo ist öffentlich und bleibt kundenkontextfrei.
+
+**Queue-Anbindung:** Die **Klassifikation** eines Pflegekandidaten leistet der Kern in Station 1
+des Queue-Flows, dem Abschlussschritt von `/nc:end-session`; die Abteilung liefert dazu nur ihre
+**Ausprägung** (`pflege-auspraegung.json` an der Wurzel dieses Plugins: Queue-Pfad,
+Kriterienverweis, Journal-Sonderregeln, Domänen-rote-Linien, Übergangsregel). Ein eigener
+Abteilungs-Queue-Skill ist **nicht** vorgesehen und wird nicht gebaut. Solange die Abteilung
+keinen eigenen Satelliten hat, lebt ihre Queue als **Übergangs-Queue im OS-Repo** und wird über
+dessen regulären Branch/PR-Fluss eingebracht — **`/nc:queue-abteilung` ist hier nicht der Weg**
+(er gilt für Abteilungs-Satelliten-Klone). Die Kriterien selbst stehen in
+`referenz/pflege-auspraegung.md` des Kern-Plugins `nc` und werden hier nicht dupliziert; eine
+eigene Abteilungs-Kriterienliste gibt es bis zum Maintainer-Entscheid bewusst nicht.
+
+Das Routing für alle Sitzungen der Abteilung steht zusätzlich in der Abteilungs-CLAUDE
+`development-abteilungs-claude.md` an der Wurzel dieses Plugins, die `/nc:start` beim
+Einstiegs-Ritual lädt.

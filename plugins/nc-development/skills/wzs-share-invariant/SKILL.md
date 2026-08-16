@@ -6,7 +6,8 @@ description: >-
   Desktop = Kopieren und QR ohne Mail-Schritt, Mobil = wa.me und mailto in der Mail-App des
   Promotors. Kundenspezifisch — gilt ausschließlich für das Wasserzisterne-Projekt. Quelle:
   CLAUDE.md §2, Projektplan v2.3 §1/§3/§16.H3 des Arbeits-Repos; BGH Urt. v. 12.09.2013 –
-  I ZR 208/12.
+  I ZR 208/12. Frische: Stand v2.3, abgeglichen 2026-07-07 — vor Nutzung gegen den Projektplan
+  im Arbeits-Repo prüfen.
   Trigger-Begriffe: „Share-Kanal", „Empfehlungsnachricht", „Teilen-Flow", „wa.me",
   „mailto", „UWG", „Empfängerliste".
 ---

@@ -30,7 +30,8 @@ Kleinständerungen — direkt die Umsetzung.
 3. **Betroffene Stellen finden:** Relevante Dateien, Module und Tests im Arbeits-Repo
    identifizieren und kurz benennen — mit Pfad, nicht als Vermutung.
 4. **Branch vorbereiten:** Von einem aktuellen `main` einen Feature-Branch nach dem Muster
-   `feat/<kurzbeschreibung>` vorschlagen. Kein direkter `main`-Push: Feature-Branch → PR →
+   `feat/<kurzbeschreibung>` vorschlagen — der Branch-Name ist ein Code-Artefakt,
+   Entwurfssprache nach `nc-sync.md` §6 des Kern-Plugins `nc`. Kein direkter `main`-Push: Feature-Branch → PR →
    Review → Merge.
 5. **Branch-Namen freigeben lassen:** Vorschlag zeigen, Freigabe einholen, erst danach den
    Branch anlegen.

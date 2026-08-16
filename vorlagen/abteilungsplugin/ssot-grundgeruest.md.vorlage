@@ -1,14 +1,28 @@
 # Wissensbasis-Grundgerüst des Satelliten {{ABTEILUNG}} (Vorlage)
 
 > Beim Anlegen eines **eigenständigen Satelliten** (oder beim Nachrüsten eines bestehenden)
-> entsteht unter `knowledge-base/` **genau diese Fünfer-Struktur** — nicht mehr:
-> `standardprozesse/` und die Produktdefinitionen bleiben rein zentral im OS-Repo (Drift-Schutz
-> der Kerndokumente). Platzhalter `{{…}}` beim Instanzieren ersetzen; je noch leerem Ordner eine
-> `PLATZHALTER.md` (hält den Ordner in Git und ist von der Indexpflicht ausgenommen).
+> entsteht unter `knowledge-base/` **genau diese Fünfer-Struktur** — nicht mehr (Gattung B
+> zusätzlich die **Kandidaten-Queue als sechste Kategorie**; die Protokoll-Kategorie bleibt
+> Kern-Ledger, siehe Abschnitt unten): `standardprozesse/` und die Produktdefinitionen
+> bleiben rein zentral im OS-Repo (Drift-Schutz der Kerndokumente). Platzhalter `{{…}}` beim
+> Instanzieren ersetzen; je noch leerem Ordner eine `PLATZHALTER.md` (hält den Ordner in Git und
+> ist von der Indexpflicht ausgenommen).
 >
 > **Gilt nicht für repo-interne Abteilungsplugins** — für die ist die Wissensbasis des OS-Repos
 > zuständig. Verbindlicher Kontext: Standardprozesse `ssot-aufbau.md` §4 und
 > `abteilungs-plugin-bau.md` §3b im OS-Repo.
+>
+> **Zwei Gattungen von Satelliten — die Vorlage bedient beide, aber nicht gleich:**
+>
+> | Gattung | Was sie ist | Was diese Vorlage liefert |
+> |---|---|---|
+> | **A — eigenständiges Kollegen-OS** (heute: Felix-OS, Biggi-OS) | Eigenes Repo mit eigener Kontroll-Schicht, **ohne** Kern-Dependency. **Terminal:** schreibt nie in Kerndokumente | die fünf Pflichtbausteine, die Protokollköpfe, die **Isolation** und den mechanischen Wächter — **keine** Queue, **keine** Kriterienliste, **keine** `pflege-auspraegung.json` |
+> | **B — Abteilungs-Satellit mit Kern-Dependency** (heute **keiner**; `development` liegt repo-intern) | Eigenes Repo, aber `dependencies: ["nc"]`; nimmt am Queue-Flow zwischen Abteilung und Kern teil | zusätzlich den **sechsten Baustein Kandidaten-Queue** und den Pflichtbestandteil **`pflege-auspraegung.json`** (eigener Abschnitt unten) |
+>
+> **Die Gattung wird vor dem ersten Ordner entschieden, nicht nachträglich.** Wer Gattung A baut,
+> überspringt den Queue-Abschnitt vollständig — er ist dort nicht „noch nicht", sondern
+> gegenstandslos (Entscheid E1 / Invariante I8 des Bauplans 2026-08-15; `ssot-aufbau.md` §4a im
+> OS-Repo).
 
 ## Die fünf Pflichtbausteine
 
@@ -41,7 +55,65 @@ Zeilen, weil es **zwei** Protokolle trägt — die Tabelle hat deshalb sechs Zei
 Fehler, der erste in `debug-log.md` beim ersten gefundenen Bug. Erfundene Beispieleinträge
 entwerten das Protokoll.
 
-## Isolation — warum es hier keine Warteschlange gibt
+## Nur Gattung B: sechster Baustein Kandidaten-Queue
+
+> **Gattung A überspringt diesen Abschnitt und den nächsten vollständig.** Ein eigenständiges
+> Kollegen-OS bekommt **keine** Queue, **keinen** reservierten Platz dafür und **keine**
+> `pflege-auspraegung.json` — die Begründung steht unten unter „Isolation". Wer hier trotzdem
+> baut, hat die Gattung verwechselt.
+
+Für einen **Abteilungs-Satelliten mit Kern-Dependency** ist die Queue **kein reservierter
+Andockpunkt, sondern beim Anlegen mitzubauen**: Der Kern-Skill `/nc:end-session` klassifiziert am
+Sitzungsende gegen die Kriterienliste und schreibt hinein.
+
+| Ordner/Datei | Zweck | Lebenszyklus |
+|---|---|---|
+| `kandidaten-queue/queue.md` | **eigene Kategorie** (Wurzel-Invariante: nur der Index liegt direkt in `knowledge-base/`) — Sammelstelle der kernrelevanten Sitzungsergebnisse, Einzeiler + Verweis statt Volltext | **append-only**; `/nc:queue-kern` setzt Zeilen beim Folgelauf auf `befördert (PR #n)` bzw. `abgelehnt (PR #n)`, löscht aber nie |
+
+Pflichten beim Anlegen:
+
+1. Datei mit Kopf-Blockquote und **genau diesem Tabellenkopf** erzeugen:
+
+   ```markdown
+   # Kandidaten-Queue {{ABTEILUNG}} — append-only
+
+   > Kandidaten für die Kern-SSOT. Eintrag = Einzeiler + Verweis, nie Volltext
+   > („Kern verlinkt, Abteilung dokumentiert"). Zeilen werden nie gelöscht;
+   > befördert wird durch Statuswechsel.
+
+   | Datum | Einzeiler | Verweis | erfülltes Kriterium | Status |
+   |---|---|---|---|---|
+   ```
+
+   **Keine Beispielzeile** — die Queue startet leer.
+
+2. **Routing-Zeile in Teil 1** und **Triage-Tabelle in Teil 2** des satelliteneigenen
+   `SSOT-Document-Index.md` nachziehen — in derselben Änderung, wie bei jeder Wissensdatei.
+3. Der Kern-Zufluss aus Bauplänen läuft **nur** über das `bauplan-archiv/`; laufende Pläne werden
+   nie in den Kern gespiegelt.
+
+**Keine `queue-protokolle/`-Kategorie im Satelliten:** Die committeten Prüfprotokolle des
+Kern-Aufstiegslaufs `/nc:queue-kern` sind das **Ledger des Kerns** und liegen ausschließlich in
+der Wissensbasis des OS-Repos (`knowledge-base/queue-protokolle/`, dort geführt) — der Folgelauf
+liest sie aus dem gemergten Kern-Stand, nie aus dem Abteilungs-Repo.
+
+## Nur Gattung B: Pflichtbestandteil der Plugin-Wurzel `pflege-auspraegung.json`
+
+Ein **Abteilungsplugin mit Kern-Dependency** liefert an seiner **Plugin-Wurzel** (neben
+`.claude-plugin/`) die deklarative Pflege-Ausprägung `pflege-auspraegung.json` — Queue-Ort,
+Kriterien-Verweis, Journal-Sonderregeln, domänen-spezifische rote Linien, optionale
+Übergangsregel. Ohne sie findet `/nc:end-session` die Queue nicht und meldet fehlendes Setup.
+
+**Verbindliches Format:** `referenz/pflege-auspraegung.md` des Kern-Plugins `nc` (Schema v1,
+Auflösungsregel, Queue-Format v1, Kriterienliste v1). Nicht aus dem Gedächtnis füllen — die
+Referenz nennt Pflichtfelder und Prüfliste. Solange der Registry-Eintrag der Abteilung kein
+`repository` führt, ist das Feld `uebergang` Pflicht.
+
+## Isolation — warum es bei Gattung A keine Warteschlange gibt
+
+*(Gilt für **eigenständige Kollegen-OS**. Für Gattung B gelten stattdessen die beiden Abschnitte
+darüber — die Repo-Grenzen-Regeln zu Maschinenpfaden und Leseanweisungen bleiben aber auch dort
+unverändert in Kraft.)*
 
 Die Wissensbasis dieses Satelliten ist **terminal**: Er **schreibt nie in Dokumente des
 OS-Repos**, weder direkt noch über eine Vorstufe. Deshalb existiert **keine Kandidaten-Queue,
@@ -75,21 +147,45 @@ gebaut — was er zur Laufzeit liest, gehört neben ihn ins Plugin.
 1. Der Index existiert und ist die **einzige** `.md`-Datei direkt in `knowledge-base/`.
 2. Jede `.md` unterhalb hat eine Index-Zeile (`PLATZHALTER.md` ausgenommen).
 3. Kein Index-Link zeigt ins Leere.
-4. **Alle vier** Kategorien existieren und sind in Teil 1 geroutet.
+4. **Alle vier** Grundkategorien existieren und sind in Teil 1 geroutet (Gattung B: zusätzlich
+   `kandidaten-queue/`).
 5. Beide Protokolle existieren und tragen ihren append-only-Kopf.
-6. **Isolation:** kein Pfad und kein Dateiname unter `knowledge-base/` deutet auf eine
-   Warteschlangen-Mechanik hin; keine ausgelieferte Datei führt einen Maschinenpfad ins OS-Repo.
+6. **Isolation — Gattungs-Bedingung, nicht abwählbar:** Ist der Satellit ein **eigenständiges
+   Kollegen-OS** (Gattung A, erkennbar an der fehlenden Kern-Dependency im `plugin.json`), dann
+   deutet **kein** Pfad und **kein** Dateiname unter `knowledge-base/` auf eine
+   Warteschlangen-Mechanik hin, und es existiert **keine** `pflege-auspraegung.json`. Die
+   Bedingung wird **nicht gestrichen**, wenn ein Satellit der Gattung B gebaut wird — sie greift
+   dann schlicht nicht, weil ihre Voraussetzung nicht erfüllt ist. Ein Wächter, der die Prüfung
+   ganz entfernt, statt sie an die Gattung zu binden, gäbe die Isolation auch für Gattung A auf.
+   Unabhängig von der Gattung gilt: **keine ausgelieferte Datei führt einen Maschinenpfad ins
+   OS-Repo** — das OS-Repo wird ausschließlich als Quellenangabe genannt.
 7. **Plugin-Grenze:** keine `../`-Verweise in `skills/**` und `hooks/**`.
+8. **Nur Gattung B:** `pflege-auspraegung.json` liegt an der Plugin-Wurzel, ist parsebar, führt
+   `schemaVersion` `1` und alle Pflichtfelder; `queuePfad` zeigt auf eine existierende Datei mit
+   dem exakten Tabellenkopf des Queue-Formats v1.
 
 ## Instanzieren
 
+0. **Gattung bestimmen** (A oder B, Tabelle im Kopf) und die Entscheidung im
+   `SSOT-Document-Index.md` des Satelliten festhalten. Sie steuert, ob die Schritte 4a und 4b
+   überhaupt anfallen — nachträgliches Umwidmen ist keine Option.
 1. `knowledge-base/` mit den fünf Bausteinen anlegen, `PLATZHALTER.md` in jeden noch leeren
    Ordner.
 2. `SSOT-Document-Index.md` schreiben: Kopf (Zweck, Benutzung, Verhältnis zum OS-Repo **als
    Quellenangabe**, Pflegeregel testerzwungen, Auslieferungshinweis), Teil 1 Routing mit
    Lebenszyklus je Ordner inklusive Pflicht-Verschiebung ins Archiv, Teil 2 Triage.
 3. Beide Protokollköpfe übernehmen, `{{ABTEILUNG}}` ersetzen.
-4. `test/wissensbasis.test.mjs` anlegen und grün fahren.
-5. `AGENTS.md` des Satelliten um Pflicht-Einstieg, Abschluss-Checkliste und Protokollzwang
+4. **Nur Gattung B:**
+   - **4a** `kandidaten-queue/queue.md` mit Kopf-Blockquote und exaktem Tabellenkopf anlegen
+     (leer, ohne Beispielzeile); die Kategorie in Teil 1 routen und `queue.md` in Teil 2
+     aufnehmen. (Die Prüfprotokolle des Aufstiegslaufs liegen **nicht** hier — sie sind das
+     Ledger des Kerns im OS-Repo.)
+   - **4b** `pflege-auspraegung.json` an der Plugin-Wurzel anlegen, Felder nach Schema v1 der
+     Kern-Referenz; `uebergang` setzen, solange die Registry-Zeile der Abteilung kein
+     `repository` führt.
+5. `test/wissensbasis.test.mjs` anlegen und grün fahren. **Wächter-Punkt 6 wird nie gestrichen** —
+   er trägt seine Gattungs-Bedingung selbst: Bei Gattung A greift er voll, bei Gattung B ist
+   seine Voraussetzung nicht erfüllt und Punkt 8 kommt hinzu.
+6. `AGENTS.md` des Satelliten um Pflicht-Einstieg, Abschluss-Checkliste und Protokollzwang
    ergänzen.
-6. Kontrolle: `grep -r "{{" knowledge-base test` liefert keine Treffer.
+7. Kontrolle: `grep -r "{{" knowledge-base test` liefert keine Treffer.

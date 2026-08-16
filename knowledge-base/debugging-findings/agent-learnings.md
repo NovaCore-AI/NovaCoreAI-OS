@@ -201,3 +201,24 @@
 - **Lernerkenntnis/Präventionsregel:** PR-/Issue-Bodies und -Kommentare mit Markdown
   **immer** über `--body-file <datei>` bzw. `-F body=@datei` übergeben, nie inline —
   Datei zuerst schreiben, dann posten, dann Ergebnis-Länge gegenprüfen.
+
+### 2026-08-16 — Klarname im Fußblock einer AUSGELIEFERTEN Datei (I9-Verstoß, extern gefunden)
+
+- **Kontext/Aufgabe:** Phase 3, AP-E1 — Port der Kern-Referenz `pflege-auspraegung.md`
+  (delegierter Opus-Agent), Overseer-Review vor der externen Review-Kette.
+- **Was schiefging:** Der Portkopf-Fußblock der ausgelieferten Datei
+  `plugins/nc/referenz/pflege-auspraegung.md` nannte den Maintainer mit Klarnamen —
+  obwohl derselbe Fußblock zwei Zeilen weiter „Admin als Rolle statt eines Klarnamens"
+  als bewusste Abweichung dokumentierte. Mein Abnahme-Review hat den Widerspruch
+  übersehen; gefunden hat ihn erst der externe GLM-5.3-Durchgang (MAJOR).
+- **Ursache:** Die Fußblock-Konvention der Wissensbasis („Angelegt … auf Weisung
+  <Name>") wurde unreflektiert in eine **Plugin**-Datei übernommen; die I9-Regel
+  „Rollen statt Klarnamen" wurde beim Review nur auf den Dokument-KÖRPER angewendet,
+  nicht auf den Fußblock. Eine testerzwungene Klarnamen-Invariante für `plugins/**`
+  existiert nicht — und kann nicht trivial ergänzt werden, weil der Suchbegriff selbst
+  in einer ausgelieferten Testdatei stünde (derselbe I9-Verstoß).
+- **Lernerkenntnis/Präventionsregel:** In `plugins/**` gilt „Rollen statt Klarnamen"
+  für JEDE Zeile inklusive Fußblöcken — Zeichnung dort: „auf Weisung des Maintainers
+  (Rolle: Admin)". Review-Handgriff vor jedem Phasen-PR: `grep -ri` mit den
+  Klarnamens-Varianten über `plugins/` (Handgriff, bewusst kein testerzwungener
+  Baustein — Begründung oben).

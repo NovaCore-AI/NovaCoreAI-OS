@@ -35,12 +35,26 @@ führt **jede Umgebung ihre eigene Registry**.
 - `abteilungen` listet die installierten **internen** Abteilungsplugins (heute:
   `development`); Kollegen-OS-Satelliten erscheinen hier **nie** (Isolations-Invariante —
   sie haben eine eigene zweidimensionale SSOT und hängen an keiner Kern-Mechanik).
+- **Optionale Queue-Flow-Felder (Andockpunkte — real ab dem ersten Abteilungs-Satelliten,
+  Phase 3 / AP-E2/E3):** `kernRepoPfad` — absoluter Pfad eines **Arbeitsklons** des OS-Repos
+  auf dieser Maschine (niemals die Lesekopie `kernSsotPfad`); braucht allein
+  `/nc:queue-kern` für den Promotions-PR. `abteilungsRepoPfade` — Objekt
+  `Abteilungsname → absoluter Pfad` des lokalen Satelliten-Arbeitsklons bzw. `"ausstehend"`;
+  Leser sind die Queue-Skills (`queue-abteilung`/`queue-kern`) und der Fälligkeits-Hook
+  `nc-queue-faelligkeit.js`. Heute setzt **keine** Maschine diese Felder (kein
+  Abteilungs-Satellit, Entscheid E1 — die Übergangs-Queue lebt im OS-Repo); fehlen sie,
+  schweigt der Hook und die Skills brechen mit Übergangs-Befund ab. **Additive optionale
+  Felder, kein Schema-Bruch:** Leser ignorieren unbekannte Felder, der Schreiber
+  (`/nc:setup`) erhält Fremdfelder unverändert — `schemaVersion` bleibt `1`. (Abweichung
+  vom Onsite-Einzelfeld `abteilungsRepoPfad`: eine Map, passend zur `abteilungen`-Liste.)
 - `zuletztGeprueft` ist ein **reines Diagnose-Feld** (Datum je Schicht, `YYYY-MM-DD`) —
   nie Beleg-Ersatz. Grundregel: **die Platte ist die Wahrheit**; ein Registry-Pfad ohne
   echten Bestand dahinter gilt als „fehlt".
 - Liest ein Kern-Skill eine **höhere `schemaVersion`** als die ihm bekannte, arbeitet er
   nicht einfach weiter, sondern meldet „Registry neuer als der installierte Kern" — nie
-  stillschweigend überschreiben.
+  stillschweigend überschreiben. Ausnahme: der SessionStart-Hook `nc-queue-faelligkeit.js`
+  schweigt in diesem Fall bewusst statt zu melden — im Sitzungsstart zählt Fail-Open ohne
+  Rauschen, keine geratene Fälligkeit.
 - **Leser:** `start` (Kontextaufbau, tolerant bei Fehlen: Hinweis auf `/nc:setup`) und
   `update-doks` (F2-Konsistenzlauf). `journal` und `end-session` schreiben in die von
   `/nc:start` bestimmte Ablage und hängen nur **indirekt** an ihr.

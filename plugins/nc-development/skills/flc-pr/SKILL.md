@@ -26,13 +26,19 @@ bzw. `/nc-development:be-review` den Diff.
 2. **Gesamtdiff analysieren:** `git diff main...HEAD` **und** die komplette Commit-Historie des
    Branches betrachten, nicht nur den letzten Commit. Der Selbst-Review bezieht sich auf den
    Gesamtdiff, nicht auf den zuletzt geänderten Ausschnitt.
-3. **PR-Beschreibung entwerfen** mit vier Teilen:
+3. **PR-Beschreibung entwerfen** mit vier Teilen. Entwurfssprache nach `nc-sync.md` §6 des
+   Kern-Plugins `nc`:
    - **Zusammenfassung:** Was ändert sich und warum (1–3 Sätze).
    - **Änderungen:** Stichpunkte der wesentlichen Änderungen.
    - **Testplan:** Wie wurde getestet und wie kann der Reviewer es nachvollziehen.
    - **Offene Punkte:** Bekannte Einschränkungen und Folgearbeiten.
 4. **Freigabe einholen:** Den Entwurf zeigen. Erst nach explizitem „Ja" pushen
-   (`git push -u origin <branch>`) und den PR anlegen (z. B. `gh pr create`).
+   (`git push -u origin <branch>`) und den PR anlegen. Mit vorhandener GitHub-CLI:
+   `gh pr create --base main --head <branch> --title "<titel>" --body-file <datei>`.
+   **Ohne `gh`-Zugang der manuelle Weg:** nach dem Push in der Weboberfläche des Repos die
+   Vergleichsansicht öffnen (Pfad `compare/main...<branch>` unter der Repo-URL), dort
+   „Pull request" wählen, Titel und den entworfenen Text einsetzen und absenden — das Absenden
+   ist der Schritt des Menschen. Der Agent liefert Titel und Text als kopierfertigen Block.
 5. **Ergebnis melden:** Die PR-URL nennen und den nächsten Schritt empfehlen (Review anfordern;
    je nach Änderungsart `/nc-development:fe-review` oder `/nc-development:be-review`).
 
@@ -42,6 +48,9 @@ bzw. `/nc-development:be-review` den Diff.
   der Mensch entscheidet.
 - **Rote Linie: der Skill merged nicht** und fordert keinen Merge an — Feature-Branch → PR →
   Review → Merge, niemals direkt auf `main`.
+- **Review-Kette (Rollen):** Wer implementiert hat, reviewt nicht — die Fremdprüfung leistet
+  ein zweiter Dev oder ein Agenten-Review; **abgenommen und gemergt wird von der Rolle
+  Maintainer/Admin**. Als Reviewer wird deshalb nie die eigene Rolle vorgeschlagen.
 - Basis-Branch ist `main`, sofern nicht ausdrücklich anders vereinbart.
 - **Bestehende PRs werden aktualisiert, nicht gelöscht und neu angelegt** — die Review-Historie
   bleibt erhalten.
