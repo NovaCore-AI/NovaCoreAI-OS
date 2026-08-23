@@ -1,0 +1,31 @@
+feat: Onsite-Endstand-Nachbau Phase 3 — Queue-Flow & Development-Plugin (Kern 0.10.0, nc-development 0.2.0)
+
+Vollzug des Bauplans grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md
+Phase 3 (AP-E1–E3, AP-F1–F2; Nachtraege N6/N8), Basis main@489a909 nach Merge PR #20.
+
+- AP-E1: Queue-Referenz pflege-auspraegung.md (Schema v1, Queue-Format v1,
+  Kriterienliste v1: a–d + GF1–GF4 + No-Duplicate), Standardprozesse queue-flow.md
+  und kriterien-pflege.md, Kriterienlisten-Definition, erste reale Auspraegung
+  pflege-auspraegung.json, Wissensbasis-Kategorien kandidaten-queue/ und
+  queue-protokolle/, zwei Matrix-Zeilen, Pruefbaustein queue-os.test.mjs
+- AP-E2: Kern-Skills queue-abteilung und queue-kern (Station 2 liest nur
+  origin/<standardbranch>, Divergenz-/behind-Abbruch, Ledger, dreiwertige Marker,
+  Dry-Run, Secrets-Preflight, Push/PR je Lauf freigabepflichtig)
+- AP-E3: SessionStart-Hook nc-queue-faelligkeit.js (14-Tage-Takt + 1 Tag Versatz,
+  fail-open, max. 5 Git-Calls, kein Netz; 44 Tests) + hooks.json-Registrierung,
+  end-session-Schritt 8 Queue-Klassifikation scharf
+- AP-F1: Synthese-Bauplan 2026-08-16-nc-development-modernisierung-bauplan.md
+  (Drift-Matrix, beide Prueflaeufe als Anhaenge)
+- AP-F2: erste ausgelieferte Abteilungs-CLAUDE Ebene 2 (development) inkl.
+  Lese-Verdrahtung /nc:start Schritt 7, vier neue Skills qs-bugfix/qs-abnahme/
+  rel-vorbereitung/rel-verifikation in Modulen qs/rel — 15 Skills in 6 Modulen,
+  workflow.md +SSOT-Abschnitt, wzs-Fixes, Frische-Marker
+- nc-sync.md §6 Sprachregel N6-praezisiert; Nachzuege AGENTS/README/Registry/
+  CHANGELOG; Bumps 0.9.0→0.10.0 und 0.1.0→0.2.0
+- Review-Kette: GLM-5.3 R1 (1 MAJOR/2 MINOR/1 NIT gefixt), Codex R1 (13/15 gefixt,
+  2 begruendet abgelehnt), Restfixes + Runde 2 GLM (3 MINOR/1 NIT) und Codex
+  (2 MAJOR/4 MINOR) — alle eingearbeitet
+
+Testsuite: 192 Tests / 191 bestanden / 1 uebersprungen (POSIX-only).
+Validierung: claude plugin validate . / plugins/nc --strict /
+plugins/nc-development --strict — bestanden.
