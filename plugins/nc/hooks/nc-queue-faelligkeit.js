@@ -2,6 +2,9 @@
 // nc-queue-faelligkeit.js — Faelligkeits-Erinnerung des Queue-Flows (Standardprozess
 // queue-flow.md des OS-Repos; Bauplan 2026-08-15, AP-E3). Port von Onsite.ai-OS
 // origin/main@5c2c210 `oai-queue-faelligkeit.js`, gemappt auf NovaCore.
+// NACHGEZOGENES DELTA (2026-08-23, Quelle origin/main@6d3f8db desselben Vorbilds): die
+// PR-Sichtbarkeit ueber die Repo-Grenzen (dortiges §15.39 / CHANGELOG 0.24.0, PR #69) und
+// die Windows-Sperren-Haertung aus demselben PR — beides unten an seiner Stelle dokumentiert.
 // EIN SessionStart-Hook, ZWEI Faelligkeiten:
 //   /nc:queue-abteilung — nicht eingereichte Wissensbasis-Arbeit im Abteilungs-Klon
 //                         UND letzter Lauf laenger als VIERZEHN Tage her.
@@ -23,7 +26,8 @@
 //
 // KEIN GATE — das ist die wichtigste Abgrenzung dieser Datei. Der Hook ERINNERT und
 // blockiert nichts: keine Blockade, keine Bestaetigungspflicht, kein Abbruch. Er ist
-// weder Gate 3 (Safety-Gate, nicht gebaut) noch Gate 4 (Sitzungsabschluss, auf Eis —
+// weder Gate 3 (Safety-Gate, nc-safety-gate.js — gebaut seit 2026-08-23) noch das
+// endgueltig entfallene Gate 4 (Onsite §15.44, Mapping D2 —
 // die PreCompact-Mahnung ist ausdruecklich nicht Gate 4). Wer ihn zu einem Gate ausbaut,
 // baut daneben. Ebenso KEIN Cron und KEIN Scheduler: Instruktionen wirken nur in
 // Sessions; ein Scheduler je Maschine waere eine Setup-Abhaengigkeit gegen die
@@ -42,11 +46,14 @@
 //     je Faelligkeit und Sitzung).
 //   - Subagenten-Laeufe tragen agent_id/agent_type — sie sind ausgenommen, der Parent
 //     fuehrt die Sitzung.
-//   - Die Doku mahnt fuer SessionStart ausdruecklich Schnelligkeit an: dieser Hook macht
+//   - Die Doku mahnt fuer SessionStart ausdruecklich Schnelligkeit an: der QUEUE-Teil macht
 //     hoechstens FUENF lokale Git-Aufrufe mit 2-Sekunden-Timeout und KEINEN Netzzugriff
-//     (kein fetch — ein haengender Netzaufruf im Sitzungsstart waere der teuerste
-//     Fehlerfall). Der "gemergte" Stand ist folglich der Stand des letzten Fetches; das
-//     ist bewusst so und steht auch im Erinnerungstext.
+//     (kein fetch, kein `git fetch` — ein haengender Netzaufruf im Sitzungsstart waere der
+//     teuerste Fehlerfall). Der "gemergte" Stand ist folglich der Stand des letzten
+//     Fetches; das ist bewusst so und steht auch im Erinnerungstext.
+//     EINZIGE Ausnahme im ganzen Hook ist der unten beschriebene PR-Teil (`gh pr list`,
+//     abschaltbar per NC_PR_CHECK) — mit eigenem Gesamtbudget, eigenem Aufruf-Timeout und
+//     einem Tages-Cache, damit im Normalfall gar kein Prozess startet.
 //     Die Fuenf im Ungluecksfall: status(1) · symbolic-ref(2) · for-each-ref(3) ·
 //     rev-list(4) · show(5). Der Ref wird je Klon EINMAL ermittelt und gemerkt, und die
 //     beiden Kandidatennamen origin/main|origin/master kosten zusammen einen Aufruf
@@ -92,6 +99,65 @@
 // Test-Umleitungen: NC_QUEUE_STATE_DIR (Ersatz fuer ~/.claude/nc — Registry UND
 // Lauf-Marker), NC_QUEUE_SESSION_DIR (Sitzungsmarker), NC_QUEUE_PFAD (Queue-Pfad
 // relativ zur Klon-Wurzel).
+//
+// =========================================================================================
+// ZWEITER BEFUND: PR-SICHTBARKEIT UEBER DIE REPO-GRENZEN
+// (Port des Onsite-Bausteins §15.39 / dortiger CHANGELOG 0.24.0, PR #69)
+// =========================================================================================
+// NovaCore-OS ist KEIN Ein-Repo-Produkt: Kern und Marketplace liegen im OS-Repo, jede
+// Abteilung bekommt mit dem ersten Satelliten ein eigenes Repo. `gh pr list` ohne `--repo`
+// zeigt nur das aktuelle Repo, und die Sitzungsprotokolle erfassen ebenfalls nur dieses.
+// Belegter Schaden beim Vorbild (2026-08-17): Im dortigen Satelliten stand drei Tage ein
+// fertiger, CI-gruener, MERGEABLE-PR, den niemand bemerkt hat — er kam in keinem
+// Sitzungsstand, keinem Memory und keiner PR-Liste vor. Mit jedem weiteren Satelliten
+// waechst der blinde Fleck. Dieser Hook ist der richtige Ort, weil er die Infra-Registry
+// (= alle Repo-Pfade der Maschine) ohnehin liest, ohnehin beim Session-Start laeuft, die
+// Einmal-je-Sitzung-Mechanik schon hat und ausdruecklich KEIN Gate ist. Auch dieser Teil
+// erzwingt nichts.
+//
+// ABGEFRAGT WIRD AUSSCHLIESSLICH, WAS IN DER INFRA-REGISTRY STEHT (Affiliate-Invariante):
+// `kernRepoPfad` (Arbeitsklon des OS-Repos) und ALLE Werte der Map `abteilungsRepoPfade`
+// (NC-Schema, infra-registry.md — Onsite hat dort das Einzelfeld `abteilungsRepoPfad`).
+// Nie geratene Pfade, nie die Lesekopien `ssotAblage`/`kernSsotPfad`, und vor allem NIE
+// Kollegen-OS-Satelliten (Felix, Biggi): Die stehen per Isolations-Invariante nie in der
+// Registry und sind damit auch hier kein Thema. Heutiger Uebergangszustand (E1): keine
+// Maschine setzt diese Felder — dann SCHWEIGT auch dieser Teil.
+//
+// DAS TEURE PROBLEM IST DER NETZZUGRIFF — vier Riegel, alle noetig:
+//   (1) HARTE ZEITGRENZE. Der ganze PR-Teil hat ein Gesamtbudget (PR_BUDGET_MS) und je
+//       Aufruf ein knappes Timeout (PR_AUFRUF_TIMEOUT_MS). Vor jedem Aufruf wird die
+//       Restzeit gegen BEIDE Deckel und gegen das Gesamtbudget des Hooks gerechnet; reicht
+//       sie nicht, wird STUMM abgebrochen (kein Fehler, keine Meldung). Und wie bei Git
+//       gilt: ein Timeout oder ein fehlendes Binary setzt `ghUnbrauchbar` — danach startet
+//       im selben Lauf KEIN weiterer Prozess, sonst summierten sich die Timeouts ueber das
+//       10-Sekunden-Budget aus hooks.json (Onsite-Review-Befund H4).
+//   (2) CACHE MIT MINDESTABSTAND. Abgefragt wird hoechstens einmal je Tag und Repo
+//       (PR_ERFOLG_TTL_MS); nach einem Fehlversuch gilt ein kuerzerer Ruheabstand
+//       (PR_FEHLER_TTL_MS), damit ein kaputtes/abgemeldetes `gh` nicht in jeder Sitzung
+//       erneut Zeit kostet. Bei frischem Cache faellt KEIN Netzaufruf an — der Normalfall.
+//       Gemeldet wird aus dem Cache (mit Altersangabe im Text), nicht aus dem Live-Stand;
+//       zu alte Staende (PR_MAX_ALTER_MS) werden gar nicht mehr gemeldet.
+//   (3) SCHWEIGEN STATT SCHEITERN. `gh` fehlt, ist nicht angemeldet, hat keinen Zugriff auf
+//       ein privates Repo, das Verzeichnis hat kein GitHub-Remote, die Ausgabe ist unlesbar:
+//       alles fuehrt zum Schweigen. stderr des Kindprozesses wird bewusst VERWORFEN — dort
+//       stehen Auth-Diagnosen, die niemals in einen Kontext oder ein Log gehoeren.
+//   (4) EIGENER OPT-OUT `NC_PR_CHECK=off`. Bewusst NICHT derselbe Schalter wie
+//       NC_QUEUE_CHECK: Ein Netzaufruf mit Credential-Nutzung ist eine andere Qualitaet als
+//       ein Dateicheck, und wer im Zug, offline oder hinter einem restriktiven Egress sitzt,
+//       soll genau ihn abschalten koennen, ohne die (rein lokale) Queue-Erinnerung mit zu
+//       verlieren. Die Schachtelung ist trotzdem eindeutig: NC_QUEUE_CHECK=off schaltet den
+//       GANZEN Hook ab — also auch diesen Teil.
+// State: `<stateDir>/pr-sichtbarkeit.json`, neben Registry und Lauf-Marker (env-unabhaengig,
+// muss Reboots ueberleben — sonst waere der Mindestabstand nach jedem Neustart wirkungslos).
+// Ein DEFEKTER Cache fuehrt zum Schweigen und wird still auf einen leeren, gueltigen Stand
+// zurueckgesetzt (kein Netzaufruf in diesem Lauf): Nur Schweigen ohne Reparatur hiesse, dass
+// eine einmal kaputte Datei das Feature fuer immer abschaltet — genau die Falle, die beim
+// Lauf-Marker die M3-Diagnose noetig gemacht hat. Ein Cache mit HOEHERER schemaVersion wird
+// weder gelesen noch ueberschrieben (neuer als der Kern → nicht raten).
+// Test-Umleitung: NC_PR_CMD — entweder ein Pfad oder ein JSON-Array
+// `["<binary>","<vorspann>",…]`, dessen Elemente dem `gh`-Argumentvektor vorangestellt
+// werden. Damit laesst sich der Aufruf plattformneutral stubben (ein PATH-Shim braeuchte
+// unter Windows eine .exe — dieselbe Grenze wie beim Git-Timeout-Test).
 'use strict';
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -122,8 +188,29 @@ const MAX_PROBEN = 150;
 // Deckel der Abteilungs-Auswahl aus der Registry-Liste (Verteilannahme: genau eine).
 const MAX_ABTEILUNGEN = 8;
 
+// --- PR-Sichtbarkeit (Port des Onsite-Bausteins §15.39) -------------------------------
+const PR_FELD = 'pr-sichtbarkeit';            // Feld im Sitzungsmarker (einmal je Sitzung)
+const PR_CACHE_DATEI = 'pr-sichtbarkeit.json';
+const PR_CACHE_SCHEMA = 1;
+const PR_ERFOLG_TTL_MS = 24 * 60 * 60 * 1000; // Mindestabstand je Repo nach einem Erfolg
+const PR_FEHLER_TTL_MS = 6 * 60 * 60 * 1000;  // kuerzerer Ruheabstand nach einem Fehlversuch
+const PR_MAX_ALTER_MS = 7 * TAG_MS;           // aelter → nicht mehr melden (zu unsicher)
+const PR_BUDGET_MS = 2500;                    // Gesamtdeckel des PR-Teils
+const PR_AUFRUF_TIMEOUT_MS = 1500;            // Deckel je Repo-Abfrage
+const PR_MIN_REST_MS = 400;                   // darunter lohnt kein Aufruf mehr → stumm raus
+const HOOK_BUDGET_MS = 8000;                  // Reserve unter dem 10-s-Timeout aus hooks.json
+const PR_MAX_ZEILEN = 8;                      // je Repo im Text, damit er lesbar bleibt
+const PR_LIMIT = '20';                        // Abfragegrenze von gh
+const PR_TITEL_MAX = 100;
+const PROZESS_START = Date.now();
+
 function isDisabled() {
   return OFF_VALUES.has(String(process.env.NC_QUEUE_CHECK || '').trim().toLowerCase());
+}
+
+/** Eigener Schalter des Netz-Teils; NC_QUEUE_CHECK=off schaltet zusaetzlich alles ab. */
+function prAbgeschaltet() {
+  return OFF_VALUES.has(String(process.env.NC_PR_CHECK || '').trim().toLowerCase());
 }
 
 function warn(text) {
@@ -141,6 +228,7 @@ function stateDir() {
 
 function registryDatei() { return path.join(stateDir(), 'infra.json'); }
 function laufDatei() { return path.join(stateDir(), 'queue-lauf.json'); }
+function prCacheDatei() { return path.join(stateDir(), PR_CACHE_DATEI); }
 
 function sitzungsDir() {
   const override = String(process.env.NC_QUEUE_SESSION_DIR || '').trim();
@@ -205,7 +293,25 @@ function schreibeAtomar(datei, text) {
  * Folge. Stattdessen wird nichts geschrieben: Der SessionStart-Marker schweigt still (die
  * Sitzung wird nie gestoert — im schlimmsten Fall kommt eine Erinnerung zu viel), der
  * Lauf-Marker-Schreiber (`--lauf`) meldet den Verweigerungsgrund per stderr und Exit 1.
+ * Diese NC-Haertung bleibt unangetastet; die Onsite-Erweiterung unten aendert nur, WANN
+ * „nicht sperrbar" ueberhaupt festgestellt wird, nie das Verhalten danach.
+ *
+ * WARUM MEHR ALS EEXIST ALS "BELEGT" ZAEHLT (Onsite-Fix 2026-08-17, dortiger PR #69):
+ * EEXIST ist nicht der einzige Code, den Windows fuer eine belegte Sperre liefert. Wird das
+ * Sperr-Verzeichnis gerade entfernt oder haelt es noch ein Handle (Virenscanner, Indexdienst,
+ * der andere Lauf), quittiert `mkdir` mit EPERM/EACCES/EBUSY/ENOTEMPTY. Die frueher
+ * unbedingte `break`-Zeile hat daraus sofort "nicht sperrbar" gemacht — beim Vorbild
+ * (fail-open ohne Sperre) war das der Lost Update, gegen den die Sperre existiert; bei uns
+ * ist es die vorzeitige VERWEIGERUNG eines Schreibvorgangs, der nach kurzem Warten
+ * problemlos durchgelaufen waere. Aufgefallen an der Windows-CI des Vorbilds (node 22/24 rot,
+ * POSIX und node 20 gruen): Die Parallelitaets-Probe M1 fiel nach 221 ms durch — viel zu
+ * schnell, um das Warte-Budget von 40 x 25 ms ausgeschoepft zu haben, also ein Frueh-`break`.
+ * Behandelt werden diese Codes deshalb wie EEXIST: warten und neu versuchen. Der Ausstieg
+ * bleibt: nach dem Budget gilt "nicht sperrbar" (Verhalten wie oben beschrieben), und ein
+ * wirklich unbekannter Fehler bricht weiterhin sofort aus.
  */
+const SPERRE_BELEGT_CODES = new Set(['EEXIST', 'EPERM', 'EACCES', 'EBUSY', 'ENOTEMPTY']);
+
 function mitSperre(datei, arbeit, schreibmodus) {
   const sperre = datei + '.lock';
   let gehalten = false;
@@ -215,13 +321,17 @@ function mitSperre(datei, arbeit, schreibmodus) {
       fs.mkdirSync(sperre);
       gehalten = true;
     } catch (e) {
-      if (!e || e.code !== 'EEXIST') break;   // nicht sperrbar → ohne Sperre weiterarbeiten
-      try {
-        if (Date.now() - fs.statSync(sperre).mtimeMs > SPERRE_ALT_MS) {
-          fs.rmdirSync(sperre);               // verwaiste Sperre brechen, dann neu versuchen
-          continue;
-        }
-      } catch (_) { /* egal */ }
+      const code = e && e.code;
+      if (!SPERRE_BELEGT_CODES.has(code)) break;   // unbekannt → nicht sperrbar
+      if (code === 'EEXIST') {
+        // Nur bei EEXIST steht wirklich ein Verzeichnis da, dessen Alter etwas aussagt.
+        try {
+          if (Date.now() - fs.statSync(sperre).mtimeMs > SPERRE_ALT_MS) {
+            fs.rmdirSync(sperre);             // verwaiste Sperre brechen, dann neu versuchen
+            continue;
+          }
+        } catch (_) { /* egal */ }
+      }
       schlafe(SPERRE_WARTE_MS);
     }
   }
@@ -506,6 +616,286 @@ function offeneZeilen(text) {
   return offen;
 }
 
+// --- PR-Sichtbarkeit ueber die Repo-Grenzen (Port §15.39) -----------------------------
+
+// Wie `gitUnbrauchbar`: Sobald das Werkzeug selbst als unbenutzbar erkannt ist (fehlendes
+// Binary, Timeout, Signal, unlesbare Ausgabe), startet in DIESEM Lauf kein weiterer Prozess.
+// Ein normaler Fehler-Exit ist dagegen eine Aussage ueber genau ein Repo (kein Zugriff, kein
+// GitHub-Remote) und stoppt die anderen nicht.
+let ghUnbrauchbar = false;
+
+/**
+ * Kommando fuer die PR-Abfrage. Standard ist `gh`; `NC_PR_CMD` leitet es fuer Tests um —
+ * entweder als Pfad oder als JSON-Array, dessen Elemente dem Argumentvektor vorangestellt
+ * werden (z. B. `["<node>","<stub.js>"]`). Ein PATH-Shim taugt hier nicht: Unter Windows
+ * fuehrt execFile ohne Shell weder .cmd noch Shell-Skripte aus.
+ */
+function ghKommando() {
+  const roh = String(process.env.NC_PR_CMD || '').trim();
+  if (!roh) return { datei: 'gh', vorspann: [] };
+  if (roh.startsWith('[')) {
+    try {
+      const teile = JSON.parse(roh);
+      if (Array.isArray(teile) && teile.length) {
+        return { datei: String(teile[0]), vorspann: teile.slice(1).map(String) };
+      }
+    } catch (_) { /* keine gueltige Array-Form → als Pfad lesen */ }
+  }
+  return { datei: roh, vorspann: [] };
+}
+
+/**
+ * Repos dieser Maschine aus der Infra-Registry, dedupliziert und gegen die Platte geprueft
+ * (die Registry ist ein Komfort-Cache, die Platte die Wahrheit — infra-registry.md).
+ *
+ * Quelle sind AUSSCHLIESSLICH die zwei dokumentierten Queue-Flow-Andockpunkte des
+ * NC-Schemas: `kernRepoPfad` (Arbeitsklon des OS-Repos) und ALLE Werte der Map
+ * `abteilungsRepoPfade` (Onsite hat dort das Einzelfeld `abteilungsRepoPfad`). NICHT gelesen
+ * werden `ssotAblage`/`kernSsotPfad` — das sind Lesekopien, keine Arbeitsklone — und erst
+ * recht keine geratenen Pfade oder Affiliate-Plugin-Verzeichnisse (Affiliate-Invariante):
+ * Was hier nicht in der Registry steht, wird nicht abgefragt.
+ *
+ * `"ausstehend"` (Abteilung ohne Satelliten) faellt heraus, ohne den anderen Eintrag
+ * mitzunehmen: Der Kern-Klon allein ist ein vollstaendig gueltiger Fall.
+ *
+ * Bewusst OHNE Deckel auf der Zahl der Kandidaten (anders als MAX_ABTEILUNGEN bei der
+ * Klon-Auswahl, wo genau EIN Treffer gebraucht wird): Ein Deckel wuerde ein Repo dauerhaft
+ * unsichtbar machen — und Unsichtbarkeit ist genau der Schaden, den dieser Teil behebt.
+ * Gedeckelt wird stattdessen die ZEIT (PR_BUDGET_MS/PR_AUFRUF_TIMEOUT_MS), und die
+ * Auffrischung geht nach Alter vor, sodass niemand hinten runterfaellt.
+ */
+function prRepos(reg) {
+  const pfade = (reg.abteilungsRepoPfade && typeof reg.abteilungsRepoPfade === 'object'
+    && !Array.isArray(reg.abteilungsRepoPfade)) ? reg.abteilungsRepoPfade : {};
+  const kandidaten = [reg.kernRepoPfad, ...Object.keys(pfade).map(k => pfade[k])];
+  const gesehen = new Set();
+  const repos = [];
+  for (const kandidat of kandidaten) {
+    const roh = String(kandidat || '').trim();
+    if (!roh || roh === 'ausstehend') continue;
+    let voll;
+    try { voll = path.resolve(roh); } catch (_) { continue; }
+    if (gesehen.has(voll)) continue;
+    gesehen.add(voll);
+    try { if (!fs.statSync(voll).isDirectory()) continue; } catch (_) { continue; }
+    repos.push(voll);
+  }
+  return repos;
+}
+
+/** Nur belegte Felder uebernehmen — was gh liefert, ist Fremdinhalt und wird nie roh geglaubt. */
+function normalisierePr(roh) {
+  if (!roh || typeof roh !== 'object') return null;
+  const nummer = Number(roh.number);
+  const url = String(roh.url || '');
+  // Enge URL-Pruefung: Der Text wandert in den Kontext des Modells; eine `javascript:`- oder
+  // Datei-URL aus einer manipulierten Ausgabe hat dort nichts verloren.
+  if (!Number.isFinite(nummer) || !/^https:\/\/[A-Za-z0-9.-]+\/[^\s<>"']*$/.test(url)) return null;
+  return {
+    nummer,
+    titel: String(roh.title || '').replace(/\s+/g, ' ').trim().slice(0, PR_TITEL_MAX),
+    url,
+    entwurf: roh.isDraft === true,
+    aktualisiert: String(roh.updatedAt || '').slice(0, 10)
+  };
+}
+
+/**
+ * Offene PRs EINES Repos holen. `cwd` ist der Klon — dadurch loest gh das Repo selbst ueber
+ * die Remote auf und wir brauchen weder einen Slug noch einen zusaetzlichen Git-Aufruf.
+ * Rueckgabe: Array (auch leer = belegte Aussage „nichts offen") oder null = kein Urteil.
+ */
+function holePrs(repo, timeout) {
+  if (ghUnbrauchbar) return null;
+  const { datei, vorspann } = ghKommando();
+  try {
+    const out = execFileSync(datei, [...vorspann,
+      'pr', 'list', '--state', 'open', '--limit', PR_LIMIT,
+      '--json', 'number,title,url,isDraft,updatedAt'], {
+      cwd: repo,
+      encoding: 'utf8',
+      timeout,
+      // stderr wird VERWORFEN: gh schreibt dort Auth- und Token-Diagnosen. Nichts davon
+      // darf in einen Kontext, ein Log oder den Cache geraten.
+      stdio: ['ignore', 'pipe', 'ignore'],
+      maxBuffer: 1024 * 1024,
+      windowsHide: true,
+      env: Object.assign({}, process.env, {
+        GH_NO_UPDATE_NOTIFIER: '1',   // sonst haengt an jedem Aufruf ein zweiter Netzweg
+        GH_PAGER: 'cat',
+        NO_COLOR: '1',
+        CLICOLOR: '0'
+      })
+    });
+    const daten = JSON.parse(String(out || '[]'));
+    if (!Array.isArray(daten)) { ghUnbrauchbar = true; return null; }
+    return daten.map(normalisierePr).filter(Boolean);
+  } catch (e) {
+    const code = e && e.code;
+    if (code === 'ENOENT' || code === 'ETIMEDOUT' || !Number.isFinite(e && e.status)) {
+      ghUnbrauchbar = true;
+    }
+    return null;
+  }
+}
+
+/**
+ * Cache lesen. Drei Ausgaenge, alle bewusst verschieden:
+ *   fehlt   → leerer Stand, ganz normaler Erstlauf;
+ *   defekt  → SCHWEIGEN in diesem Lauf, aber die Datei wird auf einen leeren, gueltigen
+ *             Stand zurueckgesetzt. Nur schweigen hiesse: eine einmal kaputte Datei schaltet
+ *             das Feature fuer immer ab, und niemand bemerkt den Unterschied zu „nichts
+ *             offen" (dieselbe Falle wie beim Lauf-Marker, Onsite-Review-Befund M3);
+ *   neuer   → weder lesen noch schreiben (Registry-Regel: nicht raten).
+ */
+function ladePrCache() {
+  const gelesen = ladeJson(prCacheDatei());
+  if (gelesen.fehlt) return { stand: { schemaVersion: PR_CACHE_SCHEMA, repos: {} } };
+  if (gelesen.defekt) {
+    try {
+      mitSperre(prCacheDatei(), () => {
+        schreibeAtomar(prCacheDatei(),
+          JSON.stringify({ schemaVersion: PR_CACHE_SCHEMA, repos: {} }, null, 2));
+      });
+    } catch (_) { /* fail-open — dann eben beim naechsten Mal */ }
+    return { defekt: true };
+  }
+  const daten = gelesen.daten;
+  if (Number(daten.schemaVersion) > PR_CACHE_SCHEMA) return { defekt: true, fremd: true };
+  const repos = daten.repos && typeof daten.repos === 'object' ? daten.repos : {};
+  return { stand: { schemaVersion: PR_CACHE_SCHEMA, repos } };
+}
+
+/**
+ * Aktualisierte Repo-Eintraege sichern. Read-modify-write unter derselben Sperre wie die
+ * anderen Marker: Zwei gleichzeitige Session-Starts wuerden sich sonst Eintraege
+ * ueberschreiben. Ohne Sperre wird nichts geschrieben (NC-Haertung) — das kostet einen
+ * Aufruf in der naechsten Sitzung, mehr nicht. Nicht mehr registrierte Repos fallen dabei
+ * heraus (der Cache waechst nie ueber die Registry hinaus).
+ */
+function speicherePrCache(neuEintraege, bekannteRepos) {
+  try {
+    mitSperre(prCacheDatei(), () => {
+      const gelesen = ladeJson(prCacheDatei());
+      const alt = (gelesen.daten && typeof gelesen.daten.repos === 'object')
+        ? gelesen.daten.repos : {};
+      if (gelesen.daten && Number(gelesen.daten.schemaVersion) > PR_CACHE_SCHEMA) return;
+      const repos = {};
+      for (const repo of bekannteRepos) {
+        const wert = Object.prototype.hasOwnProperty.call(neuEintraege, repo)
+          ? neuEintraege[repo] : alt[repo];
+        if (wert) repos[repo] = wert;
+      }
+      schreibeAtomar(prCacheDatei(),
+        JSON.stringify({ schemaVersion: PR_CACHE_SCHEMA, repos }, null, 2));
+    });
+  } catch (_) { /* fail-open: ein nicht geschriebener Cache kostet einen Aufruf, mehr nicht */ }
+}
+
+/** Verbleibende Zeit fuer den naechsten Netzaufruf — beide Deckel und das Hook-Budget. */
+function prRestzeit(prDeadline) {
+  const jetzt = Date.now();
+  return Math.min(PR_AUFRUF_TIMEOUT_MS, prDeadline - jetzt,
+    PROZESS_START + HOOK_BUDGET_MS - jetzt);
+}
+
+/** `owner/repo` aus der PR-URL; sonst der Ordnername. Kostet keinen zusaetzlichen Aufruf. */
+function repoName(repo, prs) {
+  for (const pr of prs || []) {
+    const treffer = /^https:\/\/[^/]+\/([^/]+\/[^/]+)\/pull\//.exec(pr.url || '');
+    if (treffer) return treffer[1];
+  }
+  return path.basename(repo);
+}
+
+function altersText(zeitpunkt) {
+  const stunden = Math.floor((Date.now() - Number(zeitpunkt || 0)) / (60 * 60 * 1000));
+  if (!Number.isFinite(stunden) || stunden < 1) return 'Stand: gerade eben';
+  if (stunden < 48) return 'Stand: vor ' + stunden + ' Std.';
+  return 'Stand: vor ' + Math.floor(stunden / 24) + ' Tag(en)';
+}
+
+// Wie beim Queue-Text bewusst OHNE Abschalt-Hinweis: Ein Hinweis, der seine eigene
+// Abschaltung mitliefert, erzieht zum Abschalten. Der Opt-out steht im Dateikopf, in
+// hooks.json und im README.
+function prSichtbarkeitsText(bloecke) {
+  const teile = bloecke.map(b => {
+    const zeilen = b.prs.slice(0, PR_MAX_ZEILEN).map(pr =>
+      '- #' + pr.nummer + ' ' + (pr.titel || '(ohne Titel)') + (pr.entwurf ? ' *(Entwurf)*' : '')
+      + ' — ' + pr.url + (pr.aktualisiert ? ' (zuletzt ' + pr.aktualisiert + ')' : ''));
+    const rest = b.prs.length - zeilen.length;
+    if (rest > 0) zeilen.push('- … und ' + rest + ' weitere(r)');
+    return '**' + b.name + '** · ' + altersText(b.stand) + '\n' + zeilen.join('\n');
+  });
+  return '# NovaCore-OS — offene Pull Requests über die Repo-Grenzen (Erinnerung, keine '
+    + 'Blockade)\n\n'
+    + 'Das OS lebt in mehreren Repositories (OS-Repo + Abteilungs-Satelliten). `gh pr list` '
+    + 'ohne `--repo` zeigt nur das gerade offene — deshalb hier der Blick über alle Repos '
+    + 'der Infra-Registry:\n\n'
+    + teile.join('\n\n') + '\n\n'
+    + 'Quelle ist der lokale Zwischenstand `' + prCacheDatei() + '` (höchstens ein Abruf je '
+    + 'Repo und Tag, kein Live-Stand) — vor einer Entscheidung am PR selbst nachsehen. '
+    + '**Merge, Review-Resolves und Approvals bleiben Mensch** (rote Linie). Dieser Hinweis '
+    + 'erscheint höchstens einmal je Sitzung und blockiert nichts.';
+}
+
+/**
+ * Der PR-Teil als Ganzes. Rueckgabe: Text oder null (= schweigen).
+ * Reihenfolge der Auffrischung: aelteste Pruefung zuerst — bricht das Budget mittendrin ab,
+ * kommt das uebergangene Repo naechste Sitzung zuerst dran und niemand faellt dauerhaft
+ * hinten runter.
+ */
+function prSichtbarkeit(reg) {
+  if (prAbgeschaltet()) return null;
+  const repos = prRepos(reg);
+  if (!repos.length) return null;             // Uebergangszustand E1: keine Repo-Pfade → still
+
+  const gelesen = ladePrCache();
+  if (gelesen.defekt) return null;            // unbekannte Lage → schweigen (Datei ist repariert)
+  const stand = gelesen.stand;
+
+  const jetzt = Date.now();
+  const prDeadline = jetzt + PR_BUDGET_MS;
+  const faellig = repos
+    .filter(repo => {
+      const e = stand.repos[repo];
+      if (!e || !Number.isFinite(Number(e.geprueft))) return true;
+      return jetzt - Number(e.geprueft) > (e.erfolg ? PR_ERFOLG_TTL_MS : PR_FEHLER_TTL_MS);
+    })
+    .sort((a, b) => Number((stand.repos[a] || {}).geprueft || 0)
+      - Number((stand.repos[b] || {}).geprueft || 0));
+
+  // ZWEI Zeitstempel je Eintrag, und das ist wichtig: `geprueft` ist der letzte VERSUCH und
+  // steuert den Mindestabstand; `stand` ist der letzte ERFOLG und steuert Altersangabe und
+  // Verfallsgrenze. Mit nur einem Feld wuerde ein fehlgeschlagener Abruf eine wochenalte
+  // Liste auf „gerade eben" zuruecksetzen — die Meldung waere dann eine Luege ueber ihr
+  // eigenes Alter.
+  const neu = {};
+  for (const repo of faellig) {
+    if (prRestzeit(prDeadline) < PR_MIN_REST_MS) break;   // stummer Abbruch, kein Befund
+    const alt = stand.repos[repo] || {};
+    const prs = holePrs(repo, prRestzeit(prDeadline));
+    neu[repo] = prs === null
+      ? { geprueft: Date.now(), stand: Number(alt.stand) || 0, erfolg: false, prs: alt.prs || [] }
+      : { geprueft: Date.now(), stand: Date.now(), erfolg: true, prs };
+    stand.repos[repo] = neu[repo];
+    if (ghUnbrauchbar) break;                            // Werkzeug defekt → nicht weiterprobieren
+  }
+  if (Object.keys(neu).length) speicherePrCache(neu, repos);
+
+  const bloecke = [];
+  for (const repo of repos) {
+    const e = stand.repos[repo];
+    if (!e || !Array.isArray(e.prs) || !e.prs.length) continue;
+    // Zu alte Staende werden nicht gemeldet: Ein PR, den wir seit einer Woche nicht mehr
+    // bestaetigen konnten, ist womoeglich laengst gemergt — eine Erinnerung daran waere
+    // Rauschen, und Rauschen erzieht zum Abschalten.
+    if (Date.now() - Number(e.stand || 0) > PR_MAX_ALTER_MS) continue;
+    bloecke.push({ name: repoName(repo, e.prs), prs: e.prs, stand: e.stand });
+  }
+  return bloecke.length ? prSichtbarkeitsText(bloecke) : null;
+}
+
 // --- Abteilungs-Auswahl aus der NC-Registry ---------------------------------------------
 
 /**
@@ -649,30 +1039,20 @@ function stempleLauf(skill) {
 
 // --- Hook-Lauf ------------------------------------------------------------------------
 
-function main() {
-  if (isDisabled()) return;
+// Gesetzt von der M3-Diagnose, ausgewertet ganz am Ende von main(): Exit 2 nur, wenn
+// wirklich nichts auf stdout ging.
+let exitZweiWennStumm = false;
 
-  let input = {};
-  try {
-    input = JSON.parse(fs.readFileSync(0, 'utf8')) || {};
-  } catch (_) { input = {}; }
-  if (typeof input !== 'object' || input === null) input = {};
-
-  if (isSubagentInvocation(input)) return; // der Parent-Lauf fuehrt die Sitzung
-
-  const datei = sitzungsDatei(resolveSessionKey(input));
-  const bereits = ladeSitzungsmarker(datei);
-  if (bereits === DEFEKT) return;
-
-  // Infra-Registry (infra-registry.md): einzige Quelle der Repo-Pfade. Fehlt sie, lief
-  // das Setup auf dieser Maschine nie — kein Befund, kein Hinweis (das erledigt /nc:setup).
-  const registry = ladeJson(registryDatei());
-  if (registry.fehlt || registry.defekt) return;
-  const reg = registry.daten;
-  if (Number(reg.schemaVersion) > REGISTRY_SCHEMA) return; // neuer als der Kern → nicht raten
-
+/**
+ * Die beiden Queue-Faelligkeiten erheben. Rueckgabe: Liste der faelligen Skills (evtl. leer).
+ * Bewusst KEIN `return` aus main() heraus: Seit dem PR-Teil haengt am selben Hook ein
+ * zweiter, unabhaengiger Befund. Ein „Abteilung hat keinen Satelliten" — heute der REGELFALL
+ * (Uebergangszustand E1) — darf die PR-Sichtbarkeit nicht mit stilllegen; genau solche
+ * verketteten Fruehausstiege erzeugen blinde Flecken.
+ */
+function queueFaelligkeiten(reg, bereits, datei) {
   const auswahl = klonAuswahl(reg);
-  if (!auswahl) return; // kein Abteilungs-Satellit registriert (Uebergangszustand E1) → schweigen
+  if (!auswahl) return []; // kein Abteilungs-Satellit registriert (E1) → keine Queue-Faelligkeit
   const klon = auswahl.klon;
 
   const laufMarker = ladeJson(laufDatei());
@@ -688,9 +1068,11 @@ function main() {
         + 'geraten). Reparatur: Datei loeschen oder nach dem naechsten Lauf '
         + '`node "' + __filename + '" --lauf <' + SKILLS.join('|') + '>` ausfuehren — das '
         + 'legt sie neu an. Diese Meldung erscheint einmal je Sitzung.');
-      process.exitCode = 2;
+      // Exit 2 nur, wenn am Ende NICHTS auf stdout geht (siehe main()): Ein Exit != 0 neben
+      // einer JSON-Ausgabe (etwa dem PR-Block) waere unnoetig riskant.
+      exitZweiWennStumm = true;
     }
-    return;
+    return [];
   }
   const laeufe = laufMarker.fehlt ? {} : laufMarker.daten;
   const jetzt = Date.now();
@@ -721,16 +1103,58 @@ function main() {
       });
     }
   }
+  return faellig;
+}
 
-  if (!faellig.length) return;
-  if (!markiereErledigt(datei, faellig.map(f => f.skill))) return;
+function main() {
+  if (isDisabled()) return;
 
-  process.stdout.write(JSON.stringify({
-    hookSpecificOutput: {
-      hookEventName: 'SessionStart',
-      additionalContext: erinnerungsText(faellig, __filename)
-    }
-  }));
+  let input = {};
+  try {
+    input = JSON.parse(fs.readFileSync(0, 'utf8')) || {};
+  } catch (_) { input = {}; }
+  if (typeof input !== 'object' || input === null) input = {};
+
+  if (isSubagentInvocation(input)) return; // der Parent-Lauf fuehrt die Sitzung
+
+  const datei = sitzungsDatei(resolveSessionKey(input));
+  const bereits = ladeSitzungsmarker(datei);
+  if (bereits === DEFEKT) return;
+
+  // Infra-Registry (infra-registry.md): einzige Quelle der Repo-Pfade. Fehlt sie, lief
+  // das Setup auf dieser Maschine nie — kein Befund, kein Hinweis (das erledigt /nc:setup).
+  const registry = ladeJson(registryDatei());
+  if (registry.fehlt || registry.defekt) return;
+  const reg = registry.daten;
+  if (Number(reg.schemaVersion) > REGISTRY_SCHEMA) return; // neuer als der Kern → nicht raten
+
+  // Zwei unabhaengige Befunde, EINE Ausgabe: SessionStart darf genau ein JSON-Objekt
+  // schreiben, also werden die Bloecke zusammengefuehrt statt zweimal auszugeben.
+  const bloecke = [];
+  const felder = [];
+
+  const faellig = queueFaelligkeiten(reg, bereits, datei);
+  if (faellig.length) {
+    bloecke.push(erinnerungsText(faellig, __filename));
+    for (const f of faellig) felder.push(f.skill);
+  }
+
+  // Netzteil — laeuft gar nicht erst an, wenn diese Sitzung ihn schon hatte.
+  if (!bereits[PR_FELD]) {
+    const prText = prSichtbarkeit(reg);
+    if (prText) { bloecke.push(prText); felder.push(PR_FELD); }
+  }
+
+  if (bloecke.length && markiereErledigt(datei, felder)) {
+    process.stdout.write(JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName: 'SessionStart',
+        additionalContext: bloecke.join('\n\n---\n\n')
+      }
+    }));
+    return;
+  }
+  if (exitZweiWennStumm) process.exitCode = 2;
 }
 
 try {

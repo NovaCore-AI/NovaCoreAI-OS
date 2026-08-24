@@ -28,7 +28,7 @@ ist — und **nur** das. Fachliches gehört in Abteilungsplugins.
 | Bestandteil | Im Kern `nc` konkret | Regel |
 |---|---|---|
 | **Basis-Gate** (Sicherheitsnetz) | FFG: universelle Destruktiv-Liste, Datei-Gate, Routine-Bash (`hooks/nc-ffg.js` + `hooks/lib/`) | **domänen-frei halten** — keine Abteilungs-Fachprüfungen; jede Kern-Prüfung ist für Abteilungen tabu zu duplizieren (Prüfungs-Eigentum) |
-| **Prozess-Infrastruktur** | Session-Start-Injektion (`nc-session-start.js`), Start-Gate + Fakten-Stempel (`nc-start-gate.js`, `nc-start-stempel.js`), Doks-Autosync (`nc-doks-autosync.js`); offen: Gate 3/4 (§5) | Hooks **fail-open** bei internen Fehlern, Opt-out-Env je Gate, **keine Marker-Dateien** (ein Gate, das man vergessen kann, ist kein Gate) |
+| **Prozess-Infrastruktur** | Session-Start-Injektion (`nc-session-start.js`), Start-Gate + Fakten-Stempel (`nc-start-gate.js`, `nc-start-stempel.js`), Safety-Gate (`nc-safety-gate.js`, seit 2026-08-23), Doks-Autosync (`nc-doks-autosync.js`); Gate 4 endgültig entfallen (§5) | Hooks **fail-open** bei internen Fehlern, Opt-out-Env je Gate, **keine Marker-Dateien** (ein Gate, das man vergessen kann, ist kein Gate) |
 | **Shared-Skills** | ständige Abteilung `gemeinsam` (`skills/<name>/SKILL.md`): `start`, `save-session`, `journal`, `setup`, `doku-sync`, `os-info`, `skill-builder` | Format strikt nach `referenz/skill-authoring.md`; Ordner ohne `SKILL.md` ignoriert der Scanner und bleibt unausgeliefert |
 | **Normative Doks** | `wp-rahmen.md` (WP0–WP8), `referenz/skill-authoring.md`, `nc-sync.md`, `doks/global-claude-firmenblock.md` (Ebene-1-Payload) | liegen **im Kern**, weil sie ausgeliefert werden — installierte Plugins sehen keine Repo-Pfade (§2 Fakt 4 des Abteilungsdokuments) |
 | **Registry** | `module-registry.json` — reiner Metadaten-SSOT (Abteilung → Plugin → Module → Skills) | steuert nichts aus; spiegelt die Kern-Version (Leitversion) |
@@ -126,6 +126,37 @@ Normative Begriffsquelle der Ebenen: `grundwissen/NovaCore-OS-CLAUDE-Ebenen-Defi
    und feuern bei `source` startup/resume/clear/compact/fork; `command`-Hooks dürfen Dateien
    schreiben.
 
+## 2b. Upstream-Drift-Ritual FFG-Engine (Onsite §15.38, Port 2026-08-23 — Mapping D3)
+
+Die FFG-Erkennung (`hooks/lib/bash-analyse.js`, `hooks/lib/shell-substitution.js`,
+Hook-Eintritt `nc-ffg.js`) ist ein Port des GateGuard aus dem ECC-Plugin. Damit ein
+künftiger Upstream-Fix (GHSA-4v57-ph3x-gf55 war genau so einer) nicht unbemerkt
+vorbeirauscht, gilt:
+
+- **Pin-Stand — genau eine Stelle, hier:** ecc@**2.0.0** (gelesen 2026-07-26,
+  Upstream-Repo-Stand nachgezogen 2026-07-27). Code-Kommentare verweisen auf diesen
+  Abschnitt, sie pflegen die Angabe nicht selbst.
+- **Trigger:** (a) neues ECC-Release im Plugin-Cache (`~/.claude/plugins/cache/ecc/`),
+  (b) jede Änderung an den beiden Lib-Dateien (Hook-Zeile im Aktualisierungs-Index
+  erinnert), (c) spätestens je Halbjahr ein Versions-Check des Caches.
+- **Schritte je Lauf:** 1. Neue/geänderte Engine-Testfälle aus
+  `tests/hooks/gateguard-fact-force.test.js` in die Drift-Falltabelle
+  (`plugins/nc/tests/nc-ffg-drift.test.mjs`) übernehmen. 2. `shell-substitution.js`
+  gegen `scripts/lib/shell-substitution.js` des neuen Stands diffen — Soll:
+  funktionell wortgleich. 3. rm-/git-/SQL-/find-/quote-aware-Logik gegen den
+  **Monolithen** `scripts/hooks/gateguard-fact-force.js` diffen (für `bash-analyse.js`
+  existiert upstream keine Datei-Entsprechung — Strukturwandel PR #1853). 4. Je Punkt
+  die Übernahme-Entscheidung im CHANGELOG festhalten — auch „bewusst nicht übernommen".
+- **Bewusste Dauer-Abweichungen** (Erwartungen der Drift-Tabelle dürfen hiervon
+  abweichen, jeweils mit Verweis in der Datei): Env-Namen `NC_FFG_*`, erweiterte
+  Read-only-Allowlist (Onsite §15.25 / NC-AP1 **plus** die NC-eigene segmentweise
+  Introspektion mit `cd`/`worktree list`/`-sb`, Härtung 2026-08-14 — weder Upstream
+  noch Onsite kennen sie), kein KI-sichtbarer Abschalt-Hinweis, Windows-Muster und
+  Wrapper-Passthrough (Onsite §15.38/§15.46 — Upstream hat beides nicht), sowie
+  `psFlagActive` mit nicht-falsy-Semantik (`-Recurse:1` zählt als aktiv — GLM-R2
+  2026-08-24, am PS-5.1-Cmdlet empirisch belegt; Onsite prüft nur `:$true` und teilt
+  die Lücke).
+
 ## 3. Regeln, die nur den Kern binden
 
 - **Kern-Version = Produkt-Leitversion.** Kein Bump = kein Auto-Update fürs Team. Gespiegelt in
@@ -160,7 +191,7 @@ wie §2; die Governance-Tabelle §1a gilt spiegelbildlich. Die Wissens-Seite rep
 
 | Offen | Stand / Blocker |
 |---|---|
-| **Gate 3 (Safety-Gate)** und **Gate 4 (Sitzungsabschluss)** | konzipiert in `grundwissen/NovaCore-OS-Gates-Definition.md`, **nicht gebaut** (so auch die `hooks.json`-Beschreibung); gemeinsamer Bump |
+| ~~Gate 3 (Safety-Gate) und Gate 4 (Sitzungsabschluss)~~ **erledigt/entfallen 2026-08-23** | Gate 3 ist **gebaut** (`nc-safety-gate.js`, Port aus dem Onsite-Vorbild — Mapping D1/EN4); Gate 4 ist **endgültig entfallen** (Onsite §15.44, Mapping D2). Stand: `grundwissen/NovaCore-OS-Gates-Definition.md` |
 | **Automatische SSOT-Pflege** über `/nc:doku-sync` hinaus | die Änderungs-Matrix ist heute der Selbsttest; was mechanisch erzwingbar ist, gehört in `struktur.test.mjs` (`ssot-aufbau.md` §2, Baustein 6) |
 
 ---

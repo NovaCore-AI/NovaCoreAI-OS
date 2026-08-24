@@ -19,6 +19,77 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ### Added
 
+- **Onsite-Delta-Nachbau Phase G — Kontroll-Schicht-Parität (Kern 0.10.0 → 0.11.0)** nach
+  Bauplan `knowledge-base/grundwissen/2026-08-23-onsite-delta-mapping.md` (Posten D1, D2,
+  D3, D6; Onsite-Quelle `origin/main@6d3f8db`; Waypoint-Arbeitsmodus nach Maintainer-Weisung
+  2026-08-23 — ein Bump je Batch, keine Einzel-Zeremonien).
+  - **FFG-Erweiterung (D3, Onsite §15.38/§15.46):** `NotebookEdit` im Datei-Gate (Zielfeld
+    `notebook_path`, gemeinsamer Fakten-Key mit Edit/Write), **Windows-Destruktivmuster**
+    (del/erase/rmdir/rd mit /s inkl. Switch-Ketten und MSYS-Formen, Remove-Item-Aliase mit
+    -Recurse UND -Force samt :$true-Wertform, cmd-/PowerShell-Wrapper inkl. implizitem
+    Kommando, -EncodedCommand, start-Indirektion) und **Wrapper-Passthrough** (bash
+    -lc/-ic-Flagbünde; env/sudo/doas/nohup/setsid/exec/command/nice/ionice/stdbuf/timeout/
+    wsl mit eigener Options-Grammatik; jeder Body beidseitig Unix+Windows geprüft,
+    Rekursionstiefe 8) in `lib/bash-analyse.js` — unter vollständigem Erhalt der
+    NC-Härtungen (segmentweise Read-only-Introspektion 2026-08-14, verankerte Exempt-Globs,
+    plattformbewusstes Case-Folding). Dazu das **Upstream-Drift-Ritual** als
+    `kern-plugin-bau.md` §2b und die Drift-Falltabelle `tests/nc-ffg-drift.test.mjs`
+    (Vorbild-Fälle ecc@2.0.0 + NC-Zeilen). Exporte der Zerlegungs-Bausteine für Gate 3.
+  - **Safety-Gate / Gate 3 gebaut (D1, Onsite §4.7/§15.21/§15.26):** neuer Hook
+    `nc-safety-gate.js` (PreToolUse auf `Bash` und `mcp__.*`,
+    `permissionDecision: "ask"` = echter Freigabedialog). Musterliste v1 im
+    NovaCore-Zuschnitt (EN4): tofu/terraform apply/destroy · deploy-Wort mit
+    Verbpositions-Ausnahme get/describe/logs · mcp-Schreibverben über Werkzeug- und
+    Parameternamen; alle vier GLM-Bypass-Härtungen des Vorbilds übernommen
+    (Shell-Wrapper-Rekursion, Präfix-Kommandos, gequotetes Kommandowort,
+    Verbpositions-Schärfung); kein State (jeder Treffer fragt erneut); Subagenten bewusst
+    nicht ausgenommen; Affiliate-Invariante I-A0 dokumentiert. **Bewusste Abweichung:**
+    Onsites firmenspezifisches Prod-SQL-Flag-Muster nicht portiert — WZS-Muster folgen nach
+    Maintainer-Benennung. **Die Musterliste v1 steht in diesem PR zur Wortlaut-Abnahme.**
+    Opt-out `NC_SAFETY_GATE=off`.
+  - **Gate 4 endgültig entfallen (D2, Onsite §15.44):** der frühere „auf Eis"-Status ist
+    aufgehoben — Gates-Definition, `kern-plugin-bau.md` §1/§5, hooks.json-Beschreibung und
+    SSOT-Index nachgezogen; die PreCompact-Mahnung bleibt bestehen und war nie Gate 4.
+  - **Queue-Fälligkeits-Hook: PR-Sichtbarkeit + Sperren-Härtung (D6, Onsite §15.39, dort
+    PR #69):** zweiter Befund desselben Hooks meldet offene Pull Requests über alle Repos
+    der Infra-Registry (NC-Schema: `kernRepoPfad` + Map `abteilungsRepoPfade`; Affiliates
+    und Kollegen-OS stehen dort nie). Einziger Netzzugriff der Kontroll-Schicht, vierfach
+    gedeckelt: 2,5-s-Gesamtbudget (je Abfrage 1,5 s, stummer Abbruch), Tages-Cache mit
+    6-h-Fehlerruhe und 7-Tage-Verfall (`~/.claude/nc/pr-sichtbarkeit.json`,
+    schemaVersion-Schutz), Schweigen bei unbrauchbarem `gh` (stderr des Kindprozesses
+    verworfen — keine Auth-Diagnosen im Kontext), eigener Opt-out `NC_PR_CHECK=off`
+    (Test-Umleitung `NC_PR_CMD`). Im Übergangszustand E1 ruht der Teil vollständig (belegt
+    getestet). Sperren-Härtung: `EPERM`/`EACCES`/`EBUSY`/`ENOTEMPTY` zählen beim
+    Sperr-mkdir wie `EEXIST` als „belegt — warten und neu versuchen"; die NC-Regel „ohne
+    Sperre KEIN Schreibabschnitt, `--lauf` → stderr + Exit 1" bleibt unangetastet.
+    *Gebaut von einem Opus-Agenten nach Plan-Sandwich-Vertrag, Overseer-reviewt.*
+  - Suite 192 → **249** Tests (247 pass / 2 skip — der neue verhaltensbasierte
+    POSIX-Sperrentest ist auf win32 übersprungen und durch einen statischen Wächter
+    ersetzt); `claude plugin validate` beide Ebenen. **Externes Review (GLM-5.3, R1+R2,
+    kimi-Plugin):** R1: 2 MAJOR (Gate-3-Wrapper-Abdeckung — kombinierte -c-Flagbünde via
+    `shellWrapperBody`, volle Argv-Passthrough-Grammatik via `passthroughInner`) + 2 MINOR
+    (deploy-Lesekommando-Fehlalarme, CHANGELOG-Ausgangszahl) + 1 NIT eingearbeitet. Die
+    zunächst abgelehnte R1-MINOR zu `psFlagActive` hat R2 mit dem **richtigen Experiment
+    belegt**: Cmdlets binden `-Recurse:1` real (PS 5.1, am synthetischen Temp-Verzeichnis
+    reproduziert; nur Funktions-`[switch]`-Parameter werfen einen Binding-Fehler —
+    Fehlerprotokoll-Eintrag 2026-08-24). `psFlagActive` zählt jetzt jede nicht explizit
+    falsy Wertform (`$false`/`false`/`0`) als aktiv — NC-Härtung gegenüber dem Vorbild,
+    als Dauer-Abweichung im Drift-Ritual (§2b) geführt. R2-Folgefunde eingearbeitet:
+    Lesekommando-Exemption sieht durch dieselben Argv-Wrapper wie die Muster; `find`
+    zählt nur ohne `-delete`/`-exec` als Lesekommando. *Beitrag: Claude (Fable 5,
+    Overseer) + Opus-Bau-Agent (D6), Nachtschicht 2026-08-23/24*
+
+- **Onsite-Delta-Mapping 0.23.0 → 0.25.0 als Iterationsgrundlage**
+  (`knowledge-base/grundwissen/2026-08-23-onsite-delta-mapping.md`, 2026-08-23): kartiert die
+  235 Onsite-Commits seit dem Referenzstand `5c2c210` (Bauplan-Nachtrag N8) als Delta-Inventar
+  D1–D24 mit Klassifikation (Nachbauen / Norm-Nachzug / Entscheid / bewusst nicht /
+  beobachten), Phasenvorschlag G–K und den offenen Maintainer-Entscheiden EN1–EN8. Löst den
+  Register-Prüfpunkt „Onsite-Upstream #59/#61/#62" ab (Nachfolger: Beobachtungsliste D24).
+  **Per Maintainer-Weisung vom selben Tag beauftragt** (Nachtrag N1): Onsite-Parität als
+  Default, Affiliate-Invariante I-A0 als benannte Dauer-Abweichung — das Dokument ist damit
+  der geltende Bauplan der Phasen G–K. Kein Bump (reine Wissensbasis-Änderung); SSOT-Index
+  Teil 2 nachgezogen. *Beitrag: Claude (Fable 5, Overseer)*
+
 - **Onsite-Endstand-Nachbau Phase 3 — Queue-Flow & Development-Plugin (Kern 0.9.0 → 0.10.0,
   nc-development 0.1.0 → 0.2.0)** nach Bauplan
   `grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md` (AP-E1–E3, AP-F1–F2).

@@ -17,6 +17,14 @@
 // ABGRENZUNG: Das ist KEIN Gate. Der Hook blockiert nie — SessionStart kann laut Doku
 // ohnehin nicht blocken (vom Vorbild verifiziert 2026-08-14). Es gibt daher keinen einzigen
 // Test, der eine Blockade erwartet; geprueft wird Ausgabe vs. Schweigen.
+//
+// ZWEI SPAETERE PORT-BLOECKE (Onsite-Delta, 2026-08-23, Quelle origin/main@6d3f8db):
+//   - Sperren-Haertung: die nicht-EEXIST-Blockade wird ausgewartet statt sofort aufgegeben
+//     (Test bei den Parallelitaets-Proben, POSIX-only — der Fehlercode ist plattformneutral
+//     nicht erzwingbar).
+//   - PR-Sichtbarkeit ueber die Repo-Grenzen (§15.39, eigener Abschnitt am Dateiende):
+//     der EINZIGE Netzweg des Hooks, in der Suite per NC_PR_CHECK=off default AUS und in
+//     den PR-Proben per NC_PR_CMD auf einen Node-Stub umgeleitet. Kein Test braucht Netz.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
@@ -135,12 +143,18 @@ function hookEnv(state, { sessionDir, env = {}, keinGit = false } = {}) {
   // Geerbte OS-Variablen duerfen die Tests nie beeinflussen (Opt-out, echte Registry,
   // echter Plugin-Cache) — der Hook laeuft hier vollstaendig isoliert.
   for (const k of ['NC_QUEUE_CHECK', 'NC_QUEUE_STATE_DIR', 'NC_QUEUE_SESSION_DIR',
-    'NC_QUEUE_PFAD', 'CLAUDE_PLUGIN_ROOT', 'CLAUDE_PROJECT_DIR', 'CLAUDE_SESSION_ID',
-    'GIT_TRACE']) {
+    'NC_QUEUE_PFAD', 'NC_PR_CHECK', 'NC_PR_CMD', 'CLAUDE_PLUGIN_ROOT', 'CLAUDE_PROJECT_DIR',
+    'CLAUDE_SESSION_ID', 'GIT_TRACE']) {
     delete kindEnv[k];
   }
   kindEnv.NC_QUEUE_STATE_DIR = state;
   kindEnv.NC_QUEUE_SESSION_DIR = sessionDir || tmp('nc-queue-sess-');
+  // WICHTIG: Der PR-Teil startet einen externen Prozess und damit potenziell einen
+  // Netzaufruf. In der Testsuite ist er deshalb DEFAULT AUS — kein Test darf echtes Netz
+  // brauchen, und ein auf der Entwicklermaschine installiertes `gh` darf die Ergebnisse der
+  // Queue-Tests nicht verfaelschen. Die PR-Tests unten schalten ihn gezielt ein und leiten
+  // den Aufruf per NC_PR_CMD auf einen Stub um.
+  kindEnv.NC_PR_CHECK = 'off';
   Object.assign(kindEnv, env);
   return keinGit ? ohneGit(kindEnv) : kindEnv;
 }
@@ -575,6 +589,56 @@ test('Zwei gleichzeitige --lauf-Prozesse verlieren keinen Zeitstempel (M1)', asy
   }
 });
 
+test('Eine nicht-EEXIST-Blockade der Sperre wird ausgewartet, nicht sofort aufgegeben',
+  { skip: process.platform === 'win32' || (process.getuid && process.getuid() === 0) }, () => {
+    // Regression zum Windows-CI-Befund des Vorbilds vom 2026-08-17 (node 22/24 rot, node 20
+    // und POSIX gruen): `mitSperre` hat frueher JEDEN Fehlercode ausser EEXIST als "nicht
+    // sperrbar" gelesen und sofort aufgegeben. Windows liefert fuer eine belegte Sperre aber
+    // auch EPERM/EACCES/EBUSY/ENOTEMPTY (Verzeichnis wird gerade entfernt, Handle noch
+    // offen) — der Schreibvorgang waere nach kurzem Warten problemlos durchgelaufen, wurde
+    // aber verweigert. Bei NC ist die Folge nicht der Lost Update des Vorbilds (unsere
+    // Haertung arbeitet nie ohne Sperre), sondern eine vorzeitige VERWEIGERUNG.
+    //
+    // Der Fehlercode laesst sich plattformneutral nicht erzwingen; POSIX liefert EACCES,
+    // wenn das Elternverzeichnis nicht schreibbar ist — dasselbe „belegt statt unbekannt".
+    // Beobachtbar ist die Fehlerrichtung ueber die DAUER: mit dem Fix wird das Warte-Budget
+    // (40 x 25 ms) ausgeschoepft, ohne ihn kehrt der Lauf sofort zurueck. Genau dieses
+    // Muster hat den Bug in der CI verraten (Durchfall nach 221 ms).
+    // Unter root greift chmod nicht — dann wird uebersprungen.
+    const state = tmp('nc-queue-state-');
+    setzeLaeufe(state, { alt: Date.now() - 3 * TAG_MS });
+    fs.chmodSync(state, 0o555);
+    try {
+      const begonnen = Date.now();
+      const r = runCli(state, ['--lauf', 'queue-kern']);
+      const dauer = Date.now() - begonnen;
+      assert.equal(r.status, 1, 'ein nicht sperrbarer Marker meldet sich sichtbar (NC-Haertung)');
+      assert.match(r.stderr, /Sperre/, 'der Verweigerungsgrund wird genannt');
+      assert.ok(dauer >= 700,
+        'die Sperre muss ausgewartet werden statt sofort aufgegeben zu werden, gebraucht: '
+        + dauer + ' ms');
+    } finally {
+      fs.chmodSync(state, 0o755);
+    }
+  });
+
+test('Die Sperre zaehlt alle Windows-Codes einer belegten Sperre als "belegt"', () => {
+  // ERGAENZUNG zur Probe oben, kein Ersatz: Die verhaltensbasierte Probe laeuft nur auf
+  // POSIX (EACCES ist dort erzwingbar) — ausgerechnet auf Windows, wo EPERM/EBUSY/ENOTEMPTY
+  // real auftreten, wird sie uebersprungen. Damit die Haertung dort nicht unbemerkt
+  // zurueckgedreht werden kann (die alte Zeile `e.code !== 'EEXIST'` sah harmlos aus und war
+  // der Bug), wird die Codeliste hier statisch festgenagelt.
+  const quelle = fs.readFileSync(HOOK, 'utf8');
+  const zeile = /const SPERRE_BELEGT_CODES = new Set\(\[([^\]]*)\]\)/.exec(quelle);
+  assert.ok(zeile, 'die Codeliste der Sperre muss als benannte Menge existieren');
+  for (const code of ['EEXIST', 'EPERM', 'EACCES', 'EBUSY', 'ENOTEMPTY']) {
+    assert.match(zeile[1], new RegExp("'" + code + "'"),
+      code + ' quittiert unter Windows eine belegte Sperre — Warten, nicht aufgeben');
+  }
+  assert.equal(/e\.code !== 'EEXIST'/.test(quelle), false,
+    'der alte Frueh-Ausstieg auf alles ausser EEXIST darf nicht zurueckkehren');
+});
+
 test('Ein abgebrochener Schreibvorgang hinterlaesst nie eine halbe Datei (M1)', async () => {
   // Belegt den atomaren Tausch: Waehrend zwanzig Stempel-Laeufe schreiben, wird die Datei
   // laufend gelesen. Jeder gelesene Stand muss vollstaendiges JSON sein — bei einem
@@ -845,4 +909,415 @@ test('Der Hook ist in hooks.json als SessionStart-Hook registriert', () => {
     'der Opt-out gehoert in die description (Aktualisierungs-Index §2.1)');
   assert.match(cfg.description, /KEIN Gate/,
     'die Abgrenzung zu Gate 3\/4 gehoert in die description');
+});
+
+// =======================================================================================
+// PR-Sichtbarkeit ueber die Repo-Grenzen (Port des Onsite-Bausteins §15.39)
+//
+// Anlass beim Vorbild (2026-08-17): Im dortigen Satelliten stand drei Tage ein fertiger,
+// CI-gruener PR, den niemand bemerkt hat — `gh pr list` ohne --repo zeigt nur das aktuelle
+// Repo. Geprueft wird hier vor allem, was den Sitzungsstart schuetzt: kein Netzaufruf bei
+// frischem Cache, harte Zeitgrenze, Schweigen bei jedem Fehlerpfad.
+//
+// NC-Anpassungen gegenueber dem Vorbild: Envs NC_PR_CHECK/NC_PR_CMD, und die Repo-Pfade
+// kommen aus dem NC-Registry-Schema — `kernRepoPfad` plus ALLE Werte der Map
+// `abteilungsRepoPfade` (Onsite hat dort das Einzelfeld `abteilungsRepoPfad`).
+//
+// KEIN Test braucht echtes Netz: Der `gh`-Aufruf wird ueber NC_PR_CMD auf einen Node-Stub
+// umgeleitet (Array-Form, damit es auch unter Windows ohne .exe funktioniert). Der Stub
+// protokolliert JEDEN Aufruf — daran haengen die Negativproben „es wurde nicht abgefragt".
+// =======================================================================================
+
+const PR_CACHE = 'pr-sichtbarkeit.json';
+const STD_MS = 60 * 60 * 1000;
+
+/** Ein Repo-Verzeichnis, dessen Basename als Schluessel des Stubs dient. */
+function macheRepo(kennung) {
+  return tmp('nc-pr-' + kennung + '-');
+}
+
+function pr(nummer, titel, slug, extra = {}) {
+  return Object.assign({
+    number: nummer,
+    title: titel,
+    url: 'https://github.com/' + slug + '/pull/' + nummer,
+    isDraft: false,
+    updatedAt: '2026-08-14T10:00:00Z'
+  }, extra);
+}
+
+/**
+ * Stub fuer `gh`. Antwortet je nach Basename des Arbeitsverzeichnisses:
+ *   { modus: 'ok', prs: [...] } · 'fehler' (Exit 1 mit Auth-Text auf stderr) ·
+ *   'haenger' (blockiert 30 s) · 'muell' (unlesbare Ausgabe).
+ * Jeder Aufruf wird protokolliert. Bewusst OHNE process.exit() nach dem Schreiben —
+ * dieselbe POSIX-Pipe-Falle wie im Hook selbst.
+ */
+function macheGhStub(antworten, protokoll) {
+  const datei = path.join(tmp('nc-pr-stub-'), 'gh-stub.cjs');
+  fs.writeFileSync(datei,
+    "'use strict';\n"
+    + 'const fs = require("fs");\n'
+    + 'const path = require("path");\n'
+    + 'const antworten = ' + JSON.stringify(antworten) + ';\n'
+    + 'const protokoll = ' + JSON.stringify(protokoll) + ';\n'
+    + 'const schluessel = path.basename(process.cwd());\n'
+    + 'try { fs.appendFileSync(protokoll, schluessel + "\\n"); } catch (e) {}\n'
+    + 'const a = antworten[schluessel] || antworten["*"] || { modus: "fehler" };\n'
+    + 'if (a.modus === "haenger") {\n'
+    + '  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 30000);\n'
+    + '} else if (a.modus === "fehler") {\n'
+    + '  process.stderr.write("gh: authentication failed — token ghp_GEHEIM123\\n");\n'
+    + '  process.exitCode = 1;\n'
+    + '} else if (a.modus === "muell") {\n'
+    + '  process.stdout.write("<html>kein json</html>");\n'
+    + '} else {\n'
+    + '  process.stdout.write(JSON.stringify(a.prs || []));\n'
+    + '}\n', 'utf8');
+  return datei;
+}
+
+function prEnv(stubDatei) {
+  return { NC_PR_CHECK: 'an', NC_PR_CMD: JSON.stringify([process.execPath, stubDatei]) };
+}
+
+function stubAufrufe(protokoll) {
+  try {
+    return fs.readFileSync(protokoll, 'utf8').split(/\r?\n/).filter(Boolean);
+  } catch (_) { return []; }
+}
+
+function protokollDatei() {
+  return path.join(tmp('nc-pr-prot-'), 'aufrufe.log');
+}
+
+function setzePrCache(state, repos) {
+  fs.writeFileSync(path.join(state, PR_CACHE),
+    JSON.stringify({ schemaVersion: 1, repos }, null, 2), 'utf8');
+}
+
+function lesePrCache(state) {
+  return JSON.parse(fs.readFileSync(path.join(state, PR_CACHE), 'utf8'));
+}
+
+/**
+ * Standardaufbau: Kern-Repo + Abteilungs-Repo in der Registry (NC-Schema), Queue-Teil
+ * bewusst ruhig (frische Laeufe), damit die Proben allein die PR-Sichtbarkeit messen.
+ */
+function prAufbau({ kernPrs = [], satellitPrs = [] } = {}) {
+  const kern = macheRepo('kern');
+  const satellit = macheRepo('sat');
+  const state = tmp('nc-queue-state-');
+  fs.writeFileSync(path.join(state, 'infra.json'), JSON.stringify({
+    schemaVersion: 1, abteilungen: ['development'], szenario: 'test',
+    kernRepoPfad: kern, abteilungsRepoPfade: { development: satellit }
+  }, null, 2), 'utf8');
+  setzeLaeufe(state, { 'queue-abteilung': Date.now(), 'queue-kern': Date.now() });
+  const protokoll = protokollDatei();
+  const stub = macheGhStub({
+    [path.basename(kern)]: { modus: 'ok', prs: kernPrs },
+    [path.basename(satellit)]: { modus: 'ok', prs: satellitPrs }
+  }, protokoll);
+  return { kern, satellit, state, protokoll, stub };
+}
+
+test('PR: offene PRs beider Repos erscheinen in EINER Meldung', () => {
+  const a = prAufbau({
+    kernPrs: [pr(62, 'Release-Zug', 'NovaCore-AI/NovaCoreAI-OS')],
+    satellitPrs: [pr(1, 'Wissensbasis-Nachzug', 'NovaCore-AI/NovaCoreAI-OS-Development')]
+  });
+  const text = kontext(runHook(a.state, { env: prEnv(a.stub) }));
+  assert.match(text, /NovaCore-AI\/NovaCoreAI-OS-Development/,
+    'der Satellit ist genau der blinde Fleck, um den es geht');
+  assert.match(text, /#1 Wissensbasis-Nachzug/);
+  assert.match(text, /#62 Release-Zug/);
+  assert.match(text, /blockiert nichts/, 'die Nicht-Gate-Zusage gehoert in den Text');
+  assert.equal(stubAufrufe(a.protokoll).length, 2, 'beide Repos werden genau einmal abgefragt');
+});
+
+test('PR: frischer Cache loest KEINE Abfrage aus', () => {
+  const a = prAufbau({ kernPrs: [pr(99, 'darf nie erscheinen', 'x/y')] });
+  setzePrCache(a.state, {
+    [a.kern]: {
+      geprueft: Date.now() - STD_MS, stand: Date.now() - STD_MS, erfolg: true,
+      prs: [{ nummer: 62, titel: 'Aus dem Cache', url: 'https://github.com/o/r/pull/62',
+        entwurf: false, aktualisiert: '2026-08-14' }]
+    },
+    [a.satellit]: { geprueft: Date.now() - STD_MS, stand: Date.now() - STD_MS, erfolg: true, prs: [] }
+  });
+  const text = kontext(runHook(a.state, { env: prEnv(a.stub) }));
+  assert.match(text, /#62 Aus dem Cache/, 'gemeldet wird der Zwischenstand …');
+  assert.equal(/darf nie erscheinen/.test(text), false, '… nicht ein frischer Abruf');
+  assert.deepEqual(stubAufrufe(a.protokoll), [],
+    'bei frischem Cache darf kein einziger Prozess starten — das ist der Normalfall');
+});
+
+test('PR: abgelaufener Cache wird aufgefrischt', () => {
+  const a = prAufbau({ kernPrs: [pr(62, 'Frisch geholt', 'NovaCore-AI/NovaCoreAI-OS')] });
+  setzePrCache(a.state, {
+    [a.kern]: { geprueft: Date.now() - 2 * TAG_MS, stand: Date.now() - 2 * TAG_MS, erfolg: true, prs: [] },
+    [a.satellit]: { geprueft: Date.now() - STD_MS, stand: Date.now() - STD_MS, erfolg: true, prs: [] }
+  });
+  const text = kontext(runHook(a.state, { env: prEnv(a.stub) }));
+  assert.match(text, /#62 Frisch geholt/);
+  assert.deepEqual(stubAufrufe(a.protokoll), [path.basename(a.kern)],
+    'nur das abgelaufene Repo wird abgefragt, das frische bleibt unberuehrt');
+});
+
+test('PR: fehlendes gh schweigt und rauscht nicht', () => {
+  const a = prAufbau({ kernPrs: [pr(62, 'X', 'o/r')] });
+  const fehlt = path.join(tmp('nc-pr-leer-'), 'gibt-es-kein-gh');
+  const r = runHook(a.state, {
+    env: { NC_PR_CHECK: 'an', NC_PR_CMD: JSON.stringify([fehlt]) }
+  });
+  assert.equal(r.stdout, '', 'ohne gh gibt es keinen belegten Befund — also keinen Hinweis');
+  assert.equal(r.stderr, '', 'fehlendes gh ist kein Diagnosefall');
+  assert.equal(r.status, 0);
+});
+
+test('PR: ein haengendes gh laeuft in die Zeitgrenze und schweigt', () => {
+  const a = prAufbau();
+  const protokoll = protokollDatei();
+  const stub = macheGhStub({ '*': { modus: 'haenger' } }, protokoll);
+  const r = runHook(a.state, { env: prEnv(stub) });
+  assert.equal(r.stdout, '', 'ein Timeout ist kein Befund');
+  assert.equal(r.status, 0);
+  // Zwei Repos x 1,5 s waeren 3 s; nach dem ersten Timeout darf kein weiterer Prozess mehr
+  // starten (dieselbe Lehre wie bei Git, Onsite-Review-Befund H4).
+  assert.equal(stubAufrufe(protokoll).length, 1,
+    'nach dem ersten Timeout wird kein zweiter Prozess gestartet');
+  assert.ok(r.dauer < 4000, 'der Sitzungsstart darf nicht haengen, gebraucht: ' + r.dauer + ' ms');
+});
+
+test('PR: Fehler-Exit von gh schweigt, leakt nichts und ruht danach', () => {
+  const a = prAufbau();
+  const protokoll = protokollDatei();
+  const stub = macheGhStub({ '*': { modus: 'fehler' } }, protokoll);
+  const r = runHook(a.state, { env: prEnv(stub) });
+  assert.equal(r.stdout, '', 'kein Zugriff heisst kein Befund');
+  assert.equal(r.stderr, '', 'stderr des Kindprozesses wird verworfen');
+  assert.equal(/ghp_GEHEIM123/.test(r.stdout + r.stderr), false,
+    'Auth-Diagnosen von gh duerfen nie durchgereicht werden');
+  assert.equal(/ghp_GEHEIM123/.test(fs.readFileSync(path.join(a.state, PR_CACHE), 'utf8')), false,
+    'und sie landen auch nicht im Cache');
+  const nachFehler = lesePrCache(a.state).repos[a.kern];
+  assert.equal(nachFehler.erfolg, false, 'der Fehlversuch wird als solcher vermerkt');
+
+  // Zweite Sitzung: der Fehler-Ruheabstand (6 h) verhindert einen neuen Versuch.
+  const vorher = stubAufrufe(protokoll).length;
+  runHook(a.state, { env: prEnv(stub), session: 'zweite' });
+  assert.equal(stubAufrufe(protokoll).length, vorher,
+    'ein kaputtes/abgemeldetes gh darf nicht in jeder Sitzung erneut Zeit kosten');
+});
+
+test('PR: unlesbare gh-Ausgabe schweigt', () => {
+  const a = prAufbau();
+  const protokoll = protokollDatei();
+  const stub = macheGhStub({ '*': { modus: 'muell' } }, protokoll);
+  const r = runHook(a.state, { env: prEnv(stub) });
+  assert.equal(r.stdout, '', 'was nicht parst, wird nicht geraten');
+  assert.equal(r.status, 0);
+});
+
+test('PR: defekter Cache schweigt, repariert sich und fragt nicht ab', () => {
+  const a = prAufbau({ kernPrs: [pr(62, 'X', 'o/r')] });
+  fs.writeFileSync(path.join(a.state, PR_CACHE), '{kaputt', 'utf8');
+  const r = runHook(a.state, { env: prEnv(a.stub) });
+  assert.equal(r.stdout, '', 'unbekannte Lage → schweigen, nicht raten');
+  assert.deepEqual(stubAufrufe(a.protokoll), [], 'und in diesem Lauf auch kein Netzaufruf');
+  // Selbstheilung: Ohne Reparatur wuerde eine einmal kaputte Datei das Feature fuer immer
+  // abschalten, ohne dass es jemand von "nichts offen" unterscheiden koennte.
+  assert.deepEqual(lesePrCache(a.state), { schemaVersion: 1, repos: {} },
+    'der Cache wird auf einen leeren, gueltigen Stand zurueckgesetzt');
+  const text = kontext(runHook(a.state, { env: prEnv(a.stub), session: 'danach' }));
+  assert.match(text, /#62/, 'die naechste Sitzung arbeitet wieder normal');
+});
+
+test('PR: hoehere schemaVersion des Caches wird weder gelesen noch ueberschrieben', () => {
+  const a = prAufbau({ kernPrs: [pr(62, 'X', 'o/r')] });
+  const fremd = JSON.stringify({ schemaVersion: 99, repos: { irgendwas: true } }, null, 2);
+  fs.writeFileSync(path.join(a.state, PR_CACHE), fremd, 'utf8');
+  const r = runHook(a.state, { env: prEnv(a.stub) });
+  assert.equal(r.stdout, '', 'neuer als der Kern → nicht raten');
+  assert.equal(fs.readFileSync(path.join(a.state, PR_CACHE), 'utf8'), fremd,
+    'ein fremder, neuerer Stand wird nicht ueberschrieben');
+});
+
+test('PR: hoechstens eine Meldung je Sitzung', () => {
+  const a = prAufbau({ satellitPrs: [pr(1, 'Teil A', 'NovaCore-AI/NovaCoreAI-OS-Development')] });
+  const sessionDir = tmp('nc-queue-sess-');
+  kontext(runHook(a.state, { sessionDir, env: prEnv(a.stub) }));
+  const zweite = runHook(a.state, { sessionDir, env: prEnv(a.stub) });
+  assert.equal(zweite.stdout, '', 'der zweite Session-Start derselben Sitzung schweigt');
+  assert.deepEqual(stubAufrufe(a.protokoll).length, 2,
+    'und fragt gar nicht erst ab — der Sitzungsmarker greift vor dem Netzaufruf');
+  // Eine andere Sitzung erfaehrt es sehr wohl, jetzt aber aus dem frischen Cache.
+  kontext(runHook(a.state, { sessionDir, env: prEnv(a.stub), session: 'andere' }));
+  assert.equal(stubAufrufe(a.protokoll).length, 2, 'ohne neuen Abruf');
+});
+
+test('PR: NC_PR_CHECK=off schaltet nur den Netzteil ab, nicht den ganzen Hook',
+  { skip: !GIT_DA }, () => {
+    // Aufbau mit echtem Abteilungs-Klon, damit der Queue-Teil etwas zu melden hat.
+    const klon = macheKlon([OFFENE_ZEILE]);
+    const kern = macheRepo('kern');
+    const state = macheState(klon, { kernRepoPfad: kern });
+    setzePrCache(state, {
+      [kern]: {
+        geprueft: Date.now(), stand: Date.now(), erfolg: true,
+        prs: [{ nummer: 62, titel: 'Offen im OS-Repo', url: 'https://github.com/o/r/pull/62',
+          entwurf: false, aktualisiert: '2026-08-14' }]
+      }
+    });
+    const protokoll = protokollDatei();
+    const stub = macheGhStub({ '*': { modus: 'ok', prs: [] } }, protokoll);
+
+    for (const wert of ['off', '0', 'false', 'disabled', 'OFF']) {
+      const text = kontext(runHook(state, {
+        env: { NC_PR_CHECK: wert, NC_PR_CMD: JSON.stringify([process.execPath, stub]) },
+        session: 'proff-' + wert
+      }));
+      assert.match(text, /\/nc:queue-kern/, 'die lokale Queue-Erinnerung bleibt bestehen');
+      assert.equal(/Offen im OS-Repo/.test(text), false,
+        'NC_PR_CHECK=' + wert + ' muss den PR-Teil abschalten');
+    }
+
+    // Und der Sammelschalter des ganzen Hooks schaltet beides ab.
+    const alles = runHook(state, {
+      env: { NC_QUEUE_CHECK: 'off', NC_PR_CHECK: 'an',
+        NC_PR_CMD: JSON.stringify([process.execPath, stub]) },
+      session: 'alles-aus'
+    });
+    assert.equal(alles.stdout, '', 'NC_QUEUE_CHECK=off schaltet den ganzen Hook ab');
+  });
+
+test('PR: beide Befunde erscheinen zusammen, in EINEM JSON', { skip: !GIT_DA }, () => {
+  const klon = macheKlon([OFFENE_ZEILE]);
+  const kern = macheRepo('kern');
+  const state = macheState(klon, { kernRepoPfad: kern });
+  const protokoll = protokollDatei();
+  const stub = macheGhStub({
+    [path.basename(kern)]: { modus: 'ok', prs: [pr(62, 'Release-Zug', 'NovaCore-AI/NovaCoreAI-OS')] },
+    [path.basename(klon)]: { modus: 'ok', prs: [] }
+  }, protokoll);
+  const r = runHook(state, { env: prEnv(stub) });
+  const text = kontext(r);
+  assert.match(text, /\/nc:queue-kern/, 'Queue-Teil');
+  assert.match(text, /#62 Release-Zug/, 'PR-Teil');
+  assert.equal(r.stdout.trim().startsWith('{'), true, 'SessionStart vertraegt nur EIN JSON-Objekt');
+  assert.equal(JSON.parse(r.stdout).decision, undefined, 'weiterhin kein Gate');
+});
+
+test('PR: der Kern-Klon allein reicht — "ausstehend" legt die Sichtbarkeit nicht still', () => {
+  // Regression gegen den frueheren Fruehausstieg: Vor diesem Baustein verliess main() den
+  // Lauf, sobald keine Abteilung einen Satelliten hatte — und das ist heute der REGELFALL
+  // (Uebergangszustand E1). Der PR-Teil haengt daran nicht.
+  const kern = macheRepo('kern');
+  const state = tmp('nc-queue-state-');
+  fs.writeFileSync(path.join(state, 'infra.json'), JSON.stringify({
+    schemaVersion: 1, abteilungen: ['development'], szenario: 'test',
+    kernRepoPfad: kern, abteilungsRepoPfade: { development: 'ausstehend' }
+  }, null, 2), 'utf8');
+  const protokoll = protokollDatei();
+  const stub = macheGhStub({
+    [path.basename(kern)]: { modus: 'ok', prs: [pr(62, 'Nur im OS-Repo', 'NovaCore-AI/NovaCoreAI-OS')] }
+  }, protokoll);
+  const text = kontext(runHook(state, { env: prEnv(stub) }));
+  assert.match(text, /#62 Nur im OS-Repo/);
+  assert.deepEqual(stubAufrufe(protokoll), [path.basename(kern)],
+    'ein "ausstehend"-Eintrag wird uebersprungen, nicht zum Abbruch');
+});
+
+test('PR: alle Werte der Map werden abgefragt — Lesekopien und Geratenes nie', () => {
+  // NC-eigene Probe zum Registry-Schema und zur Affiliate-Invariante: Gefragt wird
+  // `kernRepoPfad` plus JEDER Wert von `abteilungsRepoPfade` (Onsite kennt dort nur ein
+  // Einzelfeld). NICHT gefragt werden die SSOT-Lesekopien `ssotAblage`/`kernSsotPfad` — und
+  // schon gar nicht geratene Pfade oder Kollegen-OS-Satelliten, die in der Registry nie
+  // stehen.
+  const kern = macheRepo('kern');
+  const eins = macheRepo('abt-eins');
+  const zwei = macheRepo('abt-zwei');
+  const lesekopie = macheRepo('lesekopie');
+  const state = tmp('nc-queue-state-');
+  fs.writeFileSync(path.join(state, 'infra.json'), JSON.stringify({
+    schemaVersion: 1, abteilungen: ['development', 'marketing'], szenario: 'test',
+    ssotAblage: lesekopie, kernSsotPfad: lesekopie,
+    kernRepoPfad: kern, abteilungsRepoPfade: { development: eins, marketing: zwei }
+  }, null, 2), 'utf8');
+  setzeLaeufe(state, { 'queue-abteilung': Date.now(), 'queue-kern': Date.now() });
+  const protokoll = protokollDatei();
+  const stub = macheGhStub({
+    [path.basename(zwei)]: { modus: 'ok', prs: [pr(5, 'Im zweiten Satelliten', 'NovaCore-AI/Zwei')] },
+    '*': { modus: 'ok', prs: [] }
+  }, protokoll);
+  const text = kontext(runHook(state, { env: prEnv(stub) }));
+  assert.match(text, /#5 Im zweiten Satelliten/, 'auch der zweite Map-Eintrag wird gesehen');
+  const gefragt = stubAufrufe(protokoll).sort();
+  assert.deepEqual(gefragt, [kern, eins, zwei].map(p => path.basename(p)).sort(),
+    'genau die drei Registry-Repos — nicht mehr, nicht weniger');
+  assert.equal(gefragt.includes(path.basename(lesekopie)), false,
+    'Lesekopien sind keine Arbeitsklone und werden nie abgefragt');
+});
+
+test('PR: heutiger Uebergangszustand E1 — ohne Registry-Pfade kein einziger Netzaufruf', () => {
+  // Der reale NC-Ist-Zustand: Die optionalen Queue-Flow-Felder sind auf keiner Maschine
+  // gesetzt (infra-registry.md). Dann ist der PR-Teil vollstaendig still — und zwar OHNE
+  // zu raten: kein Prozess, kein Cache-Schreiben, kein Hinweis.
+  const state = tmp('nc-queue-state-');
+  fs.writeFileSync(path.join(state, 'infra.json'), JSON.stringify({
+    schemaVersion: 1, abteilungen: ['development'], szenario: 'test'
+  }, null, 2), 'utf8');
+  const protokoll = protokollDatei();
+  const stub = macheGhStub({ '*': { modus: 'ok', prs: [pr(9, 'darf nie erscheinen', 'o/r')] } },
+    protokoll);
+  const r = runHook(state, { env: prEnv(stub) });
+  assert.equal(r.stdout, '', 'ohne registrierte Repo-Pfade gibt es nichts zu melden');
+  assert.equal(r.status, 0);
+  assert.deepEqual(stubAufrufe(protokoll), [], 'und keinen einzigen Netzaufruf');
+  assert.equal(fs.existsSync(path.join(state, PR_CACHE)), false,
+    'ein Lauf ohne Kandidaten legt auch keinen Cache an');
+});
+
+test('PR: keine offenen PRs heisst Schweigen', () => {
+  const a = prAufbau();                       // beide Repos antworten mit leerer Liste
+  const r = runHook(a.state, { env: prEnv(a.stub) });
+  assert.equal(r.stdout, '', 'ohne offene PRs gibt es nichts zu melden');
+  assert.equal(lesePrCache(a.state).repos[a.kern].erfolg, true,
+    'der erfolgreiche Leerbefund wird trotzdem gecacht — sonst wird taeglich neu gefragt');
+});
+
+test('PR: ein zu alter Stand wird nicht mehr gemeldet', () => {
+  const a = prAufbau();
+  const uralt = Date.now() - 30 * TAG_MS;
+  setzePrCache(a.state, {
+    [a.kern]: {
+      geprueft: Date.now(), stand: uralt, erfolg: false,
+      prs: [{ nummer: 7, titel: 'Vor einem Monat gesehen', url: 'https://github.com/o/r/pull/7',
+        entwurf: false, aktualisiert: '2026-07-18' }]
+    }
+  });
+  const r = runHook(a.state, { env: prEnv(a.stub) });
+  assert.equal(r.stdout, '',
+    'ein seit Wochen unbestaetigter PR ist vermutlich laengst gemergt — das waere Rauschen');
+});
+
+test('PR: Entwuerfe werden gekennzeichnet, unbrauchbare Eintraege verworfen', () => {
+  const a = prAufbau({
+    kernPrs: [
+      pr(62, 'Entwurf-PR', 'NovaCore-AI/NovaCoreAI-OS', { isDraft: true }),
+      { number: 'kaputt', title: 'ohne Nummer', url: 'https://github.com/o/r/pull/1' },
+      { number: 63, title: 'boese URL', url: 'javascript:alert(1)' }
+    ]
+  });
+  const text = kontext(runHook(a.state, { env: prEnv(a.stub) }));
+  assert.match(text, /#62 Entwurf-PR \*\(Entwurf\)\*/);
+  assert.equal(/ohne Nummer/.test(text), false, 'Eintraege ohne belegte Nummer fallen heraus');
+  assert.equal(/javascript:/.test(text), false, 'nur https-URLs gehen in den Kontext');
+});
+
+test('PR: der Hinweis liefert seine eigene Abschaltung nicht mit', () => {
+  const a = prAufbau({ kernPrs: [pr(62, 'X', 'o/r')] });
+  const text = kontext(runHook(a.state, { env: prEnv(a.stub) }));
+  assert.equal(/NC_PR_CHECK/.test(text), false,
+    'ein Hinweis, der seinen Opt-out mitliefert, erzieht zum Abschalten (Muster der Mahnung)');
 });

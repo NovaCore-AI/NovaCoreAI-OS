@@ -222,3 +222,25 @@
   (Rolle: Admin)". Review-Handgriff vor jedem Phasen-PR: `grep -ri` mit den
   Klarnamens-Varianten über `plugins/` (Handgriff, bewusst kein testerzwungener
   Baustein — Begründung oben).
+
+### 2026-08-24 — Review-Finding mit dem FALSCHEN Experiment „widerlegt" (PS-Binding: Funktion ≠ Cmdlet)
+
+- **Kontext/Aufgabe:** Nachtschicht Phase G, externes GLM-5.3-Review R1 — Finding MINOR 4:
+  `psFlagActive` erkenne die PowerShell-Wertform `-Recurse:1` nicht, `Remove-Item
+  -Recurse:1 -Force x` lösche real, das FFG lasse es durch.
+- **Was schiefging:** Ich habe das Finding „empirisch widerlegt" — belegt mit einer
+  selbstgebauten PS-**Funktion** (`function t([switch]$s){…}; t -s:1`), die einen
+  ParameterBindingError wirft. Der GLM-R2-Bestätigungslauf widerlegte MICH mit dem
+  richtigen Experiment: **Cmdlets** binden `:1` anstandslos — `Remove-Item -Recurse:1
+  -Force <tmp>` löscht auf PS 5.1 real (eigener Nachtest am synthetischen Temp-Verzeichnis:
+  `GELOESCHT=True`). Beinahe wäre eine echte Gate-Lücke als „widerlegt" in die
+  Review-Kette gewandert.
+- **Ursache:** Das Gegen-Experiment prüfte einen ANDEREN Bindungspfad als der Angriffsweg:
+  Skript-Funktionen mit `[switch]`-Parametern koerzieren Int32 nicht, kompilierte
+  Cmdlet-Parameter schon. Die Verallgemeinerung „PowerShell wirft bei `-Switch:1`" war
+  aus einem Sonderfall gezogen.
+- **Lernerkenntnis/Präventionsregel:** Ein Review-Finding wird nur mit einem Experiment
+  auf **exakt dem behaupteten Angriffsweg** widerlegt (hier: dasselbe Cmdlet, echtes
+  Ziel-Objekt, synthetisch) — nie mit einem Analogie-Konstrukt. Vor jedem „widerlegt"
+  in einer Review-Kette: den Repro-Befehl des Reviewers wörtlich nachfahren; erst wenn
+  DER fehlschlägt, ist die Ablehnung tragfähig.

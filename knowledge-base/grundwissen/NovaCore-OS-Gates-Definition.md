@@ -1,6 +1,8 @@
-# Kontroll-Schicht — Definition der vier Gates
+# Kontroll-Schicht — Definition der Gates
 
-> **Zweck:** die verbindliche Kurzbeschreibung der vier Gates an einem Ort. Abgeleitetes
+> **Zweck:** die verbindliche Kurzbeschreibung der Gates an einem Ort — **drei gebaute
+> Gates**; das früher geplante Gate 4 ist **endgültig entfallen** (Onsite-Paritäts-Entscheid
+> §15.44, übernommen 2026-08-23 via Mapping D2). Abgeleitetes
 > Dokument — bei Widerspruch gewinnen die normativen Quellen (jüngste Spec/Bauplan in
 > `grundwissen/`, dann `CHANGELOG.md` als Produktstand).
 >
@@ -14,12 +16,12 @@ Gemeinsame Eigenschaften aller Gates: **deterministisch** (die KI hat kein Veto)
 **kein Marker** — Aktivierungsbedingung ist die Installation des Kern-Plugins, Opt-out nur
 per Env **je Gate**. Alle Hooks liegen im Kern `nc`.
 
-| # | Gate | Erzwingt | Mechanik | Fragt den Menschen? | Status (2026-08-10) | Opt-out | Quelle |
+| # | Gate | Erzwingt | Mechanik | Fragt den Menschen? | Status | Opt-out | Quelle |
 |---|---|---|---|---|---|---|---|
-| **1** | **FFG** (Fact-Forcing-Gate) — im Kern als domänen-freies **Basis-Gate**; drei Sub-Gates („FFG 1–3") | Fakten **vor** schreibenden Aktionen: **(1) Datei-Gate** je Zieldatei (Edit/Write/MultiEdit), **(2) Destruktiv-Gate** je Kommando (`rm -rf`, Force-Push, `reset --hard`, SQL-DDL, `find -exec` …), **(3) Routine-Bash-Gate** einmal je Session; Read-only-Git nie | PreToolUse (`nc-ffg.js`); Ablehnung mit Investigations-Text, Durchlass nach Faktenvorlage; quote-aware Bash-Analyse (GHSA-4v57-ph3x-gf55-Härtung), verankerte Exempt-Globs, plattformbewusstes Case-Folding, Session-Key-Hashing bei jeder Zeichen-Ersetzung | **Nie** — es verlangt Fakten und lässt danach den normalen Permission-Flow laufen | **gebaut** (v2; Review-Härtungen 2026-07-28, Lib-Extraktion + `exitCode`-Fix 2026-08-10, Read-only-Git-Erkennung segmentweise korrigiert 2026-08-14) | `NC_FFG=off` | Design-Spec 2026-07-28 §5; Bauplan 2026-08-10 AP1 |
+| **1** | **FFG** (Fact-Forcing-Gate) — im Kern als domänen-freies **Basis-Gate**; drei Sub-Gates („FFG 1–3") | Fakten **vor** schreibenden Aktionen: **(1) Datei-Gate** je Zieldatei (Edit/Write/MultiEdit/NotebookEdit — NotebookEdit wie Edit auf `notebook_path`, seit 2026-08-23), **(2) Destruktiv-Gate** je Kommando (`rm -rf`, Force-Push, `reset --hard`, SQL-DDL, `find -exec`, **Windows-Destruktivmuster** `del/rd /s`, `Remove-Item -Recurse -Force`, `-EncodedCommand` und **Wrapper-Passthrough** sudo/env/wsl/timeout … — Onsite §15.38/§15.46, Port 2026-08-23), **(3) Routine-Bash-Gate** einmal je Session; Read-only-Git nie | PreToolUse (`nc-ffg.js`); Ablehnung mit Investigations-Text, Durchlass nach Faktenvorlage; quote-aware Bash-Analyse (GHSA-4v57-ph3x-gf55-Härtung), verankerte Exempt-Globs, plattformbewusstes Case-Folding, Session-Key-Hashing bei jeder Zeichen-Ersetzung; Upstream-Drift-Falltabelle testerzwungen (`nc-ffg-drift.test.mjs`) | **Nie** — es verlangt Fakten und lässt danach den normalen Permission-Flow laufen | **gebaut** (v2; Review-Härtungen 2026-07-28, Lib-Extraktion + `exitCode`-Fix 2026-08-10, Read-only-Git-Erkennung segmentweise korrigiert 2026-08-14, Onsite-Delta-Port §15.38/§15.46 2026-08-23) | `NC_FFG=off` | Design-Spec 2026-07-28 §5; Bauplan 2026-08-10 AP1; Mapping D3 (2026-08-23) |
 | **2** | **Session-Start-Zwang** | Kein Blind-Start: Pflicht-Einstieg + lebender Projektstand zu Sessionbeginn; die **erste schreibende Aktion** erst, nachdem `/nc:start` gelaufen und der Fakten-Stempel gesetzt ist — Lesen und Fragen bleiben frei | zweiteilig („Zangen-Prinzip"): SessionStart-**Injektion** (`nc-session-start.js`; kann plattformbedingt nicht blocken) + PreToolUse-**Erzwingungs-Begleiter** (`nc-start-gate.js`) mit Fakten-Stempel (`nc-start-stempel.js`, verifiziert `--branch`/`--head` gegen die Git-Lage des **Projektverzeichnisses**) | Nein | **gebaut** mit dem Umbau 2026-08-10 (vorher: markergebundener Begrüßungs-Hinweis, kein Gate); Read-only-Git-Erkennung segmentweise korrigiert 2026-08-14 (Pfadwechsel/Verkettung/`worktree list` wieder frei) | `NC_START_GATE=off` (ein Schalter für beide Teile) | Bauplan 2026-08-10 AP2, Nachtrag N2 |
-| **3** | **Safety-Gate** | Echte **menschliche Freigabe** vor Aktionen mit Außen- oder Infrastrukturwirkung: Infra/Deploy/Prod **und** kundensichtbare Schreibaktionen — Vorlagepflicht: Empfänger/Zielort + **wörtlicher** Text | PreToolUse mit `permissionDecision: "ask"` → echter Freigabedialog; semantische Schreib-Marker auch für `mcp__*`-Tools (manifest-unabhängig); Fehlalarm-Schutz als Abnahmekriterium | **Ja — genau dafür existiert es** (das einzige Gate mit Dialog) | **nicht gebaut** (wie im Vorbild) | vorgesehen, analog je Gate | offen |
-| **4** | **Sitzungsabschluss** | Kein Wissensverlust am Sessionende: ungesicherte substanzielle Arbeit wird angemahnt, Erinnerung/Journal und Logs werden gepflegt | vorgesehen dreiteilig: PostToolUse-**Akkumulator** + **Stop**-Hook (blockt **einmal** je Turn-Kette, Schleifenschutz) + SessionEnd-Protokoll; menschliches Gegenstück ist `/nc:end-session` | Nein — es mahnt und blockt einmal, entscheidet nicht | **nicht gebaut** — es existieren der Skill `/nc:end-session` und (seit Kern 0.8.0) die **PreCompact-Mahnung**, die ausdrücklich **nicht** Gate 4 ist (siehe unten) | vorgesehen, analog je Gate | offen |
+| **3** | **Safety-Gate** | Echte **menschliche Freigabe** vor Aktionen mit Außen- oder Infrastrukturwirkung: Infra/Deploy/Prod **und** kundensichtbare Schreibaktionen — Vorlagepflicht: Empfänger/Zielort + **wörtlicher** Text | PreToolUse (`nc-safety-gate.js`) auf `Bash` **und** `mcp__.*` mit `permissionDecision: "ask"` → echter Freigabedialog; Musterliste v1 im NovaCore-Zuschnitt (EN4): tofu/terraform apply/destroy · deploy-Wort mit Verbpositions-Ausnahme get/describe/logs · mcp-Schreibverben über Werkzeug- **und** Parameternamen (manifest-unabhängig); Bypass-Härtung gegen Shell-Wrapper, Präfix-Kommandos und gequotete Kommandowörter (GLM-Review-Stand des Vorbilds); **kein State** (jeder Treffer fragt erneut); **Subagenten nicht ausgenommen**; Fehlalarm-Schutz als Abnahmekriterium. Bewusste Abweichung: Onsites Prod-SQL-Flag-Muster ist firmenspezifisch und nicht portiert — WZS-Muster folgen nach Maintainer-Benennung | **Ja — genau dafür existiert es** (das einzige Gate mit Dialog) | **gebaut** (Port 2026-08-23 aus `oai-safety-gate.js@6d3f8db`, Mapping D1/EN4) | `NC_SAFETY_GATE=off` | Onsite §4.7/§15.21/§15.26; Mapping D1 (2026-08-23) |
+| **4** | **Sitzungsabschluss** — **ENDGÜLTIG ENTFALLEN** | *(historisch: sollte Wissensverlust am Sessionende verhindern — PostToolUse-Akkumulator + Stop-Hook + SessionEnd-Protokoll)* | entfällt ersatzlos; das menschliche Gegenstück bleibt `/nc:end-session`, die **PreCompact-Mahnung** bleibt bestehen und war nie Gate 4 (siehe unten) | — | **entfallen** (Onsite-Maintainer-Entscheid §15.44, übernommen 2026-08-23 via Mapping D2 — der frühere „nicht gebaut/offen"-Status ist aufgehoben) | — | Onsite §15.44; Mapping D2 (2026-08-23) |
 
 ## Abgrenzungen, die Verwechslungen verhindern
 
@@ -31,17 +33,18 @@ per Env **je Gate**. Alle Hooks liegen im Kern `nc`.
   mit eigenen Fragen auf eigenen Mustern bauen. Regel: **keine Kern-Prüfung duplizieren oder
   abschwächen**; Matcher sind frei. Gate 1 und Gate 2 nutzen denselben Matcher und prüfen
   trotzdem Verschiedenes — das ist gewollt, nicht redundant.
-- **Gate 2 vs. Gate 4:** Der Start-Zwang sichert den **Anfang** (richtiger Kontext, bevor
-  geschrieben wird), der Sitzungsabschluss das **Ende** (nichts geht verloren). Ihre
-  menschlichen Gegenstücke sind `/nc:start` und `/nc:end-session` (bis Kern 0.7.x
-  `save-session`).
-- **PreCompact-Mahnung vs. Gate 4 (seit Kern 0.8.0):** `nc-end-mahnung.js` blockt die
-  **erste** Kompaktierung einer Sitzung ohne abgeschlossenes `/nc:end-session` (top-level
-  JSON `decision`, Exit 0) und lässt die zweite immer durch (Loop-Schutz gegen
+- **Gate 2 vs. Sitzungsende:** Der Start-Zwang sichert den **Anfang** (richtiger Kontext,
+  bevor geschrieben wird); das **Ende** sichert kein Gate mehr (Gate 4 entfallen, Mapping
+  D2), sondern der Skill `/nc:end-session` (bis Kern 0.7.x `save-session`) plus die
+  PreCompact-Mahnung.
+- **PreCompact-Mahnung vs. das entfallene Gate 4 (seit Kern 0.8.0):** `nc-end-mahnung.js`
+  blockt die **erste** Kompaktierung einer Sitzung ohne abgeschlossenes `/nc:end-session`
+  (top-level JSON `decision`, Exit 0) und lässt die zweite immer durch (Loop-Schutz gegen
   Auto-Compact-Sackgassen); Abschluss-Stempel `nc-end-stempel.js` ist reine
-  Selbstauskunft, Marker verfallen nach 30 Min **Inaktivität** (Heartbeat). Das ist
-  **kein** Gate 4: Es mahnt nur vor der Kompaktierung, nie am Sitzungsende, und
-  entscheidet nichts. Opt-out `NC_PRECOMPACT=off`, Test-Override `NC_END_STATE_DIR`.
+  Selbstauskunft, Marker verfallen nach 30 Min **Inaktivität** (Heartbeat). Das war
+  **nie** Gate 4 und ist auch **kein Ersatz** dafür: Es mahnt nur vor der Kompaktierung,
+  nie am Sitzungsende, und entscheidet nichts. Opt-out `NC_PRECOMPACT=off`, Test-Override
+  `NC_END_STATE_DIR`.
 
 ## Weitere Mitglieder der Kontroll-Schicht (keine Gates)
 
@@ -94,8 +97,9 @@ Ehrliche Reichweite, damit die Tabelle oben nicht mehr verspricht, als der Code 
 - **Fail-open bleibt fail-open:** Läuft die Git-Abfrage des Gates in den 2-Sekunden-Timeout,
   wird durchgelassen (wie bei allen Gates) — dann aber mit einer Warnung auf stderr, damit
   Last die Kontroll-Schicht nicht unbemerkt abschwächt.
-- **`NotebookEdit`** verlangt den erledigten Session-Start (Gate 2 matcht es), aber **keine
-  Fakten je Zieldatei** — Gate 1 matcht es nicht.
+- **`NotebookEdit`** verlangt seit 2026-08-23 **beides**: den erledigten Session-Start
+  (Gate 2) **und** Fakten je Zieldatei (Gate 1, Datei-Gate auf `notebook_path` —
+  Onsite §15.38, Mapping D3); die frühere Lücke „Gate 1 matcht es nicht" ist geschlossen.
 
 ## Satelliten (Kollegen-OS)
 
