@@ -64,7 +64,7 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | `VERSION` | Produkt-Leitversion (SemVer) = Version des Kern-Plugins |
 | `.claude-plugin/marketplace.json` | Marketplace `novacore-os` — Einträge ohne `version`-Feld (die steht allein in der jeweiligen `plugin.json`); die Repo-Wurzel ist **nur** Marketplace-Wurzel, kein Plugin |
 | `.github/workflows/` | `ci.yml` (Ubuntu+Windows × Node 20/22/24, Suite + Validator-Positivkontrolle) und `release.yml` (Tag `nc--v*` → GitHub-Release aus dem CHANGELOG-Abschnitt) |
-| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`end-session`/`journal`/`setup`/`doku-sync`/`os-info`/`skill-builder`/`update-doks`/`queue-abteilung`/`queue-kern`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; Gate 3: `nc-safety-gate.js`; PreCompact-Mahnung: `nc-end-mahnung.js` + `nc-end-stempel.js`; dazu `nc-doks-autosync.js` — Ebenen 1 + 1b; dritter SessionStart-Hook `nc-queue-faelligkeit.js` — Queue-Fälligkeits-Erinnerung, kein Gate) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `nc-sync.md` (zugleich Ebene-1b-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `referenz/agent-authoring.md` (Subagenten-Formatregeln, ausgeliefert), `referenz/pflege-auspraegung.md` (Queue-Format v1 + Kriterienliste v1, ausgeliefert), `agents/` (Subagent `sync-nachzug-executor`), `skills/setup/infra-registry.md` (Infra-Registry-Referenz), `tests/` |
+| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`end-session`/`journal`/`setup`/`os-info`/`skill-builder`/`update-doks`/`queue-abteilung`/`queue-kern`/`wissen-aendern`/`wissen-planen`/`wissen-nachschlagen`/`wissen-protokolle`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; Gate 3: `nc-safety-gate.js`; PreCompact-Mahnung: `nc-end-mahnung.js` + `nc-end-stempel.js`; dazu `nc-doks-autosync.js` — Ebenen 1 + 1b; dritter SessionStart-Hook `nc-queue-faelligkeit.js` — Queue-Fälligkeits-Erinnerung, kein Gate; UserPromptSubmit-Hook `nc-wissens-hinweis.js` + `hooks/wissen-sucheindex.json` — Wissens-Zeiger, kein Gate; PreToolUse-Hook `nc-pfad-hinweis.js` + `hooks/pfad-aenderungsindex.json` — Pfad-Zeiger, kein Gate) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `nc-sync.md` (zugleich Ebene-1b-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `referenz/agent-authoring.md` (Subagenten-Formatregeln, ausgeliefert), `referenz/pflege-auspraegung.md` (Queue-Format v1 + Kriterienliste v1, ausgeliefert), `agents/` (Subagent `sync-nachzug-executor`), `skills/setup/infra-registry.md` (Infra-Registry-Referenz), `tests/` |
 | `plugins/nc-development/` | Abteilung `development` (Namespace `/nc-development:`): 15 Skills in 6 Modulen (`fe`/`be`/`flc`/`wzs`/`qs`/`rel`, flaches Layout) + `workflow.md` (Fachablauf WP1–WP7) + `development-abteilungs-claude.md` (CLAUDE-Ebene 2, erstes ausgeliefertes Exemplar) + `pflege-auspraegung.json` (Queue-Ort, Kriterienverweis, Journal-Sonderregeln, Domänen-rote-Linien, Übergangsregel) |
 | `vorlagen/abteilungsplugin/` | Vorlage für neue Abteilungsplugins — **kein Plugin** (`.vorlage`-Endungen); dazu `abteilungs-claude.md.vorlage` (Ebene 2, Pflichtbestandteil jedes Abteilungsplugins) und `agents/beispiel-agent.md.vorlage` (Subagenten-Baustein, Read-only-Variante, optional beim ersten Agenten) |
 | `knowledge-base/` | Wissensbasis — Glossar im nächsten Abschnitt |
@@ -189,7 +189,9 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Offene-Stränge-Register, Projekt-Memory-Spiegel, Abschluss-Stempel) · `/nc:start` liest
   Memory/Register/Roll-up/Infra-Registry/Team-Sync · neuer Maintainer-Skill
   **`/nc:update-doks`** (F1 Marker-Reparatur über den Autosync-Code, F2 index-geführter
-  Konsistenzlauf) · **PreCompact-Mahnung** (`nc-end-mahnung.js` + `nc-end-stempel.js`,
+  Konsistenzlauf — F1/F2-Zweiteilung seit Kern v0.12.0 durch eine einzige Aufgabe ersetzt,
+  Kreuzverweis-/Pfad-Pflege der SSOT-Dokumente, siehe Phase-H-Eintrag unten) ·
+  **PreCompact-Mahnung** (`nc-end-mahnung.js` + `nc-end-stempel.js`,
   Heartbeat, Loop-Schutz, `NC_PRECOMPACT=off`) · **Doks-Autosync Ebene 1b**
   (`~/.claude/nc-teamsync.md` als Ganzdatei, Payload `nc-sync.md` — Nachtrag N2, kein
   doks/-Umzug; CRLF-normalisierter Vergleich; Overrides `NC_AUTOSYNC_TARGET`/
@@ -242,6 +244,17 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   §15.44), Queue-Hook mit PR-Sichtbarkeit über die Infra-Registry (einziger, vierfach
   gedeckelter Netzzugriff der Kontroll-Schicht) und Windows-Sperren-Härtung. Phasen H–K
   folgen nach Mapping.
+- **Gebaut (Kern v0.12.0, 2026-08-24): Onsite-Delta-Nachbau Phase H — SSOT-Präsenz** nach
+  Mapping `grundwissen/2026-08-23-onsite-delta-mapping.md` (D4, D5, D7, D8, D9, D25;
+  Onsite-Quelle live `origin/main@51e230f`). Neue Begriffsnorm
+  `grundwissen/NovaCore-OS-Node-Doks-Definition.md` (D25). **Vier neue Wissens-Router**
+  im neuen Modul `wissen` (D7): `wissen-aendern`/`wissen-planen`/`wissen-nachschlagen`/
+  `wissen-protokolle` — Zeiger auf die Node-Doks statt kopiertem Inhalt. **Zwei neue
+  Zeiger-Hooks** (beide kein Gate): `nc-wissens-hinweis.js` (UserPromptSubmit, D4) und
+  `nc-pfad-hinweis.js` (PreToolUse, D5) samt Sucheindizes. **`/nc:doku-sync` ersatzlos
+  entfernt** (D8, Onsite §15.43) — Nachfolge: `/nc:wissen-aendern` + Aktualisierungs-Index
+  (Träger-Regel). **`/nc:update-doks` auf eine Aufgabe geschnitten** (D9): reine
+  Kreuzverweis-/Pfad-Pflege der SSOT-Dokumente, F1/F2 entfallen.
 - **Noch nicht gebaut:** (Gate 4 ist endgültig entfallen — Onsite §15.44, Mapping D2; die
   PreCompact-Mahnung bleibt und war nie Gate 4), CLAUDE-Ebene 0 (Org-Instructions, weiterhin
   ungenutzt), weitere fe-/be-Skills, Module

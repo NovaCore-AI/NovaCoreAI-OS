@@ -1,0 +1,527 @@
+{
+  "schemaVersion": 1,
+  "_hinweis": "Vorgebauter, kompakter Sucheindex des UserPromptSubmit-Hooks nc-wissens-hinweis.js (Port des Onsite-Hooks oai-wissens-hinweis.js, Spec §15.40; Delta-Mapping-Position D4). Der Hook feuert bei JEDEM Prompt — er liest ausschliesslich diese Datei und niemals ein Markdown-Dokument. Feld 'pfad' ist relativ zur REPO-WURZEL des OS-Repos (kernRepoPfad der Infra-Registry), also mit knowledge-base/-Praefix; das ist die bewusste Abweichung vom Onsite-Original, das ein festes Wissensbasis-Segment einschiebt. 'basis': \"kern-plugin\" loest stattdessen gegen die Wurzel des Kern-Plugins auf (heute von keinem Eintrag genutzt, Mechanik testabgedeckt). 'stichworte' sind normalisiert kleingeschrieben, Umlaute gefaltet (ae/oe/ue/ss), mindestens vier Zeichen; der Hook matcht sie mit LINKER Wortgrenze und offenem Wortende, damit deutsche Beugungen greifen (bauplan -> bauplaene). Datenquelle ist knowledge-base/SSOT-Document-Index.md (OS-Repo) TEIL 2, je lebender Quelle ein Eintrag; historische und extern gefuehrte Quellen (bauplan-archiv/, firmenkernprozesse/) sowie PLATZHALTER-Dateien sind bewusst NICHT indexiert. Handgepflegt, nicht generiert: generierte Indizes driften leiser. Neue/verschobene/geloeschte Wissensdatei => diese Datei gehoert zum Aenderungsumfang (Aenderungs-Matrix des Aktualisierungs-Index). Testverdrahtet: nc-wissens-hinweis.test.mjs prueft, dass jeder Pfad real existiert und jedes Stichwort die Normalisierungsregeln erfuellt.",
+  "eintraege": [
+    {
+      "id": "ssot-document-index",
+      "titel": "SSOT-Document-Index (Master-Index)",
+      "pfad": "knowledge-base/SSOT-Document-Index.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "Triage: welches Dokument existiert, wohin gehört es, wann wird es gebraucht",
+      "stichworte": [
+        "ssot-document-index",
+        "master-index",
+        "welches dokument",
+        "wohin gehoer",
+        "quellen-triage",
+        "wissensbasis",
+        "bauplan",
+        "bauplaene"
+      ]
+    },
+    {
+      "id": "aktualisierungs-index",
+      "titel": "Aktualisierungs-Index",
+      "pfad": "knowledge-base/standardprozesse/aktualisierungs-index.md",
+      "router": "wissen-aendern",
+      "hinweis": "je Änderungsart: Pflichtlektüre und was in derselben Änderung nachzuziehen ist",
+      "stichworte": [
+        "aktualisierungs-index",
+        "aenderungs-matrix",
+        "mitaendern",
+        "nachziehen",
+        "doku-nachzug",
+        "sync-matrix",
+        "nachzugspflicht"
+      ]
+    },
+    {
+      "id": "anker-reservierung",
+      "titel": "Standardprozess Anker-Reservierung",
+      "pfad": "knowledge-base/standardprozesse/anker-reservierung.md",
+      "router": "wissen-aendern",
+      "hinweis": "Handgriffe vor der ersten Zeile, wenn mehr als eine Arbeitseinheit gleichzeitig baut",
+      "stichworte": [
+        "anker-reservierung",
+        "anker reservieren",
+        "reserve/",
+        "parallelbau",
+        "namenskollision",
+        "worktree"
+      ]
+    },
+    {
+      "id": "kern-plugin-bau",
+      "titel": "Standardprozess Kern-Plugin-Bau",
+      "pfad": "knowledge-base/standardprozesse/kern-plugin-bau.md",
+      "router": "wissen-aendern",
+      "hinweis": "Scope, Bauablauf, Governance-Schichten und Drift-Ritual des Kern-Plugins",
+      "stichworte": [
+        "kern-plugin",
+        "kernplugin",
+        "team-shared",
+        "upstream-drift",
+        "drift-ritual",
+        "mindest-client"
+      ]
+    },
+    {
+      "id": "abteilungs-plugin-bau",
+      "titel": "Standardprozess Abteilungs-Plugin-Bau",
+      "pfad": "knowledge-base/standardprozesse/abteilungs-plugin-bau.md",
+      "router": "wissen-aendern",
+      "hinweis": "Architekturregeln, Marketplace-Mechanik, Satelliten-Extraktion, Kollegen-OS, Fehlertabelle",
+      "stichworte": [
+        "abteilungsplugin",
+        "abteilungs-plugin",
+        "marketplace",
+        "satellit",
+        "sha-pin",
+        "kollegen-os",
+        "install-probe"
+      ]
+    },
+    {
+      "id": "abteilungs-inhalts-pruefung",
+      "titel": "Standardprozess Abteilungs-Inhalts-Prüfung",
+      "pfad": "knowledge-base/standardprozesse/abteilungs-inhalts-pruefung.md",
+      "router": "wissen-aendern",
+      "hinweis": "wiederkehrende Inhaltsprüfung eines Abteilungsplugins gegen Normlage — zwei unabhängige Läufe",
+      "stichworte": [
+        "inhalts-pruefung",
+        "inhaltspruefung",
+        "soll-anforderung",
+        "ist-inventur",
+        "12-punkte"
+      ]
+    },
+    {
+      "id": "subagenten-bau",
+      "titel": "Standardprozess Subagenten-Bau",
+      "pfad": "knowledge-base/standardprozesse/subagenten-bau.md",
+      "router": "wissen-aendern",
+      "hinweis": "Agent-vs-Skill, Scope, Werkzeuggrenzen, Gate-Semantik und rote Linien der Subagenten",
+      "stichworte": [
+        "subagent",
+        "sub-agent",
+        "agents-verzeichnis",
+        "werkzeuggrenze",
+        "auto-delegation"
+      ]
+    },
+    {
+      "id": "team-distribution",
+      "titel": "Standardprozess Team-Distribution",
+      "pfad": "knowledge-base/standardprozesse/team-distribution.md",
+      "router": "wissen-aendern",
+      "hinweis": "Verteilung des OS an das Team, Update-Wege, Auto-Update-Bugs, Koexistenzregeln",
+      "stichworte": [
+        "team-distribution",
+        "team-workspace",
+        "rollout",
+        "auto-update-bug",
+        "koexistenz"
+      ]
+    },
+    {
+      "id": "ssot-aufbau",
+      "titel": "Standardprozess SSOT-Aufbau",
+      "pfad": "knowledge-base/standardprozesse/ssot-aufbau.md",
+      "router": "wissen-aendern",
+      "hinweis": "Grundbausteine und Aufbau-Ablauf einer Wissensbasis, Struktur-Vererbung und Isolation",
+      "stichworte": [
+        "ssot-aufbau",
+        "wissensbasis aufbau",
+        "grundbausteine",
+        "struktur-vererbung",
+        "isolations-invariante"
+      ]
+    },
+    {
+      "id": "claude-netz-bau",
+      "titel": "Standardprozess CLAUDE-Netz-Bau",
+      "pfad": "knowledge-base/standardprozesse/claude-netz-bau.md",
+      "router": "wissen-aendern",
+      "hinweis": "Bau und Verdrahtung der CLAUDE-Ebenen samt Import-Mechanik und Pfad-Matrix",
+      "stichworte": [
+        "claude-netz",
+        "netz-bau",
+        "ebenen-verdrahtung",
+        "teamsync",
+        "firmenblock"
+      ]
+    },
+    {
+      "id": "sync-nachzug-bauzyklus",
+      "titel": "Standardprozess Sync-Nachzug je Bauzyklus",
+      "pfad": "knowledge-base/standardprozesse/sync-nachzug-bauzyklus.md",
+      "router": "wissen-aendern",
+      "hinweis": "Protokoll während des Baus, gebündelter Executor-Lauf am Zyklusende, Konfliktzonen-Regel",
+      "stichworte": [
+        "sync-nachzug",
+        "bauzyklus",
+        "executor-lauf",
+        "konfliktzone"
+      ]
+    },
+    {
+      "id": "queue-flow",
+      "titel": "Standardprozess Queue-Flow",
+      "pfad": "knowledge-base/standardprozesse/queue-flow.md",
+      "router": "wissen-aendern",
+      "hinweis": "Weg eines Wissensstücks von der Sitzung in die Kern-SSOT — acht Stationen, Takt, Grenzen",
+      "stichworte": [
+        "queue-flow",
+        "queue-station",
+        "queue-takt",
+        "aufstiegslauf",
+        "promotions-pr"
+      ]
+    },
+    {
+      "id": "kriterien-pflege",
+      "titel": "Standardprozess Kriterien-Pflege",
+      "pfad": "knowledge-base/standardprozesse/kriterien-pflege.md",
+      "router": "wissen-aendern",
+      "hinweis": "Ablauf zum Bauen und Schärfen der Kriterienliste samt Schema-Grenze und Kürzel-Regel",
+      "stichworte": [
+        "kriterien-pflege",
+        "kriterien schaerfen",
+        "gegenkriterium",
+        "kuerzel-vergabe"
+      ]
+    },
+    {
+      "id": "os-bau-methode",
+      "titel": "OS-Bau-Methode",
+      "pfad": "knowledge-base/standardprozesse/os-bau-methode.md",
+      "router": "wissen-aendern",
+      "hinweis": "Methodenfragen zum Gesamtaufbau des OS — die an die Firmenphilosophie anpassbare Methode",
+      "stichworte": [
+        "os-bau-methode",
+        "bau-methode",
+        "gesamtmethode",
+        "firmenphilosophie"
+      ]
+    },
+    {
+      "id": "produktarchitektur",
+      "titel": "NovaCore-OS-Produktarchitektur",
+      "pfad": "knowledge-base/grundwissen/NovaCore-OS-Produktarchitektur.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "die sechs Schichten der Produktvision — Referenz für Vision-Abgleiche",
+      "stichworte": [
+        "produktarchitektur",
+        "produkt-architektur",
+        "sechs schichten",
+        "produktvision",
+        "vision-abgleich"
+      ]
+    },
+    {
+      "id": "ssot-definition",
+      "titel": "NovaCore-OS-SSOT-Definition",
+      "pfad": "knowledge-base/grundwissen/NovaCore-OS-SSOT-Definition.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "normative Begriffsquelle „SSOT\" inklusive Abgrenzung firmenintern ↔ affiliate",
+      "stichworte": [
+        "ssot-definition",
+        "was ist ssot",
+        "begriff ssot",
+        "memory-share",
+        "affiliate"
+      ]
+    },
+    {
+      "id": "gates-definition",
+      "titel": "NovaCore-OS-Gates-Definition",
+      "pfad": "knowledge-base/grundwissen/NovaCore-OS-Gates-Definition.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "Ist-Inventur der Kontroll-Schicht: Zweck, Mechanik, Status und Opt-out je Gate",
+      "stichworte": [
+        "gates-definition",
+        "kontroll-schicht",
+        "gate-status",
+        "welche gates",
+        "gate 2"
+      ]
+    },
+    {
+      "id": "node-doks-definition",
+      "titel": "NovaCore-OS-Node-Doks-Definition",
+      "pfad": "knowledge-base/grundwissen/NovaCore-OS-Node-Doks-Definition.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "Begriffsnorm Knotendokumente: Knoten erschließen Wissen, Blätter tragen es — Bestandstabelle und Kontext-Ökonomie-Regel",
+      "stichworte": [
+        "node-doks",
+        "knotendokumente",
+        "knoten",
+        "wissensnetz",
+        "kontext-oekonomie"
+      ]
+    },
+    {
+      "id": "claude-ebenen-definition",
+      "titel": "NovaCore-OS-CLAUDE-Ebenen-Definition",
+      "pfad": "knowledge-base/grundwissen/NovaCore-OS-CLAUDE-Ebenen-Definition.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "normative Begriffsquelle der CLAUDE.md-Ebenen samt Präzedenzregel und Marker-Konvention",
+      "stichworte": [
+        "claude-ebenen",
+        "ebenen-definition",
+        "praezedenzregel",
+        "privat-zone",
+        "ebene 1b"
+      ]
+    },
+    {
+      "id": "anker-reservierung-definition",
+      "titel": "NovaCore-OS-Anker-Reservierung-Definition",
+      "pfad": "knowledge-base/grundwissen/NovaCore-OS-Anker-Reservierung-Definition.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "das Warum der Anker-Reservierung: Begriffsnorm, Kollisionsklassen, Abgrenzungen",
+      "stichworte": [
+        "anker-reservierung-definition",
+        "warum anker",
+        "kollisionsklasse",
+        "anker-begriff"
+      ]
+    },
+    {
+      "id": "kriterienliste-definition",
+      "titel": "NovaCore-OS-Kriterienliste-Definition",
+      "pfad": "knowledge-base/grundwissen/NovaCore-OS-Kriterienliste-Definition.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "warum es einen Filter zwischen Abteilungs- und Kern-SSOT gibt und wie er zu lesen ist",
+      "stichworte": [
+        "kriterienliste",
+        "kriterienliste-definition",
+        "firmenrelevant",
+        "asymmetrie"
+      ]
+    },
+    {
+      "id": "bauplan-ssot-provisionierung",
+      "titel": "SSOT-Provisionierung — Bauplan 2026-08-10",
+      "pfad": "knowledge-base/grundwissen/2026-08-10-ssot-provisionierung-bauplan.md",
+      "router": "wissen-planen",
+      "hinweis": "wie die Wissensbasis überhaupt auf den Rechner kommt — Weg B, Ablageort, Fast-Forward-Regel",
+      "stichworte": [
+        "ssot-provisionierung",
+        "provisionierung",
+        "lesekopie",
+        "ssot-klon"
+      ]
+    },
+    {
+      "id": "bauplan-onsite-align",
+      "titel": "Onsite-Align-Umbau — Bauplan 2026-08-10",
+      "pfad": "knowledge-base/grundwissen/2026-08-10-onsite-align-umbau-bauplan.md",
+      "router": "wissen-planen",
+      "hinweis": "Umbau nach dem Onsite-Vorbild: Ausgangslage, Rename-Regeln, AP1–AP8, harte Ausschlüsse",
+      "stichworte": [
+        "onsite-align",
+        "align-umbau",
+        "rename-regel",
+        "umbau-bauplan"
+      ]
+    },
+    {
+      "id": "bauplan-prozesskorpus-nachzug",
+      "titel": "Prozesskorpus-Nachzug + Satelliten-SSOT — Bauplan 2026-08-11",
+      "pfad": "knowledge-base/grundwissen/2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md",
+      "router": "wissen-planen",
+      "hinweis": "Nachzug des Bau-/Prozesskorpus und eigene Wissensbasis je Satellit — Invarianten I1–I7",
+      "stichworte": [
+        "prozesskorpus",
+        "satelliten-ssot",
+        "invariante i1",
+        "delegationsschnitt"
+      ]
+    },
+    {
+      "id": "bauplan-onsite-endstand",
+      "titel": "Onsite-Endstand-Nachbau — Bauplan 2026-08-15",
+      "pfad": "knowledge-base/grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md",
+      "router": "wissen-planen",
+      "hinweis": "Nachbau des Onsite-Endstands 0.22.0 in sechs Phasen A–F samt Invarianten und Testfällen",
+      "stichworte": [
+        "onsite-endstand",
+        "endstand-nachbau",
+        "nachbau-bauplan",
+        "haertungs-erhalt"
+      ]
+    },
+    {
+      "id": "bauplan-agent-sdk-gui",
+      "titel": "NovaCore Agent SDK & UI (`nc-web`) — Bauplan 2026-08-16",
+      "pfad": "knowledge-base/grundwissen/2026-08-16-novacore-agent-sdk-gui-architektur.md",
+      "router": "wissen-planen",
+      "hinweis": "eigene Desktop-/Web-UI oder Custom-Agent-SDK-Host: 4-Schichten-Modell, Gate-Fidelity, INV-01–INV-14",
+      "stichworte": [
+        "agent-sdk",
+        "nc-web",
+        "desktop-ui",
+        "canusetool",
+        "gate-fidelity"
+      ]
+    },
+    {
+      "id": "spec-multi-plugin-architektur",
+      "titel": "Multi-Plugin-Architektur — Design-Spec 2026-07-28",
+      "pfad": "knowledge-base/grundwissen/2026-07-28-multi-plugin-architektur-design.md",
+      "router": "wissen-planen",
+      "hinweis": "Begründung und Fortschreibung des Multi-Plugin-Schnitts samt Satelliten-Nachträgen",
+      "stichworte": [
+        "multi-plugin",
+        "plugin-schnitt",
+        "versionsmodell",
+        "marketplace-schnitt"
+      ]
+    },
+    {
+      "id": "bauplan-nc-development-modernisierung",
+      "titel": "Modernisierung `nc-development` — Bauplan 2026-08-16",
+      "pfad": "knowledge-base/grundwissen/2026-08-16-nc-development-modernisierung-bauplan.md",
+      "router": "wissen-planen",
+      "hinweis": "Drift-Matrix der Abteilung `nc-development`, Arbeitsliste F2.1–F2.8 und persistierte Rohdaten",
+      "stichworte": [
+        "nc-development-modernisierung",
+        "modernisierung",
+        "drift-matrix",
+        "abteilungs-drift"
+      ]
+    },
+    {
+      "id": "mapping-onsite-delta",
+      "titel": "Onsite-Delta-Mapping 0.23.0 → 0.25.0 — 2026-08-23",
+      "pfad": "knowledge-base/grundwissen/2026-08-23-onsite-delta-mapping.md",
+      "router": "wissen-planen",
+      "hinweis": "Delta-Inventar D1–D24 mit Klassifikation, Phasenvorschlag G–K und den Entscheiden EN1–EN8",
+      "stichworte": [
+        "onsite-delta",
+        "delta-mapping",
+        "delta-inventar",
+        "nachbau-iteration"
+      ]
+    },
+    {
+      "id": "idee-anti-drift-pruefung",
+      "titel": "Idee: Anti-Drift-Prüfung der Indizes",
+      "pfad": "knowledge-base/ideen-backlog/2026-08-09-anti-drift-pruefung-der-indizes.md",
+      "router": "wissen-planen",
+      "hinweis": "automatisierte Kohärenz-Prüfung von Aktualisierungs-Index und SSOT gegen den Repo-Stand",
+      "stichworte": [
+        "anti-drift",
+        "anti-drift-pruefung",
+        "kohaerenz-pruefung",
+        "index-drift"
+      ]
+    },
+    {
+      "id": "idee-release-branch-modell",
+      "titel": "Idee: Release-Branch-Modell (Live-/Entwicklungslinie)",
+      "pfad": "knowledge-base/ideen-backlog/2026-08-10-release-branch-modell-live-dev.md",
+      "router": "wissen-planen",
+      "hinweis": "getrennte Live-Linie statt „jeder Merge erreicht sofort jede Maschine\"",
+      "stichworte": [
+        "release-branch",
+        "branch-modell",
+        "live-linie",
+        "entwicklungslinie"
+      ]
+    },
+    {
+      "id": "idee-dev-satelliten-extraktion",
+      "titel": "Idee: Extraktion `nc-development` in ein Satelliten-Repo",
+      "pfad": "knowledge-base/ideen-backlog/2026-08-10-dev-plugin-satelliten-extraktion.md",
+      "router": "wissen-planen",
+      "hinweis": "Motiv, Rückstellungsgründe und die Abgrenzung §3a ↔ §3b der Satelliten-Wege",
+      "stichworte": [
+        "satelliten-extraktion",
+        "dev-plugin-extraktion",
+        "extraktion",
+        "satelliten-repo"
+      ]
+    },
+    {
+      "id": "idee-ffg-nachbesserungen",
+      "titel": "Idee: FFG-Nachbesserungen (Upstream-Drift, Windows, NotebookEdit)",
+      "pfad": "knowledge-base/ideen-backlog/2026-08-10-ffg-nachbesserungen-upstream-windows-notebookedit.md",
+      "router": "wissen-planen",
+      "hinweis": "drei gegen unseren Code belegte Lücken des FFG-Ports — Pflege gegen das GateGuard-Vorbild",
+      "stichworte": [
+        "ffg-nachbesserung",
+        "gateguard",
+        "destruktivmuster",
+        "notebookedit"
+      ]
+    },
+    {
+      "id": "idee-executor-delegation",
+      "titel": "Idee: Executor-Delegation + fremde Agenten-CLIs",
+      "pfad": "knowledge-base/ideen-backlog/2026-08-10-executor-delegation-und-fremdagenten-integration.md",
+      "router": "wissen-planen",
+      "hinweis": "Delegation bulkiger Schreibarbeit und die vier offenen Klärungen zu Fremdanbietern",
+      "stichworte": [
+        "executor-delegation",
+        "fremdagenten",
+        "agenten-cli",
+        "copyleft",
+        "bulk-work delegieren"
+      ]
+    },
+    {
+      "id": "idee-nc-web-sdk-pivot",
+      "titel": "Idee: Web-GUI `/nc:web` — Nachtrag v0.3 (SDK-Pivot)",
+      "pfad": "knowledge-base/ideen-backlog/2026-07-22-nc-web-gui-design-nachtrag-v0.3-sdk-pivot.md",
+      "router": "wissen-planen",
+      "hinweis": "geltender Stand des Web-GUI-Vorhabens: Standalone-SDK-App statt Plugin-Feature",
+      "stichworte": [
+        "sdk-pivot",
+        "web-gui",
+        "nc:web",
+        "standalone-sdk"
+      ]
+    },
+    {
+      "id": "kandidaten-queue",
+      "titel": "Kandidaten-Queue `development`",
+      "pfad": "knowledge-base/kandidaten-queue/queue.md",
+      "router": "wissen-protokolle",
+      "hinweis": "append-only Übergangs-Queue: kernrelevante Sitzungsergebnisse als Einzeiler + Verweis",
+      "stichworte": [
+        "kandidaten-queue",
+        "queue-eintrag",
+        "queue-zeile",
+        "kernrelevant"
+      ]
+    },
+    {
+      "id": "agent-learnings",
+      "titel": "Fehlerprotokoll (`agent-learnings.md`)",
+      "pfad": "knowledge-base/debugging-findings/agent-learnings.md",
+      "router": "wissen-protokolle",
+      "hinweis": "Pflichteintrag nach jedem EIGENEN Fehler — und Fallen-Check vor einer neuen Aufgabe",
+      "stichworte": [
+        "agent-learning",
+        "fehlerprotokoll",
+        "fehler gemacht",
+        "fehlermuster"
+      ]
+    },
+    {
+      "id": "debug-log",
+      "titel": "Debug-Log (`debug-log.md`)",
+      "pfad": "knowledge-base/debugging-findings/debug-log.md",
+      "router": "wissen-protokolle",
+      "hinweis": "Pflichteintrag für jeden GEFUNDENEN Bug oder Fehlbefund, auch an fremdem Material",
+      "stichworte": [
+        "debug-log",
+        "debug log",
+        "bug gefunden",
+        "fehlbefund"
+      ]
+    }
+  ]
+}

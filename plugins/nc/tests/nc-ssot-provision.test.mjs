@@ -95,7 +95,7 @@ test('Erstlauf: klont voll, materialisiert das ganze Repo, schreibt den Zeiger',
 
   // VOLLER Klon: Der Rest des Repos MUSS mitkommen. Ein frueherer Entwurf holte per
   // --sparse nur die Wissensbasis und schnitt damit `plugins/` weg — genau das, worauf
-  // doku-sync (referenz/skill-authoring.md) verweist. Dieser Test haelt das offen.
+  // skill-builder (referenz/skill-authoring.md) verweist. Dieser Test haelt das offen.
   assert.equal(fs.existsSync(path.join(q.pfad, 'grossordner', 'gross.md')), true,
     'der Klon ist unvollstaendig — die SSOT-Skills brauchen das ganze Repo, nicht nur die Wissensbasis');
 

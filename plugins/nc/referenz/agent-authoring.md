@@ -64,7 +64,7 @@ tools: Read, Grep, Glob
 
 - `description`: Pflicht — sie steuert die **Auto-Delegation**. Dritte Person, enthält die
   Einsatz-Situation (wann einschalten) **und** die benannte Abgrenzung zum nächstliegenden
-  Skill („für Einzel-Checks bleibt `/nc:doku-sync` zuständig"). Ohne Abgrenzungssatz entstehen
+  Skill („für Einzel-Checks bleibt `/nc:wissen-aendern` zuständig"). Ohne Abgrenzungssatz entstehen
   Overlap-Doppelungen.
 - **YAML-Falle — Pflichtregel (dieselbe Parser-Lektion wie bei Skills):** Enthält ein Wert
   einen Doppelpunkt gefolgt von einem Leerzeichen (`: `) oder ein `#`, ist ein unquotierter
@@ -231,7 +231,7 @@ Vollartefakte liegen als Dateien, der Bericht nennt ihre Pfade>
   zu lesen (die Pfade stehen in den SKILL.md-Dateien; der Agent löst sie im installierten
   Plugin-Verzeichnis auf — nie raten).
 - **Namensform (im Vorbild doku-verifiziert 2026-08-15, `sub-agents`):** `skills:` erwartet
-  **nackte Skill-Namen** (`doku-sync`), nicht die Plugin-qualifizierte Form. Fehlende oder
+  **nackte Skill-Namen** (`journal`), nicht die Plugin-qualifizierte Form. Fehlende oder
   deaktivierte Skills werden beim Preload **still übersprungen** (nur Debug-Log-Warnung) —
   derselbe Silent-Failure-Modus wie die YAML-Falle. Hausregeln dagegen: Preload **nur mit
   Skills des eigenen Plugins** (fremde Skills zur Laufzeit übers Skill-Tool laden), und die
