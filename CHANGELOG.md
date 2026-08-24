@@ -10,12 +10,85 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
-> **Sammelabschnitt des Onsite-Endstand-Umbaus (bewusst, E6/E7 — Bauplan 2026-08-15 N1/N6):**
-> Die Kern-Bumps laufen je Großphase (0.7.x → 0.8.0 → 0.9.0, jeweils im Eintrag vermerkt),
-> aber Release-Schnitte, Tags und GitHub-Releases folgen **gesammelt am Umbau-Ende** —
-> erst dann wird dieser Abschnitt in die Versions-Blöcke zerlegt, die `release.yml` je Tag
-> erwartet. Bis dahin ist „höchste CHANGELOG-Überschrift < Kern-Version" der gewollte
-> Zwischenzustand, kein Versäumnis.
+## [0.13.0] — 2026-08-25
+
+> **Erster Waypoint-Schnitt.** Dieser Abschnitt schneidet den seit 0.6.1 aufgelaufenen
+> `[Unreleased]`-Bestand — die Großphasen **0.7.x bis 0.13.0** — in **eine** Version. Er löst
+> den früheren Sammelabschnitt-Vorbehalt (E6/E7, Bauplan 2026-08-15) ab: Seit Entscheid **EN5**
+> (ausgeführt in Phase I) gilt das **Waypoint-Batch-Modell** — eine Version je Batch und
+> Plugin, vergeben am **Release-Zug** und nur auf Maintainer-Kommando
+> (`standardprozesse/aktualisierungs-index.md` §3.6). Der frühere Zwischenzustand „höchste
+> CHANGELOG-Überschrift < Kern-Version" ist damit aufgelöst.
+>
+> **Zwei-Klassen-Buchführung (§0, neu mit dieser Version):** Ins CHANGELOG gehört ab sofort
+> **nur die Produktklasse** (`plugins/**`, `.claude-plugin/**`, `.github/workflows/**`).
+> Wissensklassen-Änderungen (`knowledge-base/**`) tragen **Datum, Status und SSOT-Index-Zeile**
+> und erscheinen hier nicht mehr. Die Einträge unterhalb der Phase-I-Blöcke stammen aus der
+> Zeit vor dieser Regel und mischen beides — sie bleiben **unverändert historisch** stehen.
+>
+> **`[Unreleased]` ist bewusst leer.** Ein Dauerbestand dort ist unter dem Waypoint-Modell
+> kein gewollter Zwischenzustand mehr, sondern eine Bringschuld an den nächsten Release-Zug.
+
+### Added
+
+- **Onsite-Delta-Nachbau Phase I — Wissensfluss & Sanierungs-Normen (Kern 0.12.0 → 0.13.0)**
+  nach Bauplan `aktive-bauplaene/2026-08-24-onsite-delta-phase-i-bauplan.md` (D10–D15, D26,
+  D27; Onsite-Quelle live `origin/main@2530ced`, Kern 0.26.0). Produktanteil:
+  - **`plugins/nc/referenz/pflege-auspraegung.md` → Kriterienliste v2:** neuer Abschnitt 5.5
+    mit den Stufen-Prüfungen **GL1–GL5** an der unteren Stufengrenze — **Vetos mit
+    Ziel-Routing**, die nie in der Spalte `erfülltes Kriterium` erscheinen. „GL2 sticht
+    immer", auch über GF3. GL5(i) schließt fremde Repos, **Affiliate-Plugins** und die
+    eigenständigen Kollegen-OS-Satelliten gleichermaßen vom Queue-Weg aus (P-E7).
+    `schemaVersion` bleibt `1` — es ändert sich kein Feld, nur Text.
+  - **`/nc:os-info`** meldet erstmals, **wo das Sitzungswissen wohnt**; `NC_SECRETS_REF`
+    bekommt genau **drei** Berührungspunkte (Payload, nicht-blockierender
+    `/nc:setup`-Prüfpunkt, `os-info`-Ausgabezeile) — kein Hook, kein Gate, kein
+    Secrets-Speicher, kein Beispielpfad.
+  - **`nc-sync.md` (Ebene-1b-Payload):** drei neue Blöcke — „Ein Archiv ist keine
+    Wissensquelle", **Meta-Regeln** (eigener Worktree, nie direkt auf `main`, Queue-Skills nur
+    nach Fälligkeit) und das **Multi-Agent-Ruleset** (P-E3). Im Firmen-Block der Ebene 1:
+    „SSOT-Änderungen: erst der Aktualisierungs-Index."
+  - **Testsuite:** neue Invarianten für die Sitzungswissen-Struktur (Kategorie geroutet,
+    Register erreichbar und indiziert, `stand.md` je Abteilungsordner) und die
+    Vorlagen-Sammelzeile; zwei Ausnahme-Regex (Tagesjournale, `.vorlage`-Bausteine); eine
+    Negativprobe, dass der Session-Start-Hook **keine** Fälligkeit berechnet und kein Gate ist.
+
+### Changed
+
+- **BREAKING — `/nc:end-session` und `/nc:start` neu gefasst (Mapping D14).** Das
+  Sitzungswissen wohnt in Repos **mit** eigener Wissensbasis committet unter
+  `sitzungswissen/`; **in fremden Arbeits-Repos entsteht kein Dateistrom mehr** — dort trägt
+  das **Projekt-Memory** den Stand allein. Das ändert das Kern-Verhalten auf **allen**
+  Team-Maschinen. Im Einzelnen:
+  - `end-session` kennt zwei Läufe, die **allein das Argument** entscheidet (`nachzug`); eine
+    Heuristik ist ausdrücklich unzulässig, weil ein geratener Nachzug die Arbeit von heute
+    unter das Datum von gestern schriebe. Neu: Zielort-Entscheid, Konsolidierungspflicht bei
+    jedem Lauf, Schritte **9a–9d** über alle drei lokalen Scopes inklusive
+    **Scratchpad-Erfassung**, GL1–GL5 vor den Kriterien, und die Übergabe weist
+    zurückgehaltene Kandidaten als **„bewusst nicht eingetragen"** aus.
+  - `start` bestimmt den Ablageort, liest das **Projekt-Memory vor** der commit-getakteten
+    Repo-SSOT, erkennt einen nicht abgeschlossenen Vortag, gibt ein **30-Sekunden-Briefing mit
+    hartem 20-Zeilen-Deckel** und Quellen-Fußblock aus und legt Erstlauf-Bausteine erst
+    **hinter** dem Stempel an. Ein gefundener `.nc/erinnerung/`-Altbestand wird **gemeldet,
+    nicht gelesen**.
+- **`nc-session-start.js`** nennt den Aufruf `/nc:end-session nachzug` — als reiner
+  Textbaustein: kein neuer Hook, kein Gate, keine dritte Fälligkeit, kein zweiter
+  Speicherort. Zugleich zieht der Hook „Laufende Vorhaben" jetzt aus `aktive-bauplaene/`
+  statt aus `grundwissen/`; sonst hätte er abgeschlossene Design-Specs als laufende Vorhaben
+  präsentiert.
+- **Release-Politik:** E7 („ein Sammelrelease am Umbau-Ende") ist durch das
+  **Waypoint-Batch-Modell** ersetzt (EN5). Im Arbeitsstrang wird **nie** gebumpt; die
+  vierte Bump-Stelle ist aufgehoben. **Reserve-/Anker-Tags entfallen** (P-E2) — Tags entstehen
+  ausschließlich als Teil eines Release.
+
+### Removed
+
+- **Der lokale Strom `.nc/erinnerung/`** ist ersatzlos aufgehoben. `.nc/` steht wieder in
+  `.gitignore` — ausdrücklich als **Altstand-Schutz**, nicht als zugesagter Ablageort.
+- **Der fehlerhafte Verifikationsschritt in `end-session`**, der `git status --short` auf
+  „keine `.nc/`-Pfade (Ignore greift)" prüfte und bei Befund eine `.gitignore`-Änderung
+  vorschlug. Er prüfte gegen einen Repo-Zustand, den der Maintainer mit `242b9e7` bewusst
+  hergestellt hatte — der ausgelieferte Skill widersprach damit dem geltenden Entscheid.
 
 ### Added
 
