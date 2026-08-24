@@ -140,7 +140,7 @@ Nutzerakzeptanz), und **lieber veraltet als zerstört**.
 | 0 | — (Textentwurf zur Freigabe, noch kein Repo-Artefakt) | Admin-Settings des Team-Workspace | jeder Client der Org | zentral, ohne Sync-Mechanik |
 | 1 | `plugins/nc/doks/global-claude-firmenblock.md` | `~/.claude/CLAUDE.md`, Block zwischen `NC:BLOCK`-Markern | jede Session | SessionStart-Autosync `nc-doks-autosync.js` |
 | 1b | `plugins/nc/nc-sync.md` | `~/.claude/nc-teamsync.md` (Ganzdatei) | jede Session per `@`-Import aus Ebene 1, zusätzlich Lese-Schritt in `/nc:start` | derselbe Autosync, Datei-Ersatz |
-| 2 | `vorlagen/abteilungsplugin/abteilungs-claude.md.vorlage` → `plugins/<plugin>/<abteilung>-abteilungs-claude.md` | Plugin-Cache der Maschine | Einstiegs-Ritual `/nc:start` (Schritt 7 liest die Ebene-2-Datei je installiertem Abteilungsplugin; Erstauslieferung `nc-development` 0.2.0) | Marketplace-Auto-Update bei Plugin-Bump |
+| 2 | `knowledge-base/standardprozesse/vorlagen/abteilungsplugin/abteilungs-claude.md.vorlage` → `plugins/<plugin>/<abteilung>-abteilungs-claude.md` | Plugin-Cache der Maschine | Einstiegs-Ritual `/nc:start` (Schritt 7 liest die Ebene-2-Datei je installiertem Abteilungsplugin; Erstauslieferung `nc-development` 0.2.0) | Marketplace-Auto-Update bei Plugin-Bump |
 | 3 | Arbeitsrepo: `CLAUDE.md` / `AGENTS.md` | dort | Verzeichnisbaum-Ladung beim Start | Git |
 | 3b | dieses Repo: getrackte `AGENTS.md` + un-getrackte lokale `CLAUDE.md` | dort | wer **im** Repo baut | Git (nur `AGENTS.md`) |
 

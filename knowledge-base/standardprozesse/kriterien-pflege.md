@@ -90,7 +90,7 @@ Nachzug nach §3, Verifikation nach §6 — beides in **derselben** Arbeitseinhe
 | [`NovaCore-OS-Kriterienliste-Definition.md`](../grundwissen/NovaCore-OS-Kriterienliste-Definition.md) | wenn die **Systematik** berührt ist (Aufbau, Grenzfälle, Abgrenzungen, offene Punkte) | nicht bei jeder Wortlaut-Politur |
 | lesende Kern-Skills (`end-session`, `journal`, `queue-abteilung`, `queue-kern`) | nur wenn sie Kürzel oder Kriterientext **wörtlich zitieren** | mit `grep` nach dem Kürzel prüfen statt zu vermuten — der Regelfall ist der Verweis, nicht das Zitat |
 | [`queue-flow.md`](queue-flow.md) | wenn sich Stationen oder Prüfpunkte des Flows ändern | die Kriterien selbst stehen dort bewusst **nicht** — nur ihre Anwendung |
-| `vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage` | wenn der Queue-/Kriterien-Baustein der Vorlage die Aussage trägt | sonst entsteht die Drift bei der nächsten Abteilung |
+| `knowledge-base/standardprozesse/vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage` | wenn der Queue-/Kriterien-Baustein der Vorlage die Aussage trägt | sonst entsteht die Drift bei der nächsten Abteilung |
 | `README.md` (Repo-Wurzel) | wenn dort die Versionsbezeichnung der Liste steht | NovaCore führt **keine** Kern-Plugin-README — die Wurzel-README ist die einzige Stelle |
 | `pflege-auspraegung.json` der **Abteilungen** | wenn deren `kriterienVerweis` die Versionsbezeichnung nennt | repo-intern (`plugins/nc-development/`): **derselbe** PR · Abteilungs-Satellit mit eigenem Repo: **eigener PR**, danach im Marketplace per `ref` + Full-SHA umpinnen |
 | `CHANGELOG.md` | immer | mit Namenszeichnung des Agenten; teamsichtbar, weil sich die Klassifikation ändert |

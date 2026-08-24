@@ -361,6 +361,46 @@ test('SSOT-Document-Index: jede Wissensdatei ist indiziert', () => {
     `nicht im SSOT-Document-Index.md erfasst: ${fehlend.join(', ')} — jede neue Wissensdatei braucht eine Zeile mit "Relevant wenn …"`);
 });
 
+test('Vorlagen-Bausteine: die Sammelzeile VORLAGE.md ist indiziert', () => {
+  // Gegenstueck zur Vorlagen-Ausnahme oben (VORLAGE_RE): Die Einzelzeilen-Pflicht der
+  // .vorlage-Bausteine entfaellt NUR, weil der Index den Satz ueber seine VORLAGE.md-Zeile als
+  // Ganzes triagiert. Faellt diese Zeile weg, liefe der ganze Vorlagen-Satz still an der
+  // Indexpflicht vorbei — genau die Drift, die der Index verhindern soll.
+  const index = fs.readFileSync(INDEX_DATEI, 'utf8');
+  assert.ok(index.includes('standardprozesse/vorlagen/abteilungsplugin/VORLAGE.md'),
+    'der SSOT-Document-Index muss die Sammelzeile der Vorlage (VORLAGE.md) fuehren — '
+    + 'ohne sie ist die Ausnahme in VORLAGE_RE unbegruendet');
+});
+
+test('Sitzungswissen: Kategorie geroutet, Register erreichbar, Stand je Abteilung', () => {
+  // Gegenstueck zur Journal-Ausnahme oben (JOURNAL_RE): Die Einzelzeilen-Pflicht entfaellt fuer
+  // Tages-Journale NUR, weil diese Invariante die Struktur der Kategorie deterministisch
+  // erzwingt — Residenzpflicht des Sitzungswissens in der Wissensbasis (Mapping D14, Onsite
+  // §15.48). Der fruehere lokale Strom .nc/erinnerung/ war un-getrackt, stale und wurde von
+  // niemandem zurueckgelesen; er ist mit Phase I aufgehoben. In Repos OHNE eigene Wissensbasis
+  // traegt das Projekt-Memory den Stand allein — dort entsteht kein Dateistrom.
+  const dir = path.join(WISSEN, 'sitzungswissen');
+  assert.ok(fs.existsSync(dir),
+    'knowledge-base/sitzungswissen/ fehlt — Sitzungswissen wohnt seit Phase I in der Wissensbasis');
+  const index = fs.readFileSync(INDEX_DATEI, 'utf8');
+  assert.ok(index.includes('`sitzungswissen/`'),
+    'SSOT-Document-Index Teil 1 routet die Kategorie sitzungswissen/ nicht');
+  assert.ok(fs.existsSync(path.join(dir, 'offene-straenge-register.md')),
+    'sitzungswissen/offene-straenge-register.md fehlt — /nc:end-session muss offene Straenge eintragen koennen');
+  assert.ok(index.includes('sitzungswissen/offene-straenge-register.md'),
+    'das Offene-Straenge-Register ist nicht im Index verlinkt — /nc:start faende es nicht');
+  assert.ok(fs.existsSync(path.join(dir, 'roll-up.md')),
+    'sitzungswissen/roll-up.md fehlt — der Roll-up-Index ist Pflichtbaustein');
+  const abteilungen = fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory());
+  assert.ok(abteilungen.length > 0,
+    'sitzungswissen/ hat keinen Abteilungsordner — mindestens `gemeinsam/` ist Pflicht');
+  for (const entry of abteilungen) {
+    assert.ok(fs.existsSync(path.join(dir, entry.name, 'stand.md')),
+      `sitzungswissen/${entry.name}/: stand.md fehlt — je Abteilungsordner ist der konsolidierte `
+      + 'Stand Pflicht (Konsolidierungspflicht von /nc:end-session)');
+  }
+});
+
 test('SSOT-Document-Index: kein Eintrag zeigt ins Leere', () => {
   const tot = indexZiele().filter((ziel) => !fs.existsSync(path.join(WISSEN, ...ziel.split('/'))));
   assert.deepEqual(tot, [],
@@ -479,7 +519,7 @@ test('CHANGELOG: keine Versionsueberschrift doppelt vergeben (spaete Anker-Invar
 });
 
 test('Vorlage ist kein Plugin und enthaelt keine ausgefuellten Werte', () => {
-  const dir = p('vorlagen', 'abteilungsplugin');
+  const dir = p('knowledge-base', 'standardprozesse', 'vorlagen', 'abteilungsplugin');
   assert.equal(fs.existsSync(path.join(dir, '.claude-plugin', 'plugin.json')), false,
     'die Vorlage darf kein einsatzfaehiges plugin.json enthalten (nur .vorlage)');
   const tpl = fs.readFileSync(path.join(dir, '.claude-plugin', 'plugin.json.vorlage'), 'utf8');
@@ -493,7 +533,7 @@ test('Vorlage ist kein Plugin und enthaelt keine ausgefuellten Werte', () => {
   // ausgefuellte Instanz und wuerde beim Kopieren stillschweigend fremde Namen mitschleppen.
   const ssot = path.join(dir, 'ssot-grundgeruest.md.vorlage');
   assert.ok(fs.existsSync(ssot),
-    'vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage fehlt — sie ist die verbindliche '
+    'standardprozesse/vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage fehlt — sie ist die verbindliche '
     + 'Vorlage der Satelliten-Wissensbasis (ssot-aufbau.md §4, abteilungs-plugin-bau.md §3b.1)');
   assert.match(fs.readFileSync(ssot, 'utf8'), /\{\{ABTEILUNG\}\}/,
     'ssot-grundgeruest.md.vorlage ohne Platzhalter {{ABTEILUNG}} — wurde sie ausgefuellt?');

@@ -72,7 +72,7 @@ test('Vorlagen-Invariante: beispiel-agent.md.vorlage traegt Platzhalter und Allo
   // Allowlist-Prinzip (2026-08-15) gibt die Vorlage die Pflichtfelder tools und model sowie
   // den Defense-Baseline-Block vor; die Read-only-Variante kommt ohne Bash und ohne
   // Schreib-Werkzeuge in der Allowlist aus (disallowedTools ist nicht mehr Traeger der Grenze).
-  const vorlage = p('vorlagen', 'abteilungsplugin', 'agents', 'beispiel-agent.md.vorlage');
+  const vorlage = p('knowledge-base', 'standardprozesse', 'vorlagen', 'abteilungsplugin', 'agents', 'beispiel-agent.md.vorlage');
   assert.ok(fs.existsSync(vorlage), `${vorlage} fehlt — der Agenten-Baustein der Vorlage ist Pflicht`);
   const inhalt = fs.readFileSync(vorlage, 'utf8');
   assert.match(inhalt, /\{\{AGENT_NAME\}\}/, 'Vorlage ohne Platzhalter {{AGENT_NAME}} — wurde sie ausgefuellt?');

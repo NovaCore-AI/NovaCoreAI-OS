@@ -85,7 +85,7 @@ Instruktionsebene).
   Datei seitdem in `/nc:start` Schritt 7 aus dem Plugin-Root — Auslieferung ≠ Wirkung ist
   damit geschlossen). Zielname `<abteilung>-abteilungs-claude.md` an der Plugin-Wurzel,
   zweigeteilt (Teil 1 für alle Sessions der Abteilung, Teil 2 Werkstatt); verbindliche Vorlage
-  `vorlagen/abteilungsplugin/abteilungs-claude.md.vorlage`, Bauprozess
+  `../standardprozesse/vorlagen/abteilungsplugin/abteilungs-claude.md.vorlage`, Bauprozess
   [`claude-netz-bau.md`](../standardprozesse/claude-netz-bau.md). Kein
   Memory-Share zwischen affiliate-Satelliten (siehe SSOT-Definition).
 

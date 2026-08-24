@@ -116,9 +116,10 @@ NovaCoreAI-OS/
 ├── plugins/nc-development/             # Abteilungsplugin, dependencies ["nc"]
 │   ├── workflow.md                     #   WP1–WP7 auf den NovaCore-Zyklus übersetzt
 │   └── skills/<modul>-<name>/SKILL.md  #   flaches Layout, Module = Namenspräfixe
-├── vorlagen/abteilungsplugin/          # Vorlage für weitere Abteilungen (kein Plugin)
 └── knowledge-base/                     # Wissensbasis im OS-Repo: grundwissen,
                                         # standardprozesse, debugging-findings
+    └── standardprozesse/vorlagen/abteilungsplugin/
+                                        # Vorlage für weitere Abteilungen (kein Plugin)
 ```
 
 Abteilungen können zusätzlich in **Satelliten-Repos** leben (das Repo IST das Plugin,

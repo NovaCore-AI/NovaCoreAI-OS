@@ -90,8 +90,10 @@ Marketplace-Quelle bei NovaCore das **öffentliche** Repo `NovaCore-AI/NovaCoreA
 (Marketplace-Name `novacore-os`, `.claude-plugin/marketplace.json`). Das ändert an der
 Verteilungsmechanik nichts — Kollegen brauchen keinen privaten Repo-Zugriff, um den
 Marketplace hinzuzufügen —, verschärft aber die Rollen-Regel (Kopf dieses Dokuments) und
-die Sitzungswissen-Frage (Bauplan-Entscheide E2/E3: `.nc/erinnerung/` im Arbeits-Repo
-bleibt Wohnort, nicht `sitzungswissen/` im öffentlichen OS-Repo).
+die Sitzungswissen-Frage: Die Alt-Entscheide E2/E3 sind seit dem 2026-08-24 durch **EN1/P-E4**
+abgelöst — das Sitzungswissen wohnt **committet** unter `knowledge-base/sitzungswissen/` in
+diesem öffentlichen OS-Repo (`roll-up.md` und `offene-straenge-register.md` direkt dort,
+`gemeinsam/stand.md` und `gemeinsam/journal/<YYYY-MM-DD>.md` auf der Abteilungsebene).
 
 ## 3. Kollegen-Seite — Installation
 
