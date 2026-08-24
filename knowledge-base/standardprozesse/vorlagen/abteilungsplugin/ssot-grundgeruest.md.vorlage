@@ -105,7 +105,7 @@ Kriterien-Verweis, Journal-Sonderregeln, domänen-spezifische rote Linien, optio
 Übergangsregel. Ohne sie findet `/nc:end-session` die Queue nicht und meldet fehlendes Setup.
 
 **Verbindliches Format:** `referenz/pflege-auspraegung.md` des Kern-Plugins `nc` (Schema v1,
-Auflösungsregel, Queue-Format v1, Kriterienliste v1). Nicht aus dem Gedächtnis füllen — die
+Auflösungsregel, Queue-Format v1, Kriterienliste v2). Nicht aus dem Gedächtnis füllen — die
 Referenz nennt Pflichtfelder und Prüfliste. Solange der Registry-Eintrag der Abteilung kein
 `repository` führt, ist das Feld `uebergang` Pflicht.
 

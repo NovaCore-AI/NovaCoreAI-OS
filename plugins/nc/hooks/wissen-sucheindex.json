@@ -522,6 +522,39 @@
         "bug gefunden",
         "fehlbefund"
       ]
+    },
+    {
+      "id": "systemachsen",
+      "titel": "Systemachsen-Definition",
+      "pfad": "knowledge-base/grundwissen/NovaCore-OS-Systemachsen.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "Die drei Systemachsen (Wissensfluss, Auslieferung, Instandhaltung) und die Definition der lokalen Ebene als Scope-Begriff mit ihren drei Scopes.",
+      "stichworte": [
+        "systemachse",
+        "systemachsen",
+        "wissensfluss",
+        "lokale ebene",
+        "projekt-scope",
+        "user-scope",
+        "scratchpad-scope",
+        "welche achse"
+      ]
+    },
+    {
+      "id": "scratchpad-nutzung",
+      "titel": "Standardprozess Scratchpad-Nutzung",
+      "pfad": "knowledge-base/standardprozesse/scratchpad-nutzung.md",
+      "router": "wissen-aendern",
+      "hinweis": "R1 Arbeiten, R2 Ersetzen, R3 Erfassen: das Scratchpad ist Arbeitsplatz, nie Finalitaets-Ort; jeder Fund wird beim Sitzungsabschluss entschieden.",
+      "stichworte": [
+        "scratchpad",
+        "session-scratchpad",
+        "fluechtig",
+        "finalitaet",
+        "zwischenstand",
+        "arbeitsverzeichnis",
+        "gebaut gilt erst nach push"
+      ]
     }
   ]
 }

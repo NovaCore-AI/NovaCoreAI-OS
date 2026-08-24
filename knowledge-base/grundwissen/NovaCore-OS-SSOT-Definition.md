@@ -26,7 +26,9 @@ aus:
 3. ihrer **technischen Einbindung** in das OS über Hooks und standardisierte Arbeitsabläufe.
 
 Sie umfasst damit alle drei Ebenen des Wissens im OS — die Wissensbasis des OS-Repos, das
-Laufzeit-Gedächtnis in den Arbeits-Repos (`.nc/erinnerung/`) und die verteilten Doks
+Laufzeit-Gedächtnis der Arbeits-Repos (**Projekt-Memory**; der frühere lokale Dateistrom
+`.nc/erinnerung/` ist seit 2026-08-24 aufgehoben — [Systemachsen](NovaCore-OS-Systemachsen.md),
+Abschnitt „Die lokale Ebene") und die verteilten Doks
 (Global-/Projekt-CLAUDEs, seit 2026-08-10 per Doks-Autosync) — **und deren Orchestrierung
 miteinander**.
 
@@ -90,5 +92,51 @@ ausformuliert (Doppelpflege-Verbot); der Kern verweist, die Abteilung beschreibt
 
 ---
 
+## Nachtrag 2026-08-24 — SSOT-Wissen vs. ausgeliefertes Laufzeit-Regelwerk
+
+*(Entscheid EN6 „übernehmen, angepasst" + P-E5; AP-C2 des Phase-I-Bauplans, Mapping D13.)*
+
+**Die Frage:** Gehört ein Inhalt in die Wissensbasis (`knowledge-base/`) oder als ausgeliefertes
+Laufzeit-Regelwerk nach `plugins/<name>/referenz/`?
+
+**Der Schnitt:** Ein installiertes Plugin sieht **keine** Repo-Pfade — nur, was im
+Plugin-Verzeichnis mitkopiert wurde. Regelwerk, das **zur Laufzeit auf der Maschine des
+Nutzers** gelten muss (SKILL.md-Formatregeln, Subagenten-Formatregeln, Queue-Format und
+Kriterienliste), liegt deshalb unter `plugins/<name>/referenz/` und wird ausgeliefert. Es ist
+damit **Produktklasse**, nicht Wissensklasse (Aktualisierungs-Index §0): Es wird mit dem Plugin
+versioniert, erscheint im CHANGELOG — und bekommt **keine** SSOT-Index-Zeile.
+
+**Freigegebene Instruktions-Träger — dokumentierte Abweichung vom Vorbild.** Onsite kennt genau
+einen freigegebenen Träger im Paket: `doks/`. **Bei uns sind es zwei:** `doks/` **und**
+`plugins/nc/nc-sync.md`. Grund ist eine bewusste Bauentscheidung, belegt im Code
+(`plugins/nc/hooks/nc-doks-autosync.js`, Z. 45–48): Die Ebene-1b-Payload **ist** die bestehende
+Datei `nc-sync.md`, **keine Kopie** nach `doks/` — sie wird von Skills, `workflow.md` und
+Standardprozessen referenziert und bleibt die eine Quelle. Onsite führt dieselbe Payload als
+`doks/oai-teamsync.md`. Die Abweichung ist **Doppelpflege-Vermeidung**, kein Versehen.
+
+**Einstufung des Bestands (P-E5 — Beleg je Datei, kein pauschaler Stempel).** Geprüft wurde die
+PR-Historie je Datei:
+
+| Datei | Eingeführt in | Review-Beleg | Einstufung |
+|---|---|---|---|
+| `referenz/skill-authoring.md` | PR #3 | PR-Body führt ein **externes Kimi-Review (read-only)** mit Ergebnisabschnitt | belegt review**t** — durch Agenten-Review |
+| `referenz/agent-authoring.md` | PR #20 | PR-Body führt die **Review-Kette N1** (Selbstreview + deterministische Gegenproben, GLM-Review) | belegt reviewt — durch Agenten-Review |
+| `referenz/pflege-auspraegung.md` | PR #21 | PR-Body führt **zwei GLM-5.3-Runden** mit Befundzählung und eingearbeiteten Fixes | belegt reviewt — durch Agenten-Review |
+
+**Der ehrliche Rest:** Alle drei PRs stehen auf GitHub bis heute auf `REVIEW_REQUIRED` mit
+**null aufgezeichneten Reviews**. Es gibt also je Datei einen **dokumentierten Review-Vorgang**,
+aber **kein aufgezeichnetes Maintainer-Approval**. Ein pauschaler `unreviewed`-Stempel wäre
+falsch (die Vorgänge sind belegt); ein „vom Maintainer abgenommen" wäre es ebenso. Der Rest
+steht als eigene Zeile im
+[Offene-Stränge-Register](../sitzungswissen/offene-straenge-register.md).
+
+**Norm ab sofort:** **Keine weitere `referenz/`-Neuanlage ohne ausdrückliche Abnahme.** Wer eine
+neue Datei unter `plugins/<name>/referenz/` anlegen will, begründet in derselben Änderung, warum
+der Inhalt zur **Laufzeit beim Nutzer** gebraucht wird und deshalb nicht in die Wissensbasis
+gehört — und holt die Abnahme ein, bevor die Datei ausgeliefert wird.
+
+---
+
 *Angelegt 2026-08-10 durch Claude (Opus 5, Claude Code) im Zuge des Onsite-Align-Umbaus, auf
-Weisung Lucas Vöhringer; Begriffshoheit: Lucas Vöhringer.*
+Weisung Lucas Vöhringer; Begriffshoheit: Lucas Vöhringer. Nachtrag 2026-08-24 (Phase I, AP-C2)
+durch Claude (Opus 5) als Overseer.*

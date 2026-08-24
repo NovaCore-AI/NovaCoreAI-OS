@@ -24,8 +24,9 @@
 ## 1. Der Flow auf einen Blick
 
 ```
-Sitzung
-  └─ /nc:end-session   klassifiziert gegen Kriterien a–d + Gegenkriterien GF1–GF4
+Sitzung  (lokale Stufe = SCOPE, kein Ort: Projekt · User · Scratchpad)
+  └─ /nc:end-session   Stufe 1 — erst GL1–GL5 (darf es den Scope verlassen?),
+                       dann Kriterien a–d + Gegenkriterien GF1–GF4
        └─ Queue-Zeile (append-only) in der Abteilungs-Wissensbasis   [Agent]
             └─ /nc:queue-abteilung   Zyklus-Lauf (14-tägig), bündelt zu EINEM
                Abteilungs-PR                                          [Agent]
@@ -41,6 +42,12 @@ Sitzung
                                    (`befördert (PR #n)` / `abgelehnt (PR #n)`)
 ```
 
+**Der Flow ist dreistufig** (lokal → Abteilung → Kern). Die **untere** Stufengrenze liegt in
+`/nc:end-session` und ist **kein Speicher**, sondern ein Klassifikations- und
+Kriterien-Apparat: Eine eigene Queue-Datei auf lokaler Ebene gibt es bewusst **nicht**.
+Die Achsen-Einordnung steht in der
+[Systemachsen-Definition](../grundwissen/NovaCore-OS-Systemachsen.md) (Achse 1).
+
 **Die eine Regel, die den Flow trägt:** Agenten bereiten bis zum fertigen PR vor, Menschen
 entscheiden. Merge, Review-Resolves und alles Kundensichtbare bleiben rote Linie. Ob die
 PR-**Erstellung** eine stehende Freigabe bekommt oder je Lauf einzeln freizugeben ist, ist
@@ -50,7 +57,7 @@ offen (§6).
 
 | # | Station | Wer | Was geprüft wird (QS) |
 |---|---|---|---|
-| 1 | **Klassifikation** (`/nc:end-session`, Abschlussschritt) | Agent | Kriterium **belegt** benannt (a–d), Gegenkriterien geprüft; im Zweifel **nicht** eintragen — Session-Agenten überschätzen die eigene Relevanz systematisch |
+| 1 | **Klassifikation an der unteren Stufengrenze** (`/nc:end-session`, Schritte 8 und 9a–9d) | Agent | **Zuerst die Freigabe-Prüfungen GL1–GL5** (`pflege-auspraegung.md` Abschnitt 5.5): Darf das Ergebnis den lokalen Scope überhaupt verlassen? Sie sind **Vetos mit Ziel-Routing** und stehen **nie** in der Spalte `erfülltes Kriterium` — **GL2 (ausdrückliches Verbot des Menschen) sticht immer**, auch über GF3. **Danach** die Eintrittsfrage: Kriterium **belegt** benannt (a–d), Gegenkriterien GF1–GF4 geprüft; im Zweifel **nicht** eintragen (Ausnahme GF3: im Zweifel eintragen). Erfasst werden **alle drei lokalen Scopes** — Projekt, User und **Scratchpad** (Schritt 9a: jeder Fund wird entschieden, gerettet oder bewusst verworfen). Zurückgehaltene Kandidaten erscheinen in der Übergabe als **„bewusst nicht eingetragen"** mit dem greifenden Kürzel, ohne den geschützten Inhalt |
 | 2 | **Queue-Zeile** | Agent | Fünf Spalten, ISO-Datum, Einzeiler ohne Kontextbedarf, Verweis statt Volltext, Status `offen`; keine Secrets/Kundendaten |
 | 3 | **Abteilungs-PR** (`/nc:queue-abteilung`) | Agent | Nur-Wissensbasis-Pfadbedingung (hart) · Standardbranch-Sync: Divergenz ⇒ Abbruch, und **`behind > 0` ⇒ kein neuer Commit** (sonst entstünde die Divergenz erst durch den eigenen Commit) · Queue-Format als **strukturierter Tabellenvergleich** (Multimengen je Schlüssel aus den ersten vier Spalten, one-to-one-Verbrauch, einzig erlaubte Transition `offen → befördert/abgelehnt (PR #n)`; doppeldeutige Zeilen-Identität ist selbst ein Befund) · **ein** PR je Lauf |
 | 4 | **Merge des Abteilungs-PR** | **Mensch (Admin)** | fachliche Richtigkeit der Abteilungs-Einträge |
