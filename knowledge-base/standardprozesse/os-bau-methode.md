@@ -147,7 +147,7 @@ und nach zur eigenen macht, ohne die Struktur zu brechen:
 | **Modul-Schnitt** | Nach Prozess-Stufen (Onsite: feat/mr/rev/qs/rel) oder Leistungsfeldern (NovaCore: fe/be/flc/wzs)? | Leistungsfelder + Lifecycle-Modul |
 | **Gate-Schärfe** | deny (Fakten erzwingen) vs. ask (nur bestätigen)? | FFG deny; Session-Hinweis Komfort |
 | **Scoping** | Gates überall oder nur in markierten Repos? | Gates markerlos, Komfort Marker-gebunden |
-| **Memory-Ort** | Wo lebt Projektgedächtnis? | `.nc/erinnerung/` im Arbeits-Repo, nie im OS-Repo |
+| **Memory-Ort** | Wo lebt Projektgedächtnis? | Projekt-Memory im Arbeits-Repo (kein Dateistrom mehr); im OS-Repo selbst committet unter `sitzungswissen/` der Wissensbasis |
 | **Sprache/Ton** | Artefakt-Sprache, Du/Sie, Terminologie | Deutsch, direktiv-imperativisch |
 | **Review-Regime** | Wer reviewt was, wann extern/adversarial? | Implementierer ≠ Reviewer; kritischer Pfad dual |
 | **Versions-Schema** | Wann Minor/Patch/Major? | Neuerung → Minor, Fix → Patch, Strukturbruch → groß |

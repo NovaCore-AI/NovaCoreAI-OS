@@ -9,9 +9,10 @@
 // KEIN FAKTEN-STEMPEL (anders als nc-start-stempel.js): Dort gibt es eine pruefbare
 // Aussenwelt — Branch und HEAD lassen sich gegen `git rev-parse` verifizieren. Der
 // Sitzungsabschluss hat keine solche Instanz: WELCHE Dateien end-session schreibt,
-// haengt am Arbeits-Repo (Wohnort `.nc/erinnerung/` bzw. kuenftig eine Wissensbasis-
-// Kategorie in privaten Repos, Entscheid E2 des Bauplans) und am installierten
-// Abteilungsplugin. Ein Pfad-Check waere entweder umgehbar oder falsch-negativ und
+// haengt am Arbeits-Repo (seit Kern 0.13.0: die Kategorie `sitzungswissen/` der eigenen
+// Wissensbasis — und wo es keine gibt, GAR KEINE Datei, weil dort das Projekt-Memory
+// allein traegt) und am installierten Abteilungsplugin. Ein Pfad-Check waere damit erst
+// recht entweder umgehbar oder falsch-negativ und
 // wuerde ein *mahnendes* Gate in eine Sackgasse verwandeln. Der Stempel ist daher ein
 // reiner Selbstauskunfts-Marker — vertretbar, weil die Mahnung nur mahnt (einmal je
 // Sitzung) und nichts dauerhaft verweigert.

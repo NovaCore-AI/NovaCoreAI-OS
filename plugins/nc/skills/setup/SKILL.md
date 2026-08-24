@@ -4,8 +4,9 @@ description: >-
   Richtet eine Maschine vollständig fürs NovaCore-OS ein oder repariert ein bestehendes
   Setup (Reconciler über sechs Soll-Schichten S0–S6) — prüft Voraussetzungen und
   Plugin-Stand, stellt die SSOT-Lesekopie bereit (voller Klon, Fast-Forward,
-  Sparse-Heilung), verknüpft über die Infra-Registry, legt fehlendes Sitzungswissen-Gerüst
-  im Arbeits-Repo an und verifiziert die CLAUDE-Lokaldokumente. Mehrfach ausführbar, kein
+  Sparse-Heilung), verknüpft über die Infra-Registry, legt fehlendes Sitzungswissen-Gerüst an
+  (sofern das Repo eine eigene Wissensbasis führt) und verifiziert die CLAUDE-Lokaldokumente.
+  Mehrfach ausführbar, kein
   Schritt legt doppelt an. Trigger-Begriffe: „OS einrichten", „Setup", „Ersteinrichtung",
   „neuer Rechner", „Onboarding", „SSOT einrichten", „Wissensbasis fehlt", „Wissensbasis
   aktualisieren", „Registry reparieren", „was fehlt noch".
@@ -73,15 +74,20 @@ lokale Kopie. S2 schließt genau diese Lücke.
    weitergeben. Die Verlinkung ist der feste Pfad `~/.nc/ssot/<repo-name>/`, den der
    Firmen-Block nennt (Ablage-Override für Tests/Sonderfälle: `NC_SSOT_DIR` — Standard
    bleibt `~/.nc/ssot/`).
-5. **S4 Sitzungswissen-Gerüst im Arbeits-Repo reconcilen:** Im aktuellen Arbeits-Repo
-   fehlende Bausteine unter `.nc/erinnerung/` **alle** anlegen (Onsite-Lehre 0.18.2:
-   halbe Gerüste erzeugen Folgefehler): `stand.md` · `journal/` ·
-   `offene-straenge-register.md` · `roll-up.md` — je Datei mit Kopf-Blockquote **und der
-   Struktur, die `/nc:end-session` erwartet** (Register: Tabelle
+5. **S4 Sitzungswissen-Gerüst reconcilen — nur bei eigener Wissensbasis:** Führt das aktuelle
+   Arbeits-Repo eine eigene Wissensbasis (SSOT-Kategorie mit Master-Index — im OS-Repo
+   `knowledge-base/`), dort fehlende Bausteine unter `sitzungswissen/` **alle** anlegen
+   (Onsite-Lehre 0.18.2: halbe Gerüste erzeugen Folgefehler): `roll-up.md` ·
+   `offene-straenge-register.md` · je Abteilung `<abteilung>/stand.md` ·
+   `<abteilung>/journal/` — je Datei mit Kopf-Blockquote **und der Struktur, die
+   `/nc:end-session` erwartet** (Register: Tabelle
    `Datum · Strang · Verbleib · Nächster Schritt · Status`; Roll-up: eine Zeile je
-   Arbeitstag, jüngster oben), nie Bestandsdateien überschreiben. Fehlt der `.gitignore`-Eintrag `.nc/`, darauf hinweisen
-   (die Datei gehört dem Arbeits-Repo; Änderung nur nach Zustimmung). Läuft der Skill
-   außerhalb eines Arbeits-Repos, ist S4 **nicht anwendbar** (nicht „grün").
+   Arbeitstag, jüngster oben), nie Bestandsdateien überschreiben. **Führt das Repo keine
+   eigene Wissensbasis** (der Regelfall bei Kunden- und Fremd-Repos)**, ist S4 nicht
+   anwendbar** — dort legt dieser Skill nichts mehr an; das Projekt-Memory von Claude Code
+   trägt den Stand allein (kein Dateistrom, kein Verzeichnis, keine Datei, kein
+   `.gitignore`-Eintrag). Der frühere lokale Strom `.nc/erinnerung/` ist abgeschafft: Ein
+   gefundener Altbestand wird **gemeldet, nicht benutzt und nicht weitergeschrieben**.
 6. **S5 CLAUDE-Lokaldokumente verifizieren:** `NC:BLOCK`-Marker + Versions-Stempel in
    `~/.claude/CLAUDE.md`, die Import-Zeile `@~/.claude/nc-teamsync.md` im Firmen-Block
    und den `NC:TEAMSYNC:VERSION`-Stempel in der **ersten Zeile** von
@@ -97,7 +103,10 @@ lokale Kopie. S2 schließt genau diese Lücke.
    Platte bleibt der Beleg; ein Eintrag mit totem Pfad gilt beim nächsten Lauf als
    „fehlt".
 8. **S6 Abschlussbericht:** Tabelle S0–S6 mit Beleg je Schicht (Befehl + Ergebnis, Pfad,
-   Version, Marker-Fund), offene Punkte, Gegenprobe per `/nc:os-info`.
+   Version, Marker-Fund), offene Punkte, Gegenprobe per `/nc:os-info`. Zusätzlich
+   **`NC_SECRETS_REF` nicht-blockierend prüfen**: nur „gesetzt" oder „nicht gesetzt"
+   vermerken, ihr Wert wird **nie** gelesen oder ausgegeben — fehlt sie, ist das ein Hinweis,
+   **kein Abbruch** und keine der sechs Schichten.
 
 ## Regeln
 
@@ -107,9 +116,10 @@ lokale Kopie. S2 schließt genau diese Lücke.
   vorhandene Bestände werden gemeldet („vorhanden, Beleg …"), nie überschrieben.
 - **Nur Fast-Forward in S2.** Eine lokal veränderte Lesekopie wird **gemeldet, nicht
   überschrieben** — dort könnte ungesicherte Arbeit liegen.
-- **Geschrieben wird ausschließlich** in der SSOT-Ablage (Override `NC_SSOT_DIR`), in
-  `.nc/erinnerung/` des aktuellen Arbeits-Repos (S4) und in der Infra-Registry (S3).
-  Die globale `CLAUDE.md` wird **nie** von diesem Skill beschrieben (S5 verifiziert nur).
+- **Geschrieben wird ausschließlich** in der SSOT-Ablage (Override `NC_SSOT_DIR`), im
+  Sitzungswissen-Gerüst einer **eigenen** Wissensbasis (S4) und in der Infra-Registry (S3).
+  Ohne eigene Wissensbasis schreibt S4 nichts. Die globale `CLAUDE.md` wird **nie** von diesem
+  Skill beschrieben (S5 verifiziert nur).
 - **Nie Skill-Dateien patchen:** Die Verknüpfung läuft ausschließlich über den festen
   SSOT-Pfad und die Infra-Registry — der Plugin-Cache wird bei jedem Auto-Update ersetzt.
 - **Kollegen-OS-Satelliten (Felix, Biggi) brauchen hier nichts:** ihr Repo ist das

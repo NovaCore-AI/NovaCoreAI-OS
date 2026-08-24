@@ -52,7 +52,9 @@ Einstieg ist immer der **Dokuindex** der zuständigen Wissensbasis — erst tria
   Satelliten **by design nicht erreichbar** (Rechte-Trennung) — das ist kein Defekt und kein
   blockierter Skill, sondern der vorgesehene Zustand; es wird gemeldet, nicht umgangen.
 - **Sitzungswissen** (Stand, Journal, offene Stränge) schreiben und lesen `/nc:start` bzw.
-  `/nc:end-session` — Wohnort ist `.nc/erinnerung/` des Arbeits-Repos.
+  `/nc:end-session` — Wohnort: bei eigener Wissensbasis (repo-interne Abteilung: das OS-Repo;
+  Satellit: die eigene Wissensbasis) unter `sitzungswissen/`, sonst trägt das Projekt-Memory
+  den Stand allein — kein Dateistrom.
 - **Firmenweites, Kern-Regeln, Produktstand** stehen in den Ebenen 1/1b und werden hier **nicht**
   wiederholt.
 

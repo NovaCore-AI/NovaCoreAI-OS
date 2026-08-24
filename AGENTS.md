@@ -16,9 +16,11 @@
    `git status --short`: **der Working Tree ist die Wahrheit**, nicht der letzte Commit und
    nicht diese Datei.
 2. **Produktstand:** `CHANGELOG.md` (autoritativ für „was ist gebaut / was fehlt") + `VERSION`.
-3. **Planungsstand:** Specs/Pläne liegen final in `knowledge-base/grundwissen/` mit
-   Datumspräfix — die jüngste Spec ist der aktuellste Planungsstand; die Produktvision
-   (`NovaCore-OS-Produktarchitektur.md`) ist die Referenz für Vision-Abgleiche.
+3. **Planungsstand:** Laufende Baupläne liegen final in `knowledge-base/aktive-bauplaene/`
+   mit Datumspräfix — die jüngste Datei je Strang ist der aktuellste Planungsstand;
+   `knowledge-base/grundwissen/` trägt seit Phase I nur noch dauerhafte Begriffsnormen und
+   Design-Specs, nicht mehr die laufenden Pläne; die Produktvision
+   (`NovaCore-OS-Produktarchitektur.md`) bleibt die Referenz für Vision-Abgleiche.
 4. **Triage über den Master-Index:** `knowledge-base/SSOT-Document-Index.md` — Teil 1 sagt,
    wohin ein Dokument gehört, Teil 2 („Relevant wenn …") nennt je Quelle die
    Abruf-Situation. Vor Vermutungen dort nachsehen.
@@ -42,7 +44,8 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 1. **Verteilung** — ein Marketplace (`novacore-os`), mehrere Plugins (Kern + Abteilungen),
    versioniert je Plugin, Auto-Update fürs Team
 2. **Wissen (SSOT)** — `nc-sync.md` (Global-Anweisung, im Kern ausgeliefert),
-   Projekt-CLAUDEs, Projekt-Memory `.nc/erinnerung/` je Arbeits-Repo
+   Projekt-CLAUDEs, Projekt-Memory je Arbeits-Repo — im OS-Repo `knowledge-base/sitzungswissen/`,
+   sonst kein Dateistrom mehr (Projekt-Memory von Claude Code trägt allein)
 3. **Pflicht-Workflow** — `/nc:start` → WP-Gates → `/nc:end-session`; Rahmen WP0–WP8
    normativ in `plugins/nc/wp-rahmen.md`, Fachablauf je Abteilung in deren `workflow.md`
 4. **Abteilungen** — **je Abteilung ein Plugin** (`plugins/nc-<abteilung>/`, Kern als
@@ -76,7 +79,8 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | Kategorie | Zweck | Wann konsultieren |
 |---|---|---|
 | **`SSOT-Document-Index.md`** (Wurzel) | **Master-Index** der Wissensbasis: Teil 1 Ordner-Routing (wohin gehört ein Dokument), Teil 2 Quellen-Triage („Relevant wenn …") über alle Bestandsdateien. **Einzige Datei auf Wurzelebene** (testerzwungen) | **zuerst** — vor dem Griff in eine Kategorie und vor dem Anlegen/Verschieben/Löschen einer Wissensdatei |
-| `grundwissen/` | Produktvision, Begriffsnormen (SSOT-, Gates-, CLAUDE-Ebenen-Definition), Design-Specs und Pläne (Datumspräfix; jüngste Datei = Planungsstand) | Vision-/Architektur-Fragen; vor Design-Entscheidungen; Planungsarbeit; wenn ein Begriff (SSOT, Gate, CLAUDE-Ebene) erklärt oder abgegrenzt werden muss |
+| `grundwissen/` | Produktvision, Begriffsnormen (SSOT-, Gates-, CLAUDE-Ebenen-Definition) und Design-Specs — dauerhafte Referenzen ohne Datumspräfix; laufende Baupläne liegen seit Phase I in `aktive-bauplaene/` | Vision-/Architektur-Fragen; vor Design-Entscheidungen; wenn ein Begriff (SSOT, Gate, CLAUDE-Ebene) erklärt oder abgegrenzt werden muss |
+| `aktive-bauplaene/` | laufende Baupläne (Datumspräfix je Strang), inkl. Delta-Mappings und Nachtschicht-Ausführungsplänen — der aktuelle Planungsstand, bis ein Plan abgeschlossen/verworfen und ins `bauplan-archiv/` verschoben wird | vor jeder Planungsarbeit; für den aktuellen Bauplan eines laufenden Stranges |
 | `standardprozesse/` | verbindliche Abläufe: `aktualisierungs-index.md` (**„ich ändere X — was muss ich anfassen"**, Langfassung der Sync-Matrix + Prüfzyklus + Selbsttest), `kern-plugin-bau.md` (Kern-Plugin, Governance-Schichten, Doks-Autosync), `abteilungs-plugin-bau.md` (Abteilungen und Satelliten, Auslieferungsgrenze), `ssot-aufbau.md` (Aufbau der Wissensbasis, Struktur-Vererbung an Satelliten), `sync-nachzug-bauzyklus.md` (gebündelte Nachzüge je Bauzyklus), `os-bau-methode.md` (Gesamt-Methode, an die Firmenphilosophie anpassbar), `claude-netz-bau.md` (Instruktions-Schicht der CLAUDE-Ebenen), `subagenten-bau.md` (Bau von Subagenten: Agent-vs-Skill, Scope, Gate-Semantik), `anker-reservierung.md` (frühe `reserve/*`-Tag-Reservierung knapper Bezeichner bei Parallelarbeit), `abteilungs-inhalts-pruefung.md` (wiederkehrendes, read-only Inhalts-Audit je Abteilung/Satellit), `team-distribution.md` (Rollout ans Team über den Claude-Team-Workspace) | vor **jeder** inhaltlichen Änderung am Plugin oder Repo — zuerst prüfen, ob ein Standardprozess existiert |
 | `bauplan-archiv/` | abgeschlossene oder verworfene Baupläne, **unverändert** übernommen — **terminal**: keine Quelle Richtung Kern oder Satelliten, keine Kandidaten-Queue | wenn nachvollzogen werden soll, wie ein abgeschlossenes Vorhaben lief; **Pflicht-Verschiebung** dorthin, sobald ein Plan abgeschlossen oder verworfen ist |
 | `ideen-backlog/` | Ideen ohne aktuellen Auftrag, je Idee ein Dokument | beim Festhalten einer Idee ohne Arbeitspaket; wird sie beauftragt, entsteht ein Bauplan in `grundwissen/`, der auf sie verweist — die Idee bleibt stehen |
@@ -84,6 +88,7 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | `firmenkernprozesse/` | extern geführte Prozess- und Produktdokumente des **Onsite.ai-OS-Vorbilds** und der Firmenebene: Prozesskarten, Team-Rollout-Infrastruktur, Featurekarte, Berichte und Methodik — Referenz für Ausrichtung und Abgleich, **nicht** normativ für dieses Repo | wenn der Vorbild-Stand abgeglichen, die Firmenprozesse nachvollzogen oder Rollout-/Onboarding-Material gebraucht wird; bei Widersprüchen gilt die NovaCore-Quellen-Hierarchie |
 | `kandidaten-queue/` | Übergangs-Queue der repo-internen Abteilung `development` (`queue.md`, append-only) — kernrelevante Sitzungsergebnisse als Einzeiler + Verweis, Format nach `plugins/nc/referenz/pflege-auspraegung.md` Abschnitt 4 | wenn `/nc:end-session` einen Kandidaten klassifiziert oder geprüft wird, was aktuell zum Kern-Aufstieg ansteht; solange `development` keinen eigenen Satelliten hat, läuft die Einreichung über den regulären Branch/PR-Fluss dieses Repos |
 | `queue-protokolle/` | Committete Prüfprotokolle des Kern-Aufstiegslaufs `/nc:queue-kern` — je Lauf ein Dokument `queue-protokoll-<abteilung>-<YYYY-MM-DD>.md`, das Ledger für dessen Folgelauf | wenn ein Aufstiegslauf sein Prüfprotokoll ablegt oder der Folgelauf entschiedene Zeilen gegen den Merge-Stand abgleicht; solange leer: `PLATZHALTER.md` |
+| `sitzungswissen/` | Sitzungswissen dieses Repos selbst: `roll-up.md` (Mehrtages-Überblick), `offene-straenge-register.md`, je Abteilung `<abteilung>/stand.md` + `<abteilung>/journal/<YYYY-MM-DD>.md` — geschrieben/gelesen von `/nc:start` bzw. `/nc:end-session` | Session-Start/-Ende in diesem Repo; wenn der konsolidierte Stand, das jüngste Journal oder offene Stränge gebraucht werden |
 
 **Zwei Indizes, zwei Fragen** — beide gehören zum Ablauf, in dieser Reihenfolge:
 `SSOT-Document-Index.md` beantwortet *„welches Dokument existiert, wohin gehört es, wann
@@ -255,6 +260,30 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   entfernt** (D8, Onsite §15.43) — Nachfolge: `/nc:wissen-aendern` + Aktualisierungs-Index
   (Träger-Regel). **`/nc:update-doks` auf eine Aufgabe geschnitten** (D9): reine
   Kreuzverweis-/Pfad-Pflege der SSOT-Dokumente, F1/F2 entfallen.
+- **Gebaut (Kern v0.13.0, 2026-08-24): Onsite-Delta-Nachbau Phase I — Wissensfluss &
+  Sanierungs-Normen** nach Mapping `grundwissen/2026-08-23-onsite-delta-mapping.md`
+  (D10–D15, D26). **Sitzungswissen-Umzug** (D14, BREAKING): `.nc/erinnerung/` entfällt
+  ersatzlos — Sitzungswissen wohnt jetzt committet in der Wissensbasis dieses Repos unter
+  `sitzungswissen/` (`roll-up.md`, `offene-straenge-register.md`, je Abteilung `stand.md` +
+  `journal/`); in fremden Arbeits-Repos ohne eigene Wissensbasis wird kein Sitzungswissen
+  mehr angelegt — dort trägt das Projekt-Memory den Stand allein. `end-session` und `start`
+  neu gefasst: Zwei-Fall-Logik am Argument `nachzug`, Stufen-Prüfungen **GL1–GL5** vor der
+  Kandidaten-Klassifikation (`pflege-auspraegung.md` §5.5, Kriterienliste v2), Altstand-Regel
+  (`.nc/`-Fund wird gemeldet, nie gelesen). **Kategorie `aktive-bauplaene/`** scharfgestellt
+  (D10): `grundwissen/` trägt seither nur noch dauerhafte Begriffsnormen und Design-Specs,
+  laufende Baupläne wohnen in `aktive-bauplaene/`; `vorlagen/` zog von der Repo-Wurzel nach
+  `standardprozesse/vorlagen/` um (EN7). **Aktualisierungs-Index** neu gefasst (D11): §0
+  Zwei-Klassen-Buchführung, §3.6 Release-Zug-Runbook (Waypoint-Batches statt Sammelrelease,
+  EN5), Bagatellgrenze und Batch-Kadenzen. **Tag-Norm** nach P-E2: Reserve-/Anker-Tags
+  entfallen, Tags entstehen nur noch als Teil eines Release. **`referenz/`-Einstufung** (D13,
+  EN6 angepasst): dokumentierter Review-Vorgang je Datei, kein pauschaler
+  `unreviewed`-Stempel. **`NovaCore-OS-Systemachsen.md`** neu angelegt (D26): drei Achsen
+  (Wissensfluss, Auslieferung, Instandhaltung) + Scope-Begriff (Projekt/User/Scratchpad).
+  **`scratchpad-nutzung.md`** neu angelegt (D27, R1–R3). Im gebündelten Nachzug dieses
+  Zyklus zusätzlich: Team-Sync-Payload **„Ein Archiv ist keine Wissensquelle"** + Meta-Regeln
+  + Multi-Agent-Ruleset in `nc-sync.md` (D12), **`NC_SECRETS_REF`** (D15) und die
+  Zähl-Wahrheits-Prüfung (D18). Branch `feat/onsite-delta-phase-i`, Commits
+  `e7e5f19`/`7a4db3a`/`bcb3f6b` + Nachzugspaket.
 - **Noch nicht gebaut:** (Gate 4 ist endgültig entfallen — Onsite §15.44, Mapping D2; die
   PreCompact-Mahnung bleibt und war nie Gate 4), CLAUDE-Ebene 0 (Org-Instructions, weiterhin
   ungenutzt), weitere fe-/be-Skills, Module
@@ -346,6 +375,7 @@ Repo-Struktur, Manifeste, `CHANGELOG.md` und Spec.
    | Hook / Gate geändert | `plugins/nc/hooks/hooks.json` (`description` trägt den Prosa-Zustand der ganzen Kontroll-Schicht), `grundwissen/NovaCore-OS-Gates-Definition.md`, README (Hook-Tabelle inkl. Opt-out-Envs), CHANGELOG — Details: `standardprozesse/aktualisierungs-index.md` §2.1 |
    | Pflicht-Einstieg / rote Linien geändert | der Text ist gespiegelt in `nc-session-start.js`, `skills/start/SKILL.md`, `doks/global-claude-firmenblock.md` und hier — alle vier gemeinsam, **plus Kern-Bump** |
    | Agent macht selbst einen Fehler | `debugging-findings/agent-learnings.md` (sofort, append-only) |
+   | Sitzungswissen-Ort geändert | `plugins/nc/nc-sync.md` §3, Skills `start`/`end-session`/`journal` (Kern), `SSOT-Document-Index.md`, hier (Glossar) — **plus Kern-Bump** |
    | Skill neu / entfernt / umbenannt | Skill-Tabelle (README + Plugin-README), Trigger-Matrix (`workflow.md`), CHANGELOG, Registry |
    | Neues Modul | Registry, README, CHANGELOG, Repo-Karte (hier) |
    | **Neues Abteilungsplugin** | Standardprozess `abteilungs-plugin-bau.md` befolgen (Marketplace, Registry, hier, README, CHANGELOG, Install-Probe) |

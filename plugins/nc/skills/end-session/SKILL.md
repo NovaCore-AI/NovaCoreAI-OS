@@ -211,7 +211,8 @@ ausdrücklich als Nachzug aus.
   geschrieben. „Läuft" ohne Beweis ist kein Stand.
 - **Keine Secrets, Tokens, Kundendaten oder personenbezogenen Pfade** ins Gedächtnis —
   Dateipfade und Ticket-Bezüge des Arbeits-Repos ja, Zugangsdaten nie.
-- **Kundenkontext bleibt im Arbeits-Repo** unter `.nc/` und wandert nie ins OS-Repo.
+- **Kundenkontext bleibt im Arbeits-Repo** bzw. dessen Projekt-Memory und wandert nie ins
+  OS-Repo (der frühere lokale Strom `.nc/erinnerung/` ist abgeschafft, siehe Schritt 2).
 - **Der Agent committet und pusht nie selbst.** Keine automatischen Pushes, Merges, Posts,
   Releases oder Deployments ohne explizite Nutzerfreigabe — auch nicht „nur schnell den
   Journal-Eintrag".

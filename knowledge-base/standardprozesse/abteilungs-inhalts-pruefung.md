@@ -78,7 +78,7 @@ Typ `Kommende Änderung` (Quelle 6 u. a.) füllt die Drift-Matrix, nicht die Sof
 | 3 | Sprach-/Formatregeln für Text-Entwürfe — NC-Grundregel „alle Artefakte Deutsch" (`nc-sync.md`, Kopf); Abweichungen je Fremdsystem nur benennen, sofern belegt |
 | 4 | Fremdsystem-Fakten der Abteilung gegen die Quellen-Hierarchie (Quelle vor Gedächtnis, `nc-sync.md` §2.1) |
 | 5 | Rote Linien: Kurzverweis auf Normquelle (`global-claude-firmenblock.md`) statt Duplikat; Ownership je Skill klar |
-| 6 | SSOT-Anbindung: Pfade gegen `SSOT-Document-Index.md` (Teil 1/2) statt geraten; Sitzungswissen-Residenz korrekt (`.nc/erinnerung/` des Arbeits-Repos bzw. eigene Wissensbasis des Satelliten, `ssot-aufbau.md` §4); Registry-Eintrag (`module-registry.json`) stimmig |
+| 6 | SSOT-Anbindung: Pfade gegen `SSOT-Document-Index.md` (Teil 1/2) statt geraten; Sitzungswissen-Residenz korrekt (kein Dateistrom im Arbeits-Repo ohne eigene Wissensbasis — Projekt-Memory trägt allein; `sitzungswissen/` bei eigener Wissensbasis/Satelliten-SSOT, `ssot-aufbau.md` §4); Registry-Eintrag (`module-registry.json`) stimmig |
 | 7 | Verweise auf Kern-Skills: Umbenennungen/Entfernungen nachgezogen; Kommendes nur als Merker |
 | 8 | `workflow.md`: Trigger-Matrix vollständig, WP-Mapping konsistent mit `wp-rahmen.md`, SSOT-Abschnitt korrekt |
 | 9 | Offene Punkte der Abteilung/des Satelliten (§4, Quelle 9): umgesetzt oder bestätigt fehlend? |

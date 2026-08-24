@@ -36,6 +36,13 @@ Fehlt das Verzeichnis, ist die Wissensbasis auf diesem Rechner noch nicht bereit
 einmal `/nc:setup` ausführen. Bis dahin gilt — Aussagen, die die Wissensbasis bräuchten,
 werden als **nicht belegbar** gekennzeichnet, nicht geraten.
 
+## SSOT-Änderungen: erst der Aktualisierungs-Index
+
+Vor jeder Änderung an der Wissensbasis (Pfade, Kategorien, Versionsnummern, Kreuzverweise)
+erst den Aktualisierungs-Index der Wissensbasis triagieren — er nennt je Änderungsart, was
+vorher zu lesen und was in derselben Änderung nachzuziehen ist. Nicht raten, was noch
+mitzieht.
+
 ## Team-Sync (Ebene 1b)
 
 Teamweite Methodik, Conventions und Safety stehen in der vollständig firmengeführten

@@ -32,8 +32,10 @@ Ergänzend jederzeit: **`/nc:journal`** hält **einzelne** Ereignisse fest, soba
 statt sie bis WP8 zu sammeln — Entscheidung, Fund, Blocker, Erledigtes, jeweils mit Beleg.
 
 **Warum WP0/WP8 im Kern liegen:** Sie sind abteilungsunabhängig und arbeiten auf dem
-Sitzungsgedächtnis unter `.nc/erinnerung/` des Arbeits-Repos (`stand.md` konsolidiert,
-`journal/<YYYY-MM-DD>.md` append-only). Der Kern ist über `dependencies` jedes
+Sitzungsgedächtnis: im **OS-Repo** selbst unter `knowledge-base/sitzungswissen/`
+(`stand.md` konsolidiert, `journal/<YYYY-MM-DD>.md` append-only); in einem fremden
+Arbeits-Repo ohne eigene Wissensbasis trägt stattdessen dessen Projekt-Memory den Stand
+allein — dort entsteht kein Dateistrom mehr. Der Kern ist über `dependencies` jedes
 Abteilungsplugins immer aktiv — der Rahmen kann damit nicht fehlen.
 
 ## Globale Freigabe-Politik
