@@ -83,6 +83,24 @@ test('Injiziert den Stempel-Befehl samt Session-Schluessel (Zangen-Prinzip)', ()
   assert.match(kontext, /--branch <branch> --head <head>/, 'Fakten-Argumente fehlen');
 });
 
+test('Trägt den Red-Flags-Block der Disziplin-Schicht, knapp (Phase H, D5)', () => {
+  // Anti-Rationalisierung, KEIN Skill-Katalog: geprueft werden die drei Saetze, mit denen der
+  // Standardprozess uebersprungen wird — und das Laengenbudget, weil dieser Block in JEDER
+  // Sitzung Dauerkontext kostet. Die Superpowers-1%-Regel wird bewusst nicht uebernommen.
+  const kontext = kontextVon(fixture());
+  assert.match(kontext, /Red Flags/, 'der Block muss als solcher erkennbar sein');
+  assert.match(kontext, /nur eine\s+Doku-Änderung/,
+    'die Rationalisierung „nur Doku" muss benannt sein');
+  assert.match(kontext, /ich kenne die Struktur/);
+  assert.match(kontext, /zu klein für den Standardprozess/);
+  assert.match(kontext, /\/nc:wissen-aendern/,
+    'der Wissens-Router bleibt der benannte Ausweg');
+
+  const zeile = kontext.split('\n').find((z) => z.includes('Red Flags'));
+  assert.ok(zeile.length <= 400,
+    `der Red-Flags-Block muss unter 400 Zeichen bleiben, war ${zeile.length}`);
+});
+
 test('NC_START_GATE=off schaltet den Hook ab', () => {
   for (const wert of ['off', '0', 'false', 'disabled', 'OFF']) {
     const { status, stdout } = runHook(fixture(), { env: { NC_START_GATE: wert } });

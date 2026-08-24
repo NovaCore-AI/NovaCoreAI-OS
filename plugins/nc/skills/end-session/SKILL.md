@@ -20,8 +20,10 @@ description: >-
 Letzter Pflichtschritt jeder Sitzung (WP8 im WP-Rahmen `wp-rahmen.md` dieses Kern-Plugins `nc`).
 Der Skill überführt das, was in dieser Sitzung passiert ist, in das Sitzungsgedächtnis unter
 `.nc/erinnerung/`, damit die nächste Sitzung mit `/nc:start` nahtlos daran anknüpfen kann. Er
-sichert **Wissen** — er stellt keine Commit-Reife her und ersetzt kein Review; das leistet
-`/nc:doku-sync`. Der Skill trug bis zu dieser Fassung einen anderen Aufrufnamen; dieser existiert
+sichert **Wissen** — er stellt keine Commit-Reife her und ersetzt kein Review: den
+mechanischen Teil des Prüfzyklus trägt die CI-Suite, den urteilsabhängigen das
+Maintainer-Review am PR. Welche Doks eine Änderung mitziehen muss, beantwortet
+`/nc:wissen-aendern`. Der Skill trug bis zu dieser Fassung einen anderen Aufrufnamen; dieser existiert
 nicht mehr — `/nc:end-session` ist der einzige gültige Aufruf.
 
 Zweiter Auslöser neben dem Sitzungsende: die **Kontext-Kompaktierung** — die PreCompact-Mahnung
@@ -116,8 +118,8 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
    Queue-Klassifikation (angehängte Zeilen mit Kriterium bzw. der Befund „keine Kandidaten";
    nicht abgelegte Kandidaten mit Handlungsbedarf), ein eventueller **Sofort-Pfad-Block**
    (Schritt 8), der empfohlene Einstieg der nächsten
-   Sitzung — plus der Hinweis auf `/nc:doku-sync`, falls ein Commit ansteht, und darauf, dass
-   dieser Commit die Freigabe des Menschen braucht.
+   Sitzung — plus, falls ein Commit ansteht, der Hinweis auf `/nc:wissen-aendern` für den
+   Änderungsumfang und darauf, dass dieser Commit die Freigabe des Menschen braucht.
 11. **Abschluss-Stempel setzen:** Als **letzten** Schritt den Stempel-Befehl ausführen, den die
     Mahn-Ausgabe des PreCompact-Hooks wörtlich nennt —
     `node "<hooks-Pfad>/nc-end-stempel.js" --session <key>`. Er markiert den Sitzungsabschluss;

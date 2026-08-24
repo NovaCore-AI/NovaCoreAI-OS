@@ -39,7 +39,7 @@ wird nicht zweimal ausformuliert.** Das ist eine Regel für Menschen und Agenten
 | 4 | **Zwei append-only-Protokolle**: eigene Fehler (mit Präventionsregel) und gefundene Bugs | Lernen aus eigenen Fehlern; Symptom-Abgleich **vor** neuer Fehlersuche | `debugging-findings/agent-learnings.md` · `debugging-findings/debug-log.md` |
 | 5 | **Norm / Ist / Plan getrennt**: Norm nur per Nachtrag änderbar (der jüngste gewinnt) · Ist-Inventur des Gebauten · Planungsdokumente mit Lebenszyklus | Widersprüche werden entscheidbar statt unsichtbar | Definitionsdokumente in `grundwissen/` (Norm) · `README.md`/`AGENTS.md` (Ist) · datierte Baupläne in `grundwissen/`, nach Abschluss in `bauplan-archiv/` (Plan) |
 | 6 | **Mechanische Wächter**: Test-Invarianten (Index-Vollständigkeit, Linkgültigkeit, Wurzel-Regel, Kategorie-Routing, Versions-Gleichstand) plus CI | erzwingen, was erzwingbar ist — der Rest steht im Matrix-Selbsttest | `plugins/nc/tests/struktur.test.mjs` · `.github/workflows/` |
-| 7 | **Rituale mit Erzwingung**: Pflicht-Einstieg und Sitzungsabschluss als Skills, technisch gestützt durch Gates | die Wissensbasis wird gelesen und gepflegt, nicht nur besessen | `/nc:start` + Gate 2 (Start-Gate und Fakten-Stempel) · `/nc:save-session` · `/nc:doku-sync` |
+| 7 | **Rituale mit Erzwingung**: Pflicht-Einstieg und Sitzungsabschluss als Skills, technisch gestützt durch Gates | die Wissensbasis wird gelesen und gepflegt, nicht nur besessen | `/nc:start` + Gate 2 (Start-Gate und Fakten-Stempel) · `/nc:end-session` · `/nc:wissen-aendern` + Aktualisierungs-Index (Träger-Regel seit 0.12.0) |
 
 ## 3. Aufbau-Ablauf
 

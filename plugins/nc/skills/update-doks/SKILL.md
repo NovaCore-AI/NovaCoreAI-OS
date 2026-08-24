@@ -1,151 +1,123 @@
 ---
 name: update-doks
 description: >-
-  Maintainer-Werkzeug für die geteilten Doks — bringt die lokalen CLAUDE-Doks wieder auf
-  Stand, wenn der Doks-Autosync nicht greift (defekte NC-Marker, veralteter Versions-Stempel,
-  fehlende Team-Sync-Datei), und fährt den index-geführten Konsistenzlauf über die lebende
-  Doku des OS-Repos mit Drift-Bericht je Fund (Ist, Soll, Quelle). Fixes ausschließlich nach
-  ausdrücklicher Freigabe des Maintainers. Kein Alltagsbefehl — den Normalweg fährt der
-  Doks-Autosync des Kerns automatisch beim Session-Start. Trigger-Begriffe: „Doks
-  reparieren", „update-doks", „Marker defekt", „Sync erzwingen", „Doku auf Stand ziehen",
-  „Konsistenzlauf", „Doku-Drift", „Drift prüfen".
+  Maintainer-Werkzeug für die Instandhaltung der harten SSOT-Dokumente des OS-Repos: Es erhebt
+  Kreuzverweise, Pfadangaben und Verlinkungen der im SSOT-Document-Index gelisteten Dokumente
+  gegen den realen Repo-Stand, legt einen Drift-Bericht mit Quellenbeleg je Fund vor und zieht
+  erst nach ausdrücklicher Bestätigung nach. Datengrundlage ist die Änderungs-Matrix des
+  Aktualisierungs-Index, die der Skill zur Laufzeit liest statt sie zu duplizieren. Kein
+  Alltagsbefehl und kein Werkzeug für Arbeits-Repos — er läuft ausschließlich im Arbeitsklon
+  des OS-Repos und ausschließlich in Maintainer-Hand. Trigger-Begriffe aus dem
+  Maintainer-Vokabular, nicht aus der Alltagssprache: „update-doks", „SSOT-Kreuzverweise
+  erheben", „SSOT-Verlinkungen instand halten", „Kern-Repo-Doku-Drift prüfen".
 ---
 
-# /nc:update-doks — Doks reparieren & Doku-Konsistenz prüfen (Maintainer)
+# /nc:update-doks — Kreuzverweise und Pfade der SSOT-Dokumente instand halten (Maintainer)
 
 ## Zweck
 
-Manuelles Wartungswerkzeug der ständigen Abteilung `gemeinsam` (Kern-Plugin `nc`) mit zwei
-Funktionen. **F1** heilt die lokalen, firmengeführten CLAUDE-Doks in den Fällen, die der
-automatische Doks-Autosync bewusst auslässt (defekte Marker) oder in denen er in dieser
-Session nicht gelaufen ist. **F2** ist der index-geführte Konsistenzlauf über die lebende
-Doku des OS-Repos. Der Skill ist **nicht** für den Team-Alltag gedacht: dort hält der
-SessionStart-Autosync beide Ziele ohne Zutun aktuell. Er läuft nach `/nc:start` (WP0,
-Rahmen `wp-rahmen.md` des Kern-Plugins `nc`) — alle Schreibschritte liegen hinter dem
-Fakten-Stempel. Herleitung und Auftrag: Bauplan 2026-08-15 „Onsite-Endstand-Nachbau",
-AP-A4 (OS-Repo, `knowledge-base/grundwissen/`); die Ebenen-Konvention steht in der
-CLAUDE-Ebenen-Definition desselben Ordners.
+**Ein Skill, eine Aufgabe.** Er hält die **harten SSOT-Dokumente** — die, die im
+SSOT-Document-Index gelistet sind — untereinander anschlussfähig: Kreuzverweise, Pfadangaben
+und Verlinkungen sollen nach jeder Änderung noch auf das zeigen, was wirklich da ist. Er
+verteilt nichts an Maschinen und entscheidet nicht, ob etwas Firmenwissen ist. Er ist das
+**Meta-Pendant zu `/nc:end-session`**: Was der Sitzungsabschluss für eine Sitzung leistet,
+leistet dieser Lauf für den Dokumentenbestand — reiner **Maintainer-Skill**, kein
+Team-Alltagswerkzeug. Er läuft nach `/nc:start` (WP0, Rahmen `wp-rahmen.md` dieses
+Kern-Plugins `nc`); alle Schreibschritte liegen hinter dem Fakten-Stempel.
+
+**Übergangs-Hinweis:** Das Instandhalten der firmengeführten CLAUDE-Ebenen **auf einer
+Maschine** (Ebene 1 Firmen-Block, Ebene 1b Team-Sync-Datei) ist ausdrücklich **nicht** mehr
+Aufgabe dieses Skills — auch nicht der Reparatur- und Erstlauf-Fall. Bis ein künftiger
+CLAUDE-Netz-Aktualisierer gebaut ist, trägt der **Doks-Autosync-Hook** des Kerns diese Ziele
+allein; defekte Marker lässt er fail-safe aus und legt sie dem Menschen vor.
 
 ## Ablauf
 
-1. **Einstiegs-Triage:** Ist das Start-Gate aktiv und die Session ungestempelt, abbrechen
-   mit „erst `/nc:start`, dann erneut". Ruft ein normaler Team-Kontext ohne konkreten
-   Befund auf, zuerst auf den Normalweg hinweisen (Autosync beim nächsten Session-Start)
-   und nur auf ausdrücklichen Wunsch weiterfahren.
-2. **Funktion wählen:** F1 (Lokal-Doks), F2 (Repo-Konsistenzlauf) oder beides — bei
-   unklarem Auftrag fragen, nicht raten.
-
-### F1 — Lokal-Doks reparieren / Sync erzwingen
-
-3. **Zielinventur — zwei Ziele mit unterschiedlicher Mechanik.** **Ebene 1** ist der
-   Firmen-Block in `~/.claude/CLAUDE.md` (Marker-Chirurgie; alles außerhalb der Marker ist
-   Privat-Zone des Mitarbeiters). **Ebene 1b** ist die Team-Sync-Datei `nc-teamsync.md` im
-   `.claude`-Ordner des Home-Verzeichnisses — **Ganzdatei**, vollständig firmengeführt, ohne
-   Marker und ohne Privat-Zone. Payloads sind `doks/global-claude-firmenblock.md` (Ebene 1)
-   und die ausgelieferte `nc-sync.md` (Ebene 1b) des Kern-Plugins, die Soll-Version steht im
-   Manifest `.claude-plugin/plugin.json` desselben Plugins (alles vom Plugin-Wurzel-
-   verzeichnis aus auflösen). Fehlt eine Payload, gilt das Ziel als **„noch nicht
-   ausgeliefert"** — melden, nichts anlegen.
-4. **Befund je Ziel erheben (nur lesend).**
-   **Ebene 1:** Anzahl von `<!-- NC:BLOCK:START global -->` und
-   `<!-- NC:BLOCK:ENDE global -->`, ihre Reihenfolge und der Stempel
-   `<!-- NC:BLOCK:VERSION <kern-version> -->` als erste Zeile im Block. Vier Lagen:
-   **intakt + aktuell** → No-op melden · **intakt + alter Stempel** → Sync fahren
-   (Schritt 5) · **gar kein Marker** → Sync fahren, der Hook setzt den Block oben ein ·
-   **defekt** (START ohne ENDE, ENDE vor START, Mehrfach-Marker) → Reparatur vorlegen
-   (Schritt 6). Zusätzlich prüfen, ob der Block die Import-Zeile
-   `@~/.claude/nc-teamsync.md` enthält — ohne sie lädt Ebene 1b in keiner Sitzung.
-   **Ebene 1b:** nur der Stempel `<!-- NC:TEAMSYNC:VERSION <kern-version> -->` in der
-   **ersten Zeile**. Drei Lagen: **aktuell** → No-op melden · **alter oder fehlender
-   Stempel** → Sync fahren · **Datei fehlt** → Sync fahren, der Hook legt sie an. Eine
-   Reparatur von Hand gibt es hier nicht: die Datei wird immer als Ganzes ersetzt, es ist
-   nichts zu schützen.
-5. **Sync fahren — denselben Code, keinen Nachbau.** Die Chirurgie wird **nie** im Skill
-   nachgebildet, sondern der Autosync des Kerns gefahren:
-
-   ```
-   echo '{}' | node "<plugin-pfad>/hooks/nc-doks-autosync.js"     # bash
-   '{}'  | node "<plugin-pfad>/hooks/nc-doks-autosync.js"         # PowerShell
-   ```
-
-   Das leere JSON-Objekt auf stdin ist Pflicht (der Hook liest sein Event von dort). Er ist
-   idempotent, verarbeitet beide Ziele unabhängig, legt vor jedem Schreiben die rollierende
-   Sicherung `<ziel>.nc-autosync-backup` an und schreibt atomar. Vergleiche laufen über
-   **zeilenenden-normalisierte** Texte — ein inhaltsgleiches CRLF-Ziel bleibt unangetastet.
-   Vorher prüfen, dass `NC_AUTOSYNC` **nicht** auf einem Aus-Wert steht (`off`/`0`/`false`/
-   `disabled`), sonst ist der Lauf ein stiller No-op. Danach den Befund aus Schritt 4 neu
-   erheben.
-6. **Defekte Marker (Ebene 1) — Vorlage statt Eingriff.** Diesen Fall lässt der Hook
-   fail-safe aus, und **dieser Skill schreibt dort ebenfalls nicht**. Stattdessen dem
-   Menschen vorlegen: den Befund (Marker-Zählung, Positionen), die vorhandene Sicherung
-   `~/.claude/CLAUDE.md.nc-autosync-backup` als letzten guten Stand und den exakten
-   Reparaturvorschlag — entweder **ein** wohlgeformtes Marker-Paar wiederherstellen
-   (START vor ENDE, genau einmal) oder die defekten Marker-Reste vollständig entfernen,
-   dann setzt der Hook den Block oben neu ein. Der Mensch führt die Änderung aus, danach
-   Schritt 5 und erneut Schritt 4. Ist die Blockgrenze nicht eindeutig rekonstruierbar,
-   wird auch **kein** Vorschlag als fertig ausgegeben, sondern die Mehrdeutigkeit benannt.
-7. **Ergebnis je Ziel belegen:** Pfad, Lage vorher/nachher, Stempel-Zitat (bei Ebene 1 samt
-   Marker-Paar, bei Ebene 1b die erste Zeile), Backup-Pfad — oder „No-op, bereits aktuell".
-
-### F2 — Repo-Doku-Konsistenzlauf (index-geführt)
-
-8. **Arbeitsgegenstand auflösen:** Läuft die Sitzung im OS-Repo selbst, direkt dort
-   arbeiten. Sonst gilt die lokale SSOT-Kopie `~/.nc/ssot/NovaCoreAI-OS/` (Zeiger
-   `~/.nc/ssot/index.json`). Fehlt sie, melden und `/nc:setup` vorschlagen — **keine Pfade
-   raten**, keine fremden Arbeitsklone annehmen.
-9. **Soll-Quellen zur Laufzeit lesen** (nie aus dem Gedächtnis; sie **sind** das Regelwerk):
-   der Master-Index `SSOT-Document-Index.md` der Wissensbasis (Routing + Quellen-Triage) ·
-   der Aktualisierungs-Index unter `standardprozesse/` (Änderungs-Matrix, Version/Release/
-   Tag, Protokoll- und Indexpflichten) · die Sync-Matrix der `AGENTS.md`. Alle drei liegen
-   im OS-Repo, die ersten beiden unterhalb `knowledge-base/`.
-10. **Prüfumfang je Lauf:** Versions-Spiegel (`VERSION` ↔ `plugin.json` ↔
-    `module-registry.json` ↔ Versionsnennungen der lebenden Doku) · Skill- und
-    Modul-Tabellen (README, `AGENTS.md`, Registry) gegen die realen `skills/`-Ordner ·
-    Statusaussagen (Gates, Platzhalter, Test-Anzahl) gegen den CHANGELOG-Stand · tote Pfade
-    per Grep über die lebende Doku · Index-Vollständigkeit deterministisch per
-    `node --test plugins/nc/tests/*.test.mjs` im OS-Repo.
-11. **Drift-Bericht ausgeben:** je Fund Datei und Stelle, **Ist**, **Soll** und die
-    **Quelle** der Soll-Aussage. Keine stille Korrektur während der Erhebung.
-12. **Fixes vorbereiten:** nur nach Freigabe, ausschließlich in einem Arbeits-Branch,
-    Abschluss über `/nc:doku-sync` (Commit-Reife) — dieser Skill liefert den Befund,
-    `doku-sync` die Commit-Vorbereitung.
+1. **Vorbedingungen prüfen — vor jeder anderen Aktion, Abbruch statt Notlauf.** Drei Fragen,
+   jede einzeln beantwortet und im Ergebnis genannt:
+   **(a) Session gestempelt?** Ist das Start-Gate aktiv und die Sitzung ungestempelt: abbrechen
+   mit „erst `/nc:start`, dann erneut".
+   **(b) Arbeitsklon des OS-Repos vorhanden?** Läuft die Sitzung selbst im Arbeitsbaum des
+   OS-Repos (per `git remote get-url origin` belegen, nicht annehmen), ist das der
+   Gegenstand. Sonst zählt allein der Pfad aus dem Feld `kernRepoPfad` der Infra-Registry
+   `~/.claude/nc/infra.json`. Die Lesekopie `kernSsotPfad` ist **nie** der Gegenstand — sie
+   ist ein Bereitstellungs-Klon, dort geschriebene Fixes erreichen das Repo nie. Fehlt beides
+   oder ist der Pfad tot: abbrechen und `/nc:setup` vorschlagen — **keine Pfade raten, kein
+   anderes Repo ersatzweise prüfen**.
+   **(c) Maintainer-Auftrag?** Der Lauf schreibt in die SSOT des Kerns. Ist der Auftrag nicht
+   ausdrücklich als Instandhaltung des OS-Repos gestellt — etwa weil ein Alltagsbegriff den
+   Skill gezogen hat —, den Zweck in einem Satz nennen, den vermuteten Bedarf benennen und
+   **ohne Erhebung beenden**, solange die Maintainer-Absicht nicht bestätigt ist.
+2. **Infrastruktur des Arbeitsbaums feststellen** (nur lesend): Existiert der Arbeitsbaum, ist
+   er ein Git-Repo, auf welchem Branch steht er, gibt es uncommittete Änderungen und parallele
+   Worktrees (`git status`, `git branch --show-current`, `git worktree list`)? Der
+   **Arbeitsbaum ist die Wahrheit** — nicht der letzte Commit. Steht der Klon auf einem fremden
+   Arbeitsstand oder laufen fremde Worktrees, das im Ergebnis nennen; Fixes gehören nie in
+   fremde Arbeit.
+3. **Datengrundlage einlesen — zur Laufzeit im Arbeitsbaum, nie aus dem Gedächtnis.** Das
+   **Soll** liefert die Änderungs-Matrix des **Aktualisierungs-Index** (im OS-Repo unter
+   `knowledge-base/standardprozesse/`): Sie sagt je Änderungsart, was mitzuziehen ist. Dazu der
+   **SSOT-Document-Index** (im OS-Repo das einzige Dokument auf der Wurzelebene der
+   Wissensbasis) — er nennt den Prüfumfang, also **welche** Dokumente überhaupt zum harten
+   Bestand zählen. **Der Skill dupliziert diese Listen nie**; steht eine Änderungsart nicht in
+   der Matrix, ist sie für diesen Lauf unsichtbar und genau das wird als Lücke gemeldet.
+4. **Abweichungen erheben — erheben, nicht korrigieren.** Über die im SSOT-Document-Index
+   gelisteten Dokumente: **tote Links** (Ziel existiert nicht mehr), **verschobene Pfade**
+   (Datei liegt woanders als angegeben), **veraltete Kreuzverweise** (Verweis auf entfernte
+   oder umbenannte Skills, Agenten, Hooks, Module, Kategorien) und **Index-Lücken** (Datei ohne
+   Zeile im Index, Indexzeile ohne Datei). Gegenprobe ist immer die Platte
+   (Glob/Grep/`git status`), nicht eine zweite Dokumentaussage. Die deterministisch prüfbaren
+   Anteile deckt `node --test plugins/nc/tests/*.test.mjs` ab — der Lauf ergänzt ihn, ersetzt
+   ihn nicht.
+5. **Vorschau vor dem Schreiben — Pflichtschritt, nicht überspringbar.** Zuerst den
+   **Drift-Bericht** ausgeben: je Fund Datei und Stelle, **Ist**, **Soll** und die **Quelle**
+   der Soll-Aussage. Danach die vorgesehenen Änderungen als Vorschlag zeigen und **ausdrücklich
+   bestätigen lassen** — eine Rückfrage im Dialog, kein Hook und keine stillschweigende
+   Annahme. Ohne Antwort wird nichts geschrieben; ein leerer Bericht endet hier mit „keine
+   Drift gefunden" samt Liste der geprüften Punkte.
+6. **Erst nach Bestätigung nachziehen**, und nur das Bestätigte: in einem Arbeits-Branch, ein
+   Fund nach dem anderen, Formulierung minimal. Wird während des Schreibens ein neuer Fund
+   sichtbar, kommt er in den Bericht — nicht ungefragt in den Diff.
+7. **Belegen:** Was wurde geändert (Datei, Stelle, alt → neu), was blieb bewusst offen und
+   warum, welche Prüfungen liefen. Der Prüfzyklus schließt den Lauf ab: Testsuite plus
+   `claude plugin validate .` und `claude plugin validate plugins/<name> --strict` je berührtem
+   Plugin.
 
 ## Regeln
 
-- **Die Privat-Zone außerhalb der NC-Marker wird nie verändert** — kein Reformatieren, kein
-  Umsortieren, keine Whitespace-Kosmetik. **Der Skill schreibt selbst überhaupt nicht in
-  `~/.claude/CLAUDE.md`:** die inhaltliche Chirurgie gehört allein dem Autosync-Hook (eine
-  Implementierung, kein zweiter Pfad), die Marker-Reparatur allein dem Menschen.
-- **Keine automatischen Fixes.** F2 erhebt und berichtet; jede Änderung an der Doku braucht
-  die ausdrückliche Freigabe des Maintainers im laufenden Lauf.
-- **Rote Linien:** kein `git commit`, `push`, `merge` oder Tag ohne explizite Freigabe des
-  Maintainers; nichts wird an Dritte gesendet.
-- **Nur lebende Dokumente:** CHANGELOG-Alteinträge, das Bauplan-Archiv und append-only-
-  Protokolle werden nie umgeschrieben; Definitionsdokumente ändern sich per Nachtrag.
-- **Widersprüche werden gemeldet, nie stillschweigend geglättet.** Quellen-Hierarchie:
-  jüngster Bauplan bzw. Definitionsdokument → Standardprozesse → lebende Doku; bei Pfaden
-  gewinnt die Platte (Glob/Grep/`git status`).
-- **Maintainer-Werkzeug:** Wer nur aktuelle Doks braucht, braucht diesen Skill nicht — dann
-  auf den Autosync verweisen statt Schreibaktionen zu starten.
-- Keine personenbezogenen Pfade annehmen; Zielorte kommen aus dem Home-Verzeichnis, dem
-  Plugin-Verzeichnis oder dem SSOT-Zeiger — nie aus Annahmen über den Rechner.
+- **Vorschau vor Schreiben, ohne Ausnahme.** Kein Fund wird während der Erhebung still
+  korrigiert; Schritt 5 ist die einzige Tür zu Schritt 6.
+- **Keine Doppelpflege.** Der Skill trägt keine Kopie der Änderungs-Matrix, keine Dateiliste
+  und keine Kategorienliste — er liest sie. Eine hier eingebaute Zweitfassung wäre genau die
+  Drift, gegen die er läuft.
+- **Nur lebende Dokumente.** CHANGELOG-Alteinträge, Bauplan-Alttext (Änderung nur per
+  Nachtrag), das Bauplan-Archiv und die append-only-Protokolle werden nie rückwirkend auf neue
+  Pfade umgeschrieben. Historische Pfadangaben sind kein Fund, sondern Zeitstand.
+- **Widersprüche werden gemeldet, nie stillschweigend geglättet.** Quellen-Hierarchie: jüngster
+  Bauplan bzw. Definitionsdokument → Standardprozesse → lebende Doku; bei Pfaden gewinnt die
+  Platte.
+- **Kein Zuständigkeitsausgriff.** Nur der Arbeitsklon des OS-Repos. Satelliten-Repos,
+  Arbeits-Repos des Teams und die CLAUDE-Ebenen einer Maschine sind nicht Gegenstand dieses
+  Laufs — Befunde dazu werden genannt, nicht bearbeitet; für die CLAUDE-Ebenen ist der
+  Doks-Autosync-Hook zuständig.
+- **Rote Linien:** kein `git commit`, `push`, `merge`, kein Tag und kein Release ohne explizite
+  Freigabe des Maintainers im laufenden Lauf; nichts wird an Dritte gesendet. **Kein
+  Versions-Bump** — Versionen vergibt allein der Release-Entscheid des Maintainers.
+- Keine personenbezogenen Pfade annehmen; der Repo-Pfad kommt aus dem laufenden Arbeitsbaum
+  oder aus der Infra-Registry — nie aus Annahmen über den Rechner.
 
 ## Verifikation
 
-- **F1:** Je berührtes Ziel steht im Ergebnis das Stempel-Zitat mit der Version aus dem
-  Kern-Manifest — bei Ebene 1 zusätzlich das vollständige Marker-Paar
-  (`NC:BLOCK:START`/`ENDE`) und der Nachweis der Import-Zeile auf Ebene 1b, bei Ebene 1b die
-  erste Zeile (`NC:TEAMSYNC:VERSION`) — plus der Backup-Pfad jeder geschriebenen Datei. Ein
-  direkter Zweitlauf meldet für beide Ziele **No-op** (nichts geschrieben, kein neues
-  Backup).
-- **F1-Privat-Zone:** Der Bereich außerhalb der Marker ist gegen die Sicherung
-  byte-identisch (Diff-Nachweis: nur der Blockbereich unterscheidet sich).
-- **F1-Defektfall:** Solange die Marker defekt sind, existiert **kein** Schreibvorgang des
-  Skills — belegt durch den unveränderten Zeitstempel der Zieldatei plus vorgelegten
-  Reparaturvorschlag.
-- **F2:** Der Drift-Bericht listet jeden Fund mit Datei, Ist, Soll und Quellenbeleg; ein
-  leerer Bericht wird als „keine Drift gefunden" mit Nennung der geprüften Punkte
-  ausgegeben.
-- **Abschluss-Gegenprobe:** `node --test plugins/nc/tests/*.test.mjs` ist im OS-Repo grün;
+- **Vorbedingungen:** Das Ergebnis nennt zu (a), (b) und (c) je eine ausdrückliche Antwort —
+  bei Abbruch steht dort, **welche** der drei Bedingungen fehlte, und es wurde nichts
+  geschrieben. Bei (b) ist der verwendete Pfad samt Herkunft (Arbeitsbaum oder
+  `kernRepoPfad`) genannt.
+- **Drift-Bericht:** Jeder Fund trägt Datei, Stelle, Ist, Soll und Quellenbeleg. Ein leerer
+  Bericht wird als „keine Drift gefunden" mit Nennung der geprüften Punkte ausgegeben — nie als
+  stilles Nichts.
+- **Bestätigungsschritt:** Zu jeder geschriebenen Änderung lässt sich die Bestätigung im
+  Gesprächsverlauf zeigen; ohne sie darf keine Datei berührt worden sein.
+- **Abschluss-Gegenprobe:** `node --test plugins/nc/tests/*.test.mjs` im Arbeitsbaum ist grün;
   bei berührten Manifesten oder Skills zusätzlich
-  `claude plugin validate plugins/<name> --strict`.
+  `claude plugin validate plugins/<name> --strict`. Ein direkter Zweitlauf meldet für die
+  behobenen Funde **keine Drift** mehr.

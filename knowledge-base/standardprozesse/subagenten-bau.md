@@ -47,7 +47,7 @@ geführter Ablauf in der Haupt-Session → **Skill**. **Im Zweifel Skill.**
 
 | Richtung | Wann | NovaCore-Beispiele |
 |---|---|---|
-| **Skill** | Die Session geht jeden Schritt mit · Zwischen-Entscheide · kleine fokussierte Checks · Rückfragen an den Menschen sind Teil des Ablaufs | `/nc:start`, `/nc:end-session`, `/nc:doku-sync`, `/nc:skill-builder` |
+| **Skill** | Die Session geht jeden Schritt mit · Zwischen-Entscheide · kleine fokussierte Checks · Rückfragen an den Menschen sind Teil des Ablaufs | `/nc:start`, `/nc:end-session`, `/nc:update-doks`, `/nc:skill-builder` |
 | **Agent** | Der Haupt-Kontext würde fluten oder ein eigener Kontext ist nötig · bulkige Lese-/Schreibarbeit · klar umrissener Auftrag mit Zusammenfassungs-Rückgabe · unabhängige Zweitdiagnose | `sync-nachzug-executor` — gebündelte Doku-Nachzüge am Zyklusende (AP-D1) |
 
 Ein Agent kostet einen Delegations-Schritt und liefert nur eine **Zusammenfassung** zurück,

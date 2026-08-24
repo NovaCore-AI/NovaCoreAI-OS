@@ -51,8 +51,10 @@ verbindlichen Formatregeln entspricht und Bewährtes später per Fork-back ins O
    - **Sandbox:** Skill im eigenen Skill-Verzeichnis des Nutzers ablegen; bewährt er sich,
      den **Fork-back-Weg** gehen: beim Maintainer einreichen → Review → Übernahme in das
      passende OS-Plugin → Verteilung per Version-Bump.
-   - **OS-Beitrag:** Doku-Pflicht über `/nc:doku-sync` (Registry, README, CHANGELOG mit
-     Namenszeichnung) — kein Commit/Push ohne Freigabe des Maintainers.
+   - **OS-Beitrag:** Doku-Pflicht nach der Änderungs-Matrix — welche Doks mitzuziehen sind,
+     beantwortet `/nc:wissen-aendern` (Registry, README, CHANGELOG mit Namenszeichnung);
+     geprüft wird über CI-Suite und Maintainer-Review am PR — kein Commit/Push ohne
+     Freigabe des Maintainers.
 
 ## Regeln
 

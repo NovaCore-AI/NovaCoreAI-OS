@@ -29,7 +29,7 @@ ist — und **nur** das. Fachliches gehört in Abteilungsplugins.
 |---|---|---|
 | **Basis-Gate** (Sicherheitsnetz) | FFG: universelle Destruktiv-Liste, Datei-Gate, Routine-Bash (`hooks/nc-ffg.js` + `hooks/lib/`) | **domänen-frei halten** — keine Abteilungs-Fachprüfungen; jede Kern-Prüfung ist für Abteilungen tabu zu duplizieren (Prüfungs-Eigentum) |
 | **Prozess-Infrastruktur** | Session-Start-Injektion (`nc-session-start.js`), Start-Gate + Fakten-Stempel (`nc-start-gate.js`, `nc-start-stempel.js`), Safety-Gate (`nc-safety-gate.js`, seit 2026-08-23), Doks-Autosync (`nc-doks-autosync.js`); Gate 4 endgültig entfallen (§5) | Hooks **fail-open** bei internen Fehlern, Opt-out-Env je Gate, **keine Marker-Dateien** (ein Gate, das man vergessen kann, ist kein Gate) |
-| **Shared-Skills** | ständige Abteilung `gemeinsam` (`skills/<name>/SKILL.md`): `start`, `save-session`, `journal`, `setup`, `doku-sync`, `os-info`, `skill-builder` | Format strikt nach `referenz/skill-authoring.md`; Ordner ohne `SKILL.md` ignoriert der Scanner und bleibt unausgeliefert |
+| **Shared-Skills** | ständige Abteilung `gemeinsam` (`skills/<name>/SKILL.md`): `start`, `end-session` (bis 0.7.x `save-session`), `journal`, `setup`, `os-info`, `skill-builder`, `update-doks`, `queue-abteilung`/`queue-kern` und die vier `wissen-*`-Router (seit 0.12.0; `doku-sync` ist seit 0.12.0 ersatzlos entfallen) | Format strikt nach `referenz/skill-authoring.md`; Ordner ohne `SKILL.md` ignoriert der Scanner und bleibt unausgeliefert |
 | **Normative Doks** | `wp-rahmen.md` (WP0–WP8), `referenz/skill-authoring.md`, `nc-sync.md`, `doks/global-claude-firmenblock.md` (Ebene-1-Payload) | liegen **im Kern**, weil sie ausgeliefert werden — installierte Plugins sehen keine Repo-Pfade (§2 Fakt 4 des Abteilungsdokuments) |
 | **Registry** | `module-registry.json` — reiner Metadaten-SSOT (Abteilung → Plugin → Module → Skills) | steuert nichts aus; spiegelt die Kern-Version (Leitversion) |
 | **Testsuite** | `tests/*.test.mjs` — FFG, Start-Gate, Session-Start, Autosync, SSOT-Provisionierung, Struktur-Invarianten | jeder Hook bekommt Tests **inklusive Negativ- und Fehlalarm-Probe**; die Struktur-Invarianten sind Policy-Tests des ganzen Marketplace |
@@ -49,7 +49,7 @@ diesem Dokument und `abteilungs-plugin-bau.md`; sie steht **nur hier**.
 | | Kern `nc` (team-shared) | Abteilungsplugin / Satellit (individuell) |
 |---|---|---|
 | **Sicherheitsnetz** | **Basis-Gate**: universelle Destruktiv-Liste, Datei-Gate, Routine-Bash — domänen-frei, einmal gepflegt (das heutige FFG) | **Repo-interne Abteilung: keine eigenen Hooks** (sonst feuern die Gates doppelt; testerzwungen „Hooks nur im Kern"). Fachliche Prüfwünsche werden als Anforderung an den Kern gestellt. **Eigenständiger Satellit:** trägt eine **eigene Kopie** der Kontroll-Schicht, weil er Kern-Hooks technisch nicht erreichen kann |
-| **Infrastruktur** | Session-Start (Injektion + Erzwingungs-Begleiter), Doks-Autosync, Wissens- und Doku-Pflege (`/nc:doku-sync`), Shared-Skills, geteiltes Fehlerprotokoll | Fach-Skills · Fach-Workflow (`workflow.md`) · eigene Konnektoren · beim eigenständigen Satelliten zusätzlich die **eigene Wissensbasis** samt mechanischem Wächter (`ssot-aufbau.md` §4) |
+| **Infrastruktur** | Session-Start (Injektion + Erzwingungs-Begleiter), Doks-Autosync, SSOT-Präsenz (Wissens-Router `wissen-*` + zwei Zeiger-Hooks; der frühere `/nc:doku-sync` ist ersatzlos entfallen — Träger: CI-Prüfzyklus + Maintainer-Review am PR), Shared-Skills, geteiltes Fehlerprotokoll | Fach-Skills · Fach-Workflow (`workflow.md`) · eigene Konnektoren · beim eigenständigen Satelliten zusätzlich die **eigene Wissensbasis** samt mechanischem Wächter (`ssot-aufbau.md` §4) |
 | **Verbot** | keine Abteilungs-Fachprüfungen im Kern | **keine Kern-Prüfung duplizieren oder abschwächen** |
 
 **Prüfungs-Eigentum statt Matcher-Eigentum:** Jede Prüfung hat genau ein Heimat-Plugin;
@@ -69,7 +69,7 @@ Kern-Hook läuft.
 3. **Skills** nach `referenz/skill-authoring.md` (YAML-Falle, Trigger in dritter Person, Länge);
    eine Datei je Skill, Detailwissen als Referenzdatei daneben. **Keine Repo-Pfade in
    ausgelieferten Dateien** (Plugin-Grenze, testerzwungen).
-4. **Kontroll-Schicht** auf gemeinsamem Gerüst, in der Reihenfolge der Gates 1 → 2 → 3 → 4:
+4. **Kontroll-Schicht** auf gemeinsamem Gerüst, in der Reihenfolge der Gates 1 → 2 → 3 (ein Gate 4 gibt es nicht mehr):
    quote-aware Bash-Analyse wiederverwenden (`hooks/lib/bash-analyse.js`), Session-Schlüssel aus
    `hooks/lib/session-key.js` beziehen (nie eine zweite Kopie in Sicherheitscode),
    **`process.exitCode` statt `process.exit()`** — Truncation-Falle: `process.exit()` kann auf
@@ -192,7 +192,7 @@ wie §2; die Governance-Tabelle §1a gilt spiegelbildlich. Die Wissens-Seite rep
 | Offen | Stand / Blocker |
 |---|---|
 | ~~Gate 3 (Safety-Gate) und Gate 4 (Sitzungsabschluss)~~ **erledigt/entfallen 2026-08-23** | Gate 3 ist **gebaut** (`nc-safety-gate.js`, Port aus dem Onsite-Vorbild — Mapping D1/EN4); Gate 4 ist **endgültig entfallen** (Onsite §15.44, Mapping D2). Stand: `grundwissen/NovaCore-OS-Gates-Definition.md` |
-| **Automatische SSOT-Pflege** über `/nc:doku-sync` hinaus | die Änderungs-Matrix ist heute der Selbsttest; was mechanisch erzwingbar ist, gehört in `struktur.test.mjs` (`ssot-aufbau.md` §2, Baustein 6) |
+| **Automatische SSOT-Pflege** über die SSOT-Präsenz (Router + Zeiger-Hooks) hinaus | die Änderungs-Matrix ist heute der Selbsttest; was mechanisch erzwingbar ist, gehört in `struktur.test.mjs` (`ssot-aufbau.md` §2, Baustein 6) |
 
 ---
 

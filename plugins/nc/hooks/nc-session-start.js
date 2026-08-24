@@ -203,6 +203,20 @@ function buildContext(root, source, sessionKey) {
 
   if (sessionKey) teile.push(stempelHinweis(sessionKey));
 
+  // Red-Flags der Disziplin-Schicht (Port des Onsite-Blocks aus `oai-session-start.js`,
+  // Spec §15.49 Baustein B2; Delta-Mapping-Position D5, Phase H Paket C). Bewusst eine
+  // ANTI-RATIONALISIERUNGS-Zeile und KEIN Skill-Katalog: Die Wissens-Router und der
+  // Wissens-Zeiger machen die Dokumente ohnehin praesent — was fehlt, ist der Einwand gegen
+  // die drei Saetze, mit denen der Standardprozess uebersprungen wird. Die
+  // Superpowers-1%-Regel ("vor jedem Schritt alle Skills pruefen") wird ausdruecklich NICHT
+  // uebernommen: sie verletzt die Trigger-Disjunktion und verbrennt Dauerkontext.
+  // Laengenbudget: hoechstens 400 Zeichen, testerzwungen (dieser Block kostet in JEDER
+  // Sitzung Kontext).
+  teile.push('**Red Flags — Gedanken, die den Standardprozess überspringen:** „nur eine '
+    + 'Doku-Änderung" → erst `/nc:wissen-aendern` · „ich kenne die Struktur" → '
+    + 'Aktualisierungs-Index-Zeile zur Änderungsart lesen · „zu klein für den Standardprozess" '
+    + '→ gerade dann greift er.');
+
   teile.push('**Rote Linien (nie automatisiert, gelten auch hier):** Merges · Deploy-Klicks · '
     + 'Review-Resolves/Approvals · alles Kundensichtbare (PR-Texte, Ticket-Kommentare posten). '
     + '**Kein Commit/Push ohne explizite Freigabe des Maintainers.**');

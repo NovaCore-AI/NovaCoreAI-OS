@@ -186,6 +186,37 @@ test('Frontmatter: description bricht nicht am YAML-Plain-Scalar', () => {
   }
 });
 
+// Kontext-Budget der Wissens-Router (Node-Doks-Definition, Abschnitt "Kontext-Oekonomie";
+// Port der Onsite-Invariante via Mapping D7). Schliesst direkt an die description-Invariante
+// oben an: Dort wird die EINZELgrenze (1024 Zeichen je Skill) geprueft, hier die SUMME der
+// vier Router. Warum ueberhaupt ein Deckel: Von jedem Skill liegen `name` + `description` ab
+// Sitzungsstart DAUERHAFT im Kontext. Genau das ist der Preis der Router — und der Grund,
+// warum sie je Arbeitsanlass und nicht je Dokument geschnitten sind. Der Deckel haelt diesen
+// Preis sichtbar und begrenzt; wer ihn hebt, tut es bewusst.
+const ROUTER_SKILLS = ['wissen-aendern', 'wissen-planen', 'wissen-nachschlagen', 'wissen-protokolle'];
+const ROUTER_BUDGET = 6000;
+
+test('Wissens-Router: die Summe der descriptions bleibt im Kontext-Budget', () => {
+  let summe = 0;
+  for (const name of ROUTER_SKILLS) {
+    const datei = p('plugins', KERN, 'skills', name, 'SKILL.md');
+    assert.ok(fs.existsSync(datei),
+      `${datei} fehlt — die vier Wissens-Router gehoeren zusammen (Node-Doks-Definition)`);
+    const zeilen = frontmatter(datei).split(/\r?\n/);
+    const idx = zeilen.findIndex((l) => /^description:/.test(l));
+    assert.ok(idx >= 0, `${datei}: kein description-Feld`);
+    const text = zeilen.slice(idx + 1)
+      .filter((l) => /^\s+\S/.test(l)).map((l) => l.trim()).join(' ');
+    assert.ok(text.length > 0 && text.length <= 1024,
+      `${datei}: description ist leer oder ueber 1024 Zeichen (${text.length})`);
+    summe += text.length;
+  }
+  assert.ok(summe <= ROUTER_BUDGET,
+    `Router-descriptions belegen ${summe} Zeichen Dauerkontext (Budget ${ROUTER_BUDGET}) — `
+    + 'Router werden je Arbeitsanlass geschnitten, nicht je Dokument '
+    + '(knowledge-base/grundwissen/NovaCore-OS-Node-Doks-Definition.md des OS-Repos)');
+});
+
 test('Plugin-Dateien verweisen nicht ueber die Plugin-Grenze', () => {
   // Installierte Plugins liegen isoliert im Cache: "Installed plugins cannot reference files
   // outside their directory" (plugins-reference). Repo-Pfade sind daher nur als Quellenangabe
