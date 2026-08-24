@@ -1,72 +1,68 @@
-# Stand (konsolidiert) — 2026-08-24, 05:1x nach der Nachtschicht (Phasen G + H)
+# Stand (konsolidiert) — 2026-08-25, 01:5x nach der Nachtschicht (Phase I)
 
 ## Aktueller Arbeitsstand
 
-- **Der finale Onsite-Delta-Umbau läuft** (beauftragt 2026-08-23, Bauplan =
-  `knowledge-base/grundwissen/2026-08-23-onsite-delta-mapping.md` mit Nachträgen N1–N3;
-  Onsite-Parität als Default, **Affiliate-Invariante I-A0** als Dauer-Abweichung;
-  **Waypoint-Arbeitsmodus** — die alten CHANGELOG-/Tag-/Bump-Zeremonien und
-  Zahlen-Spiegel gelten nicht mehr).
-- **Phase G (Kontroll-Schicht-Parität) fertig → PR #22** (Kern **0.11.0**): FFG mit
-  NotebookEdit/Windows-Mustern/Wrapper-Passthrough + Drift-Ritual §2b, Safety-Gate/Gate 3
-  gebaut (Musterliste v1, Wortlaut-Abnahme am PR), Gate 4 endgültig entfallen, Queue-Hook
-  mit PR-Sichtbarkeit + Windows-Sperren-Härtung. GLM-5.3 R1–R3, CI komplett grün.
-- **Phase H (SSOT-Präsenz) fertig → PR #23** (stacked, Kern **0.12.0**):
-  Node-Doks-Definition, vier `wissen-*`-Router (Modul `wissen`), Wissens-Zeiger-Hook +
-  Sucheindex (38), Pfad-Zeiger-Hook + Pfad-Index (22 Klassen) + Red-Flags-Block,
-  doku-sync ersatzlos entfallen (Träger-Regel), update-doks auf eine Aufgabe. GLM-5.3
-  R1+R2 „vollständig behoben". Suite **312/310/2**, validate ×3 grün.
-- `.nc/` ist seit Maintainer-Commit `242b9e7` (2026-08-23, „war Absicht") **getrackt** —
-  Vorwegnahme von EN1/D14; Sitzungswissen-Commits reisen in den Phasen-PRs mit.
-- **Merge-Reihenfolge:** PR #22 zuerst, dann PR #23 (stacked auf dem G-Branch).
+- **Der Onsite-Delta-Umbau ist bis Phase I gebaut.** Rahmenplan:
+  `knowledge-base/aktive-bauplaene/2026-08-23-onsite-delta-mapping.md` (Nachträge N1–**N4**),
+  Anker jetzt Onsite `origin/main@2530ced` / Kern **0.26.0**. Phasen G, H und I sind fertig;
+  **J und K stehen aus**.
+- **Phase I → PR #25** (`feat/onsite-delta-phase-i`, Kern **0.13.0**), offen und `MERGEABLE`,
+  **10/10 CI-Checks grün**, Suite 312 → **315**. Fünf Commits: I-A Fugen · I-B Umzug ·
+  I-C Mechanik · Nachzug + Bump · Waypoint-Schnitt.
+- **Zwei neue Kategorien in der Wissensbasis:** `aktive-bauplaene/` (laufende Pläne;
+  `grundwissen/` trägt nur noch dauerhafte Referenzen und Design-Specs) und `sitzungswissen/`
+  (dieses Dokument liegt darin). `vorlagen/` ist von der Repo-Wurzel nach
+  `standardprozesse/vorlagen/` gezogen — als Unterordner, nicht als Kategorie.
+- **Das Buchführungsmodell hat gewechselt:** Aktualisierungs-Index §0 (Zwei-Klassen: Produkt-
+  vs. Wissensklasse) und §3.6 (Release-Zug, acht Schritte, nur auf Maintainer-Kommando). Im
+  Arbeitsstrang wird **nie** gebumpt, `[Unreleased]` bleibt leer.
 
-## Offene Punkte (alle im Register)
+## Offene Punkte
 
-- Maintainer: PR #22/#23 abnehmen + mergen; **EN4-Wortlaut-Abnahme** Safety-Gate-
-  Musterliste v1 (Merge = Abnahme); WZS-Deploy-/DB-/Webhook-Kommandos für Muster 4
-  benennen; Knoten-Entscheid `module-registry.json` (Knoten oder Blatt).
-- **Phasen I/J/K offen:** I = D14 (sitzungswissen-Umzug, end-session/start-Umbau,
-  GL1–GL5, **Kriterienliste v2**) + D10 (Sanierungs-Normen, Bauplan-2026-08-15-
-  Archivierung) + D11 (Release-Runbook/Waypoints statt E7) + D12 (1b-Archiv-Satz,
-  Kern-Bump) + D13 (doks-Governance) + D26 (Systemachsen-Port — Entscheid: portieren);
-  J = D19–D23 (drei dev-Subagenten, W4, Anlageweg, CI-Kostenschnitt); K = D15–D18.
-- Ketten-Zeilen in den lebenden Standardprozessen (Onsite-Muster, vertagt);
-  `/nc:setup` um `kernRepoPfad`-Schreiben erweitern (bis dahin ruht D5, D4 nutzt die
-  `kernSsotPfad`-Zweitquelle).
-- **Onsite-Beobachtung ab `51e230f`** (D24-Liste: mneme-dreaming, ssot-krake,
-  init-cli-bootstrap, nachzug-kadenz/executor-umbau, node-doks-Folgeplan,
-  claude-ebenen-standards, dev-plugin-modernisierung, sanierung Phase 2).
-- **Jira-Blöcke B/C zurückgestellt** (Maintainer-Weisung; Scratchpad existiert):
-  B = Jira-Konzept NCOS (Leons 8-Epics-Gerüst vom 2026-08-17 einbeziehen;
-  Onsite-Backlog-Extrakt im Journal 2026-08-24); C = EP-Umzug wegen
-  `stud.hs-coburg.de`-Konten (Site-Frage klären).
-- Alt-Stränge unverändert: reserve-Tags (E4) · Queue-Praxisprobe · GF3-Queue-Zeile ·
-  @claude-Bot · Livetests · Ebene-0-Textentwurf · Remote-Branch phase-3 löschen ·
-  nc-web-Bauplan.
+- **Abnahme-Vorbehalt S1:** Merge von PR #25 = **Wortlaut-Abnahme** der Kriterienliste v2 und
+  GL1–GL5. Wer den Wortlaut ändern will, tut das vor dem Merge.
+- **`referenz/`-Review (P-E5):** Je Datei existiert ein dokumentierter Review-Vorgang
+  (PR #3 Kimi, #20 Kette N1, #21 zwei GLM-Runden), aber alle drei stehen auf
+  `REVIEW_REQUIRED` mit **null** aufgezeichneten Reviews. Maintainer-Entscheid nötig.
+- **Jira-Ablageort:** `.nc/` steht wieder in `.gitignore` — künftige Jira-Artefakte des
+  parallelen Vorgangs wären dort ungetrackt. `git add -f` ist der dokumentierte Ausweg.
+- **`nc-development`-Modernisierungsplan** liegt in `aktive-bauplaene/` statt im Archiv: sechs
+  offene „Kommende Änderungen"-Merker müssten erst ins Register, dann kann er archiviert werden.
+- **Leitplanken der Ebene 0** sind normativ verankert, aber **nicht ausgebaut** (eigener Vorgang).
+- **Achse 2 ohne Maintenance-Skill:** Onsites „CLAUDE-Netz-Aktualisierer" ist bei uns weder
+  gebaut noch beschlossen; die Rolle trägt heute `/nc:setup`.
+- **Phase J** (D19 Subagenten, D20 Hook-Norm W4, D21 Anlageweg, D22 CI-Kostenschnitt, D23
+  Prozessteil, dazu **D28/D29/D30** aus N4) und **Phase K** (D16, D17) stehen aus.
 
 ## Zuletzt getroffene Entscheidungen
 
-- Maintainer 2026-08-23: `.nc/`-Commit auf main „war Absicht" · finaler Umbau
-  beauftragt, EN1–EN8 = Onsite-Parität · Waypoint-Arbeitsmodus sofort · Onsite immer
-  live lesen · Jira zurückgestellt.
-- Overseer (Nacht, dokumentiert in Mapping/CHANGELOG/PR-Bodies): Prod-SQL-Flag nicht
-  portiert · psFlagActive nicht-falsy (NC-Härtung, Drift-Ritual) ·
-  Lesekommando-Exemption deploy · kernSsotPfad-Zweitquelle für Zeiger · Ketten-Zeilen
-  und Phase I vertagt (PR-Schnitt-Disziplin).
+- **P-E1–P-E9** (2026-08-24) sind in Phase I vollständig ausgeführt.
+- **A8 aufgeteilt:** permissive Testausnahmen nach I-A, strukturfordernde Invarianten mit dem
+  Umzug in I-B — sonst wäre kein Commit einzeln grün gewesen.
+- **T19 nicht erzwungen:** Der Router-Kontext-Deckel misst die Summe der
+  `wissen-*`-Descriptions, nicht einen Skill-Rumpf; er wurde nicht auf eine Datei angewandt,
+  für die er nie galt.
+- **Die frozen v0.1.0-Spec bleibt unangetastet** — „Historisch bleibt historisch" schlägt die
+  neue Spec-Governance; die Begründung steht im SSOT-Index, damit sie niemand als Drift meldet.
 
-## Aktive Branches / PRs
+## Aktive Branches und offene Pull Requests
 
-- `feat/onsite-delta-phase-g` → **PR #22** (offen, CI grün).
-- `feat/onsite-delta-phase-h` → **PR #23** (offen, stacked; lokal ausgecheckt).
-- `main` @ `242b9e7`.
+- `feat/onsite-delta-phase-i` → **PR #25**, offen, MERGEABLE, CI grün, **nicht gemergt**.
+- `main` steht auf `cab9f88` (Kern 0.12.0); PR #22, #23 und #24 sind gemergt und im Register
+  als erledigt geführt.
 
 ## Bekannte Risiken
 
-- Stacked-PR-Reihenfolge (falsche Merge-Reihenfolge erzeugt Konflikte).
-- Parallel-Sessions auf der Maschine (nie `git add -A`; Fremd-Commit-Vorfall 242b9e7).
-- Onsite wandert weiter (Anker 51e230f, D24 beobachten).
+- **BREAKING, teamweit:** Sobald 0.13.0 ausgeliefert ist, legen `/nc:start` und
+  `/nc:end-session` in fremden Arbeits-Repos **nichts** mehr an — das Projekt-Memory trägt
+  allein. Ein `.nc/erinnerung/`-Altbestand wird **gemeldet**, nicht gelesen.
+- Der Tag `nc--v0.13.0` fehlt noch und gehört **hinter** den Merge. Die Release-Tag-Invariante
+  ist grün, weil die jüngste CHANGELOG-Version bewusst ausgenommen ist — nach dem nächsten
+  Schnitt ohne Tag würde sie rot.
+- Die Queue-Praxisprobe steht weiterhin aus (kein Abteilungs-Satellit).
 
 ## Nächster Schritt
 
-- Maintainer: PRs #22/#23 reviewen/mergen (EN4-Abnahme). Danach Phase I als eigener
-  Bauzyklus — Einstieg über das Mapping (N3) und `/nc:start`.
+**Maintainer:** PR #25 lesen, die drei Fragen im PR-Body beantworten (referenz/-Approval,
+Jira-Ablageort, S1-Wortlaut), mergen und `nc--v0.13.0` annotiert taggen. **Danach** Phase J auf
+frischem Branch — sie ist von G–I unabhängig und parallelisierbar.
