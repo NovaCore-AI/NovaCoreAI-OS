@@ -9,7 +9,7 @@
     {
       "name": "nc",
       "source": "./plugins/nc",
-      "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam (10 Skills — Session-Zyklus start/end-session, Journal, Infrapflege setup/doku-sync/os-info/skill-builder/update-doks, Queue-Flow queue-abteilung/queue-kern), Kontroll-Schicht (Gate 1 FFG, Gate 2 Session-Start-Zwang, PreCompact-Mahnung, Queue-Fälligkeits-Erinnerung), Doks-Autosync (Ebene 1 + 1b), WP-Rahmen WP0–WP8, Abteilungs-Registry, Subagenten. Wird von jedem Abteilungsplugin vorausgesetzt.",
+      "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam — Session-Zyklus start/end-session, Journal, Infrapflege setup/os-info/skill-builder/update-doks, SSOT-Präsenz-Router wissen-aendern/wissen-planen/wissen-nachschlagen/wissen-protokolle, Queue-Flow queue-abteilung/queue-kern, Kontroll-Schicht (Gate 1 FFG, Gate 2 Session-Start-Zwang, PreCompact-Mahnung, Queue-Fälligkeits-Erinnerung, zwei Zeiger-Hooks der SSOT-Präsenz — nc-wissens-hinweis, nc-pfad-hinweis, beide kein Gate), Doks-Autosync (Ebene 1 + 1b), WP-Rahmen WP0–WP8, Abteilungs-Registry, Subagenten. Wird von jedem Abteilungsplugin vorausgesetzt.",
       "category": "kern"
     },
     {

@@ -19,6 +19,49 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ### Added
 
+- **Onsite-Delta-Nachbau Phase H — SSOT-Präsenz (Kern 0.11.0 → 0.12.0)** nach Bauplan
+  `knowledge-base/grundwissen/2026-08-23-onsite-delta-mapping.md` (Posten D4, D5, D7, D8,
+  D9, D25; Onsite-Quelle live `origin/main@51e230f` — das Nacht-Delta 6d3f8db → 51e230f
+  war reine Doku-Hygiene des Vorbilds). Drei parallele Opus-Baupakete nach
+  Plan-Sandwich-Verträgen, Overseer-reviewt und -integriert.
+  - **Node-Doks-Definition (D25):** neue Begriffsnorm
+    `grundwissen/NovaCore-OS-Node-Doks-Definition.md` — Knoten erschließen Wissen,
+    Blätter tragen es; NC-Bestandstabelle (Onsite führt seit dem Vier-Knoten-Entscheid
+    2026-08-21 VIER Knoten; NC-Zusätze `AGENTS.md`/Registry als Hybrid bzw. Grenzfall
+    mit offenem Maintainer-Punkt).
+  - **Vier Wissens-Router (D7, neues Modul `wissen`):** `/nc:wissen-aendern`,
+    `/nc:wissen-planen`, `/nc:wissen-nachschlagen`, `/nc:wissen-protokolle` — Zeiger auf
+    Node-Doks und Kategorien statt kopiertem Inhalt; Registry-Auflösung `kernRepoPfad` →
+    `kernSsotPfad` (Lesekopie legitim für Zeiger), Reparaturweg `/nc:setup`;
+    Descriptions-Summe 4.023 Zeichen, testerzwungen < 6.000.
+  - **Wissens-Zeiger-Hook (D4, Onsite §15.40):** `nc-wissens-hinweis.js`
+    (UserPromptSubmit, KEIN Gate, Exit nie 2 — würde den Prompt löschen) + handgebauter
+    `wissen-sucheindex.json` (38 Einträge aus SSOT-Index Teil 2, normalisierte
+    Stichworte, testerzwungene Pfad-Existenz); höchstens drei Einzeiler-Treffer je
+    Sitzung, derselbe höchstens einmal.
+  - **Pfad-Zeiger-Hook (D5, Onsite §15.49):** `nc-pfad-hinweis.js` (PreToolUse
+    Write/Edit/MultiEdit/NotebookEdit, bewusst ohne Bash — benannte ehrliche Lücke;
+    `permissionDecision` wird NIE gesetzt) + `pfad-aenderungsindex.json` (22 Pfadklassen,
+    repo-relativ; jeder matrixKey testerzwungen ein Fett-Anker des
+    Aktualisierungs-Index, jeder Prefix trifft einen realen Pfad) + Red-Flags-Block
+    (258 Zeichen, Budget 400, testerzwungen) in der Session-Start-Injektion.
+  - **`/nc:doku-sync` ersatzlos entfernt (D8, Onsite §15.43):** die Funktion tragen
+    `/nc:wissen-aendern` (Zeiger auf die Änderungs-Matrix) und der Aktualisierungs-Index
+    selbst; Träger-Regel übernommen — jede Checklistenzeile braucht einen benannten
+    Träger (mechanisch: CI-Prüfzyklus, urteilsabhängig: Maintainer-Review am PR); das
+    Pre-Commit-Fangnetz ist ersatzlos verworfen. Verweis-Sweep über neun Plugin-Dateien
+    und Aktualisierungs-Index §2.1/§5.
+  - **`/nc:update-doks` auf EINE Aufgabe geschnitten (D9, Onsite §15.47):**
+    Kreuzverweis-/Pfad-Pflege innerhalb der harten SSOT-Dokumente, sieben Schritte mit
+    Vorschau vor dem Schreiben, nur noch Maintainer-Vokabular triggert; die
+    F1/F2-Zweiteilung ist entfallen; Zielauflösung über den belegten Arbeitsbaum bzw.
+    `kernRepoPfad` — nie die Lesekopie.
+  - Neue Matrix-Zeile „Wissens-Router oder Zeiger-Index geändert" im
+    Aktualisierungs-Index; Gates-Definition um die zwei Nicht-Gates ergänzt. Suite
+    249 → **312** Tests (310 pass / 2 skip — inkl. GLM-R1-Regressionen: kernSsotPfad-Fallback positiv + Grenze); `claude plugin validate` beide Ebenen.
+    Externes Review: GLM-5.3 via kimi-Plugin — Kette im PR-Body. *Beitrag: Claude
+    (Fable 5, Overseer) + drei Opus-Baupakete, Nachtschicht 2026-08-24*
+
 - **Onsite-Delta-Nachbau Phase G — Kontroll-Schicht-Parität (Kern 0.10.0 → 0.11.0)** nach
   Bauplan `knowledge-base/grundwissen/2026-08-23-onsite-delta-mapping.md` (Posten D1, D2,
   D3, D6; Onsite-Quelle `origin/main@6d3f8db`; Waypoint-Arbeitsmodus nach Maintainer-Weisung

@@ -130,7 +130,7 @@ function bereitstellen(quelle) {
       fs.mkdirSync(basisVerzeichnis(), { recursive: true });
       // VOLLER Klon, bewusst. Ein frueherer Entwurf holte per --sparse nur die
       // Wissensbasis — das schnitt `plugins/` weg (das u. a. referenz/skill-authoring.md
-      // traegt, auf das doku-sync verweist) und sparte dabei ganze 445 KB. Funktionsverlust
+      // traegt, auf das skill-builder verweist) und sparte dabei ganze 445 KB. Funktionsverlust
       // fuer nichts: das gesamte Repo ist wenige Megabyte. Wer die Wissensbasis lokal
       // braucht, soll das Repo lokal haben.
       git(['clone', quelle.repo, ziel]);

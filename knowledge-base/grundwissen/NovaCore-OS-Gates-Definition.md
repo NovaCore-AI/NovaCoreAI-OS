@@ -66,6 +66,23 @@ per Env **je Gate**. Alle Hooks liegen im Kern `nc`.
   `NC_QUEUE_CHECK=off`; Test-Overrides `NC_QUEUE_STATE_DIR`, `NC_QUEUE_SESSION_DIR`,
   `NC_QUEUE_PFAD`. Details: `standardprozesse/queue-flow.md`.
 
+- **Wissens-Zeiger** (`nc-wissens-hinweis.js`, UserPromptSubmit, seit Kern 0.12.0 — Onsite
+  §15.40, Mapping D4): gleicht Prompt-Stichworte gegen den vorgebauten Sucheindex
+  `hooks/wissen-sucheindex.json` und injiziert höchstens drei Zeiger-Zeilen auf Quellen
+  der Wissensbasis — nie deren Inhalt. **Kein Gate**: Exit nie 2 (würde den Prompt
+  löschen), blockiert nichts. Registry-Auflösung `kernRepoPfad` → `kernSsotPfad`
+  (Lesekopie legitim für Zeiger). Opt-out `NC_WISSEN_HINWEIS=off`; Test-Overrides
+  `NC_WISSEN_INDEX`/`NC_WISSEN_STATE_DIR`/`NC_WISSEN_SESSION_DIR`.
+- **Pfad-Zeiger** (`nc-pfad-hinweis.js`, PreToolUse Write/Edit/MultiEdit/NotebookEdit,
+  bewusst ohne Bash, seit Kern 0.12.0 — Onsite §15.49, Mapping D5): legt bei der ersten
+  Schreibaktion je Sitzung und Pfadklasse (22 Klassen, `hooks/pfad-aenderungsindex.json`,
+  längster Prefix) die passende Zeile der Änderungs-Matrix bei; matrixKeys sind
+  testerzwungen Fett-Anker des Aktualisierungs-Index. **Kein Gate**: `permissionDecision`
+  wird nie gesetzt, Exit immer 0. Nur im OS-Repo wirksam (`kernRepoPfad`, bewusst ohne
+  Lesekopie-Fallback — begleitet Schreibarbeit). Dazu der Red-Flags-Block (≤ 400 Zeichen,
+  testerzwungen) in der Session-Start-Injektion. Opt-out `NC_PFAD_HINWEIS=off`;
+  Test-Overrides `NC_PFAD_INDEX`/`NC_PFAD_STATE_DIR`/`NC_PFAD_SESSION_DIR`.
+
 ## Was Gate 2 deterministisch prüft — und was nicht
 
 Ehrliche Reichweite, damit die Tabelle oben nicht mehr verspricht, als der Code hält:

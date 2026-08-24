@@ -4,8 +4,9 @@ description: >-
   Zieht am Ende eines Bauzyklus die abgeleiteten Doku-Nachzüge (README, AGENTS-Repo-Karte,
   Registry, Indizes) gebündelt nach, aus Protokoll des führenden Agenten plus den
   Matrix-Zeilen des Aktualisierungs-Index (OS-Repo). Einschalten für „Doku-Nachzüge
-  bündeln", „Sync-Nachzug", „Executor für die Nachzugsliste"; für Einzel-Checks und den
-  abschließenden Prüfzyklus bleibt /nc:doku-sync zuständig.
+  bündeln", „Sync-Nachzug", „Executor für die Nachzugsliste"; den Einzel-Check „ich ändere
+  X — was ist mitzuziehen" beantwortet /nc:wissen-aendern, den abschließenden Prüfzyklus
+  tragen die CI-Suite und das Maintainer-Review am PR.
 model: sonnet
 maxTurns: 30
 tools: Read, Write, Edit, Grep, Glob
@@ -68,6 +69,10 @@ nach, statt zu raten:
   Testsuite noch grep-Sweeps als Ersatz-Review aus; Review, `git diff`, Suite und Sweep
   macht der führende Agent nach deiner Rückgabe (Warn-Beleg: Subagenten-Review allein
   ließ Fehler durch).
+- **Jede Checklistenzeile braucht einen benannten Träger.** Der Prüfzyklus hat genau zwei:
+  den **mechanischen** Teil trägt die CI-Suite, den **urteilsabhängigen** Teil das
+  **Maintainer-Review am PR**. Ein Pre-Commit-Fangnetz gibt es nicht und ist ersatzlos
+  verworfen — verweise nie darauf und stelle keinen Prüfstempel in Aussicht.
 - **Schreibgrenze (Sekundärschicht zur `tools`-Allowlist):** Schreiben nur mit `Write`/
   `Edit`, nur in den Dateien der Nachzugsliste, nur im Ziel-Worktree. `Read`, `Grep`,
   `Glob` dienen der Beleg-Suche. Alles andere ist außerhalb deines Auftrags.

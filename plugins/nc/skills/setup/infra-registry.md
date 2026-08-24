@@ -37,8 +37,12 @@ führt **jede Umgebung ihre eigene Registry**.
   sie haben eine eigene zweidimensionale SSOT und hängen an keiner Kern-Mechanik).
 - **Optionale Queue-Flow-Felder (Andockpunkte — real ab dem ersten Abteilungs-Satelliten,
   Phase 3 / AP-E2/E3):** `kernRepoPfad` — absoluter Pfad eines **Arbeitsklons** des OS-Repos
-  auf dieser Maschine (niemals die Lesekopie `kernSsotPfad`); braucht allein
-  `/nc:queue-kern` für den Promotions-PR. `abteilungsRepoPfade` — Objekt
+  auf dieser Maschine (niemals die Lesekopie `kernSsotPfad`); Leser sind
+  `/nc:queue-kern` für den Promotions-PR, `/nc:update-doks` für den Kreuzverweis-Lauf,
+  der Pfad-Zeiger-Hook `nc-pfad-hinweis.js` (nur dieses Feld — begleitet Schreibarbeit)
+  sowie `nc-wissens-hinweis.js` und die vier `wissen-*`-Router (dieses Feld zuerst,
+  `kernSsotPfad` als Zweitquelle für reine Zeiger),
+  falls die Sitzung nicht schon im OS-Repo selbst läuft. `abteilungsRepoPfade` — Objekt
   `Abteilungsname → absoluter Pfad` des lokalen Satelliten-Arbeitsklons bzw. `"ausstehend"`;
   Leser sind die Queue-Skills (`queue-abteilung`/`queue-kern`) und der Fälligkeits-Hook
   `nc-queue-faelligkeit.js`. Heute setzt **keine** Maschine diese Felder (kein
@@ -56,7 +60,10 @@ führt **jede Umgebung ihre eigene Registry**.
   schweigt in diesem Fall bewusst statt zu melden — im Sitzungsstart zählt Fail-Open ohne
   Rauschen, keine geratene Fälligkeit.
 - **Leser:** `start` (Kontextaufbau, tolerant bei Fehlen: Hinweis auf `/nc:setup`) und
-  `update-doks` (F2-Konsistenzlauf). `journal` und `end-session` schreiben in die von
+  `update-doks` (Kreuzverweis-Lauf über die SSOT-Dokumente — liest `kernRepoPfad`, nie die
+  Lesekopie, weil Fixes committierbar sein müssen); `nc-pfad-hinweis.js` liest ebenfalls nur
+  `kernRepoPfad`, `nc-wissens-hinweis.js` und die `wissen-*`-Router fallen auf `kernSsotPfad`
+  zurück (Zeiger dürfen in die Lesekopie zeigen). `journal` und `end-session` schreiben in die von
   `/nc:start` bestimmte Ablage und hängen nur **indirekt** an ihr.
 - **Schreiber:** allein `/nc:setup` (einmal je Lauf, als letzter Schreibschritt). Vor dem
   Schreiben die Datei **erneut lesen** und fremde/unbekannte Felder unverändert

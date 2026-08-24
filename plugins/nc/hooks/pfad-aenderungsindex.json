@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "_hinweis": "Vorgebauter, kompakter Pfad-Aenderungsindex des PreToolUse-Hooks nc-pfad-hinweis.js (Port des Onsite-Hooks oai-pfad-hinweis.js, Spec §15.49; Delta-Mapping-Position D5). Der Hook feuert bei JEDER Schreibaktion — er liest ausschliesslich diese Datei und niemals ein Markdown-Dokument. 'prefix' ist repo-relativ zum OS-Repo (kernRepoPfad der Infra-Registry) und wird per LAENGSTEM Treffer aufgeloest: der spezifischste Eintrag gewinnt, damit 'plugins/nc/hooks/lib/session-key.js' die Bibliotheks-Zeile bekommt statt der allgemeinen Hook-Zeile. 'matrixKey' MUSS woertlich als Fett-Anker '**...**' in der Aenderungs-Matrix (§2) von knowledge-base/standardprozesse/aktualisierungs-index.md (OS-Repo) vorkommen — nc-pfad-hinweis.test.mjs erzwingt beide Richtungen (Prefix existiert real, matrixKey ist auffindbar). Handgepflegt, nicht generiert: generierte Indizes driften leiser. Neue Pfadklasse => Eintrag in DERSELBEN Aenderung. 'lesen'/'mitziehen' sind Kurzformen der Matrix-Zeile, nie ihr Ersatz — es gilt immer die Quelle.",
+  "eintraege": [
+    {
+      "id": "hook",
+      "prefix": "plugins/nc/hooks/",
+      "titel": "Hook (Kontroll-Schicht)",
+      "matrixKey": "Hook neu/geändert",
+      "lesen": "NovaCore-OS-Gates-Definition.md (Ist-Stand aller Gates) · jüngster Bauplan in grundwissen/ · bestehender Hook-Code samt hooks/lib/",
+      "mitziehen": "hooks.json — Matcher UND das description-Feld (es trägt den Prosa-Zustand der GESAMTEN Kontroll-Schicht) · Gates-Definition (Statusspalte) · README.md (Kontroll-Hook-Tabelle inkl. Opt-out-Envs) · AGENTS.md · CHANGELOG.md mit den sicherheitsrelevanten Entscheidungen · Kern-Bump + VERSION + Registry · Tests mit belegter Negativprobe · Opt-out-Env an drei Orten"
+    },
+    {
+      "id": "hook-lib",
+      "prefix": "plugins/nc/hooks/lib/",
+      "titel": "Hook-Bibliothek (geteilte Gate-Mechanik)",
+      "matrixKey": "Hook neu/geändert",
+      "lesen": "kern-plugin-bau.md §2b (Upstream-Drift-Ritual der FFG-Engine) · JEDEN Hook, der das Modul lädt (grep) — eine lib-Änderung wirkt auf mehrere Gates gleichzeitig",
+      "mitziehen": "alle aufrufenden Hooks prüfen · Tests jedes betroffenen Gates · hooks.json-description, falls sich Verhalten ändert · CHANGELOG.md · Kern-Bump"
+    },
+    {
+      "id": "test",
+      "prefix": "plugins/nc/tests/",
+      "titel": "Testsuite",
+      "matrixKey": "Test neu/geändert",
+      "lesen": "die bestehenden Invarianten der Suite — nicht doppeln",
+      "mitziehen": "CHANGELOG.md. Testzahlen stehen bewusst NUR im CHANGELOG-Eintrag der Version, nie in README/AGENTS · Lauf wortgleich `node --test plugins/nc/tests/*.test.mjs` (ein Verzeichnis-Argument schlägt fehl)"
+    },
+    {
+      "id": "skill",
+      "prefix": "plugins/nc/skills/",
+      "titel": "Skill",
+      "matrixKey": "Skill inhaltlich geändert",
+      "lesen": "die SKILL.md selbst · plugins/nc/referenz/skill-authoring.md (Format, YAML-Falle) · plugins/nc/wp-rahmen.md, falls Gates berührt sind. Bei neuem, umbenanntem oder entferntem Skill gelten stattdessen die Nachbarzeilen der Matrix",
+      "mitziehen": "README.md (Skill-Tabelle) · module-registry.json (Modul-Segment und status-Text) · AGENTS.md Repo-Karte, falls die Skill-Liste dort namentlich steht · CHANGELOG.md · Bump des betroffenen Plugins · `claude plugin validate <plugin> --strict`"
+    },
+    {
+      "id": "agent",
+      "prefix": "plugins/nc/agents/",
+      "titel": "Subagent",
+      "matrixKey": "Agent (Subagent) neu/geändert",
+      "lesen": "subagenten-bau.md (Faustregel Agent-vs-Skill, Scope, Gate-Semantik §8) · plugins/nc/referenz/agent-authoring.md (Feld-Kanon, Werkzeuggrenzen-Regel)",
+      "mitziehen": "Registry-agents-Segment · README (Agenten-Nennung) · AGENTS.md Repo-Karte · Trigger-/Overlap-Prüfung gegen Agents UND Skills · agenten.test.mjs · CHANGELOG.md · Kern-Bump · Werkzeuggrenze hart im Frontmatter, verbotene Felder hooks/mcpServers/permissionMode"
+    },
+    {
+      "id": "referenz",
+      "prefix": "plugins/nc/referenz/",
+      "titel": "Referenz-Apparat",
+      "matrixKey": "Skill-Formatregeln geändert",
+      "lesen": "die Datei selbst · kern-plugin-bau.md §2.3",
+      "mitziehen": "abhängige Skills und Agenten gegen die neue Regel prüfen · Verweise in AGENTS.md · CHANGELOG.md · Kern-Bump — der referenz-Apparat wird mit dem Kern ausgeliefert und gilt sofort teamweit"
+    },
+    {
+      "id": "skill-authoring",
+      "prefix": "plugins/nc/referenz/skill-authoring.md",
+      "titel": "Skill-Formatregeln",
+      "matrixKey": "Skill-Formatregeln geändert",
+      "lesen": "die Datei selbst · kern-plugin-bau.md §2.3",
+      "mitziehen": "ALLE vorhandenen SKILL.md gegen die neue Regel prüfen · Verweise in AGENTS.md · CHANGELOG.md · Kern-Bump · Achtung: die Datei ist die einzige Ausnahme der Plugin-Grenzen-Invariante in struktur.test.mjs, und die CI-Positivkontrolle setzt die Frontmatter-Form `description: >-` voraus"
+    },
+    {
+      "id": "pflege-auspraegung",
+      "prefix": "plugins/nc/referenz/pflege-auspraegung.md",
+      "titel": "Pflege-Ausprägung / Queue-Format",
+      "matrixKey": "Pflege-Ausprägung / Queue-Format geändert",
+      "lesen": "die Datei selbst · queue-flow.md (Stationen, Takt, Prüfpunkte) · kriterien-pflege.md (Schema-Grenze) · die lesenden Kern-Skills end-session, journal, queue-abteilung, queue-kern",
+      "mitziehen": "pflege-auspraegung.json JEDER Abteilung — eine FELD-Änderung heißt schemaVersion hochzählen und alle Abteilungen nachziehen · die lesenden SKILL.md · vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage · README.md · CHANGELOG.md · Kern-Bump · queue-os.test.mjs · Queue bleibt append-only"
+    },
+    {
+      "id": "doks",
+      "prefix": "plugins/nc/doks/",
+      "titel": "Team-globale CLAUDE-Payload (Ebene 1)",
+      "matrixKey": "Team-globale CLAUDE-Anteile geändert",
+      "lesen": "NovaCore-OS-CLAUDE-Ebenen-Definition.md (Ebenen, Kanal-Regel, NC-Marker-Konvention)",
+      "mitziehen": "die betroffene Payload · Ebenen-Definition, falls Regeln berührt sind · CHANGELOG.md · Kern-Bump (ohne ihn erreicht der Autosync niemanden) · Marker-Konvention einhalten, Privat-Zone NIE anfassen · nc-doks-autosync.test.mjs läuft ausschließlich gegen die Overrides, nie gegen echte ~/.claude-Ziele"
+    },
+    {
+      "id": "plugin-claude",
+      "prefix": "plugins/nc/nc-sync.md",
+      "titel": "Plugin-CLAUDE `nc-sync.md`",
+      "matrixKey": "Abteilungs-/Plugin-CLAUDE geändert",
+      "lesen": "NovaCore-OS-CLAUDE-Ebenen-Definition.md · die Datei selbst. Sie ist ZUGLEICH Ebene-1b-Payload — es gilt zusätzlich die Matrix-Zeile **Team-globale CLAUDE-Anteile geändert**",
+      "mitziehen": "README.md des Plugins · AGENTS.md, falls die Ebene dort beschrieben ist · CHANGELOG.md · Kern-Bump, weil die Datei ausgeliefert wird · Plugin-Grenze: keine Repo-Pfade, keine ../-Verweise (testerzwungen)"
+    },
+    {
+      "id": "plugin-manifest",
+      "prefix": "plugins/nc/.claude-plugin/",
+      "titel": "Plugin-Manifest (Kern)",
+      "matrixKey": "Plugin-Manifest",
+      "lesen": "abteilungs-plugin-bau.md §2 Fakt 6 · Abschnitt 3 des Aktualisierungs-Index (Bump-Schema, Release-Weg)",
+      "mitziehen": "VERSION + module-registry.json (Gleichstand ist testerzwungen) · README.md (Plugin-Tabelle) · AGENTS.md (Produktstand) · CHANGELOG.md · Tag und Release NIE vom Versions-Commit trennen"
+    },
+    {
+      "id": "abteilungsplugin",
+      "prefix": "plugins/nc-development/",
+      "titel": "Abteilungsplugin `nc-development`",
+      "matrixKey": "Skill inhaltlich geändert",
+      "lesen": "abteilungs-plugin-bau.md §2 · plugins/nc-development/workflow.md (Trigger-Matrix) · plugins/nc/wp-rahmen.md. Bei neuem Modul oder neuem Plugin gelten die Nachbarzeilen **Neues Modul** bzw. **Neues Abteilungsplugin (im Repo)**",
+      "mitziehen": "Trigger-Matrix in workflow.md · module-registry.json (Modul-Segment UND status-Text der Abteilung) · README.md · AGENTS.md Repo-Karte · CHANGELOG.md · Bump DES ABTEILUNGSPLUGINS, nicht des Kerns — Abteilungsplugins zählen eigenständig"
+    },
+    {
+      "id": "vorlage",
+      "prefix": "vorlagen/abteilungsplugin/",
+      "titel": "Vorlage Abteilungsplugin",
+      "matrixKey": "Vorlage geändert",
+      "lesen": "abteilungs-plugin-bau.md §3 · die Vorlagendateien selbst",
+      "mitziehen": "Repo-Karte in AGENTS.md UND README.md · CHANGELOG.md · zwei Invarianten: „Vorlage ist kein Plugin\" (kein echtes plugin.json, Platzhalter müssen stehenbleiben) und „keine offenen Platzhalter in ausgelieferten Plugins\""
+    },
+    {
+      "id": "vorlage-ssot",
+      "prefix": "vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage",
+      "titel": "Vorlage `ssot-grundgeruest`",
+      "matrixKey": "Vorlage `ssot-grundgeruest` geändert",
+      "lesen": "ssot-aufbau.md §4 und §4a (Isolation) · abteilungs-plugin-bau.md §3b.1 · die Vorlagendatei selbst",
+      "mitziehen": "vorlagen/abteilungsplugin/VORLAGE.md (Inhaltsliste, Variablen, Kopierzeile) · CHANGELOG.md · der Abteilungs-Platzhalter muss stehenbleiben (Invariante „Vorlage ist kein Plugin\") · KEIN Rück-Nachzug in bereits gebaute Satelliten (eigenständige Repos, eigener Vorgang) · kein Bump, die Vorlage wird nicht ausgeliefert"
+    },
+    {
+      "id": "wissen",
+      "prefix": "knowledge-base/",
+      "titel": "Wissensdatei",
+      "matrixKey": "Wissensdatei neu",
+      "lesen": "SSOT-Document-Index Teil 1 (Zielordner samt „gehört nicht hierher\")",
+      "mitziehen": "Zeile im SSOT-Document-Index Teil 2 der Zielkategorie: Link, Status, „Relevant wenn …\" — struktur.test.mjs erzwingt Vollständigkeit UND Linkgültigkeit, ohne Eintrag ist die Suite rot · AGENTS.md Glossar bei neuer Kategorie · CHANGELOG.md · kein Plugin-Bump nötig · berührt es den Wissens-Sucheindex, gehört wissen-sucheindex.json in dieselbe Änderung"
+    },
+    {
+      "id": "standardprozess",
+      "prefix": "knowledge-base/standardprozesse/",
+      "titel": "Standardprozess",
+      "matrixKey": "Konvention/Prozess geändert",
+      "lesen": "AGENTS.md (Konventionen, Standardzyklus — bei Widerspruch gewinnt AGENTS.md) · den Prozess selbst · SSOT-Document-Index Teil 2",
+      "mitziehen": "AGENTS.md · DIESEN Aktualisierungs-Index (Langfassung derselben Disziplin) · SSOT-Document-Index Teil 2, falls Titel oder „Relevant wenn …\" wandern · CHANGELOG.md — Prozessänderungen, die Agenten binden, müssen in AGENTS.md landen, sonst wirken sie nicht"
+    },
+    {
+      "id": "queue",
+      "prefix": "knowledge-base/kandidaten-queue/",
+      "titel": "Kandidaten-Queue (append-only)",
+      "matrixKey": "Pflege-Ausprägung / Queue-Format geändert",
+      "lesen": "plugins/nc/referenz/pflege-auspraegung.md Abschnitt 4 (verbindliches Queue-Format, fünf Spalten) · queue-flow.md §2 (Stationen und Prüfpunkte)",
+      "mitziehen": "am Format NICHTS — die Queue ist append-only: Zeilen werden nie gelöscht und nie umgeschrieben; Beförderung ausschließlich per Statuswechsel `offen → befördert (PR #n)` bzw. `abgelehnt (PR #n)` · Kürzel nie neu belegen"
+    },
+    {
+      "id": "marketplace",
+      "prefix": ".claude-plugin/marketplace.json",
+      "titel": "Marketplace-Manifest",
+      "matrixKey": "Marketplace-Manifest",
+      "lesen": "abteilungs-plugin-bau.md §2 (harte Mechanik-Fakten)",
+      "mitziehen": "README.md · CHANGELOG.md · NIE ein version-Feld setzen (Claude Code löst aus plugin.json auf und ignoriert den Marketplace-Wert ohne Warnung) · externe Quellen und Satelliten immer per `ref` + Full-SHA pinnen (testerzwungen) · `claude plugin validate .` · die Beschreibungstexte liest das Team im Installationsdialog"
+    },
+    {
+      "id": "ci",
+      "prefix": ".github/workflows/",
+      "titel": "CI-/Release-Workflow",
+      "matrixKey": "CI-Workflow",
+      "lesen": "der bestehende Workflow · Abschnitt 5 des Aktualisierungs-Index — lokaler Prüfzyklus und CI müssen dieselben Schritte fahren, sonst ist grün lokal wertlos",
+      "mitziehen": "README.md (CI-Absatz) · AGENTS.md Repo-Karte · CHANGELOG.md · Actions per Full-SHA pinnen · die Positivkontrolle (absichtlich defekter Wegwerf-Skill muss rot werden) nie entfernen"
+    },
+    {
+      "id": "agents-md",
+      "prefix": "AGENTS.md",
+      "titel": "AGENTS.md (normativer Einstieg)",
+      "matrixKey": "Konvention/Prozess geändert",
+      "lesen": "AGENTS.md selbst (Konventionen, Standardzyklus, Sync-Matrix, Abschluss-Checkliste) · Abschnitt 2 des Aktualisierungs-Index",
+      "mitziehen": "DIESEN Aktualisierungs-Index · ggf. den betroffenen Standardprozess · CHANGELOG.md. Berührt die Änderung Pflicht-Einstieg oder rote Linien, gilt zusätzlich **Pflicht-Einstieg oder rote Linien geändert**: der Text ist mehrfach gespiegelt (nc-session-start.js, skills/start, doks-Payload) und braucht einen Kern-Bump"
+    },
+    {
+      "id": "readme",
+      "prefix": "README.md",
+      "titel": "README (abgeleitete Doku)",
+      "matrixKey": "Konvention/Prozess geändert",
+      "lesen": "die Sync-Matrix in AGENTS.md — die README ist abgeleitet, nicht normativ",
+      "mitziehen": "die QUELLE der Aussage mitziehen, nicht nur den README-Text (module-registry.json, plugin.json, hooks.json) · CHANGELOG.md · Sparsamkeits-Regel: keine neue Spiegelstelle für Zahlen anlegen"
+    },
+    {
+      "id": "changelog",
+      "prefix": "CHANGELOG.md",
+      "titel": "CHANGELOG (Historie)",
+      "matrixKey": "Konvention/Prozess geändert",
+      "lesen": "Abschnitt 3 des Aktualisierungs-Index (Version, Release, Tag) · der bestehende `[Unreleased]`-Abschnitt",
+      "mitziehen": "Eintrag unter `[Unreleased]` nach Keep-a-Changelog MIT Namenszeichnung — Pflicht für jede integrierte Änderung · Bump des betroffenen Plugins am einzig richtigen Ort (Kern: + VERSION + Registry) · Alteinträge sind historisch und werden nie umgeschrieben · keine doppelte Versionsüberschrift (späte Anker-Invariante)"
+    }
+  ]
+}

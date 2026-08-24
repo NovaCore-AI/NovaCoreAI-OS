@@ -206,10 +206,28 @@ bleiben erhalten (Härtungs-Erhalt wie Bauplan 2026-08-15, I-Serie).
   (CHANGELOG-Batch, Kern-Bump 0.11.0 + VERSION/Registry, README-Hook-Tabelle,
   AGENTS-Produktstand) via Executor.
 
+## Nachtrag N3 (2026-08-24) — Phase-H-Vollzug und Anker-Fortschreibung
+
+- **Phase H ist gebaut und reviewt** (Nachtschicht 2026-08-24): D4, D5, D7, D8, D9, D25 —
+  Branch `feat/onsite-delta-phase-h`, **PR #23** (stacked auf PR #22/Phase G). Kern
+  0.12.0, Suite 249 → 312 (310 pass / 2 skip), GLM-5.3 R1+R2 („vollständig behoben,
+  keine neuen Probleme"). Drei parallele Opus-Baupakete + Sonnet-Executor,
+  Overseer-integriert.
+- **Beobachtungs-Anker fortgeschrieben:** Onsite `origin/main` wanderte während der Nacht
+  auf **`51e230f`** (PRs #121/#123 — Doku-Hygiene, u. a. **Vier-Knoten-Entscheid**-Fix,
+  kein neuer Produktbaustein; Delta geprüft). Phase-H-Ports lasen live diesen Stand;
+  die nächste Iteration misst ab `51e230f`.
+- **Neue offene Posten aus Phase H:** Knoten-Entscheid `module-registry.json`
+  (Knoten oder Blatt) · Ketten-Zeilen in den lebenden Standardprozessen (Onsite-Muster,
+  vertagt) · `/nc:setup` schreibt `kernRepoPfad` nicht (D5 ruht bis dahin;
+  D4/Router nutzen die `kernSsotPfad`-Zweitquelle — Overseer-Entscheid dokumentiert).
+- **Offen bleiben die Phasen I, J, K** (D10–D18 Rest, D14 inkl. Kriterienliste v2 +
+  GL1–GL5, D19–D23, D26 Systemachsen-Port [Entscheid: portieren]).
+
 ---
 
 *Angelegt 2026-08-23 durch Claude (Fable 5, Claude Code) als Overseer-Mapping auf Weisung
 Lucas Vöhringer; Quellen: Onsite.ai-OS `origin/main@6d3f8db`, NovaCoreAI-OS `main@242b9e7`.
 Nachtrag N1 am selben Tag nach Maintainer-Weisung (Beauftragung, Onsite-Parität,
 Affiliate-Invariante); Nachtrag N2 am selben Tag (Node-Doks/Systemachsen/Kriterienliste-v2,
-Phase-G-Vollzug).*
+Phase-G-Vollzug); Nachtrag N3 am 2026-08-24 (Phase-H-Vollzug, Anker `51e230f`).*
