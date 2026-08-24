@@ -11,7 +11,11 @@
 > (`plugins-reference`, `plugin-marketplaces`, `skills`) — u. a. wörtlich: „Avoid setting `version`
 > in both `plugin.json` and the marketplace entry. Claude Code always uses the `plugin.json` value
 > without warning."
-> **Stand:** 2026-07-28 · Spec-Version 0.2.0 · Pflege: Lucas Vöhringer · Sprache: Deutsch.
+> **Stand:** 2026-07-28 · Status: lebend · Pflege: Lucas Vöhringer · Sprache: Deutsch.
+> **Aktualität bestimmt der jüngste datierte Nachtrag**, nicht eine Versionsnummer — die
+> Spec-Versionszählung ist seit 2026-08-24 abgeschafft (Spec-Governance,
+> [Aktualisierungs-Index §4](../standardprozesse/aktualisierungs-index.md)). Änderungen laufen
+> ausschließlich über Nachträge „Nachtrag YYYY-MM-DD — Thema"; §-Nummern bleiben zitierfähig.
 
 ---
 
@@ -294,7 +298,7 @@ je Abteilung, Version nur in `plugin.json`, Satelliten per `ref` + Full-SHA gepi
 
 ---
 
-*Spec-Version 0.2.0 · 2026-07-28 · erstellt in der Nachtschicht-Session (Fable), Review durch
+*Angelegt 2026-07-28 · erstellt in der Nachtschicht-Session (Fable), Review durch
 Maintainer steht aus — dieser Umbau ist als PR zur Abnahme vorgelegt, nicht gemergt.
 Nachtrag §10 ergänzt 2026-07-28 (Abteilung felix, erster Satellit).
 Nachtrag §11 ergänzt 2026-08-05 (Abteilung biggi, zweiter Satellit, Onsite-Leitlinie).

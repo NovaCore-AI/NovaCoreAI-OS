@@ -29,17 +29,62 @@
 
 ---
 
+## 0. Zwei-Klassen-Buchführung — die erste Frage vor jeder Änderung
+
+*(Maintainer-Entscheid EN5 vom 2026-08-23, ausgeführt mit Phase I; löst den früheren
+E7-Strang „ein Sammelrelease am Umbau-Ende" ab. Vorbild: Onsite-Aktualisierungs-Index §0.)*
+
+**Grundsätze:** Arbeitsstränge liefern Substanz — die Bücher führt der **Release-Zug** (§3.6).
+Versioniert wird nur das Produkt; Wissen trägt ein **Datum** und einen **Status**. Eine
+Version ist ein **Waypoint**: Der Maintainer setzt sie am Release-Zug, sie fasst die Features
+des Batches zusammen.
+
+| | **Produktklasse** | **Wissensklasse** |
+|---|---|---|
+| Pfade | `plugins/**` · `.claude-plugin/**` · `.github/workflows/**` | `knowledge-base/**` · SSOT-Kategorien der Satelliten |
+| Version | ja — aber **nur am Release-Zug** (§3.6), nie im Strang | **nie** |
+| CHANGELOG | ja — geschrieben **vom Zug** aus den PR-Ergebnismemos | **nie** |
+| Aktualität | Versionsstand (`VERSION`, Tags) | **Datumsstempel** („jüngster Nachtrag gewinnt") + Status `lebend`/`historisch` |
+| Auffindbarkeit | Repo-Karte in `AGENTS.md`, `README.md` | **SSOT-Index-Zeile** (testerzwungen, unverändert Pflicht) |
+
+- **Mischfall** (ein PR ändert beides): CHANGELOG-relevant ist **nur der Produktanteil** — im
+  PR-Ergebnismemo kennzeichnen.
+- **Repo-Doku** (`AGENTS.md`, `README.md`, `ONBOARDING.md`, `CLAUDE.md`): weder Version noch
+  CHANGELOG — gepflegt gemäß der Änderungs-Matrix (§2).
+- **Affiliate-Plugins** (Marketplace-Kategorie `affiliate`, heute `kimi-code-plugin-cc` und
+  `mneme-kimi-code`) fallen in **keine** der beiden Klassen: Sie sind **isolierte
+  Abteilungen ohne SSOT-Anbindung** mit eigenen, persönlich gepflegten Payloads und
+  Dokumenten (Entscheid P-E7 vom 2026-08-24; Affiliate-Invariante N1.1 des
+  [Delta-Mappings](../grundwissen/2026-08-23-onsite-delta-mapping.md)). Für sie gilt: keine
+  Registry-Zeile, keine `pflege-auspraegung.json`, **kein Queue-Weg**, keine Fit-Prüfung,
+  keine gemeinsame Payload, keine SSOT-Index-Zeile. Ein Befund an einem Affiliate-Satelliten
+  wird **nie** in die Kandidaten-Queue eingetragen; er gehört in dessen eigenes Repo. Im
+  Kern-Repo wird an ihnen ausschließlich der **Marketplace-Pin** (`ref` + Full-SHA)
+  gepflegt — und der ist Produktklasse.
+- **Was in keiner Klasse wegfällt:** Fehlerprotokoll (sofort, append-only) · Debug-Log ·
+  Register-Pflege · SSOT-Index-Zeile je neuer Wissensdatei · Spec-Nachtrag bei
+  Design-Entscheidungen (datums-geschlüsselt, §4).
+- **Kurzregeln für Agenten:**
+  - *„Muss mein PR ins CHANGELOG?"* — nur Produktklasse, und auch dann schreibst **du**
+    nichts: Das macht der Zug aus deinem PR-Ergebnismemo. **Schreib das Memo gut.**
+  - *„Welche Version bumpe ich?"* — **keine, niemals im Strang.**
+  - *„Ist ein Dokument aktuell?"* — Datumsstempel + Status im SSOT-Index, **nie** über
+    Versionsnummern schließen.
+  - *„Wann wird released?"* — wenn der Maintainer es sagt (§3.6).
+
+---
+
 ## 1. Immer zuerst — unabhängig von der Änderungsart
 
 | # | Pflichtschritt | Quelle |
 |---|---|---|
 | 1 | **Log-Stand:** `git log --oneline -10` + `git status`, dazu `git worktree list` und in jedem fremden Baum `git status --short`. Der Working Tree ist die Wahrheit, nicht der letzte Commit und nicht die Doku | — |
 | 2 | **Produktstand:** `CHANGELOG.md` (autoritativ für gebaut/fehlend) + `VERSION` | Repo-Wurzel |
-| 3 | **Planungsstand:** jüngste datierte Datei in `grundwissen/` (Datumspräfix) — sie ist der aktuellste Planungsstand | `knowledge-base/grundwissen/` |
+| 3 | **Planungsstand:** laufende Vorhaben in `aktive-bauplaene/` (jüngste datierte Datei = aktuellster Planungsstand); verbindliche Grundlage ist die jüngste Design-Spec in `grundwissen/` (jüngster Nachtrag gewinnt) | `knowledge-base/aktive-bauplaene/`, `knowledge-base/grundwissen/` |
 | 4 | **Triage:** [`SSOT-Document-Index`](../SSOT-Document-Index.md) — Teil 1 (wohin gehört ein Dokument), Teil 2 („Relevant wenn …") | `knowledge-base/SSOT-Document-Index.md` |
 | 5 | **Standardprozess-Check:** existiert für die Arbeit schon ein Prozess in `standardprozesse/`? Falls ja: ihm folgen. Falls nein und die Tätigkeit ist wiederkehrend: hinterher dort dokumentieren | dieser Ordner, v. a. [`kern-plugin-bau.md`](kern-plugin-bau.md), [`abteilungs-plugin-bau.md`](abteilungs-plugin-bau.md), [`ssot-aufbau.md`](ssot-aufbau.md) und [`sync-nachzug-bauzyklus.md`](sync-nachzug-bauzyklus.md) |
 | 6 | **Eigene Fehlermuster prüfen:** [`agent-learnings.md`](../debugging-findings/agent-learnings.md) — bekannte Fallen vor der Arbeit lesen | `debugging-findings/` |
-| 7 | **Arbeitsplan ablegen** (bei mehr als einem Trivialschritt): eigenes Dokument in `grundwissen/` mit Datumspräfix — **keine** Ad-hoc-Ablage | `grundwissen/` |
+| 7 | **Arbeitsplan ablegen** — **nur bei mehrtägigen oder mehrsträngigen Vorhaben** (**Bagatellgrenze**, Entscheid P-E1/2026-08-24): eigenes Dokument in `aktive-bauplaene/` mit Datumspräfix. Kleinere Aufgaben brauchen **keinen** Bauplan; ihr Wissensträger ist das **PR-Ergebnismemo** (§3.5). Ein laufender Bauplan erhält genau **ein** konsolidiertes Update am Tages- oder Aufgabenende — kein Live-Mikro-Update, **keine** Ad-hoc-Ablage außerhalb der Norm-Ordner | `knowledge-base/aktive-bauplaene/` |
 
 Bei Widersprüchen zwischen Doku-Ebenen: **jüngste Design-Spec/Bauplan (`grundwissen/`) →
 Standardprozesse → Produktvision**. Bei Widerspruch zwischen Doku und Platte gilt die Platte
@@ -88,15 +133,20 @@ Sonderpflichten. Abschnitt 1 gilt zusätzlich immer, Abschnitte 3–5 ebenso.
 | **Neue Kategorie/Ordner in der Wissensbasis** | `SSOT-Document-Index` Teil 1 · `AGENTS.md` Glossar | `SSOT-Document-Index` Teil 1 (Routing-Zeile: gehört hinein / nicht hinein / Lebenszyklus) **und** eigene Tabelle in Teil 2 · `AGENTS.md` Glossar + Repo-Karte · `CHANGELOG.md` | Zwei testerzwungene Invarianten: **nur der Index selbst** liegt direkt in `knowledge-base/` (alles andere in eine Kategorie) **und** jede Kategorie braucht ihre **Tabellenzeile in Teil 1** — eine Nennung an anderer Stelle des Index genügt nicht. Ein `PLATZHALTER.md` ist nur indexfrei, solange es die **einzige** Datei seines Ordners ist |
 | **Satelliten-Wissensbasis neu angelegt** | `ssot-aufbau.md` §4 **und §4a (Isolation)** · `vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage` · `abteilungs-plugin-bau.md` §3b.1 | im **Satelliten**: alle fünf Bausteine, eigener `SSOT-Document-Index.md` als einzige Wurzeldatei, beide Protokollköpfe, `test/wissensbasis.test.mjs`, `AGENTS.md` (Pflicht-Einstieg + Abschluss-Checkliste + Protokollzwang), `CHANGELOG.md` · **hier** erst beim nächsten Pin-Nachzug: Registry-Statuszeile, `AGENTS.md`, `README.md` | **Isolation ist testerzwungen:** keine Warteschlangen-Mechanik unter `knowledge-base/`, kein Maschinenpfad ins OS-Repo in ausgelieferten Dateien, das OS-Repo nur als **Quellenangabe**. Reine Wissensbasis-Arbeit braucht **keinen** Bump — CHANGELOG-Eintrag trotzdem |
 | **Satelliten-SSOT geändert** (Inhalt einer Satelliten-Wissensbasis) | der `SSOT-Document-Index` **des Satelliten**, Teil 1 | **ausschließlich** Dokumente im Satelliten: dessen Index Teil 1 und Teil 2, dessen Protokolle, dessen `CHANGELOG.md` | **Kein Nachzug im OS-Repo.** Die Satelliten-SSOT ist terminal (`ssot-aufbau.md` §4a): kein Weg zurück in Kerndokumente, keine Weitergabe, kein Cross-Satelliten-Zugriff. Wer hier eine Kern-Datei anfasst, verletzt die Isolation |
-| **Bauplan abgeschlossen oder verworfen** | der Plan selbst (Statuszeile) · `SSOT-Document-Index` Teil 1 | `git mv` von `grundwissen/` nach `bauplan-archiv/`, **Inhalt unverändert** · Index **Teil 2**: Zeile wandert in die Archiv-Tabelle, Status `historisch`, Verschiebedatum nennen · `grep` nach dem alten Pfad über das **ganze** Repo · `CHANGELOG.md` | **Pflicht, nicht Ermessen** (Entscheid E1, 2026-08-11): Ohne Verschiebung verliert `grundwissen/` die Aussage „das läuft gerade" · Archiv ist **terminal** und wird nie rückwirkend umgeschrieben |
+| **Bauplan abgeschlossen oder verworfen** | der Plan selbst (Statuszeile) · `SSOT-Document-Index` Teil 1 | `git mv` von `aktive-bauplaene/` nach `bauplan-archiv/`, **Inhalt unverändert** · Index **Teil 2**: Zeile wandert in die Archiv-Tabelle, Status `historisch`, Verschiebedatum nennen · `grep` nach dem alten Pfad über das **ganze** Repo · `CHANGELOG.md` | **Pflicht, nicht Ermessen** (Entscheid E1, 2026-08-11): Ohne Verschiebung verliert `grundwissen/` die Aussage „das läuft gerade" · Archiv ist **terminal** und wird nie rückwirkend umgeschrieben |
 | **Idee ohne Auftrag festhalten** | `SSOT-Document-Index` Teil 1 (`ideen-backlog/`) | ein Dokument **je Idee** in `ideen-backlog/` mit Datumspräfix · Zeile in Teil 2 · `PLATZHALTER.md` entfernen, sobald die erste echte Idee liegt · `CHANGELOG.md` | Kein Bump. Eine Idee ist **kein** Bauplan: keine Arbeitspakete, keine Abnahmekriterien, keine Testfälle — sobald sie die hat, gehört sie nach `grundwissen/` |
-| **Idee wird beauftragt** | die Idee selbst · `SSOT-Document-Index` Teil 1 | **neuer Bauplan** in `grundwissen/` mit Datumspräfix, der auf die Idee **verweist** · Index Teil 2: neue Zeile für den Plan — die Zeile der Idee **bleibt** · `CHANGELOG.md` | Die Idee wird **nicht** verschoben und **nicht** gelöscht: Sie ist die Herkunft, der Plan ist die Arbeit. Zwei Dokumente, zwei Lebenszyklen |
+| **Idee wird beauftragt** | die Idee selbst · `SSOT-Document-Index` Teil 1 | **neuer Bauplan** in `aktive-bauplaene/` mit Datumspräfix, der auf die Idee **verweist** · Index Teil 2: neue Zeile für den Plan — die Zeile der Idee **bleibt** · `CHANGELOG.md` | Die Idee wird **nicht** verschoben und **nicht** gelöscht: Sie ist die Herkunft, der Plan ist die Arbeit. Zwei Dokumente, zwei Lebenszyklen |
 | **Protokolleintrag fällig** | `agent-learnings.md` (eigene Fehlermuster) bzw. `debug-log.md` (bekannte Symptome) — **vor** der Fehlersuche, nicht danach | **eigener** Fehler → [`debugging-findings/agent-learnings.md`](../debugging-findings/agent-learnings.md) · **gefundener** Bug oder Fehlbefund, auch an fremdem Material → [`debugging-findings/debug-log.md`](../debugging-findings/debug-log.md) | **Sofort, nicht sammeln.** Append-only: nie rückdatieren, nie umschreiben — ein widerlegter Eintrag bekommt einen **neuen**, der auf ihn verweist · kein Bump, kein Index-Nachzug (beide Dateien stehen bereits im Index) |
-| **Design-Entscheidung geändert** | jüngste Spec/Bauplan in `grundwissen/` inkl. aller Nachträge | **zuerst Nachtrag** in `grundwissen/` (Spec wird nie in-place umgeschrieben) · danach die inhaltlich betroffenen Stellen in `AGENTS.md`, `README.md`, betroffene Skills · `CHANGELOG.md` | Der Nachtrag ist Voraussetzung, nicht Nachbereitung — weicht ein Build bewusst von der Spec ab, wird die Spec nachgezogen, nie stillschweigend |
+| **Design-Entscheidung geändert** | jüngste Design-Spec in `grundwissen/` **inkl. aller datierten Nachträge** (der jüngste gewinnt) | **zuerst Nachtrag** in `grundwissen/` — datums-geschlüsselt als „Nachtrag YYYY-MM-DD — Thema", nie in-place · danach die inhaltlich betroffenen Stellen in `AGENTS.md`, `README.md`, betroffene Skills | Der Nachtrag ist Voraussetzung, nicht Nachbereitung — weicht ein Build bewusst von der Spec ab, wird die Spec nachgezogen, nie stillschweigend. **Keine Spec-Versionszählung und keine Fußzeilen-Kette** (abgeschafft 2026-08-24): Aktualität bestimmt der jüngste datierte Nachtrag. Bestehende §-Nummern bleiben zitierfähig, eine §-Anker-Reservierung gibt es nicht mehr. Geschrieben wird im **2-Wochen-Batch**; Zwischenträger ist das PR-Ergebnismemo. **Wissensklasse: kein Bump, kein CHANGELOG-Eintrag** (§0) |
 | **Konvention/Prozess geändert** (z. B. Commit-Format, Prüfzyklus) | `AGENTS.md` (Konventionen, Standardzyklus) | `AGENTS.md` · **dieser Aktualisierungs-Index** · ggf. Standardprozess in `standardprozesse/` · `CHANGELOG.md` | Prozessänderungen, die Agenten binden, müssen in `AGENTS.md` landen — sonst wirken sie nicht |
 | **Pflicht-Einstieg oder rote Linien geändert** | `AGENTS.md` (Pflicht-Einstieg, rote Linien) · Gates-Definition (Gate 2) | **der Text ist mehrfach gespiegelt und wird ausgeliefert:** `plugins/nc/hooks/nc-session-start.js` (injizierter Briefing-Text), `plugins/nc/skills/start/SKILL.md`, `plugins/nc/doks/global-claude-firmenblock.md` (Ebene-1-Payload), `AGENTS.md` · `CHANGELOG.md` | **Kern-Bump** — wer nur `AGENTS.md` ändert, lässt der Hook dem ganzen Team weiter die alte Pflicht injizieren |
 | **Abschluss-Checkliste / Prüfzyklus geändert** | `AGENTS.md` (Abschluss-Checkliste) · Abschnitt 5 dieses Dokuments | Abschnitt 5 dieses Dokuments · `.github/workflows/ci.yml`, falls die CI denselben Schritt fährt · `CHANGELOG.md` | **Jede Checklistenzeile braucht einen benannten Träger** (Onsite §15.43, übernommen 2026-08-24 via Mapping D8): den mechanischen Teil trägt der CI-Prüfzyklus, den urteilsabhängigen das Maintainer-Review am PR — der frühere Ausführungs-Skill `/nc:doku-sync` ist ersatzlos entfallen, ein Pre-Commit-Fangnetz ist ersatzlos verworfen |
 | **Team-globale CLAUDE-Anteile geändert** (Payloads der Ebenen 1 und 1b im Kern-Plugin: `doks/global-claude-firmenblock.md` bzw. `nc-sync.md`) | [`NovaCore-OS-CLAUDE-Ebenen-Definition.md`](../grundwissen/NovaCore-OS-CLAUDE-Ebenen-Definition.md) | die betroffene Payload · Ebenen-Definition, falls Regeln berührt · `CHANGELOG.md` | Payloads liegen im Kern-Plugin-Paket → **Kern-Bump** (sonst erreicht der Autosync niemanden) · Marker-Konvention einhalten, **Privat-Zone nie anfassen** (Ebene 1b hat keine — Ganzdatei) · Tests `nc-doks-autosync.test.mjs` laufen ausschließlich gegen die Overrides `NC_AUTOSYNC_TARGET` **und** `NC_AUTOSYNC_TEAMSYNC_TARGET` — nie gegen echte `~/.claude`-Ziele · `nc-sync.md` ist **zugleich** Abteilungs-/Plugin-CLAUDE (eigene Zeile oben) — bei Änderung gelten beide Zeilen |
+
+| **Sitzungswissen-Ort** (wo Stand, Journale, Register, Roll-up wohnen) | [`NovaCore-OS-SSOT-Definition.md`](../grundwissen/NovaCore-OS-SSOT-Definition.md) · `plugins/nc/skills/end-session/SKILL.md` und `start/SKILL.md` | **alle vier Spiegelstellen gemeinsam:** die beiden Skills · `plugins/nc/nc-sync.md` (ausgelieferte Payload) · `plugins/nc/skills/setup/infra-registry.md` (Baustein S4) · `plugins/nc/skills/os-info/SKILL.md` (Ausgabezeile) · `SSOT-Document-Index` Teil 1 · `AGENTS.md` | **Verhaltensbruch, teamweit** — gehört als *Breaking* ins PR-Ergebnismemo. In Repos **mit** eigener Wissensbasis wohnt das Sitzungswissen unter `knowledge-base/sitzungswissen/` (committet); in fremden Arbeits-Repos trägt das **Projekt-Memory** den Stand allein — **kein lokaler Dateistrom in fremden Repos**. Kern-Bump am Release-Zug |
+| **Vorlagen-Ort** (wo der Vorlagen-Baustein-Satz liegt) | `SSOT-Document-Index` Teil 1 · [`ssot-aufbau.md`](ssot-aufbau.md) §4 | `plugins/nc/tests/struktur.test.mjs` (hartkodierte Pfade **und** die Ausnahme-Regex `VORLAGE_RE`) · `plugins/nc/hooks/pfad-aenderungsindex.json` (Prefixe der Klassen `vorlage` und `vorlage-ssot`) · `SSOT-Document-Index` Teil 1 und Teil 2 (Sammelzeile `VORLAGE.md`) · `AGENTS.md` Repo-Karte · `README.md` | Die Vorlagen liegen als **Unterordner** `standardprozesse/vorlagen/`, **nicht** als eigene Kategorie — sonst griffe die Kategoriepflicht des Index. Die `.vorlage`-Bausteine sind von der Einzelzeilen-Indexpflicht ausgenommen; die **Sammelzeile bleibt** pflichtig (testerzwungen, beide Richtungen) |
+| **Secrets-Referenz** (`NC_SECRETS_REF`) | [`kern-plugin-bau.md`](kern-plugin-bau.md) · `plugins/nc/nc-sync.md` | **genau drei Berührungspunkte, nicht mehr:** Payload-Abschnitt in `nc-sync.md` · nicht-blockierender Prüfpunkt in `/nc:setup` · Ausgabezeile „gesetzt / nicht gesetzt" in `/nc:os-info` | Die Variable trägt **einen Verweis, nie einen Wert**. **Kein Hook, kein Gate, kein Secrets-Speicher, kein vorgeschlagener Ort** — und in keinem Dokument ein Beispielpfad. Ist sie nicht gesetzt: Hinweis, **kein Abbruch**; der Wert wird nie gelesen |
+| **Skillzahl in Beschreibungen** (Marketplace, Registry, README, `AGENTS.md`) | die reale Skill-Liste auf der Platte (`plugins/<name>/skills/`) | jede Beschreibung, die eine Zahl nennt — gemeinsam, nie einzeln | **Gebaute Skills zählen, Platzhalter nicht.** Das Team liest die Marketplace-Beschreibung im Installationsdialog; eine Zahl, die Platzhalter mitzählt, ist ein Versprechen, das das Plugin nicht hält. Gegenprobe gegen `module-registry.json`. Wo eine Zahl nicht gebraucht wird, wird sie **entfernt statt gepflegt** (Sparsamkeits-Regel) |
 
 ### 2.3 Mechanik-Ebene (Manifeste, CI, Versionen)
 
@@ -112,48 +162,68 @@ Sonderpflichten. Abschnitt 1 gilt zusätzlich immer, Abschnitte 3–5 ebenso.
 
 ## 3. Version, Release und Tag — der vollständige Weg ans Team
 
-**Grundregel:** Kein Bump = kein Auto-Update. Eine Änderung, die das Team erreichen soll,
-zählt die Version des **betroffenen** Plugins hoch.
+**Grundregel:** Kein Bump = kein Auto-Update. Eine Änderung, die das Team erreichen soll, muss
+über den **Release-Zug** laufen — nur er zählt die Version des betroffenen Plugins hoch
+(Runbook: §3.6). **Im Arbeitsstrang wird nie gebumpt** (§0).
 
-0. **Vierte Stelle für reine Versionsnummern-Nachzüge:** Ändert ein Nachzug **ausschließlich
-   Versionsnummern-Nennungen** (kein Inhalt, kein Verhalten — z. B. ein Pin- oder
-   Stand-Nachtrag in Doku), darf statt eines Patch-Bumps eine vierte Stelle angehängt werden
-   (`0.9.1` → `0.9.1.1`, Onsite-Muster) — sie signalisiert „nichts Neues, nur Zahlen
-   nachgezogen" und verbrennt keine Patch-Nummer. **Achtung (GLM-Review 2026-08-16, noch
-   unverifiziert):** Vier Stellen sind kein gültiges SemVer (`X.Y.Z`), und `AGENTS.md`
-   definiert die Leitversion als SemVer — **vor der Erstnutzung** deshalb belegen, dass
-   `claude plugin validate --strict` die Form akzeptiert, und die SemVer-Klausel in
-   `AGENTS.md` in derselben Änderung ausdrücklich erweitern; schlägt der Validator sie aus,
-   gilt stattdessen der reguläre Patch-Bump.
-1. **Bump-Schema:** inhaltliche Neuerung → Minor (`0.5.0` → `0.6.0`) · Fix → Patch
-   (`0.5.0` → `0.5.1`) · Strukturbruch → Major.
+1. **Bump-Schema (SemVer, dreistellig):** inhaltliche Neuerung → Minor (`0.5.0` → `0.6.0`) ·
+   Fix → Patch (`0.5.0` → `0.5.1`) · Strukturbruch → Major. Vergeben wird **eine**
+   Waypoint-Version je Batch und Plugin, am Release-Zug (§3.6).
+   **Die vierte Stelle („reiner Versionsnummern-Nachzug") ist aufgehoben** (Entscheid EN5,
+   ausgeführt 2026-08-24): Sie war nie gültiges SemVer — die Plugin-Doku verlangt
+   `MAJOR.MINOR.PATCH`, und `AGENTS.md` definiert die Leitversion als SemVer. Nach der
+   Entdublizierung der Spiegelstellen und dem Wegfall der Zahlen-Nachzüge (§4) existiert der
+   Anlassfall ohnehin nicht mehr. Wer eine vierstellige Version in einem Altdokument findet,
+   liest einen historischen Stand.
 2. **Ort:** **ausschließlich** `plugins/<name>/.claude-plugin/plugin.json`. Beim **Kern**
    zusätzlich `VERSION` und `plugins/nc/module-registry.json` spiegeln (Leitversion,
    testerzwungen). Im Marketplace-Eintrag steht **nie** eine Version.
-3. **Parallele Arbeitsstränge und Anker:** Ist eine Version noch **unveröffentlicht**, dürfen
-   mehrere Änderungen sie gemeinsam nutzen — dann kein zweiter Bump. Ist sie getaggt, ist die
-   nächste Nummer Pflicht. **Sobald mehr als eine Arbeitseinheit gleichzeitig am OS baut**
-   (zwei Sessions, Worktrees oder beauftragte Agenten), wird jeder knappe Bezeichner —
-   Ziel-Version, Skill-/Agent-/Hook-Name, Abteilungsname — **vor der ersten Zeile Arbeit**
-   per `reserve/*`-Tag reserviert: Ablauf, Freigabe-Ausnahme und Aufräum-Pflicht in
-   [`anker-reservierung.md`](anker-reservierung.md). Die frühe Reservierung ersetzt die
-   späte Testsuite-Invariante nicht (keine doppelte CHANGELOG-Versionsüberschrift) — beide
-   Ebenen sind nötig.
+3. **Parallele Arbeitsstränge und Anker:** **Versionen werden nicht mehr reserviert** — sie
+   entstehen erst am Release-Zug (§3.6), also gibt es im Strang keinen knappen
+   Versionsbezeichner mehr zu sichern. Für **Skill-, Agent-, Hook- und Abteilungsnamen**
+   sowie für Nachtrags-/AP-Kennungen bleibt die Abstimmung **vor der ersten Zeile Arbeit**
+   Pflicht: Ablauf und Aufräum-Pflicht in
+   [`anker-reservierung.md`](anker-reservierung.md). **Reserve- und Anker-Tags als Git-Ref
+   entfallen** (Entscheid P-E2 vom 2026-08-24) — Tags entstehen ausschließlich als Teil eines
+   Release. Die späte Testsuite-Invariante bleibt unberührt (keine doppelte
+   CHANGELOG-Versionsüberschrift).
 4. **Abteilungsplugins zählen eigenständig** — ein Gleichstand über alle Plugins ist
    ausdrücklich **nicht** gefordert.
-5. **CHANGELOG:** Eintrag unter `[Unreleased]` nach Keep-a-Changelog, **mit Namenszeichnung
-   des Agenten** — Pflicht für **jede** integrierte Änderung, auch kleine.
-6. **Release (Leitversion = Kern):**
-   1. `[Unreleased]` zu `## [X.Y.Z] — YYYY-MM-DD` schneiden, **frische leere
-      `[Unreleased]`-Überschrift** stehen lassen.
-   2. Versionsgleichstand prüfen: `VERSION` = Kern-`plugin.json` = `module-registry.json`.
-   3. Erst **nach dem Merge auf `main`** annotiert taggen und pushen. Tag-Schema:
-      `{plugin-name}--v{version}` (z. B. `nc--v0.6.0`), gesetzt über `claude plugin tag`.
-      **Tag und Release nie vom Versions-Commit trennen** — genau daran hing das 0.2.0-Release
-      (Tag und GitHub-Release liefen den Versionsdateien hinterher).
-   4. `release.yml` erledigt den Rest: Tag-Typ-Prüfung, Tag↔Manifest-Abgleich, Suite,
-      Release-Notes aus dem CHANGELOG-Abschnitt, GitHub-Release. Fehlt der Abschnitt zur
-      Version, scheitert das Release absichtlich → Schritt 6.1 war nicht erledigt.
+5. **CHANGELOG und PR-Ergebnismemo:** **Der Strang schreibt keinen CHANGELOG-Eintrag.** Sein
+   Wissensträger ist das **PR-Ergebnismemo** im PR-Body: was geändert wurde, warum, welche
+   Entscheidungen fielen, die Verifikations-Ausgabe — und der **Produktanteil gekennzeichnet**
+   (§0). Die CHANGELOG-Sektion schreibt der **Release-Zug** aus den Memos des Batches, unter
+   der neuen Version und nach Keep-a-Changelog, **mit Namenszeichnung des Agenten**.
+   **Wissensklassen-Änderungen erscheinen in keinem CHANGELOG** — sie tragen Datum, Status
+   und SSOT-Index-Zeile.
+6. **Der Release-Zug — Runbook** *(Auslöser: **ausschließlich das Maintainer-Kommando**
+   „schneide ein Release", typischerweise nach mehreren Merges. Es gibt **keine Fälligkeit je
+   PR** und keinen `[Unreleased]`-Dauerbestand)*:
+   1. **Batch erheben:** gemergte PRs seit dem letzten Release-Tag listen
+      (`gh pr list --state merged`, GitHub-Compare); Produktanteile aus den PR-Ergebnismemos
+      ziehen.
+   2. **Waypoint-Version wählen** (Maintainer + Overseer) nach Schema §3.1 — **eine** Version
+      je Batch und Plugin.
+   3. **CHANGELOG-Sektion schreiben** aus den PR-Memos des Batches, direkt unter der neuen
+      Version `## [X.Y.Z] — YYYY-MM-DD`. Was nicht im Batch ist, steht in keinem CHANGELOG.
+   4. **Bump:** `plugins/<name>/.claude-plugin/plugin.json` — beim Kern zusätzlich `VERSION`
+      und `plugins/nc/module-registry.json` (Gleichstand testerzwungen).
+   5. **Verifikation:** Testsuite **und** `claude plugin validate` auf beiden Ebenen.
+   6. **Release-Schnitt-PR** → der Maintainer merged; seine Merge-Freigabe deckt Tag und
+      Release mit ab.
+   7. **Tag + GitHub-Release:** erst **nach dem Merge auf `main`** annotiert taggen
+      (`{plugin-name}--v{version}`, z. B. `nc--v0.13.0`, gesetzt über `claude plugin tag`).
+      `release.yml` erledigt den Rest: Tag-Typ-Prüfung, Tag↔Manifest-Abgleich, Suite,
+      Release-Notes aus der CHANGELOG-Sektion. **Tag und Release nie vom Versions-Commit
+      trennen** — genau daran hing das 0.2.0-Release.
+   8. **Satelliten-Variante:** Bump + Tag + Release im Satelliten-Repo, danach das
+      SHA-Umpinnen des Marketplace-Eintrags im Kern
+      ([`abteilungs-plugin-bau.md`](abteilungs-plugin-bau.md) §3a) — als **Zug-Schritt**, nicht
+      als Sonderprozess.
+
+   **Auslieferungs-Takt:** Das Auto-Update des Teams hängt am Versionsfeld — **das Team
+   bekommt Produktänderungen erst mit dem Release-Zug**; ein Merge auf `main` allein liefert
+   nichts aus.
 7. **Satelliten-Releases** laufen im jeweiligen Satelliten-Repo (`abteilungs-plugin-bau.md`
    §3b); hier
    wird nur der Marketplace-Pin per `ref` + Full-SHA nachgezogen.
@@ -164,13 +234,15 @@ zählt die Version des **betroffenen** Plugins hoch.
 
 | Dokument | Art | Auslöser | Regel |
 |---|---|---|---|
-| [`CHANGELOG.md`](../../CHANGELOG.md) | Historie | **jede** integrierte Änderung | Eintrag unter `[Unreleased]`, Keep-a-Changelog-Muster, **Namenszeichnung**. Alteinträge sind historisch und werden nie umgeschrieben |
+| [`CHANGELOG.md`](../../CHANGELOG.md) | Historie | **nur der Release-Zug**, aus den PR-Ergebnismemos des Batches (§0/§3.6) | Sektion unter der neuen Version nach Keep-a-Changelog, **mit Namenszeichnung** — **nur Produktklassen-Anteile**. Der Strang schreibt hier nichts; sein Wissensträger ist das PR-Ergebnismemo. Alteinträge sind historisch und werden nie umgeschrieben |
+| **PR-Ergebnismemo** (PR-Body) | Wissensträger des Strangs | **jeder** PR | Was geändert, warum, welche Entscheidungen, Verifikations-Ausgabe, **Produktanteil gekennzeichnet**. Ersetzt den früheren CHANGELOG-Eintrag je Änderung; der Release-Zug liest daraus (§3.5) |
 | [`agent-learnings.md`](../debugging-findings/agent-learnings.md) | Fehlerprotokoll, append-only | **jeder einzelne eigene Fehler**: falsche Annahme, falscher Pfad, fehlgeschlagener Befehl durch eigenes Verschulden, falsch umgesetztes Format | Sofort, ohne Ausnahme, Format wie in der Datei. Nicht sammeln, nicht beschönigen, nicht rückdatieren |
 | [`debug-log.md`](../debugging-findings/debug-log.md) | Debug-Log, append-only | **jeder gefundene Bug oder Fehlbefund** — an eigenem Code, an Konfiguration, an der Doku oder an einem **Vorbild**, unabhängig davon, wer ihn verursacht hat | Sofort, Format wie in der Datei (Datum · Symptom · Ursache · Fix · Beleg). Vor jeder neuen Fehlersuche zuerst hier die Symptome abgleichen. Gegenstück zu `agent-learnings.md`: dort **eigene** Fehler, hier **gefundene** |
 | [`SSOT-Document-Index`](../SSOT-Document-Index.md) | Master-Index | jede neue, verschobene, umbenannte oder gelöschte Wissensdatei; jede neue Kategorie | In **derselben** Änderung. Testerzwungen (Vollständigkeit + Linkgültigkeit) |
 | [`NovaCore-OS-Gates-Definition.md`](../grundwissen/NovaCore-OS-Gates-Definition.md) | Ist-Inventur der Kontroll-Schicht | jede Änderung an einem Gate (Umfang, Status, Opt-out) | Statusspalte und Opt-out-Spalte mitziehen — eine Gate-Tabelle, die lügt, ist schlimmer als keine |
-| jüngste Spec/Bauplan in `grundwissen/` | normativ | Design-Entscheidung geändert | **Nur per Nachtrag**, nie in-place. Jüngster Nachtrag gewinnt |
-| `AGENTS.md` / `README.md` / `ONBOARDING.md` | abgeleitet, lebend | Struktur, Pfade, Skills, Module, Versionen, Prozesse, Setup-Ablauf | Gleicher Change, gleiche Pflege — nicht „später". Sync-Matrix in `AGENTS.md` |
+| Design-Spec in `grundwissen/` | normativ (Wissensklasse: Datum + Status, **keine** Version) | Design-Entscheidung geändert | **Nur per Nachtrag, nie in-place** — seit 2026-08-24 **datums-geschlüsselt** („Nachtrag YYYY-MM-DD — Thema") und im **2-Wochen-Batch**; Zwischenträger bis zum Batch sind PR-Ergebnismemo + Register-Zeile. **Die Spec-Versionszählung und die Fußzeilen-Kette sind abgeschafft** (A7): Aktualität bestimmt der jüngste datierte Nachtrag, nicht eine Versionsnummer. Bestehende §-Nummern bleiben zitierfähig; eine **§-Anker-Reservierung** gibt es nicht mehr, Namens-Anker bleiben |
+| [Produktarchitektur](../grundwissen/NovaCore-OS-Produktarchitektur.md) · [Featurekarte](../firmenkernprozesse/Onsite.ai-OS-Featurekarte.md) | Ist-Inventur | **Batch: 1× alle 2 Wochen** oder nach großen Features — **nie** je Einzeländerung | Beim Batch die betroffenen Abschnitte samt Kopfzeile `Stand:` mitziehen. Zwischenstände trägt das PR-Ergebnismemo |
+| `AGENTS.md` / `README.md` / `ONBOARDING.md` | abgeleitet, lebend | Struktur, Pfade, Skills, Module, Versionen, Prozesse, Setup-Ablauf | Gleicher Change, gleiche Pflege — nicht „später". Sync-Matrix in `AGENTS.md`. **Keine Testzahl nachziehen — nirgends:** Die Zahl der Tests wird in **keinem** Dokument gespiegelt (sie ändert sich mit jedem Paket und ist an keiner Stelle eine Aussage, die jemand braucht); die Suite selbst ist die Quelle. Dasselbe gilt für jede andere Zahl, die nicht bereits einen benannten, testerzwungenen Ort hat |
 
 ---
 

@@ -300,6 +300,22 @@ test('Registry beschreibt genau die vorhandenen Plugins mit korrektem Namespace'
 const WISSEN = p('knowledge-base');
 const INDEX_DATEI = path.join(WISSEN, 'SSOT-Document-Index.md');
 
+// Tages-Journale des Sitzungswissens (Onsite §15.29/§15.48, Mapping D14) sind append-only und
+// wachsen um eine Datei je Arbeitstag — eine Index-Zeile je Datei waere reine Fleisspflicht
+// ohne Triage-Wert und wuerde jede Session-Sicherung zu einer Index-Aenderung zwingen. Sie
+// sind deshalb von der Einzelzeilen-Pflicht ausgenommen; im Gegenzug erzwingt die
+// Sitzungswissen-Invariante weiter unten die Routing-Zeile der Kategorie, den Stand je
+// Abteilungsordner und das Register. Stand, Roll-up und Register bleiben einzeln
+// indexpflichtig; die Linkgueltigkeit gilt unveraendert fuer alles Indizierte.
+const JOURNAL_RE = /^sitzungswissen\/[^/]+\/journal\//;
+// Dieselbe Begruendung fuer die Vorlagen-Bausteine (Umzug in die Wissensbasis, Mapping D10/EN7):
+// Die .vorlage-Dateien sind EIN zusammengehoeriger Baustein-Satz, der als Ganzes gepflegt und
+// ueber die Sammelzeile `standardprozesse/vorlagen/abteilungsplugin/VORLAGE.md` triagiert wird
+// — diese Sammelzeile bleibt einzeln indexpflichtig (eigene Invariante weiter unten), eine
+// Index-Zeile je Baustein haette keinen Triage-Wert. Die Linkgueltigkeit gilt unveraendert fuer
+// alles Indizierte.
+const VORLAGE_RE = /^standardprozesse\/vorlagen\/.+\.vorlage$/;
+
 /** Alle Wissensdateien relativ zu `knowledge-base/`, POSIX-normalisiert. */
 function wissensDateien() {
   const out = [];
@@ -337,7 +353,10 @@ function indexZiele() {
 test('SSOT-Document-Index: jede Wissensdatei ist indiziert', () => {
   assert.ok(fs.existsSync(INDEX_DATEI), 'knowledge-base/SSOT-Document-Index.md fehlt');
   const index = fs.readFileSync(INDEX_DATEI, 'utf8');
-  const fehlend = wissensDateien().filter((rel) => !index.includes(rel));
+  const fehlend = wissensDateien()
+    .filter((rel) => !JOURNAL_RE.test(rel))   // Journal-Ausnahme, siehe JOURNAL_RE
+    .filter((rel) => !VORLAGE_RE.test(rel))   // Vorlagen-Baustein-Ausnahme, siehe VORLAGE_RE
+    .filter((rel) => !index.includes(rel));
   assert.deepEqual(fehlend, [],
     `nicht im SSOT-Document-Index.md erfasst: ${fehlend.join(', ')} — jede neue Wissensdatei braucht eine Zeile mit "Relevant wenn …"`);
 });

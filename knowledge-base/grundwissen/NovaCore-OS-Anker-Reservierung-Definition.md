@@ -1,8 +1,35 @@
 # Anker-Reservierung — Definition und Herleitung
 
+> ## ⚠ Normänderung 2026-08-24 (Entscheid P-E2) — das Mittel hat gewechselt, der Begriff bleibt
+>
+> **Die Begriffsnorm dieses Dokuments gilt unverändert:** Ein Anker ist ein knapper Bezeichner,
+> dessen Wert sich aus einem Zählstand ergibt und der genau einmal vergeben werden kann; die
+> Kollisionsklassen in §2 und die Herleitung in §3 („warum ein Dokument die Reservierung nicht
+> trägt") begründen weiterhin, dass Anker **vor** der ersten Zeile Arbeit abgestimmt werden.
+>
+> **Aufgehoben ist das Mittel:** Die Reservierung passiert **nicht mehr als `reserve/*`-Git-Ref**.
+> Tags entstehen bei NovaCore ausschließlich als Teil eines Release
+> ([Aktualisierungs-Index §3.6](../standardprozesse/aktualisierungs-index.md)). **§4 („Warum ein
+> Git-Ref es trägt") beschreibt damit die Herleitung einer abgeschafften Mechanik** und steht
+> historisch — der Abschnitt bleibt stehen, weil er erklärt, warum die Wahl damals auf ein Ref
+> fiel und welche Eigenschaften ein Ersatz haben müsste.
+>
+> **Der tragende Grund für den Wechsel:** §4 argumentiert mit der **Version** als dem knappsten
+> Anker. Unter dem Waypoint-Modell wird die Version erst am Release-Zug vergeben — dieser Anker
+> existiert im Arbeitsstrang gar nicht mehr. Übrig bleiben Namen (Skill, Agent, Hook, Abteilung)
+> und Kennungen (Nachtrag, AP); für sie trägt der **Bauplan in `aktive-bauplaene/` plus die
+> Zeile im Offene-Stränge-Register** die Abstimmung, gehalten vom Overseer. Das ist ein
+> schwächerer Mechanismus als ein atomares Ref — die **Schwäche wird hier benannt, nicht
+> weggeredet**: Sie ist der bewusst in Kauf genommene Preis dafür, keinen Tag-Namensraum mehr
+> für Restfälle pflegen zu müssen.
+>
+> **Was mechanisch scharf bleibt:** die späte Testsuite-Invariante gegen doppelt vergebene
+> CHANGELOG-Versionsüberschriften (`struktur.test.mjs`) — sie ist die einzige verbliebene
+> deterministische Anker-Prüfung und damit wichtiger als zuvor.
+
 > **Zweck:** die verbindliche Erklärung, was ein **Anker** ist, warum parallele
-> Arbeitseinheiten ihn kollidieren lassen und warum die Reservierung als **Git-Ref** passiert
-> und nicht als Eintrag in einem Dokument.
+> Arbeitseinheiten ihn kollidieren lassen — und (historisch, siehe Banner oben) warum die
+> Reservierung als **Git-Ref** passierte und nicht als Eintrag in einem Dokument.
 >
 > Abgeleitetes Dokument — bei Widerspruch gewinnen die normativen Quellen (jüngster Bauplan in
 > `grundwissen/`, dann `standardprozesse/aktualisierungs-index.md` §3, dann `CHANGELOG.md` als
