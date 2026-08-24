@@ -2,9 +2,11 @@
 // nc-ffg.js — Fact-Forcing-Gate (FFG) des NovaCore-OS (Design-Spec 2026-07-28 §5 (OS-Repo)).
 // PreToolUse-Hook nach GateGuard-Vorbild (ECC ecc@2.0.0, gateguard-fact-force.js,
 // gelesen 2026-07-26; Upstream-Stand des ECC-Repos nachgezogen 2026-07-27). Drei Gates:
-//   - Edit/Write/MultiEdit: Fakten einmal je Zieldatei, mit getrennten Investigations-
-//                      Texten fuer Aenderung (Importer/API) und Neuanlage (Aufrufer/
-//                      Duplikat-Check); Subagenten uebersprungen (der Parent hat die
+//   - Edit/Write/MultiEdit/NotebookEdit: Fakten einmal je Zieldatei, mit getrennten
+//                      Investigations-Texten fuer Aenderung (Importer/API) und Neuanlage
+//                      (Aufrufer/Duplikat-Check); NotebookEdit zaehlt als Aenderung mit dem
+//                      Zielfeld notebook_path (Onsite §15.38, Port 2026-08-23);
+//                      Subagenten uebersprungen (der Parent hat die
 //                      Datei bereits gegated); .claude/settings*.json ausgenommen
 //                      (Reparatur-Arbeiten nie aussperren); Betreiber-Ausnahmen per
 //                      NC_FFG_EXEMPT_GLOBS (Komma-getrennte Globs). MultiEdit steht
@@ -382,18 +384,23 @@ function main() {
 
   // Tool-Namen case-insensitiv normalisieren (Vorbild-Verhalten; Fremd-Hosts
   // senden teils Kleinschreibung).
-  const TOOL_MAP = { edit: 'Edit', write: 'Write', multiedit: 'MultiEdit', bash: 'Bash' };
+  const TOOL_MAP = { edit: 'Edit', write: 'Write', multiedit: 'MultiEdit', notebookedit: 'NotebookEdit', bash: 'Bash' };
   const rawTool = String(input.tool_name || '');
   const tool = TOOL_MAP[rawTool.toLowerCase()] || rawTool;
-  if (tool !== 'Bash' && tool !== 'Edit' && tool !== 'Write' && tool !== 'MultiEdit') return;
+  if (tool !== 'Bash' && tool !== 'Edit' && tool !== 'Write' && tool !== 'MultiEdit' && tool !== 'NotebookEdit') return;
 
   initStateFile(input);
   pruneStaleFiles();
 
-  if (tool === 'Edit' || tool === 'Write') {
+  if (tool === 'Edit' || tool === 'Write' || tool === 'NotebookEdit') {
     if (isSubagentInvocation(input)) return;
-    const f = input.tool_input && input.tool_input.file_path;
-    const decision = fileGateDecision(f, tool === 'Edit');
+    // NotebookEdit ist eine Aenderung an einer bestehenden Datei: Edit-Text,
+    // Zielfeld notebook_path (Onsite §15.38, portiert 2026-08-23 aus dem realen
+    // oai-ffg.js-Stand). Fehlendes Zielfeld fail-open wie bei Edit.
+    const f = tool === 'NotebookEdit'
+      ? (input.tool_input && input.tool_input.notebook_path)
+      : (input.tool_input && input.tool_input.file_path);
+    const decision = fileGateDecision(f, tool !== 'Write');
     if (decision === 'pass') return;
     if (decision === 'state-fehler') return allowMitStateWarnung();
     return deny(decision);

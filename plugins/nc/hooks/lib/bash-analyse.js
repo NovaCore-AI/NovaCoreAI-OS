@@ -10,6 +10,18 @@
 // NC_FFG_EXTRA_DESTRUCTIVE — der Einstiegspunkt fuer die roten Linien der Firma
 // (glab mr merge, exec-*-Deploys, …); die konkreten Muster legt der Maintainer fest
 // (Design-Spec 2026-07-28 §5 (OS-Repo), Punkt 5 bewusst offen).
+// Onsite-Delta-Port 2026-08-23 (Mapping D3, Quelle: realer oai-ffg-Stand origin/main@6d3f8db):
+//   - isDestructiveWindows() als eigener Pass mit Backslash-literalem Tokenizer (Onsite
+//     §15.38; kein ECC-Port — Upstream hat keine Windows-Faelle): der flatten-Pfad stript
+//     gequotete Bodies (powershell -Command "…"), der quote-aware-Pfad behandelt \ als
+//     Escape (C:\…\cmd.exe verliert Separatoren) — beide wuerden die haeufigsten
+//     Windows-Formen verfehlen. Rekursion ueber den Rest-STRING wie beim sh -c-Vorbild.
+//   - Wrapper-Passthrough (Onsite §15.46): sudo/env/wsl/timeout & Co. reichen ein Kommando
+//     durch; ein einzelner Wrapper hatte die gesamte Destruktiv-Erkennung umgangen.
+//   - Randnotiz (Onsite uebernommen): isDestructiveFindExec gated rmdir geerbt-ohne-Flags
+//     (Upstream-Inkonsistenz, bewusst unveraendert).
+// Upstream-Pflege: Drift-Ritual + Pin-Stand einstellig in kern-plugin-bau.md §2b;
+// Falltabelle testerzwungen in tests/nc-ffg-drift.test.mjs.
 const {
   extractCommandSubstitutions,
   extractSubshellGroups,
@@ -158,24 +170,119 @@ function quoteAwareSegments(input) {
 }
 
 const SHELL_WRAPPERS = new Set(['sh', 'bash', 'zsh', 'dash', 'ksh']);
+const EMPTY_SET = new Set();
+
+// --- Wrapper-Passthrough (Onsite §15.46, Port 2026-08-23 — kein ECC-Port) ---
+// Ein Wrapper reicht ein Kommando durch. ZWEI semantisch verschiedene Sorten:
+//   Shell-Wrapper (sh/bash/…): -c leitet eine Kommando-ZEICHENKETTE ein, die die Shell
+//     NEU parst — deshalb rekursiert der Body als STRING. Kombinierte Kurzflags zaehlen
+//     ebenso (`bash -lc`, `-ic`, `-lic`): ein Zweig, der nur das exakte `-c` matcht,
+//     laesst die dokumentierte Bridge-Form dieser Maschinen ungegated durch.
+//   Passthrough-Wrapper (env/sudo/wsl/…): fuehren nach ihren EIGENEN Optionen ein Kommando
+//     als ARGUMENT-VEKTOR aus. Der Rest wird deshalb als TOKENS rekursiert, nie neu
+//     zusammengestringt — sonst gingen die durch Quoting zusammengehaltenen Woerter
+//     verloren (aus `bash -c 'rm -rf x'` wuerde `bash -c rm`).
+// Ein einzelner Login-/env-/sudo-/wsl-Wrapper hat im Vorbild die gesamte
+// Destruktiv-Erkennung umgangen; genau das schliesst dieser Pass.
+
+// -c auch kombiniert: einstelliger Flag-Bund, der ein `c` enthaelt (-c, -lc, -ic, -lic, -cx).
+const SHELL_C_FLAG = /^-[a-z]*c[a-z]*$/;
+
+// Kommando-STRING eines Shell-Wrappers herausloesen (Body des ersten -c-Flags).
+function shellWrapperBody(tokens) {
+  for (let i = 1; i < tokens.length; i++) {
+    if (SHELL_C_FLAG.test(tokens[i])) {
+      return i + 1 < tokens.length ? { kind: 'string', body: tokens[i + 1] } : null;
+    }
+    // Ein Nicht-Options-Wort vor jedem -c ist das Skript/Operand (`bash script.sh`) —
+    // undurchsichtig wie ein Binary, kein Gate (bewusste Grenze wie ./script.sh).
+    if (!tokens[i].startsWith('-')) return null;
+  }
+  return null;
+}
+
+// Grammatik je Passthrough-Wrapper. `value`: Optionen, die den NAECHSTEN Token als Wert
+// schlucken. `stringOpt`: Optionen, deren Wert selbst ein Kommando-STRING ist (env -S).
+// `query`: ist eine davon gesetzt, fuehrt der Wrapper NICHT aus (command -v) → benign.
+// `positional`: so viele Nicht-Options-Positionale vor dem Kommando ueberspringen
+// (timeout: die Dauer). `assign`: NAME=value-Zuweisungen ueberspringen (env). `dashDash`:
+// `--` beendet die Optionen. Unbekannte `-x` gelten konservativ als wertlose Flags —
+// lieber ein Bypass zu wenig als ein Fehlalarm auf eine harmlose Option.
+const PASSTHROUGH = {
+  env:     { value: new Set(['-u', '--unset', '-C', '--chdir']), stringOpt: new Set(['-S', '--split-string']), assign: true, dashDash: true },
+  sudo:    { value: new Set(['-u', '--user', '-g', '--group', '-C', '--close-from', '-p', '--prompt', '-r', '--role', '-t', '--type', '-U', '--other-user', '-R', '--chroot', '-h', '--host']), dashDash: true },
+  doas:    { value: new Set(['-u', '-C', '-a']) },
+  nohup:   {},
+  setsid:  {},
+  exec:    { value: new Set(['-a']) },
+  command: { query: new Set(['-v', '-V']) },
+  nice:    { value: new Set(['-n', '--adjustment']) },
+  ionice:  { value: new Set(['-c', '--class', '-n', '--classdata', '-p', '--pid']) },
+  stdbuf:  { value: new Set(['-i', '--input', '-o', '--output', '-e', '--error']) },
+  timeout: { value: new Set(['-s', '--signal', '-k', '--kill-after']), positional: 1 },
+  wsl:     { value: new Set(['-d', '--distribution', '-u', '--user', '--cd', '--shell-type']), dashDash: true }
+};
+
+// Inneres Kommando eines Passthrough-Wrappers: eigene Optionen ueberspringen, dann den
+// Rest als Token-Vektor zurueckgeben (oder als STRING bei env -S / null bei command -v).
+function passthroughInner(base, tokens) {
+  const spec = PASSTHROUGH[base];
+  if (!spec) return null;
+  const value = spec.value || EMPTY_SET;
+  const stringOpt = spec.stringOpt || EMPTY_SET;
+  const query = spec.query || EMPTY_SET;
+  let positionals = spec.positional || 0;
+  let i = 1;
+  while (i < tokens.length) {
+    const t = tokens[i];
+    if (spec.dashDash && t === '--') { i += 1; break; }
+    if (t.startsWith('-') && t !== '-') {
+      if (query.has(t)) return null;                    // command -v: fuehrt nicht aus
+      if (stringOpt.has(t)) {                            // env -S 'rm -rf x' (getrennt)
+        return i + 1 < tokens.length ? { kind: 'string', body: tokens[i + 1] } : null;
+      }
+      let attached = null;
+      for (const so of stringOpt) {                      // env -S'rm -rf x' (angehaengt)
+        if (so.length === 2 && t.length > 2 && t.startsWith(so)) { attached = t.slice(2); break; }
+      }
+      if (attached !== null) return { kind: 'string', body: attached };
+      if (value.has(t)) { i += 2; continue; }            // Option mit getrenntem Wert
+      i += 1; continue;                                  // Flag oder --opt=wert
+    }
+    if (spec.assign && /^[A-Za-z_][A-Za-z0-9_]*=/.test(t)) { i += 1; continue; } // env NAME=val
+    if (positionals > 0) { positionals -= 1; i += 1; continue; }                 // timeout-Dauer
+    break;                                               // erstes echtes Kommandowort
+  }
+  const inner = tokens.slice(i);
+  return inner.length ? { kind: 'tokens', inner } : null;
+}
+
+// Destruktiv-Entscheidung fuer einen bereits quote-aufgeloesten Token-Vektor. Faengt
+// rm/git/find -exec direkt und rekursiert durch Shell- und Passthrough-Wrapper. Der
+// Wrapper-Body wird BEIDSEITIG geprueft (Unix UND Windows), weil ein Wrapper-Body auch
+// ein Windows-Kompositionsweg ist (`wsl -- cmd /c del /s x`).
+function isDestructiveTokens(tokens, depth) {
+  if (depth > 8 || tokens.length === 0) return false;
+  if (isDestructiveRm(tokens)) return true;
+  if (isDestructiveGit(tokens)) return true;
+  if (isDestructiveFindExec(tokens.join(' '))) return true;
+  const base = commandBasename(tokens[0]);
+  const res = SHELL_WRAPPERS.has(base) ? shellWrapperBody(tokens) : passthroughInner(base, tokens);
+  if (!res) return false;
+  if (res.kind === 'string') {
+    return isDestructiveQuoteAware(res.body, depth + 1) || isDestructiveWindows(res.body, depth + 1);
+  }
+  return isDestructiveTokens(res.inner, depth + 1) || isDestructiveWindows(res.inner.join(' '), depth + 1);
+}
 
 // Quote-aware Destruktiv-Check: faengt gequotete Kommandowoerter, Newline-Trenner,
-// gequotetes `find -exec` und `sh -c`/`bash -c`-Wrapper, die am Quote-Stripping-Pfad
-// vorbeirutschen (GHSA-4v57-ph3x-gf55). `depth` begrenzt die Wrapper-Rekursion.
+// gequotetes `find -exec`, Shell-Wrapper (auch kombinierte Flags) und Passthrough-Wrapper,
+// die am Quote-Stripping-Pfad vorbeirutschen (GHSA-4v57-ph3x-gf55 + Onsite §15.46).
+// `depth` begrenzt die Wrapper-Rekursion.
 function isDestructiveQuoteAware(raw, depth = 0) {
-  if (depth > 4) return false;
+  if (depth > 8) return false;
   for (const tokens of quoteAwareSegments(raw)) {
-    if (tokens.length === 0) continue;
-    if (isDestructiveRm(tokens)) return true;
-    if (isDestructiveGit(tokens)) return true;
-    if (isDestructiveFindExec(tokens.join(' '))) return true;
-    const base = commandBasename(tokens[0]);
-    if (SHELL_WRAPPERS.has(base)) {
-      const ci = tokens.indexOf('-c');
-      if (ci !== -1 && tokens[ci + 1] && isDestructiveQuoteAware(tokens[ci + 1], depth + 1)) {
-        return true;
-      }
-    }
+    if (isDestructiveTokens(tokens, depth)) return true;
   }
   return false;
 }
@@ -383,6 +490,201 @@ function collectExecutableBodies(raw) {
   return bodies;
 }
 
+// --- Windows-Destruktivmuster (Onsite §15.38, Port 2026-08-23 — kein ECC-Port) ---
+// Team-Realitaet Windows-first: Agenten koennen cmd-/PowerShell-Kommandos durch
+// die Bash senden. Nur rekursive/erzwungene Formen (Konsistenz mit isDestructiveRm):
+// del/erase/rmdir/rd genau mit /s; Remove-Item-Aliase genau mit -Recurse UND -Force.
+// In Git Bash erreicht uns cmd immer MSYS-praekonvertiert: //c statt /c, //s statt /s.
+
+// Quote-aware Zerlegung mit LITERALEM Backslash (Windows-Pfade bleiben tokenizer-
+// identifizierbar) — ansonsten analog quoteAwareSegments; Quotes gruppieren Woerter.
+function windowsSegments(input) {
+  const segments = [];
+  let words = [];
+  let current = '';
+  let hasWord = false;
+  let quote = null;
+
+  const flushWord = () => {
+    if (hasWord) words.push(current);
+    current = '';
+    hasWord = false;
+  };
+  const flushSegment = () => {
+    flushWord();
+    if (words.length) segments.push(words);
+    words = [];
+  };
+
+  for (const ch of String(input || '')) {
+    if (quote) {
+      if (ch === quote) quote = null;
+      else current += ch;
+      hasWord = true;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+      hasWord = true;
+      continue;
+    }
+    if (SHELL_SEGMENT_SEPARATORS.has(ch)) {
+      flushSegment();
+      continue;
+    }
+    if (/\s/.test(ch)) {
+      flushWord();
+      continue;
+    }
+    current += ch;
+    hasWord = true;
+  }
+  flushSegment();
+  return segments;
+}
+
+const CMD_DELETE_BUILTINS = new Set(['del', 'erase', 'rmdir', 'rd']);
+// PowerShell-Aliase auf Remove-Item (rm ist im PS-Kontext derselbe Cmdlet — im
+// Bash-Kontext faengt ihn isDestructiveRm; hier zaehlt die PS-Flag-Form).
+const PS_REMOVE_ALIASES = new Set(['remove-item', 'ri', 'del', 'erase', 'rd', 'rm']);
+const WINDOWS_CMD_WRAPPERS = new Set(['cmd']);
+const WINDOWS_PS_WRAPPERS = new Set(['powershell', 'pwsh']);
+// Wrapper-Switches von powershell/pwsh, die einen WERT konsumieren — nur sie
+// duerfen den impliziten Body-Anfang weiter hinten schieben (Onsite-Restrukturierung
+// Review-Runde 2, PR-65-Review).
+const PS_VALUE_SWITCHES = new Set([
+  '-executionpolicy', '-file', '-windowstyle', '-outputformat', '-inputformat',
+  '-configurationname', '-session'
+]);
+// start (cmd-Builtin und Git-Bash-Helfer) oeffnet eine neue Shell — der Rest
+// nach Switches und optionalem Leer-Titel ist das Kommando.
+const WINDOWS_START_WRAPPERS = new Set(['start']);
+
+// MSYS praekonvertiert einzelne /-Argumente zu //: //c, //k, //s — normalisieren.
+// cmd akzeptiert Switches ausserdem als Slash-Kette: /s/q und /q/s sind
+// aequivalent zu "/s /q" (empirisch verifiziert im Vorbild 2026-08-16; die
+// Buchstaben-Buendelung /sq ist KEINE gueltige Form und bleibt bewusst aussen vor).
+// Tokens ohne fuehrenden / (Pfade wie dir/x, C:\x) sind nie Switches.
+function isCmdSwitch(token, name) {
+  if (typeof token !== 'string' || !token.startsWith('/')) return false;
+  return token.toLowerCase().split('/').filter(Boolean).includes(name);
+}
+
+// PowerShell-Parameterform -Recurse:$true — der Wert entscheidet, ob das Flag
+// gilt (-Force:$false zaehlt nicht als Force).
+// NC-Haertung ggue. dem Vorbild (GLM-R1/R2 2026-08-24, empirisch am Cmdlet belegt):
+// Cmdlet-Parameter binden auch NUMERISCHE Wertformen — `Remove-Item -Recurse:1 -Force
+// <dir>` loescht auf PS 5.1 real rekursiv (nur [switch]-Parameter von Skript-FUNKTIONEN
+// werfen dabei einen Bindungsfehler; der Angriffsweg sind Cmdlets). Deshalb zaehlt jede
+// Wertform als aktiv, die nicht EXPLIZIT falsy ist ($false/false/0) — unbekannte Werte
+// konservativ als aktiv (Destruktiv-Detektor: lieber einmal zu viel Fakten verlangen).
+// Das Vorbild (oai) prueft nur /\$?true$/ und teilt die Luecke — Dauer-Abweichung, im
+// Drift-Ritual (kern-plugin-bau.md §2b) dokumentiert.
+function psFlagActive(token, flagName) {
+  const m = String(token).toLowerCase().match(/^-(recurse|force)(?::(.+))?$/);
+  if (!m || m[1] !== flagName) return false;
+  return m[2] === undefined || !/^\$?(false|0)$/.test(m[2]);
+}
+
+function isDestructiveWindows(raw, depth = 0) {
+  if (depth > 4) return false;
+  // PS-Call-Operator-Form "& { … }" und Scriptblock-Klammern normalisieren:
+  // fuehrendes & verwerfen, {/} als Worttrenner — die idiomatische PS-Form
+  // bleibt erkannt (Rekursionseingang, daher auch fuer Wrapper-Bodies).
+  const input = String(raw || '').replace(/^\s*&\s*/, '').replace(/[{}]/g, ' ');
+  for (const tokens of windowsSegments(input)) {
+    if (tokens.length === 0) continue;
+    const base = commandBasename(tokens[0]);
+
+    // cmd-Builtins: destruktiv genau mit /s (Switches vor/nach dem Ziel,
+    // case-insensitiv, einzeln oder als Slash-Kette /s/q).
+    if (CMD_DELETE_BUILTINS.has(base) && tokens.some(t => isCmdSwitch(t, 's'))) return true;
+
+    // PowerShell-Cmdlet-Form: -Recurse UND -Force (exakte Flags samt Wertformen
+    // :$true und :1 — nur explizites false/0 schaltet ab, s. psFlagActive;
+    // Praefixabkuerzung bleibt dokumentierte Grenze, §15.38).
+    if (PS_REMOVE_ALIASES.has(base)) {
+      let hasRecurse = false;
+      let hasForce = false;
+      for (const t of tokens.slice(1)) {
+        if (psFlagActive(t, 'recurse')) hasRecurse = true;
+        if (psFlagActive(t, 'force')) hasForce = true;
+      }
+      if (hasRecurse && hasForce) return true;
+    }
+
+    // cmd-Wrapper (/c oder /k): Rest als STRING rekursieren (wie sh -c; gequotete
+    // Bodies werden so wieder zu Woertern) — zusaetzlich gegen die Unix-Erkennung,
+    // weil powershell -c rm -rf x kein SHELL_WRAPPER ist.
+    if (WINDOWS_CMD_WRAPPERS.has(base)) {
+      const ci = tokens.findIndex(t => isCmdSwitch(t, 'c') || isCmdSwitch(t, 'k'));
+      if (ci !== -1 && ci + 1 < tokens.length) {
+        const rest = tokens.slice(ci + 1).join(' ');
+        if (isDestructiveWindows(rest, depth + 1) || isDestructiveQuoteAware(rest, depth + 1)) return true;
+      }
+    }
+
+    // PowerShell-Wrapper: Wrapper-Argumente und Body TRENNEN, dann den Body
+    // BEIDSEITIG pruefen. Explizites -Command/-c leitet den Body ein; ohne Flag
+    // fuehrt powershell den Rest nach den Wrapper-Switchen IMPLIZIT als Kommando
+    // aus (im Vorbild vorher komplett am Gate vorbei). -enc…-Praefixformen
+    // sind nur im Wrapper-Argumentbereich gueltige Abkuerzungen — im Body sind
+    // sie Parameter wie -Encoding (Fehlalarm-Gegenprobe). -File laesst den
+    // Skript-Inhalt unsichtbar: gleiches Modell wie ein opaque Binary, kein
+    // Gate (bewusste Grenze wie ./script.sh).
+    if (WINDOWS_PS_WRAPPERS.has(base)) {
+      let bodyIndex = -1;
+      for (let i = 1; i < tokens.length; i++) {
+        const t = tokens[i];
+        if (t.startsWith('-') && t !== '-') {
+          const f = t.toLowerCase();
+          const name = f.slice(1);
+          // -EncodedCommand: -e/-ec sowie jedes Praefix von "encodedcommand" (-en,-enc,…)
+          // → Base64-Body, opaque destruktiv-faehig. VOR ExecutionPolicy, sonst faengt -ep
+          //   faelschlich hier (Vorbild-Review 2026-08-17, §15.46).
+          if (name === 'e' || name === 'ec' || 'encodedcommand'.startsWith(name)) return true;
+          // -ExecutionPolicy: Alias -ep und Praefixe -ex… verbrauchen einen WERT (die
+          //   Policy). Frueher unbekannt → der Policy-Wert wurde als implizites Kommando
+          //   gelesen und der eigentliche Body rutschte am Gate vorbei (Bypass-Befund).
+          if (name === 'ep' || (name.length >= 2 && 'executionpolicy'.startsWith(name))) { i++; continue; }
+          if (f === '-command' || f === '-c') { bodyIndex = i + 1; break; }
+          if (f === '-file') break;
+          if (PS_VALUE_SWITCHES.has(f)) i++;
+        } else {
+          bodyIndex = i;
+          break;
+        }
+      }
+      if (bodyIndex !== -1 && bodyIndex < tokens.length) {
+        const rest = tokens.slice(bodyIndex).join(' ');
+        if (isDestructiveWindows(rest, depth + 1) || isDestructiveQuoteAware(rest, depth + 1)) return true;
+      }
+    }
+
+    // start-Wrapper: Switches (/b, /min, /wait …) und einen optionalen Titel
+    // uebergehen, den Rest als neue Shell rekursieren. `start ["Titel"] cmd …` —
+    // der Titel MUSS gequotet sein, aber windowsSegments hat die Quotes bereits
+    // entfernt: ein leerer Titel ("" → Leer-Token) UND ein nicht-leerer ("Titel")
+    // sind danach nicht mehr vom Kommando unterscheidbar. Deshalb wird von der ersten
+    // Nicht-Switch-Position aus BEIDES geprueft — mit dem Token als Kommando UND mit
+    // dem Token als Titel (eins weiter). Das kann nur zusaetzlich fangen, nie einen
+    // Fehlalarm erzeugen, weil nur ein real destruktiver Body true liefert
+    // (Vorbild-Restbefund §15.46: `start "Titel" cmd /c del /s x` lief vorher durch).
+    if (WINDOWS_START_WRAPPERS.has(base)) {
+      for (let i = 1; i < tokens.length; i++) {
+        if (tokens[i] !== '' && tokens[i].startsWith('/')) continue; // /b,/min,/wait …
+        for (const start of [i, i + 1]) {
+          if (start >= tokens.length) continue;
+          const rest = tokens.slice(start).join(' ');
+          if (isDestructiveWindows(rest, depth + 1) || isDestructiveQuoteAware(rest, depth + 1)) return true;
+        }
+        break;
+      }
+    }
+  }
+  return false;
+}
+
 // Entscheidet, ob eine Bash-Kommandozeile eine destruktive Aktion enthaelt:
 // SQL-/dd-Regex (auf quote-bereinigtem, subshell-aufgeloestem Input) plus
 // per-Segment-Tokenisierung fuer rm/git — jeweils inklusive der
@@ -418,18 +720,30 @@ function isDestructiveBash(command) {
 
   // Quote-aware Schlusspass: schliesst die Bypasses gequotetes Kommandowort,
   // Newline-Trenner, gequotetes find -exec und sh/bash -c (GHSA-4v57-ph3x-gf55).
+  // sh -c-Bodies sind auch Windows-Kompositionswege — der Wrapper-Zweig
+  // rekursiert deshalb ZUSAETZLICH in die Windows-Erkennung (§15.38).
   if (isDestructiveQuoteAware(raw)) return true;
+
+  // Windows-Pass ueber ALLE ausfuehrbaren Bodies (§15.38): bodies[0] ist der
+  // Rohtext, die weiteren sind $(…)/Backtick/Subshell-/Brace-Inhalte — der
+  // Windows-Detektor laeuft damit ueber dieselben Kompositionen wie rm/git
+  // (sonst waere `echo $(del /s x)` ein Bypass, obwohl `echo $(rm -rf x)`
+  // gefangen wird).
+  for (const body of bodies) {
+    if (isDestructiveWindows(body)) return true;
+  }
 
   return false;
 }
 
 // Read-only-Allowlist: reine Git-Introspektion (status/log/diff/show/branch/worktree list/
 // rev-parse in engen Formen) wird nie gegated — weder destruktiv noch routine.
-// Erweiterung 2026-08-14 (Bugfix, Bugreport Linux-Session): das Start-Gate blockte seinen
+// NC-Haertung 2026-08-14 (Bugfix, Bugreport Linux-Session; im Onsite-Vorbild NICHT
+// vorhanden — Haertungs-Erhalt beim Delta-Port 2026-08-23): das Start-Gate blockte seinen
 // eigenen Pflicht-Einstieg, sobald der Befehl einen Pfadwechsel (`cd … && git …`,
 // `git -C <dir> …`) oder eine Verkettung read-only-Kommandos enthielt, und kannte
 // `git worktree list` (Pflicht-Einstieg laut AGENTS.md) gar nicht. Die Pruefung laeuft
-// jetzt SEGMENTweise: die Kommandozeile wird quote-aware an unquoted `;`, `&` und
+// deshalb SEGMENTweise: die Kommandozeile wird quote-aware an unquoted `;`, `&` und
 // Zeilenumbruechen zerlegt, und JEDES Segment muss zulaessig sein — entweder ein reiner
 // Pfadwechsel oder ein allowlistetes Git-Kommando. Pipes, Redirects, Substitutionen und
 // Klammer-Gruppen bleiben hart ausgeschlossen (unquoted-Scan); das Subkommando wird ueber
@@ -538,4 +852,27 @@ function isReadOnlyGitIntrospection(command) {
   return segments.length > 0 && segments.every(isReadOnlySegment);
 }
 
-module.exports = { isDestructiveBash, isReadOnlyGitIntrospection };
+// Neben den beiden Entscheidern werden die Zerlegungs-Bausteine exportiert: Das
+// Safety-Gate (Gate 3, Onsite §15.26 Nr. 4 — "lib/bash-analyse.js wird wiederverwendet")
+// braucht dieselbe quote-aware Zerlegung fuer ANDERE Muster (Infrastruktur, Prod,
+// Deploy) und dieselbe Wrapper-Erkennung wie isDestructiveQuoteAware (sh -c-Bodies,
+// cmd /c, powershell -Command). Seit dem GLM-Review 2026-08-24 (NC-Findings MAJOR 1/2)
+// zusaetzlich shellWrapperBody (kombinierte -c-Flagbuende, bash -lc) und
+// passthroughInner (volle Argv-Wrapper-Grammatik env/sudo/wsl/timeout …), damit Gate 3
+// dieselbe Wrapper-Flaeche abdeckt wie das Destruktiv-Gate statt einer kleineren.
+// Reine Interface-Erweiterung — an der Logik der portierten Funktionen aendert sich
+// nichts, der Upstream-Drift-Detektor bleibt unberuehrt.
+module.exports = {
+  isDestructiveBash,
+  isReadOnlyGitIntrospection,
+  splitCommandSegments,
+  tokenize,
+  quoteAwareSegments,
+  commandBasename,
+  isCmdSwitch,
+  shellWrapperBody,
+  passthroughInner,
+  SHELL_WRAPPERS,
+  WINDOWS_CMD_WRAPPERS,
+  WINDOWS_PS_WRAPPERS
+};

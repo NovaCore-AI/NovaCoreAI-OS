@@ -333,3 +333,222 @@ test('Read-only-Git-Allowlist bleibt eng: unbekannte rev-parse-/log-Formen gaten
     assert.notEqual(run(inputFor('t-ro4', 'Bash', { command }), d.env), '', command + ' muss gegated werden');
   }
 });
+
+// --- Onsite-Delta-Port 2026-08-23 (Mapping D3): NotebookEdit, Windows-Muster,
+// --- Wrapper-Passthrough — Faelle wortgleich aus oai-ffg.test.mjs@6d3f8db uebernommen.
+
+// --- NotebookEdit im Datei-Gate (§15.38): wie Edit, Zielfeld notebook_path ---
+
+test('NotebookEdit: erste Aenderung blockt (Edit-Text), teilt den Fakten-Key mit Edit', () => {
+  const d = freshDirs();
+  const nb = path.join(d.proj, 'n.ipynb');
+  const first = denyReason(run(inputFor('t-nb', 'NotebookEdit', { notebook_path: nb }), d.env));
+  assert.match(first, /Änderung/); // istEdit-Wortlaut (Modify), nicht Write
+  // Wiederholung passiert.
+  assert.equal(run(inputFor('t-nb', 'NotebookEdit', { notebook_path: nb }), d.env), '');
+  // Key-Teilung beidseitig: NotebookEdit-Fakten gelten fuer Edit auf demselben Pfad …
+  const nb2 = path.join(d.proj, 'm.ipynb');
+  assert.ok(run(inputFor('t-nb', 'NotebookEdit', { notebook_path: nb2 }), d.env).length > 0);
+  assert.equal(run(inputFor('t-nb', 'Edit', { file_path: nb2 }), d.env), '');
+  // … und Edit-Fakten gelten fuer NotebookEdit.
+  assert.ok(run(inputFor('t-nb', 'Edit', { file_path: path.join(d.proj, 'x.js') }), d.env).length > 0);
+  assert.equal(run(inputFor('t-nb', 'NotebookEdit', { notebook_path: path.join(d.proj, 'x.js') }), d.env), '');
+  // Subagent: NotebookEdit-Datei-Gate uebersprungen (Parent hat gegated).
+  assert.equal(run(inputFor('t-nb-sub', 'NotebookEdit', { notebook_path: path.join(d.proj, 's.ipynb') },
+    { agent_id: 'agent-x' }), d.env), '');
+});
+
+// --- Windows-Destruktivmuster (§15.38): nur rekursive/erzwungene Formen ---
+
+test('Windows-Destruktivmuster: cmd-Builtins mit /s und PowerShell mit -Recurse UND -Force', () => {
+  const d = freshDirs();
+  const cases = [
+    'del /s /q build', 'del /q /s build', 'del build /s', 'erase /s /q x',
+    'rmdir /s x', 'rd /s /q x',
+    'cmd /c del /s x', 'cmd /k del /s x', 'cmd //c "del /s /q x"',
+    'C:' + String.fromCharCode(92) + 'Windows' + String.fromCharCode(92) + 'System32'
+      + String.fromCharCode(92) + 'cmd.exe /c "del /s x"',
+    'cmd /c powershell -c rm -rf x',
+    // Kompositionen (Vorbild-Review 2026-08-15, Critical #1): Windows-Muster in
+    // $()/Backticks/Subshell/Brace — dieselbe Klasse wie die Unix-GHSA-Faelle.
+    'echo $(del /s x)',
+    'echo `del /s /q x`',
+    '(del /s x)',
+    '{ del /s x; }',
+    'echo $(powershell -Command "Remove-Item -Recurse -Force x")',
+    'bash -c "rd /s /q build"',
+    "sh -c 'cmd /c del /s x'"
+  ];
+  for (const command of cases) {
+    const out = run(inputFor('t-win', 'Bash', { command }), d.env);
+    assert.ok(out.length > 0, 'erwartet Deny: ' + JSON.stringify(command));
+  }
+});
+
+test('Windows-Destruktivmuster: PowerShell-Cmdlet-Formen, Wrapper und EncodedCommand', () => {
+  const d = freshDirs();
+  const cases = [
+    'powershell -Command "Remove-Item -Recurse -Force x"',
+    'powershell -Command Remove-Item -Recurse -Force x',
+    'powershell -Command del -Recurse -Force x',
+    'powershell -c rm -rf x',
+    "powershell -Command 'Remove-Item' -Recurse -Force x",
+    "'Remove-Item' -Recurse -Force x",
+    'pwsh -EncodedCommand AAAA',
+    // -enc…-Präfixformen sind gültige PS-Abkürzungen (eindeutig ggü.
+    // -ExecutionPolicy) — Vorbild-Review 2026-08-15, Important #3.
+    'pwsh -enc AAAA',
+    'powershell -enco AAAA',
+    // PS-Call-Operator-Form "& { … }" — Vorbild-Review 2026-08-15, Important #2.
+    'powershell -Command "& {Remove-Item -Recurse -Force x}"',
+    'pwsh -Command "& { del /s x }"'
+  ];
+  for (const command of cases) {
+    const out = run(inputFor('t-win2', 'Bash', { command }), d.env);
+    assert.ok(out.length > 0, 'erwartet Deny: ' + JSON.stringify(command));
+  }
+});
+
+test('Windows-Fehlalarm-Gegenproben: benigne Formen und Einzeldatei-Loeschungen bleiben frei', () => {
+  const d = freshDirs();
+  // Routine-Bash einmal erledigen, damit nur der Destruktiv-Detektor entscheidet.
+  assert.ok(run(inputFor('t-win3', 'Bash', { command: 'ls' }), d.env).length > 0);
+  const cases = [
+    'dir /s', 'Get-ChildItem -Recurse', 'del datei.txt', 'del /q build',
+    'rmdir x', 'rd x', 'Remove-Item -Recurse x', 'Remove-Item -Force x',
+    'ri x', 'erase datei.txt', 'cmd /c dir /s', 'cmd /k echo hi',
+    'powershell -Command Get-ChildItem -Recurse',
+    // Kompositions-Gegenproben: literal/gequotete Erwaehnungen bleiben frei.
+    'echo "del /s x"',
+    'git commit -m "fix del /s issue"',
+    'echo {del /s x}',
+    'powershell -executionpolicy bypass -Command Get-ChildItem'
+  ];
+  for (const command of cases) {
+    const out = run(inputFor('t-win3', 'Bash', { command }), d.env);
+    assert.equal(out, '', 'erwartet allow: ' + JSON.stringify(command));
+  }
+});
+
+// --- Vorbild-Review-Runde 2 (2026-08-16, PR-65-Review): Switch-Syntax-Varianten ---
+
+test('Windows-Destruktivmuster: Switch-Buendelung, implizites -Command, start-Indirektion, :$true-Formen', () => {
+  const d = freshDirs();
+  const cases = [
+    // cmd bündelt Switches ohne Leerzeichen (/s/q statt /s /q) — die gängige
+    // Löschform; MSYS-Variante //s/q mitgedeckt.
+    'rd /s/q x', 'rmdir /s/q build', 'del /f/s/q *',
+    'cmd /c "del /s/q x"', 'cmd //c "rd /s/q x"', 'rd //s/q x',
+    // powershell/pwsh führen den Rest ohne -Command-Flag implizit als Kommando
+    // aus — Wrapper-Switches (mit Wert) übergehen, Rest rekursieren.
+    'powershell Remove-Item -Recurse -Force x',
+    'pwsh rm -Recurse -Force x',
+    'powershell del /s x',
+    'powershell -executionpolicy bypass Remove-Item -Recurse -Force x',
+    // start öffnet eine neue Shell — Switches/leeren Titel übergehen, Rest
+    // rekursieren.
+    'cmd /c start del /s x',
+    'start cmd /c del /s x',
+    'cmd /c start /b del /s x',
+    'cmd /c start "" cmd /c del /s x',
+    // PS-Parameterwertform -Flag:$true statt blankem Flag.
+    'Remove-Item -Recurse:$true -Force:$true x',
+    'ri -Recurse:$true -Force:$true x',
+    'powershell -Command Remove-Item -Recurse:$true -Force:$true x',
+    // NUMERISCHE Wertform (NC-Haertung nach GLM-R2 2026-08-24): Cmdlets binden
+    // -Recurse:1 real — auf PS 5.1 empirisch verifiziert (loescht rekursiv).
+    'Remove-Item -Recurse:1 -Force:1 x',
+    'ri -Recurse:1 -Force x',
+    'powershell -Command "Remove-Item -Recurse:1 -Force C:\\x"'
+  ];
+  for (const command of cases) {
+    const out = run(inputFor('t-win4', 'Bash', { command }), d.env);
+    assert.ok(out.length > 0, 'erwartet Deny: ' + JSON.stringify(command));
+  }
+});
+
+test('Windows-Fehlalarm-Gegenproben Runde 2: -Encoding im Body und implizite Benign-Kommandos', () => {
+  const d = freshDirs();
+  // Routine-Bash einmal erledigen, damit nur der Destruktiv-Detektor entscheidet.
+  assert.ok(run(inputFor('t-win5', 'Bash', { command: 'ls' }), d.env).length > 0);
+  const cases = [
+    // -enc…-Präfixregel darf nur Wrapper-Argumente prüfen, nicht Body-Parameter:
+    // -Encoding ist legitimer Cmdlet-Parameter (z. B. Get-Content), kein
+    // -EncodedCommand.
+    'powershell -Command Get-Content -Encoding UTF8 log.txt',
+    'powershell Get-Content -Encoding UTF8 log.txt',
+    // Implizite Benign-Kommandos (ohne -Command) und Wrapper-Wert-Switches.
+    'powershell Get-Date',
+    'powershell -executionpolicy bypass Get-Date',
+    'pwsh -file script.ps1',
+    // start mit benignem Ziel bleibt frei.
+    'cmd /c start notepad',
+    // Explizit abgeschaltete Wertformen zählen nicht als Force ($false wie 0).
+    'Remove-Item -Recurse:$true -Force:$false x',
+    'Remove-Item -Recurse:1 -Force:0 x',
+    'Remove-Item -Recurse:$true -Force:false x'
+  ];
+  for (const command of cases) {
+    const out = run(inputFor('t-win5', 'Bash', { command }), d.env);
+    assert.equal(out, '', 'erwartet allow: ' + JSON.stringify(command));
+  }
+});
+
+// --- Wrapper-Passthrough (§15.46): ein Wrapper darf die Destruktiv-Erkennung nicht umgehen ---
+test('Wrapper-Passthrough: Login-Shell, wsl-Bridge, env/sudo/timeout und PowerShell-Wertschalter', () => {
+  const d = freshDirs();
+  const cases = [
+    // Shell-Wrapper mit KOMBINIERTEN Flags — vorher matchte nur das exakte -c,
+    // die dokumentierte Bridge-Form dieser Maschinen (bash -lc) lief durch.
+    "bash -lc 'rm -rf x'", "bash -ic 'rm -rf x'", "bash -lic 'git push --force origin main'",
+    // wsl.exe/wsl — der reale Alltagsweg auf Windows-Maschinen.
+    "wsl.exe -d Ubuntu -- bash -lc 'rm -rf ~/x'", 'wsl -d Ubuntu rm -rf /tmp/x',
+    "wsl.exe bash -c 'rm -rf x'",
+    // Argv-Passthrough-Wrapper: env (auch -i/-S), sudo, doas, nohup, nice, timeout,
+    // stdbuf, setsid, exec, command.
+    "env FOO=1 bash -c 'rm -rf x'", "env -i bash -c 'rm -rf x'", "env -S 'rm -rf x'",
+    'sudo rm -rf /', 'sudo -u root rm -rf x', 'doas rm -rf x', 'nohup rm -rf x',
+    'nice -n 10 rm -rf x', 'timeout 5 rm -rf x', 'stdbuf -oL rm -rf x',
+    'setsid rm -rf x', 'exec rm -rf x', 'command rm -rf x',
+    // PowerShell-Wertschalter: -ep <policy> verbrauchte den Body vorher als
+    // implizites Kommando; -en/-e sind EncodedCommand (opaque).
+    'powershell -en ZGVsIC9zIHgK', 'powershell -ep bypass -c "rm -rf x"',
+    'powershell -ep bypass -Command "Remove-Item -Recurse -Force C:\\x"',
+    // start mit nicht-leerem, gequotetem Titel.
+    'start "Titel" cmd /c del /s x'
+  ];
+  for (const command of cases) {
+    const out = run(inputFor('t-wrap', 'Bash', { command }), d.env);
+    assert.ok(out.length > 0, 'erwartet Deny: ' + JSON.stringify(command));
+  }
+});
+
+test('Wrapper-Passthrough Gegenprobe: benigne Wrapper-Aufrufe bleiben frei', () => {
+  const d = freshDirs();
+  // Routine-Bash einmal erledigen, damit nur der Destruktiv-Detektor entscheidet.
+  assert.ok(run(inputFor('t-wrap2', 'Bash', { command: 'ls' }), d.env).length > 0);
+  const cases = [
+    "bash -lc 'ls -la'", "wsl.exe -d Ubuntu -- bash -lc 'git status'",
+    'env NODE_ENV=test node script.js', 'sudo apt-get update', 'timeout 5 npm test',
+    'command -v rm', 'wsl --list --verbose', 'env',
+    'powershell -ep bypass -Command "Get-ChildItem"', 'start "" notepad',
+    // Der gefaehrliche String in einem Commit-Text ist KEIN Aufruf.
+    "git commit -m 'bash -lc cleanup'"
+  ];
+  for (const command of cases) {
+    const out = run(inputFor('t-wrap2', 'Bash', { command }), d.env);
+    assert.equal(out, '', 'erwartet allow: ' + JSON.stringify(command));
+  }
+});
+
+test('Destruktiv-Deny behaelt Volltext unabhaengig vom verbrauchten Datei-Gate-Budget', () => {
+  const d = freshDirs();
+  const env = Object.assign({ NC_FFG_FULL_DENIALS: '1' }, d.env);
+  // Datei-Gate-Budget bewusst ueberziehen (kondensierte Einzeiler, #2, #3 …).
+  denyReason(run(inputFor('t-dd', 'Edit', { file_path: path.join(d.proj, 'a.js') }), env));
+  denyReason(run(inputFor('t-dd', 'Edit', { file_path: path.join(d.proj, 'b.js') }), env));
+  // Destruktiv-Deny bleibt Volltext (kein Ordinal, keine Kondensierung — Vorbild #2142).
+  const msg = denyReason(run(inputFor('t-dd', 'Bash', { command: 'rm -rf build' }), env));
+  assert.match(msg, /Destruktiver Befehl erkannt/);
+  assert.doesNotMatch(msg, /#\d+ dieser Session/);
+});

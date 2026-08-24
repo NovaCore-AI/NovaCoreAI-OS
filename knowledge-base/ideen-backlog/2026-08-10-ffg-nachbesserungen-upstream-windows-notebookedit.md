@@ -1,7 +1,10 @@
 # Idee: FFG-Nachbesserungen — Upstream-Drift-Ritual, Windows-Shell-Erkennung, NotebookEdit
 
-> **Status:** Idee ohne Auftrag — für NovaCore **nicht entschieden**. Kein Bauplan: beim Aufgreifen
-> entsteht je Punkt eine eigene Kern-Änderung nach `standardprozesse/kern-plugin-bau.md`.
+> **Status:** ~~Idee ohne Auftrag~~ **Beauftragt und umgesetzt 2026-08-23** über das
+> [Onsite-Delta-Mapping, Posten D3](../grundwissen/2026-08-23-onsite-delta-mapping.md):
+> alle drei Lücken (Upstream-Drift-Ritual + Falltabelle `nc-ffg-drift.test.mjs`,
+> Windows-Destruktivmuster, NotebookEdit-Datei-Gate) sind im Phase-G-Port geschlossen.
+> Die Idee bleibt als Herkunft liegen (Herkunft ≠ Arbeit).
 > **Herkunft:** portiert aus dem Onsite-Vorbild (dort festgehalten 2026-08-10, entstanden aus einem
 > Vollvergleich mit dem GateGuard-Vorbild) am 2026-08-15. **Alle drei Lücken wurden gegen unseren
 > eigenen Code nachgeprüft und bestehen hier unverändert** — Belegstellen unten.
@@ -83,7 +86,7 @@ Beschreibung in `hooks.json`, die den heutigen Zustand korrekt beschreibt.
 
 ## 5. Grenzen / bewusst nicht Teil
 
-- **Keine MCP-Abdeckung:** `mcp__*`-Schreibwege gehören zu Gate 3, das nicht gebaut ist — nicht Teil
+- **Keine MCP-Abdeckung:** `mcp__*`-Schreibwege gehören zu Gate 3 (seit 2026-08-23 gebaut, `nc-safety-gate.js` deckt `mcp__.*` ab) — nicht Teil
   dieser Nachbesserungen.
 - **Prüfungs-Eigentum unberührt:** A–C duplizieren keine Abteilungs-Prüfung und schwächen keine
   Kern-Prüfung (`standardprozesse/kern-plugin-bau.md` §1a).

@@ -64,7 +64,7 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | `VERSION` | Produkt-Leitversion (SemVer) = Version des Kern-Plugins |
 | `.claude-plugin/marketplace.json` | Marketplace `novacore-os` — Einträge ohne `version`-Feld (die steht allein in der jeweiligen `plugin.json`); die Repo-Wurzel ist **nur** Marketplace-Wurzel, kein Plugin |
 | `.github/workflows/` | `ci.yml` (Ubuntu+Windows × Node 20/22/24, Suite + Validator-Positivkontrolle) und `release.yml` (Tag `nc--v*` → GitHub-Release aus dem CHANGELOG-Abschnitt) |
-| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`end-session`/`journal`/`setup`/`doku-sync`/`os-info`/`skill-builder`/`update-doks`/`queue-abteilung`/`queue-kern`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; PreCompact-Mahnung: `nc-end-mahnung.js` + `nc-end-stempel.js`; dazu `nc-doks-autosync.js` — Ebenen 1 + 1b; dritter SessionStart-Hook `nc-queue-faelligkeit.js` — Queue-Fälligkeits-Erinnerung, kein Gate) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `nc-sync.md` (zugleich Ebene-1b-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `referenz/agent-authoring.md` (Subagenten-Formatregeln, ausgeliefert), `referenz/pflege-auspraegung.md` (Queue-Format v1 + Kriterienliste v1, ausgeliefert), `agents/` (Subagent `sync-nachzug-executor`), `skills/setup/infra-registry.md` (Infra-Registry-Referenz), `tests/` |
+| `plugins/nc/` | **Kern-Plugin** (Namespace `/nc:`), Dependency jedes Abteilungsplugins — Skills `start`/`end-session`/`journal`/`setup`/`doku-sync`/`os-info`/`skill-builder`/`update-doks`/`queue-abteilung`/`queue-kern`, Hooks (Gate 1: `nc-ffg.js`; Gate 2: `nc-session-start.js` + `nc-start-gate.js` + `nc-start-stempel.js`; Gate 3: `nc-safety-gate.js`; PreCompact-Mahnung: `nc-end-mahnung.js` + `nc-end-stempel.js`; dazu `nc-doks-autosync.js` — Ebenen 1 + 1b; dritter SessionStart-Hook `nc-queue-faelligkeit.js` — Queue-Fälligkeits-Erinnerung, kein Gate) mit geteilter `hooks/lib/` (`session-key.js`, `bash-analyse.js`, `shell-substitution.js`), `doks/global-claude-firmenblock.md` (Ebene-1-Payload), `nc-sync.md` (zugleich Ebene-1b-Payload), `wp-rahmen.md`, `module-registry.json` (Metadaten-SSOT), `referenz/skill-authoring.md`, `referenz/agent-authoring.md` (Subagenten-Formatregeln, ausgeliefert), `referenz/pflege-auspraegung.md` (Queue-Format v1 + Kriterienliste v1, ausgeliefert), `agents/` (Subagent `sync-nachzug-executor`), `skills/setup/infra-registry.md` (Infra-Registry-Referenz), `tests/` |
 | `plugins/nc-development/` | Abteilung `development` (Namespace `/nc-development:`): 15 Skills in 6 Modulen (`fe`/`be`/`flc`/`wzs`/`qs`/`rel`, flaches Layout) + `workflow.md` (Fachablauf WP1–WP7) + `development-abteilungs-claude.md` (CLAUDE-Ebene 2, erstes ausgeliefertes Exemplar) + `pflege-auspraegung.json` (Queue-Ort, Kriterienverweis, Journal-Sonderregeln, Domänen-rote-Linien, Übergangsregel) |
 | `vorlagen/abteilungsplugin/` | Vorlage für neue Abteilungsplugins — **kein Plugin** (`.vorlage`-Endungen); dazu `abteilungs-claude.md.vorlage` (Ebene 2, Pflichtbestandteil jedes Abteilungsplugins) und `agents/beispiel-agent.md.vorlage` (Subagenten-Baustein, Read-only-Variante, optional beim ersten Agenten) |
 | `knowledge-base/` | Wissensbasis — Glossar im nächsten Abschnitt |
@@ -234,9 +234,17 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   gelesen durch die neue Lese-Verdrahtung in `/nc:start`. Stehende offene Punkte: Kriterienliste
   v1 ist Abnahme-Gate dieses Phasen-PRs (Maintainer-Wortlautabnahme aussteht), Push-Recht und
   stehende PR-Freigabe des Queue-Flows sind Maintainer-Entscheide (`queue-flow.md` §6).
-- **Noch nicht gebaut:** Gate 3 (Safety-Gate mit echtem Freigabedialog), Gate 4
-  (Sitzungsabschluss als Hook — die PreCompact-Mahnung ist ausdrücklich nicht Gate 4),
-  CLAUDE-Ebene 0 (Org-Instructions, weiterhin ungenutzt), weitere fe-/be-Skills, Module
+- **Gebaut (Kern v0.11.0, 2026-08-24): Onsite-Delta-Nachbau Phase G — Kontroll-Schicht-Parität**
+  nach Mapping `grundwissen/2026-08-23-onsite-delta-mapping.md` (D1–D3, D6): FFG-Erweiterung
+  (NotebookEdit, Windows-Destruktivmuster, Wrapper-Passthrough, Drift-Ritual §2b +
+  Falltabelle), Safety-Gate/Gate 3 gebaut (`nc-safety-gate.js`, ask-Dialog, Musterliste v1 im
+  NovaCore-Zuschnitt — Wortlaut-Abnahme am Phasen-PR), Gate 4 endgültig entfallen (Onsite
+  §15.44), Queue-Hook mit PR-Sichtbarkeit über die Infra-Registry (einziger, vierfach
+  gedeckelter Netzzugriff der Kontroll-Schicht) und Windows-Sperren-Härtung. Phasen H–K
+  folgen nach Mapping.
+- **Noch nicht gebaut:** (Gate 4 ist endgültig entfallen — Onsite §15.44, Mapping D2; die
+  PreCompact-Mahnung bleibt und war nie Gate 4), CLAUDE-Ebene 0 (Org-Instructions, weiterhin
+  ungenutzt), weitere fe-/be-Skills, Module
   `architecture`/`incident-support` sowie der Anschluss eines Abteilungs-Satelliten an den
   Queue-Flow (Skills und Hook sind gebaut, laufen aber ohne Satelliten in den
   Übergangs-Befund). Übersicht: `grundwissen/NovaCore-OS-Gates-Definition.md`.
