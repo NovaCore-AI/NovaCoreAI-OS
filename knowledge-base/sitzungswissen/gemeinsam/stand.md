@@ -24,8 +24,11 @@
 - **`referenz/`-Review (P-E5):** Je Datei existiert ein dokumentierter Review-Vorgang
   (PR #3 Kimi, #20 Kette N1, #21 zwei GLM-Runden), aber alle drei stehen auf
   `REVIEW_REQUIRED` mit **null** aufgezeichneten Reviews. Maintainer-Entscheid nötig.
-- **Jira-Ablageort:** `.nc/` steht wieder in `.gitignore` — künftige Jira-Artefakte des
-  parallelen Vorgangs wären dort ungetrackt. `git add -f` ist der dokumentierte Ausweg.
+- **Jira-Ablageort — ENTschieden (2026-08-25):** `.nc/` ist strikt nach Onsite **kein
+  Ablageort, keine Ausnahme**; der `git add -f`-Ausweg ist ersatzlos entfernt. Die lokalen
+  Jira-Funde (`.nc/jira-migration/`, `.nc/erinnerung/jira-rest-zugang.md`) bleiben
+  unangetastete Scratchpad-Funde (D27); ihre Heimat entscheidet sich mit D29
+  (`jira-workflow.md`, Phase J/K) — offener Strang im Register.
 - **`nc-development`-Modernisierungsplan** liegt in `aktive-bauplaene/` statt im Archiv: sechs
   offene „Kommende Änderungen"-Merker müssten erst ins Register, dann kann er archiviert werden.
 - **Leitplanken der Ebene 0** sind normativ verankert, aber **nicht ausgebaut** (eigener Vorgang).
