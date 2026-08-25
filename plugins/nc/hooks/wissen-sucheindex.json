@@ -587,6 +587,40 @@
         "kontext-budget",
         "stichwort-regel"
       ]
+    },
+    {
+      "id": "feature-manual-jira-rest-zugang",
+      "titel": "Feature-Manual Jira-REST-Zugang (Atlassian-Sites, Token-Ablage)",
+      "pfad": "knowledge-base/feature-manuals/jira-rest-zugang.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "welche Atlassian-Site per REST, welche per MCP erreichbar ist; Token nur als ENV-Variable, Rotationsregel, cloudIds",
+      "stichworte": [
+        "jira",
+        "atlassian",
+        "rest api",
+        "jira_api_token",
+        "cloudid",
+        "novacore-ai-team",
+        "jira-migration",
+        "token rotation"
+      ]
+    },
+    {
+      "id": "bauplan-onsite-delta-phase-j",
+      "titel": "Bauplan Onsite-Delta Phase J (2026-08-25)",
+      "pfad": "knowledge-base/aktive-bauplaene/2026-08-25-onsite-delta-phase-j-bauplan.md",
+      "router": "wissen-planen",
+      "hinweis": "Pakete J-D/J-A/J-B/J-C/J-E, Entscheide J-E1-J-E10, Setup-Hinweis-Hook, Safety-Gate-Wertentscheidung, Contributing-Flow",
+      "stichworte": [
+        "phase j",
+        "phase-j",
+        "setup-hinweis",
+        "contributing-flow",
+        "strang-definition",
+        "dev-subagenten",
+        "ci-kostenschnitt",
+        "anker-aufhebung"
+      ]
     }
   ]
 }
