@@ -610,6 +610,33 @@
       ]
     },
     {
+      "id": "contributing-flow",
+      "titel": "Standardprozess Contributing-Flow",
+      "pfad": "knowledge-base/standardprozesse/contributing-flow.md",
+      "router": "wissen-aendern",
+      "hinweis": "Stationen S1-S7 eines Strangs, Rollen (Agent unter Overseer, Maintainer bei Merge/Release), rote Linien",
+      "stichworte": [
+        "contributing-flow",
+        "strang-stationen",
+        "pr-memo",
+        "plan-sandwich",
+        "release-zug"
+      ]
+    },
+    {
+      "id": "strang-definition",
+      "titel": "NovaCore-OS-Strang-Definition",
+      "pfad": "knowledge-base/grundwissen/NovaCore-OS-Strang-Definition.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "normative Begriffsquelle Strang: Ziel-Repo, Branch, Worktree, PR-Memo, Ende inkl. Aufraeumen",
+      "stichworte": [
+        "strang-definition",
+        "was ist ein strang",
+        "offener strang",
+        "worktree-pflicht"
+      ]
+    },
+    {
       "id": "jira-workflow",
       "titel": "Standardprozess Jira-Workflow",
       "pfad": "knowledge-base/standardprozesse/jira-workflow.md",
