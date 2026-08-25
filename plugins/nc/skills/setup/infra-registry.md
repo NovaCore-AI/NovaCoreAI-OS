@@ -23,6 +23,7 @@ führt **jede Umgebung ihre eigene Registry**.
   "szenario": "windows",
   "ssotAblage": "C:\\Users\\<nutzer>\\.nc\\ssot",
   "kernSsotPfad": "C:\\Users\\<nutzer>\\.nc\\ssot\\NovaCoreAI-OS",
+  "kernRepoPfad": "C:\\Users\\<nutzer>\\dev\\NovaCoreAI-OS",
   "zuletztGeprueft": { "S0": "2026-08-15", "S2": "2026-08-15" }
 }
 ```
@@ -35,22 +36,27 @@ führt **jede Umgebung ihre eigene Registry**.
 - `abteilungen` listet die installierten **internen** Abteilungsplugins (heute:
   `development`); Kollegen-OS-Satelliten erscheinen hier **nie** (Isolations-Invariante —
   sie haben eine eigene zweidimensionale SSOT und hängen an keiner Kern-Mechanik).
-- **Optionale Queue-Flow-Felder (Andockpunkte — real ab dem ersten Abteilungs-Satelliten,
-  Phase 3 / AP-E2/E3):** `kernRepoPfad` — absoluter Pfad eines **Arbeitsklons** des OS-Repos
-  auf dieser Maschine (niemals die Lesekopie `kernSsotPfad`); Leser sind
-  `/nc:queue-kern` für den Promotions-PR, `/nc:update-doks` für den Kreuzverweis-Lauf,
-  der Pfad-Zeiger-Hook `nc-pfad-hinweis.js` (nur dieses Feld — begleitet Schreibarbeit)
-  sowie `nc-wissens-hinweis.js` und die vier `wissen-*`-Router (dieses Feld zuerst,
-  `kernSsotPfad` als Zweitquelle für reine Zeiger),
-  falls die Sitzung nicht schon im OS-Repo selbst läuft. `abteilungsRepoPfade` — Objekt
-  `Abteilungsname → absoluter Pfad` des lokalen Satelliten-Arbeitsklons bzw. `"ausstehend"`;
-  Leser sind die Queue-Skills (`queue-abteilung`/`queue-kern`) und der Fälligkeits-Hook
-  `nc-queue-faelligkeit.js`. Heute setzt **keine** Maschine diese Felder (kein
-  Abteilungs-Satellit, Entscheid E1 — die Übergangs-Queue lebt im OS-Repo); fehlen sie,
-  schweigt der Hook und die Skills brechen mit Übergangs-Befund ab. **Additive optionale
-  Felder, kein Schema-Bruch:** Leser ignorieren unbekannte Felder, der Schreiber
-  (`/nc:setup`) erhält Fremdfelder unverändert — `schemaVersion` bleibt `1`. (Abweichung
-  vom Onsite-Einzelfeld `abteilungsRepoPfad`: eine Map, passend zur `abteilungen`-Liste.)
+- **`kernRepoPfad` (seit Bauplan Phase J AP A3 von `/nc:setup` GESCHRIEBEN, nicht mehr nur
+  optional):** absoluter Pfad eines **Arbeitsklons** des OS-Repos auf dieser Maschine
+  (niemals die Lesekopie `kernSsotPfad`) — läuft `/nc:setup` im OS-Repo selbst, ist das
+  `git rev-parse --show-toplevel`; sonst fragt der Skill nach, und ohne Arbeitsklon trägt
+  das Feld `"ausstehend"`. Leser: `/nc:queue-kern` für den Promotions-PR,
+  `/nc:update-doks` für den Kreuzverweis-Lauf, der Pfad-Zeiger-Hook `nc-pfad-hinweis.js`
+  (nur dieses Feld — begleitet Schreibarbeit), `nc-wissens-hinweis.js` und die vier
+  `wissen-*`-Router (dieses Feld zuerst, `kernSsotPfad` als Zweitquelle für reine
+  Zeiger) sowie seit AP A3/A5 der Setup-Hinweis-Hook `nc-setup-hinweis.js` (Beleg für
+  „Setup lief hier") und der Fälligkeits-Hook `nc-queue-faelligkeit.js` (PR-Sichtbarkeit,
+  Abschnitt 5b des Hook-Kopfs).
+- **Optionale Queue-Flow-Felder (Andockpunkt — real ab dem ersten Abteilungs-Satelliten,
+  Phase 3 / AP-E2/E3):** `abteilungsRepoPfade` — Objekt `Abteilungsname → absoluter Pfad`
+  des lokalen Satelliten-Arbeitsklons bzw. `"ausstehend"`; Leser sind die Queue-Skills
+  (`queue-abteilung`/`queue-kern`) und der Fälligkeits-Hook `nc-queue-faelligkeit.js`.
+  Heute setzt **keine** Maschine dieses Feld (kein Abteilungs-Satellit, Entscheid E1 —
+  die Übergangs-Queue lebt im OS-Repo); fehlt es, schweigt der Hook und die Skills
+  brechen mit Übergangs-Befund ab. **Additive optionale Felder, kein Schema-Bruch:**
+  Leser ignorieren unbekannte Felder, der Schreiber (`/nc:setup`) erhält Fremdfelder
+  unverändert — `schemaVersion` bleibt `1`. (Abweichung vom Onsite-Einzelfeld
+  `abteilungsRepoPfad`: eine Map, passend zur `abteilungen`-Liste.)
 - `zuletztGeprueft` ist ein **reines Diagnose-Feld** (Datum je Schicht, `YYYY-MM-DD`) —
   nie Beleg-Ersatz. Grundregel: **die Platte ist die Wahrheit**; ein Registry-Pfad ohne
   echten Bestand dahinter gilt als „fehlt".

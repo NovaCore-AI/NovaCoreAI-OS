@@ -101,7 +101,16 @@ lokale Kopie. S2 schließt genau diese Lücke.
    `infra-registry.md`). Vor dem Schreiben die Datei erneut lesen und fremde/unbekannte
    Felder unverändert übernehmen, nie verwerfen. Die Registry ist Komfort-Cache — die
    Platte bleibt der Beleg; ein Eintrag mit totem Pfad gilt beim nächsten Lauf als
-   „fehlt".
+   „fehlt". **Pflichtfelder garantieren** (Bauplan Phase J AP A3): `schemaVersion`,
+   `abteilungen` (leere Liste zulässig, nie fehlend) und `szenario` müssen nach diesem
+   Schritt gesetzt sein — fehlt eines und lässt es sich aus dem Lauf nicht belegen, wird
+   nachgefragt statt geraten. **`kernRepoPfad` mitschreiben** (Vorbedingung des
+   Setup-Hinweis-Hooks `nc-setup-hinweis.js`, D32): absoluter Pfad des **Arbeitsklons**
+   des OS-Repos auf dieser Maschine — läuft dieser Lauf **im OS-Repo selbst**, ist das
+   `git rev-parse --show-toplevel`; sonst beim Nutzer nachfragen, ob und wo ein
+   Arbeitsklon existiert. Ohne Arbeitsklon (reines Kunden-/Fremd-Repo ohne Kern-Klon)
+   trägt das Feld `"ausstehend"` — **niemals** die Lesekopie `kernSsotPfad` eintragen,
+   die beiden Felder haben unterschiedliche Leser (`infra-registry.md`).
 8. **S6 Abschlussbericht:** Tabelle S0–S6 mit Beleg je Schicht (Befehl + Ergebnis, Pfad,
    Version, Marker-Fund), offene Punkte, Gegenprobe per `/nc:os-info`. Zusätzlich
    **`NC_SECRETS_REF` nicht-blockierend prüfen**: nur „gesetzt" oder „nicht gesetzt"
