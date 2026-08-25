@@ -67,7 +67,7 @@ bringen ihren Kern als **Modul** selbst mit:
 | `/nc:os-info` | jederzeit | Erklärt das OS **auf Basis der realen Installation** — Plugins, Module, nutzbare Skills, Gate-Status |
 | `/nc:skill-builder` | jederzeit | Führt durch den Bau eines Skills nach den OS-Regeln (Sandbox oder OS-Beitrag, inkl. Fork-back) |
 | `/nc:wissen-aendern` | WP1 / WP8 | Router: Zeiger auf die Änderungs-Matrix und die Standardprozesse — was eine Änderung am OS vorher lesen und in derselben Änderung nachziehen muss |
-| `/nc:wissen-planen` | WP0 / WP1 | Router: Zeiger auf laufende/abgeschlossene Baupläne, Bauplan-Archiv, Ideen-Backlog, Anker-Reservierung und das Sitzungswissen des Arbeits-Repos (Stand, Journal, Offene-Stränge-Register) |
+| `/nc:wissen-planen` | WP0 / WP1 | Router: Zeiger auf laufende/abgeschlossene Baupläne, Bauplan-Archiv, Ideen-Backlog und das Sitzungswissen des Arbeits-Repos (Stand, Journal, Offene-Stränge-Register) |
 | `/nc:wissen-nachschlagen` | WP0 | Router: Zeiger auf Master-Index (SSOT-Document-Index), Repo-Karte, Produktarchitektur, Design-Specs und die normativen Begriffsdokumente der Wissensbasis |
 | `/nc:wissen-protokolle` | WP1–WP8, begleitend | Router: Zeiger auf Fehlerprotokoll und Debug-Log samt Eintragspflicht, dazu die append-only Register des Wissensflusses (Kandidaten-Queue, Queue-Protokolle) |
 | `/nc:queue-abteilung` | WP8, 14-tägig | Erste Station des Queue-Flows: bündelt die lokal gesammelten SSOT-Commits samt neuer Kandidaten-Queue-Zeilen eines Abteilungs-Satelliten-Klons zu einem Zyklus-PR gegen das Abteilungs-Repo. Push/PR-Anlage je Lauf einzeln freigabepflichtig |
@@ -171,8 +171,7 @@ Verbindliche Prozesse: [`kern-plugin-bau.md`](knowledge-base/standardprozesse/ke
 (Nachzüge je Bauzyklus) · [`os-bau-methode.md`](knowledge-base/standardprozesse/os-bau-methode.md)
 (Gesamt-Methode) · [`claude-netz-bau.md`](knowledge-base/standardprozesse/claude-netz-bau.md)
 (CLAUDE-Ebenen) · [`subagenten-bau.md`](knowledge-base/standardprozesse/subagenten-bau.md)
-(Subagenten) · [`anker-reservierung.md`](knowledge-base/standardprozesse/anker-reservierung.md)
-(Anker bei Parallelbau) · [`abteilungs-inhalts-pruefung.md`](knowledge-base/standardprozesse/abteilungs-inhalts-pruefung.md)
+(Subagenten) · [`abteilungs-inhalts-pruefung.md`](knowledge-base/standardprozesse/abteilungs-inhalts-pruefung.md)
 (Inhalts-Audit je Abteilung) · [`team-distribution.md`](knowledge-base/standardprozesse/team-distribution.md)
 (Team-Rollout) · [`queue-flow.md`](knowledge-base/standardprozesse/queue-flow.md) (Weg eines
 Wissensstücks von der Sitzung in die Kern-SSOT, nur Abteilungen mit Kern-Dependency) ·
