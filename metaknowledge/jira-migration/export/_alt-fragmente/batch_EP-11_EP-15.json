@@ -1,0 +1,67 @@
+[
+  {
+    "key": "EP-11",
+    "summary": "A4 · Klären: Gutschein-Ausführung Streamendous + failed-Handling",
+    "issuetype": "Task",
+    "status": "Erledigt",
+    "labels": [
+      "kundenblocker"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Blockt:** Phase 2 (Epic E3). **Plan:** §11.A4.\n\n**Default (baubar):** Backend prüft + triggert, Streamendous führt Amazon-Kauf aus, Code per Mail an Promotor, Status manuell auf `sent`.\n\n**Zu klären:**\n\n1. Hat Streamendous eine API / einen Webhook, oder ist der Ablauf manuell?\n2. Wie sieht das `failed`-Handling aus (Code nicht lieferbar, Fehlversand)?\n\n**Fertig:** Eintrag in Plan §11.C."
+  },
+  {
+    "key": "EP-12",
+    "summary": "A5 · Bestätigen: Share-Kanal-Design (Desktop Kopieren+QR, mobil WhatsApp+Mail-App)",
+    "issuetype": "Task",
+    "status": "Erledigt",
+    "labels": [
+      "kundenblocker"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Blockt:** Phase 3 (Epic E4). **Plan:** §11.A5 + §16.H3/H18/H19.\n\n**Default (rechtssicher, baubar):** Desktop = Nachricht-/Link-Kopieren + QR (kein E-Mail-Schritt im Web); Mobil = WhatsApp primär + „Per E-Mail teilen\" via Mail-App sekundär. Das System versendet nie an Dritte.\n\n**Wichtig — aktiv vorlegen:** Weicht bewusst von der PDF ab (F5 „nur WhatsApp\" mobil; F9–F11 „E-Mail-Weiterleitung über KlickTipp\"). Grund: BGH I ZR 208/12 — Unternehmens-Versand an Dritte = unzulässige Werbung (§ 7 UWG), Abmahnrisiko. KlickTipp-Versand nur mit dokumentierter anwaltlicher Freigabe.\n\n**Fertig:** Heins Bestätigung (Mail/Protokoll) + Eintrag in Plan §11.C."
+  },
+  {
+    "key": "EP-13",
+    "summary": "Annahmen B3–B10 bestätigen lassen",
+    "issuetype": "Task",
+    "status": "Erledigt",
+    "labels": [
+      "kundenblocker"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §11.B. Jeweils ein Satz Bestätigung genügt:\n\n* B3: WordPress nur verlinken, kein Plugin\n* B4: etermin-Prefill best-effort; Buchungsdaten als zweite Attributionsquelle prüfen\n* B5: Match-Zeitfenster 90 Tage\n* B6: Gutschein-Code-Mail über KlickTipp\n* B7: Repo/CI = GitHub + Actions (kein GitLab)\n* B8: Retention-Fristen (Tracking 12 Mon., Leads ohne Kauf 12 Mon. anonymisieren, Consents 3 J.)\n* B9: E1-CTA-Gating (CTAs erst nach Lead-Angabe aktiv)\n* B10: Content: Team draftet, Hein gibt frei; Rechtstexte liefert Kunde\n\n**Fertig:** Eintrag in Plan §11.C (Zeile B3–B10)."
+  },
+  {
+    "key": "EP-14",
+    "summary": "Zugänge einholen: KlickTipp-API, Woo-Webhook+REST, Streamendous, etermin-Doku",
+    "issuetype": "Task",
+    "status": "In Arbeit",
+    "labels": [
+      "kundenblocker"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §8 Pitch / §12. Benötigt für Phase 0 (Testzugänge, EP-2).\n\n* KlickTipp-API-Key\n* WooCommerce-Webhook-Konfiguration + REST-API-Credentials\n* Streamendous-Zugang/Doku\n* etermin-Prefill-/Export-Doku\n\n**Fertig:** Alle Zugänge in Secret-Store hinterlegt und je einmal erfolgreich getestet."
+  },
+  {
+    "key": "EP-15",
+    "summary": "Branding-Assets: Logo SVG, Hex-Farben, Vimeo-URL (60s-Video)",
+    "issuetype": "Task",
+    "status": "Code-Review",
+    "labels": [
+      "kundenblocker"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §11 (sekundär) + §12. Benötigt für Design-System-Basis (E2) und alle Seiten (E4).\n\n* Logo als SVG\n* Exakte Hex-Farben / Brand-Guide\n* Vimeo-URL des 60-Sekunden-Videos\n\n**Fertig:** Assets liegen im Repo/Drive und sind im Design-System-Task referenziert."
+  }
+]

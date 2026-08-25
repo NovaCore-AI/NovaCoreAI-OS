@@ -307,3 +307,96 @@ Vöhringer. Quellen live gelesen: Onsite.ai-OS `origin/main@a9927b2` (Kern 0.27.
 `Onsite.ai-OS-Development@v0.13.3` (`agents/*.md`, `plugin.json`); NovaCore-Gegenprobe im
 Worktree auf `feat/onsite-delta-phase-i@3d8bb63`. Entscheide J-E1–J-E10 sind Vorschläge
 (Default Onsite-Parität, N1.2) bis zur Maintainer-Bestätigung am Phase-J-PR.*
+
+---
+
+## Nachtrag N1 — Frühzug D29/D30/Muster-4-DB (2026-08-25, Kimi K3)
+
+**Maintainer-Weisung 2026-08-25 (übersteilt J-E10 und §9):** D29, D30 und die DB-Hälfte
+des WZS-Safety-Gate-Slots werden **sofort** gebaut — nicht erst mit Phase J nach dem
+Merge von PR #25. Begründete Abweichungen von den Plan-Defaults:
+
+- **D29 statt Vertagung (J-E10):** `jira-workflow.md` als Eigenbau mit benannten Lücken
+  (Onsite hat kein Pendant); **Heimat-Entscheid des Maintainers: Jira-Artefakte wohnen in
+  `metaknowledge/`** (Repo-Wurzel, außerhalb der indexpflichtigen Wissensbasis). Der
+  Prozess setzt die Regeln für die Restarbeit, solange Block B/C zurückgestellt ist.
+- **D30 vorgezogen (Planteil J-B/AP B6):** Port von Onsite
+  `workflow-md-implementierung.md` (Anker `a9927b2`) in NovaCore-Zuschnitt;
+  `wp-rahmen.md`-Kopf auf Optionalität korrigiert („Abbildung Pflicht, Ort optional",
+  Verweis auf den Anlass-Test); Registry ist bereits im Sollzustand (nur `development`
+  trägt das Feld; Satelliten bewusst ohne).
+- **Muster-4-DB-Hälfte (statt „eigener Posten" in §9):** WZS-Zulieferung 2026-08-24
+  umgesetzt in `nc-safety-gate.js` — Prisma-Schreibwege, compose-exec-psql, mit
+  Lese-Ausnahmen als Fehlalarm-Schutz; **Eigentums-Entscheid des Maintainers: schreibende
+  curl/wp-Aufrufe gegen Live-Domains gehören zu Gate 3** (keine FFG-Seite). Deploy-Hälfte
+  wartet weiter auf die Weiche Actions+SSH vs. Coolify. Getrennt vom Fehlalarm-Fix A1
+  (D33) gehalten — der bleibt Phase J.
+- **Artefakt-Migration:** `.nc/jira-migration/` + `.nc/erinnerung/jira-rest-zugang.md`
+  (Scratchpad-Funde D27) nach `metaknowledge/` übernommen — `.nc/` bleibt leerer
+  Altstand-Schutz.
+
+Gebaut auf Branch `feat/phase-j-fruehzug` (Basis `f3363cf` + Cherry-Pick des
+N5/Bauplan-Commits `7e51117` aus dem Parallel-Worktree). Die übrige Phase J
+(J-D/J-A/J-B-Rest/J-C/J-E) bleibt unverändert geplant; dieser Nachtrag ist kein
+Phasen-Vollzug.
+
+## Nachtrag N2 — Stand nach Frühzug-Merge und Release 0.14.0 (2026-08-25, Overseer)
+
+**Anlass:** Prüfauftrag nach Abschluss des Frühzugs (N1) und des Struktur-Paritätsaudits
+(#28) samt dessen Release (#29). Der Frühzug wurde vom Maintainer-Agenten auf `main` rebased (`af6acdb`, `84fa30a`, `63f2a11`) und geht als PR #30 nach `main`
+Frühzug-Head `63f2a11` auf Basis `origin/main@0253a33`). §1–§12 und N1 bleiben
+zeichengleich; dieser Nachtrag korrigiert und ergänzt.
+
+- **Versionen im Plan überholt** (§3 „Ein Branch", §8 J-E, §12): Der Plan nennt „Kern-Bump
+  0.13.0 → 0.14.0" und „nc-development 0.2.0 → 0.3.0". **0.14.0 ist bereits verbraucht** —
+  vom Struktur-Paritäts-Release, nicht von Phase J: `VERSION` = `0.14.0`, `CHANGELOG.md`
+  Abschnitt `## [0.14.0] — 2026-08-25` („Zweiter Waypoint-Schnitt … PR #27 … PR #28 …
+  Sucheindex-Pfadfix"), `plugins/nc-development/.claude-plugin/plugin.json` = `0.2.1` (nicht
+  0.3.0), Tag `nc--v0.14.0` gesetzt. J-E bumpt auf die **nächste** Waypoint-Version, die der
+  Release-Zug vergibt (voraussichtlich 0.15.0 / nc-development 0.3.0) — Regel daraus: **ein
+  Waypoint-Plan pinnt keine Versionsnummer** (Aktualisierungs-Index §0: Versionen entstehen
+  am Zug, nicht am Bauplan).
+
+- **Frühzug-Posten abgehakt — landen mit PR #30 auf `main`** (Commit `8166711`, N1): D29
+  `standardprozesse/jira-workflow.md` gebaut (J-E10 „vertagen" überstimmt) · D30 / AP B6
+  `standardprozesse/workflow-md-implementierung.md` + `plugins/nc/wp-rahmen.md` gebaut ·
+  WZS-Muster-4-**DB**-Hälfte in `plugins/nc/hooks/nc-safety-gate.js` gebaut (§9 führte sie als
+  „eigener Posten") — alles auf Branch `feat/phase-j-fruehzug`, **nicht Bestandteil von
+  `origin/main`**: `8166711` ist kein Vorfahre von `origin/main` (`git merge-base
+  --is-ancestor` verneint), `origin/main` kennt weder `jira-workflow.md` noch
+  `metaknowledge/`, und `nc-safety-gate.js` trägt dort kein `Prisma`/`compose-exec-psql`
+  (Treffer 0). Dieser Worktree testet den Merge nur probeweise (5 Konflikte gelöst laut
+  Frühzug-Head `63f2a11`, Suite 323/321 pass/2 skip) — der Merge nach `main` erfolgt mit PR #30
+  und ist Vorbedingung von Punkt 5 unten. **A1 (D33, `NAME=wert`-Wertentscheidung) bleibt
+  offen und setzt auf dem Frühzug-Stand des Gates auf** (`PROD_PRAEFIXE` fehlt weiterhin:
+  `grep -c PROD_PRAEFIXE plugins/nc/hooks/nc-safety-gate.js` = 0). Heimat-Entscheid
+  `metaknowledge/` (Repo-Wurzel, außerhalb der Wissensbasis) — in der Wurzel-Allowlist
+  `plugins/nc/tests/struktur.test.mjs` eingetragen, aber bislang nur im lokalen
+  Commit `63f2a11` des Frühzugs, landet mit PR #30 auf `main`.
+
+- **Struktur-Parität (#28, seit #29 auf `main`) verändert drei J-Pakete — unabhängig vom
+  Frühzug-Merge bereits auf `origin/main` wirksam:** J-B B6 erledigt (s. o., aber nur im
+  Frühzug-Zweig) · J-C C3: `CONTRIBUTING.md` steht als Wurzeldatei bereits im ERLAUBT-Set von
+  `struktur.test.mjs`, die Datei selbst existiert noch nicht — „vorreserviert" (Register-Zeile
+  2026-08-25 Nr. 52 nennt das explizit) · J-A A5/J-E: die README-Hook-Tabelle zählt heute
+  **neun** registrierte Hooks (`hooks.json`: neun Paare `"type": "command"` + `"command"`,
+  macht 18 Treffer auf `grep -c '"command"'`), der Setup-Hinweis wäre der zehnte ·
+  `plugins/nc/referenz/wissens-router.md` existiert (Port aus Audit `abad39e`, nicht unter
+  `knowledge-base/referenz/` — D34/J-C Overlap-Prüfung gegen Router kann sie nutzen) · die
+  Team-Sync-Payload heißt `plugins/nc/doks/nc-teamsync.md` (Umzug von der Plugin-Wurzel,
+  ebenfalls `abad39e`) — alle Plan-Nennungen von `nc-sync.md` sind damit historisch.
+
+- **Restliste offen** (Reihenfolge und Zwänge aus §3 gelten unverändert; Zusatz-Zwang: A1
+  setzt auf dem Frühzug-Stand des Gates auf):
+
+| Paket | Posten | Stand |
+|---|---|---|
+| J-D | D31 (Anker-Aufhebung), D22 (CI-Kostenschnitt) | offen |
+| J-A | D32 (Setup-Hinweis-Hook + `lib/infra-registry.js`), D28 (Queue-Handlungsanweisung), D33/A1 (Safety-Gate-Wertentscheidung), A3 (`/nc:setup` → `kernRepoPfad`) | offen |
+| J-B | D19 (drei Agenten: code-reviewer, pipeline-praeflight, test-luecken-scout), B4 (Overlap-Matrix), B5 (Registry-Eintrag) | offen — B6 bereits gebaut (Frühzug) |
+| J-C | D20 (Hook-Norm W4), D21 (Anlageweg-Weiche §3.0), D34 (Contributing-Flow + Strang-Definition), D35 (SSOT-Sichtbarkeitsmodell) | offen — C3-Vorreservierung (`CONTRIBUTING.md`) läuft bereits |
+| J-E | Nachzugs-Bündel, Bump am Release-Zug, Waypoint-Version noch offen (s. o.) | offen |
+
+Gebaut wird Phase J von `main` aus, nach Merge des Frühzugs; Delegation nach Org-Ruleset:
+Kontroll-Schicht Overseer, J-B/J-C Opus mit Plan-Sandwich, Nachzüge und Release-Zug
+Sonnet-Executor.

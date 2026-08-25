@@ -1,0 +1,116 @@
+[
+ {
+  "key": "EP-51",
+  "summary": "Admin: Promotoren-Übersicht + CRUD + CSV-Import (~6 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-6",
+  "description": "**Plan:** §3 Flow D + §8 #18. **Aufwand:** \\~6 h.\n\n**AK:** (1) Liste mit Suche; pro Promotor: Links, Klicks, Empfehlungen. (2) CRUD mit Audit. (3) CSV-Import (normalisiert, Upsert-Semantik, Fehlerreport)."
+ },
+ {
+  "key": "EP-52",
+  "summary": "Admin: Referral-Liste + Statuspflege (neu→kontaktiert→gekauft→gutschein_versendet) (~5 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-6",
+  "description": "**Plan:** §3 Flow D + §8 #19. **Aufwand:** \\~5 h.\n\n**AK:** (1) Liste filterbar nach Status/Promotor. (2) Statusänderungen manuell möglich → Audit-Log. (3) risk_flags sichtbar."
+ },
+ {
+  "key": "EP-53",
+  "summary": "Admin: Lookup (E-Mail/Telefon/Name) + manuelle Zuordnungs-UI (~5 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-6",
+  "description": "**Plan:** §3 Flow D + §8 #20 (Folie 12). **Aufwand:** \\~5 h.\n\n**AK:** (1) Lookup „über Empfehlung gekommen?\" per E-Mail/Telefon(=WhatsApp-Nr)/Name. (2) UI zur manuellen referral↔order-Verknüpfung (nutzt EP-41-Backend). (3) Fuzzy-Vorschläge werden zur Bestätigung angezeigt."
+ },
+ {
+  "key": "EP-54",
+  "summary": "Admin: Reward-Approval-UI (mit Karenz- und Fraud-Anzeige) (~5 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [
+   "geld-pfad"
+  ],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-6",
+  "description": "**Plan:** §3 Flow D + §8 #21. **Aufwand:** \\~5 h.\n\n**AK:** (1) Approval-Ansicht zeigt: Bedingungsstatus, `eligible_at` (Countdown), risk_flags, Match-Confidence. (2) Approve nur möglich, wenn Bedingung + Karenz erfüllt. (3) Jede Auslösung → Audit-Log."
+ },
+ {
+  "key": "EP-55",
+  "summary": "Admin: Programm-Pause-Schalter + Reward-Ausgaben-Report (~1 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-6",
+  "description": "**Plan:** §3 Flow D + §8 #23. **Aufwand:** \\~1 h.\n\n**AK:** (1) Pause-Flag stoppt Link-Erzeugung + Lead-Capture (Hinweisseite). (2) Monatsreport ausgezahlte Rewards (Summe/Anzahl)."
+ },
+ {
+  "key": "EP-56",
+  "summary": "Admin-Dashboard: Klicks, Empfehlungen, Conversions, NPS, Match-Rate (~3 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-6",
+  "description": "**Plan:** §3 Flow D + §8 #24 (P2). **Aufwand:** \\~3 h.\n\n**AK:** (1) Kennzahlen gemäß Pitch §5 (Promotor-Quote, Aktivierung, Link-Öffnungen/Promotor, Lead-Conversion, Empfehlungs-Conversion, Auto-Match-Rate). (2) Hinweis-Text: Reichweite = Link-Öffnungs-Proxy (wa.me-Grenze)."
+ },
+ {
+  "key": "EP-57",
+  "summary": "n8n-Flows final: KlickTipp/Woo/Reconciliation/Alerts/Gutschein/Code-Mail (~6 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-7",
+  "description": "**Plan:** §9 Phase 5. **Aufwand:** \\~6 h.\n\n**AK:** (1) Alle n8n-Flows produktionsfertig, mit Retry/Fehler-Alerts. (2) Secrets aus Secret-Store. (3) Flows dokumentiert (Mini-Doku)."
+ },
+ {
+  "key": "EP-58",
+  "summary": "KlickTipp-Kampagnen-Verdrahtung mit Kunde (Mail-Template, personalisierter Link, QR) (~2 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-7",
+  "description": "**Plan:** §9 Phase 5 (H15). **Aufwand:** \\~2 h. **Mit Kunde gemeinsam.**\n\n**AK:** (1) Kampagnen-Mail zeigt auf Prod-Domain. (2) Personalisierter Link (subscriber-Parameter) + QR in der Mail getestet. (3) Testversand an Team erfolgreich."
+ },
+ {
+  "key": "EP-59",
+  "summary": "E2E-Tests aller Flows inkl. Refund-, Karenz-, Fraud- und No-Match-Fällen (~8 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [
+   "geld-pfad"
+  ],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-7",
+  "description": "**Plan:** §9 Phase 5 + §13. **Aufwand:** \\~8 h.\n\n**AK:** (1) Mobil-Flow (NPS→C1→D1→Share→E1→Lead), Desktop-Flow (Kopieren/QR), Feedback, Admin. (2) Attribution: hart/fuzzy/manuell; Doppelzahlungs-Fall schlägt fehl (Guard). (3) Refund vor Karenzablauf erlischt Reward; keine Auszahlung vor `eligible_at`. (4) WhatsApp-Preview erzeugt keinen Klick."
+ },
+ {
+  "key": "EP-60",
+  "summary": "Mobile-/Cross-Browser-Optimierung (~3 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-7",
+  "description": "**Plan:** §9 Phase 5. **Aufwand:** \\~3 h.\n\n**AK:** (1) iOS Safari + Android Chrome fehlerfrei (mobil primär!). (2) Desktop Chrome/Firefox/Safari/Edge. (3) wa.me-, mailto- und Clipboard-Verhalten je Plattform verifiziert."
+ }
+]

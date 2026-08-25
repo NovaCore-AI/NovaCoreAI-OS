@@ -1,0 +1,24 @@
+[
+  {
+    "key": "EP-86",
+    "summary": "E3.9 — Manuelle referral↔order-Zuordnung (Backend-Logik) (~4 h)",
+    "issuetype": "Task",
+    "status": "Erledigt",
+    "labels": [],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**E3 / Phase 2 — \\~4 h.** Quelle: Plan v2.3 §9 Phase 2.\n\n**Aufgabe:** Backend-Logik für manuelle referral↔order-Zuordnung (Fallback by-design für strukturell nicht matchbare Käufe).\n\nWird in Phase 4 durch die Admin-UI ergänzt (EP-6 / Lookup + manuelle Zuordnung)."
+  },
+  {
+    "key": "EP-87",
+    "summary": "PR 1 · Scaffolding 00-backend (Next.js + TS strict + Prisma + Docker)",
+    "issuetype": "Task",
+    "status": "In Arbeit",
+    "labels": [],
+    "priority": "High",
+    "duedate": null,
+    "parent": null,
+    "description": "**Erster Development-Schritt. Haengt an nichts** — weder Server, Zugaenge noch Kundenantwort.\n\nRepository-Ordner: `00-backend/`. Struktur orientiert sich am `04-Source-code` des Alarmsystem-Repos (`Entwicklerteam-WI2-0/Alarmsystem-Dev`), uebertragen auf Next.js/TypeScript/Prisma.\n\n**Inhalt:**\n\n1. `package.json` mit **gepinnten** Versionen (Stand 26.07.2026, gegen npm-Registry verifiziert): `next@16.2.12`, `react@19.2.8`, `typescript@7.0.2`, `prisma@7.9.0`, `vitest@4.1.10`, `zod@4.4.3`, `eslint@10.8.0`, `prettier@3.9.6`\n2. `tsconfig.json` (strict), `eslint.config.mjs`, `.prettierrc`, `vitest.config.ts`\n3. `next.config.ts` mit `output: 'standalone'` (Pflicht fuer schlanke Docker-Images)\n4. `Dockerfile` (multi-stage) + `docker-compose.yml` (App + postgres:16 + Reverse-Proxy) — **Port 5432 NICHT nach aussen mappen**\n5. `.env.example` mit den Variablennamen aus `.github/PIPELINES.md`\n\n⚠️ **Nicht** `create-next-app` im Repo-Root ausfuehren: es schreibt in ein nicht-leeres Verzeichnis und ueberschreibt dabei die `README.md` mit der Projektdoku. Deshalb eigener Ordner `00-backend/`.\n\n**Nebeneffekt (wichtig):** Sobald `package.json` existiert, koennen die CI-Workflows aus `_wzs-ci-workflows-backup-*` zurueck und Branch-Protection \"Require CI\" auf `main` wird konfigurierbar. Bis dahin ist jeder PR ungeschuetzt.\n\n**Fertig, wenn:** `npm run build` gruen, `npm run lint` gruen, `docker compose up` bringt App + DB hoch, CI-Workflows sind zurueck."
+  }
+]

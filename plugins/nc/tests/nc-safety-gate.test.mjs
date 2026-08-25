@@ -285,3 +285,74 @@ test('Kein State: derselbe Treffer fragt jedes Mal erneut', () => {
   askReason(runGate({ command: 'tofu apply' }));
   askReason(runGate({ command: 'tofu apply' }));
 });
+
+// --- Muster 4 (DB-Haelfte, WZS-Zulieferung 2026-08-24) — Prisma + compose-psql ----
+// Zulieferung des Live-Umgebungs-Kollegen: Prisma 7 ist der EINZIGE Prod-DB-Schreibweg
+// (migrate dev|deploy|reset, db push|execute|seed, db:*-npm-Skripte), Admin-Pfad ist
+// `docker compose exec postgres psql` per SSH. Erlaubt ergaenzt, nie erfunden (EN4).
+test('Muster 4 — Prisma-Schreibkommandos erzeugen einen Freigabedialog', () => {
+  for (const command of [
+    'prisma migrate deploy',
+    'prisma migrate dev',
+    'prisma migrate reset',
+    'npx prisma db push',
+    'npx prisma db execute --file seed.sql',
+    'npx prisma db seed',
+    'npm run db:migrate',
+    'npm run db:push',
+    'npm run db:seed'
+  ]) {
+    const r = runGate({ command });
+    const reason = askReason(r);
+    assert.match(reason, /DB/i, command + ' muss als DB-Eingriff erkannt werden');
+  }
+});
+
+test('Muster 4 — docker compose exec postgres psql (Admin-Pfad) fragt', () => {
+  for (const command of [
+    'docker compose exec postgres psql -c "SELECT 1"',
+    'docker compose -p prod exec postgres psql -f dump.sql',
+    'docker-compose exec postgres psql -c "UPDATE t SET x=1"'
+  ]) {
+    const r = runGate({ command });
+    askReason(r);
+  }
+});
+
+test('Muster 4 — lesende/verwaltende DB-Kommandos bleiben still (Fehlalarm-Schutz)', () => {
+  for (const cmd of [
+    'prisma generate',            // Codegen, keine DB-Beruehrung
+    'prisma validate',            // Schema-Check
+    'prisma studio',              // interaktive UI — oeffnet, schreibt nicht
+    'docker compose exec postgres psql --version', // Versionsabfrage
+    'docker compose logs postgres',
+    'docker compose ps',
+    'cat prisma/schema.prisma',
+    'grep -n model prisma/schema.prisma'
+  ]) {
+    assertStill(runGate({ command: cmd }), cmd);
+  }
+});
+
+test('Muster 4 — Wrapper und Praefixe verdecken Prisma/compose-psql nicht', () => {
+  for (const command of [
+    'bash -c "npx prisma db push"',
+    'sudo docker compose exec postgres psql -c "DROP TABLE x"',
+    'env DATABASE_URL=prod npx prisma migrate deploy',
+    'timeout 30 npx prisma db push'
+  ]) {
+    const r = runGate({ command });
+    askReason(r);
+  }
+});
+
+test('Muster 4 — psql ausserhalb des compose-Exec-Kontexts bleibt still (Grenze)', () => {
+  // Lokales psql gegen Dev-Datenbanken ist Alltag (WZS: Prisma ist der EINZIGE
+  // Prod-Weg) — das Gate fragt nur im prod-nahen compose-Admin-Pfad.
+  for (const cmd of [
+    'psql -h localhost -U dev app_dev -c "SELECT 1"',
+    'psql --version'
+  ]) {
+    assertStill(runGate({ command: cmd }), cmd);
+  }
+});

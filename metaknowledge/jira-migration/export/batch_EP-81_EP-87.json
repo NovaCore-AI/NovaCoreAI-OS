@@ -1,0 +1,79 @@
+[
+ {
+  "key": "EP-81",
+  "summary": "E3.4 — Bidirektionales Matching (hart/fuzzy + Confidence + Zeitfenster) (~14 h)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-4",
+  "description": "**E3 / Phase 2 — \\~14 h.** Quelle: Plan v2.3 §9 Phase 2, §4.1/H6.\n\n**Aufgabe:** Bidirektionales Matching (hart/fuzzy) mit Confidence-Score und Zeitfenster (🔶 B5, Default 90 T).\n\n**Das Herzstück der Attribution:**\n\n* Hart: normalisierte E-Mail + Telefon (E.164)\n* Fuzzy: Name (Score-basiert)\n* Zeitfenster: Link-Öffnung → Kauf\n* Bidirektional (Lead↔Order)\n\n**Regel:** Test-first, ≥ 80 % Coverage auf Match/Reward.\n\n**Abhängigkeit:** A2 (Match-Felder), A1 (Lead-Feld-Priorisierung)."
+ },
+ {
+  "key": "EP-82",
+  "summary": "E3.5 — Mehrfach-Match-Guard + Bedingungsprüfung (A3) + Karenzzeit/eligible_at (~8 h)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-4",
+  "description": "**E3 / Phase 2 — \\~8 h.** Quelle: Plan v2.3 §9 Phase 2, §4.5/H1/H20.\n\n**Aufgabe:** Guard gegen mehrere Matches einer Order; Bedingungsprüfung (⛔ A3); Karenzzeit `eligible_at` = **Warenerhalt/**`delivered_at` + 21 Tage (§ 356 II Nr. 1a BGB, H20); Fallback `completed_at` + größerer Puffer falls kein Lieferdatum.\n\n**Kritisch (Geld):** verhindert Doppelzahlung und Reward auf widerrufene Käufe.\n\n**Regel:** Test-first (Karenz- und Refund-Fälle als benannte Tests).\n\n**Abhängigkeit:** A3 (Bedingung + Werte + Karenz-Anker)."
+ },
+ {
+  "key": "EP-83",
+  "summary": "E3.6 — Fraud-Flags (Self-Referral/IP/Velocity/Wegwerf-Domains) (~4 h)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-4",
+  "description": "**E3 / Phase 2 — \\~4 h.** Quelle: Plan v2.3 §9 Phase 2, §4.6/H2.\n\n**Aufgabe:** Automatische Fraud-Flags:\n\n* Self-Referral (Promotor wirbt sich selbst)\n* IP-Nähe\n* Velocity (viele Leads/Matches in kurzer Zeit)\n* Wegwerf-Domains\n\nFlags ins Approval-Gate anzeigen; Plus Honeypot + Rate-Limit auf öffentlichen POSTs.\n\n**Kritisch (Geld):** ohne Fraud-Abwehr ist Self-Referral für 25 € trivial ausnutzbar."
+ },
+ {
+  "key": "EP-84",
+  "summary": "E3.7 — Reward-State-Machine + doppelte Idempotenz + Audit + failed-Recovery (~9 h)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-4",
+  "description": "**E3 / Phase 2 — \\~9 h.** Quelle: Plan v2.3 §9 Phase 2, §4.4.\n\n**Aufgabe:** Reward-State-Machine mit **doppelter partial-unique-Idempotenz** (verhindert Doppelzahlung bei Mehrfach-Empfehlung), Audit, `failed`-Recovery.\n\n**Kritisch (Geld):** das ist die zentrale Auszahlungsschranke. Jeder PR Vier-Augen-Review.\n\n**Regel:** Test-first, **≥ 80 % Coverage** auf Match/Reward. Adversarial geprüft gegen dokumentierte Vorfälle (Refund, Doppelzahlung, Karenz).\n\n**Abhängigkeit:** A3 (Bedingung/Karenz), A4 (Streamendous failed-Handling)."
+ },
+ {
+  "key": "EP-85",
+  "summary": "E3.8 — Gutschein-Code-Mail-Versand (n8n/KlickTipp) (~4 h)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-4",
+  "description": "**E3 / Phase 2 — \\~4 h.** Quelle: Plan v2.3 §9 Phase 2.\n\n**Aufgabe:** Gutschein-Code-Mail-Versand via n8n/KlickTipp an den Promotor (Empfänger = eigener Kunde → zulässig).\n\n**Idempotent wiederholbar** (n8n-SPOF-Absicherung, H4/H11).\n\n**Abhängigkeit:** A4 (Streamendous-Ablauf), 🔶 B6 (Mailversand-Kanal)."
+ },
+ {
+  "key": "EP-86",
+  "summary": "E3.9 — Manuelle referral↔order-Zuordnung (Backend-Logik) (~4 h)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-4",
+  "description": "**E3 / Phase 2 — \\~4 h.** Quelle: Plan v2.3 §9 Phase 2.\n\n**Aufgabe:** Backend-Logik für manuelle referral↔order-Zuordnung (Fallback by-design für strukturell nicht matchbare Käufe).\n\nWird in Phase 4 durch die Admin-UI ergänzt (EP-6 / Lookup + manuelle Zuordnung)."
+ },
+ {
+  "key": "EP-87",
+  "summary": "PR 1 · Scaffolding 00-backend (Next.js + TS strict + Prisma + Docker)",
+  "issuetype": "Task",
+  "status": "In Arbeit",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": null,
+  "description": "**Erster Development-Schritt. Haengt an nichts** — weder Server, Zugaenge noch Kundenantwort.\n\nRepository-Ordner: `00-backend/`. Struktur orientiert sich am `04-Source-code` des Alarmsystem-Repos (`Entwicklerteam-WI2-0/Alarmsystem-Dev`), uebertragen auf Next.js/TypeScript/Prisma.\n\n**Inhalt:**\n\n1. `package.json` mit **gepinnten** Versionen (Stand 26.07.2026, gegen npm-Registry verifiziert): `next@16.2.12`, `react@19.2.8`, `typescript@7.0.2`, `prisma@7.9.0`, `vitest@4.1.10`, `zod@4.4.3`, `eslint@10.8.0`, `prettier@3.9.6`\n2. `tsconfig.json` (strict), `eslint.config.mjs`, `.prettierrc`, `vitest.config.ts`\n3. `next.config.ts` mit `output: 'standalone'` (Pflicht fuer schlanke Docker-Images)\n4. `Dockerfile` (multi-stage) + `docker-compose.yml` (App + postgres:16 + Reverse-Proxy) — **Port 5432 NICHT nach aussen mappen**\n5. `.env.example` mit den Variablennamen aus `.github/PIPELINES.md`\n\n⚠️ **Nicht** `create-next-app` im Repo-Root ausfuehren: es schreibt in ein nicht-leeres Verzeichnis und ueberschreibt dabei die `README.md` mit der Projektdoku. Deshalb eigener Ordner `00-backend/`.\n\n**Nebeneffekt (wichtig):** Sobald `package.json` existiert, koennen die CI-Workflows aus `_wzs-ci-workflows-backup-*` zurueck und Branch-Protection \"Require CI\" auf `main` wird konfigurierbar. Bis dahin ist jeder PR ungeschuetzt.\n\n**Fertig, wenn:** `npm run build` gruen, `npm run lint` gruen, `docker compose up` bringt App + DB hoch, CI-Workflows sind zurueck."
+ }
+]
