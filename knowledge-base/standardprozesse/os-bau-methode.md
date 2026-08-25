@@ -158,9 +158,8 @@ Die Standardprozesse dieses Ordners rufen einander in festem Takt auf (Onsite-Vo
 eigene „Familienkarte"; hier bewusst als Kapitel statt eigener Datei — Entscheid E5,
 Bauplan 2026-08-15):
 
-1. **Bei Parallelität zuerst** [`anker-reservierung.md`](anker-reservierung.md) — knappe
-   Bezeichner (Version, Skill-/Agent-/Hook-Name, Abteilungsname) vor der ersten Zeile
-   reservieren.
+1. **Bei Parallelität zuerst** fremde Worktrees prüfen (`git worktree list` + Status) —
+   das frühe Reservierungs-Mittel ist aufgehoben (siehe Begriffsnorm „Anker" unten).
 2. **Dann der Bau-Prozess:** [`kern-plugin-bau.md`](kern-plugin-bau.md) ·
    [`abteilungs-plugin-bau.md`](abteilungs-plugin-bau.md) ·
    [`subagenten-bau.md`](subagenten-bau.md) · [`claude-netz-bau.md`](claude-netz-bau.md) ·
@@ -168,8 +167,8 @@ Bauplan 2026-08-15):
 3. **Während des Baus:** [`aktualisierungs-index.md`](aktualisierungs-index.md) („ich
    ändere X — was muss ich mitändern") + Protokoll nach
    [`sync-nachzug-bauzyklus.md`](sync-nachzug-bauzyklus.md).
-4. **Am Zyklusende:** gebündelter Executor-Lauf (`sync-nachzug-bauzyklus.md`), Anker
-   aufräumen (`anker-reservierung.md`), Abschluss-Checkliste (`AGENTS.md`).
+4. **Am Zyklusende:** gebündelter Executor-Lauf (`sync-nachzug-bauzyklus.md`),
+   Abschluss-Checkliste (`AGENTS.md`).
 5. **Wiederkehrend:** [`abteilungs-inhalts-pruefung.md`](abteilungs-inhalts-pruefung.md)
    (Inhalts-Audit je Abteilung) · [`team-distribution.md`](team-distribution.md)
    (Rollout an Team-Maschinen).
@@ -177,6 +176,21 @@ Bauplan 2026-08-15):
 Drei Schichten als Merkbild: **Wissen** (`ssot-aufbau`) · **Instruktion**
 (`claude-netz-bau`) · **Auslieferung** (`kern-`/`abteilungs-plugin-bau`,
 `team-distribution`). Wer wen als Schwester nennt, steht im Kopf der jeweiligen Datei.
+
+## Begriffsnorm „Anker" (Entscheid 2026-08-25, Phase J AP D2)
+
+Ein **Anker** ist ein knapper, eindeutiger Bezeichner, den zwei parallele Arbeitseinheiten
+versehentlich doppelt vergeben können — Ziel-Version, Skill-/Agent-/Hook-Name,
+Abteilungsname, CHANGELOG-Versionsüberschrift. Das frühere Reservierungs-Mittel
+(`reserve/*`-Git-Tag, Standardprozess `anker-reservierung.md`) ist mit Onsite-Parität
+**ersatzlos aufgehoben** (D31) — es trug mehr Pflege als Nutzen, sobald Parallelarbeit
+selten und kurz ist. Die Absicherung eines Anker-Konflikts trägt seither allein die
+**Mechanik**, nicht mehr eine vorgelagerte Reservierung: ein **Merge-Konflikt bei
+Dateikollision** (zwei Stränge legen dieselbe Datei/denselben Dateinamen an — Git zeigt es
+sofort), die **Suite-Invariante gegen doppelte CHANGELOG-Versionsüberschriften**
+(`struktur.test.mjs`, fängt den Fall, dass Git zwei Abschnitte konfliktfrei
+nebeneinander mergt), und der **Pflichtschritt „fremde Worktrees vor dem ersten Schreiben
+prüfen"** (`git worktree list` + Status in jedem fremden Baum, Teil des Pflicht-Einstiegs).
 
 ## Pflege dieser Methode
 
