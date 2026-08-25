@@ -22,7 +22,14 @@
 //   2. Generisches `deploy`-Wort mit den Ausnahmen `get`/`describe`/`logs` — die
 //      Ausnahme gilt nur, wenn das Lese-Verb VOR dem deploy-Wort steht (Verbposition,
 //      GLM-Review des Vorbilds 2026-08-17). Deckt die WZS-rote-Linie „Deploys nur
-//      der Mensch" auf der lokalen Kommando-Ebene.
+//      der Mensch" auf der lokalen Kommando-Ebene. WERTENTSCHEIDUNG bei `NAME=wert`
+//      (Port Onsite oai-safety-gate.js@a9927b2, Mapping D33, Phase-J-AP-A1, behoben
+//      Fehlalarm 2026-08-24 „partsens"/DEPLOYMENT_TYPE): der WERT entscheidet, nicht
+//      der Name — deploy-Wort im Wert fragt, deploy-Wort im Namen fragt nur bei
+//      Prod-Praefix (`prod*`/`prd*`/`live*`) oder statisch unaufloesbarem Wert
+//      (`$VAR`, Substitution), jeder andere Wert bleibt still. Bewertet werden nur
+//      Namen, die im quote-bereinigten Strom real zugewiesen sind — eine Erwaehnung
+//      IN einer Commit-Message (`git commit -m "DEPLOYMENT_TYPE=prod"`) feuert nicht.
 //   3. Generische mcp-Schreibverben: send, post, publish, connect, invite, comment,
 //      message — Liste erweiterbar, weil jede neue Drittanbieter-Anbindung eigene
 //      Verben mitbringt. Deckt „Kundensichtbares nur der Mensch" fuer Konnektoren.
@@ -174,7 +181,64 @@ function infraTreffer(tokens) {
 // Ausnahmen exakt wie im Vorbild: `get`, `describe`, `logs`. Damit bleibt
 // `kubectl get deploy` still, `npm run deploy` fragt.
 const DEPLOY_AUSNAHMEN = new Set(['get', 'describe', 'logs']);
-const TRAEGT_DEPLOY = (t) => /deploy/i.test(t);
+
+// --- Wertentscheidung bei NAME=wert (Port Onsite oai-safety-gate.js@a9927b2, Muster 2;
+// Mapping D33, Bauplan Phase J AP A1) --------------------------------------------------
+// Belegter Fehlalarm 2026-08-24 (Arbeits-Repo "partsens"): dessen Compose-Achse heisst
+// DEPLOYMENT_TYPE, weshalb JEDER lokale Containerstart (`make up DEPLOYMENT_TYPE=dev`)
+// einen Freigabedialog erzeugte — der Alltagsstart, nicht die Auslieferung.
+// Fehlalarm-Schutz ist Abnahmekriterium (Bauplan J-2): ein Gate, das den Alltagsweg
+// gated, wird weggeklickt und verliert genau dort seine Wirkung, wo sie zaehlt.
+//
+// ENTSCHEIDEND IST DER WERT, NICHT DER NAME — in drei Stufen:
+//   a) deploy-Wort im WERT              → fragen  (`MODE=deploy-prod`)
+//   b) deploy-Wort im NAMEN, Wert PROD  → fragen  (`DEPLOYMENT_TYPE=prod`)
+//   c) deploy-Wort im NAMEN, Wert sonst → still   (`DEPLOYMENT_TYPE=dev|local`)
+// Stufe b ist der Kern (Maintainer-Vorgabe 2026-08-24): Wer die Deploy-Achse eines
+// Repos auf `prod` stellt, faellt genau die Auslieferungs-Entscheidung, die dieses Gate
+// abdeckt — dass das ueber eine Variable statt ueber ein Verb passiert, aendert die
+// Wirkung nicht.
+// PROD-Erkennung per PRAEFIX, nicht per exakter Liste: eine exakte Liste verliert die
+// realen Prod-Achsen `prod-eu`, `prod2`, `prod-us-east-1`, `prd-01` — mehrregional und
+// mehrstufig ist der Normalfall, nicht die Ausnahme. `preprod` braucht KEINE eigene
+// Ausnahme: es beginnt nicht mit `prod`.
+const PROD_PRAEFIXE = ['prod', 'prd', 'live'];
+
+// Ein statisch nicht aufloesbarer Wert (`$TARGET`, `${ENV}`, `$(…)`, Backticks) zaehlt
+// als potenziell PROD und fragt — dieselbe konservative Linie wie bei einem unbekannten
+// Wert. `DEPLOY_TARGET=$TARGET ./release.sh` bleibt damit gegated.
+const UNAUFLOESBAR = /[$`]/;
+
+// Eigene, permissive Extraktion (nicht die identifier-verankerte ZUWEISUNG-Regex):
+// ohne `=` liefert indexOf -1, und beide Helfer gaeben sonst still Unsinn zurueck.
+const hatZuweisung = (t) => String(t).indexOf('=') > 0;
+const zuweisungName = (t) => (hatZuweisung(t) ? t.slice(0, t.indexOf('=')) : '');
+const zuweisungWert = (t) => (hatZuweisung(t)
+  ? t.slice(t.indexOf('=') + 1).replace(/["']/g, '').trim()
+  : '');
+
+// Ein leerer Wert (`DEPLOYMENT_TYPE=`, `DEPLOYMENT_TYPE=""`) ist kein PROD-Ziel — eine
+// geleerte Achse liefert nichts aus.
+function istProdWert(wert) {
+  if (!wert) return false;
+  if (UNAUFLOESBAR.test(wert)) return true;
+  const w = wert.toLowerCase();
+  return PROD_PRAEFIXE.some(p => w.startsWith(p));
+}
+
+// Stufe b isoliert — der Dialogtext soll die Prod-Ausrichtung benennen, nicht von
+// "Auslieferung" sprechen, wo eine Umgebungsachse gestellt wird.
+function istProdZuweisung(t) {
+  return ZUWEISUNG.test(t)
+    && /deploy/i.test(zuweisungName(t))
+    && istProdWert(zuweisungWert(t));
+}
+
+// Ist `t` eine Zuweisung, entscheidet der WERT (Stufe a/b); sonst das Token selbst wie
+// bisher (Kommandowort-Position, Muster-1-Grammatik).
+const TRAEGT_DEPLOY = (t) => (ZUWEISUNG.test(t)
+  ? /deploy/i.test(zuweisungWert(t)) || istProdZuweisung(t)
+  : /deploy/i.test(t));
 
 // Vorbild-Befund MITTEL 4: Die Ausnahme galt fuer das GANZE Segment, egal an welcher
 // Position — `./deploy.sh get` lief damit durch. Geschaerft auf die Verbposition:
@@ -227,7 +291,12 @@ function deployTreffer(tokens) {
     const t = tokens[i];
     if (DEPLOY_AUSNAHMEN.has(t.toLowerCase()) || DEPLOY_AUSNAHMEN.has(commandBasename(t))) return null;
   }
-  return { muster: 'deploy', wirkung: 'stoesst eine Auslieferung an' };
+  return {
+    muster: 'deploy',
+    wirkung: istProdZuweisung(tokens[dIdx])
+      ? 'richtet den Lauf auf die PROD-Umgebung aus'
+      : 'stoesst eine Auslieferung an'
+  };
 }
 
 // Quote-aware Variante (Vorbild-Befund MITTEL 3): `'deploy.sh'` ueberlebt das
@@ -238,6 +307,43 @@ function deployKommandowort(tokens) {
   const bi = binaerIndex(tokens);
   if (bi === -1 || !TRAEGT_DEPLOY(tokens[bi])) return null;
   return { muster: 'deploy', wirkung: 'stoesst eine Auslieferung an' };
+}
+
+// Zuweisungs-Pass fuer den QUOTE-AWAREN Tokenstrom (Vorbild-Befund, Muster 2).
+// Notwendig, weil die quote-bereinigte Zerlegung (segmentTokens/tokenize) den WERT
+// einer gequoteten Zuweisung kollabiert (`DEPLOYMENT_TYPE="prod"` kommt dort als
+// leeres `""` an, damit `echo "…"` nie feuert) — und genau der Wert traegt hier die
+// Entscheidung. Anders als beim Kommandowort-Pass werden ALLE Tokens geprueft: eine
+// Zuweisung steht nie an der Binary-Position.
+//
+// NUR REAL ZUGEWIESENE NAMEN: Im quote-awaren Strom ist eine Erwaehnung IM STRING von
+// einer echten Zuweisung nicht zu unterscheiden — `git commit -m "DEPLOYMENT_TYPE=prod"`
+// und `make up DEPLOYMENT_TYPE="prod"` ergeben dort dasselbe literale Token. Ohne diese
+// Schranke feuerte das Gate auf Commit-Nachrichten und `grep`-Treffer, also genau gegen
+// die Kopf-Invariante ("eine Erwaehnung IN einem String ist kein Kommando").
+// `zugewieseneNamen` liest die Namen deshalb aus dem quote-BEREINIGTEN Strom (T4).
+function deployZuweisung(tokens, namen) {
+  for (const t of tokens) {
+    if (!ZUWEISUNG.test(t)) continue;
+    if (!namen.has(zuweisungName(t))) continue;
+    if (istProdZuweisung(t)) {
+      return { muster: 'deploy', wirkung: 'richtet den Lauf auf die PROD-Umgebung aus' };
+    }
+    if (/deploy/i.test(zuweisungWert(t))) {
+      return { muster: 'deploy', wirkung: 'stoesst eine Auslieferung an' };
+    }
+  }
+  return null;
+}
+
+// Namen der REAL zugewiesenen Variablen, gelesen aus dem quote-bereinigten Strom
+// (segmentTokens) — Schranke des Zuweisungs-Passes oben.
+function zugewieseneNamen(segmente) {
+  const namen = new Set();
+  for (const tokens of segmente) {
+    for (const t of tokens) if (ZUWEISUNG.test(t)) namen.add(zuweisungName(t));
+  }
+  return namen;
 }
 
 // --- Muster 4: DB-Schreibweg WZS (DB-Haelfte) ---------------------------------------
@@ -376,20 +482,27 @@ function pruefeBash(command, tiefe = 0) {
   // darf sich diese Ausnahme nicht selbst ausstellen.
   if (tiefe === 0 && isReadOnlyGitIntrospection(raw)) return null;
 
-  for (const tokens of segmentTokens(raw)) {
+  const segmente = segmentTokens(raw);
+  for (const tokens of segmente) {
     // dbTreffer VOR deployTreffer: `prisma migrate deploy` ist primaer ein
     // DB-Schema-Eingriff, kein App-Deploy — die spezifischere Klasse gewinnt.
     const treffer = infraTreffer(tokens) || dbTreffer(tokens) || deployTreffer(tokens);
     if (treffer) return treffer;
   }
 
+  // Namen der REAL zugewiesenen Variablen dieses Kommandos — Schranke fuer den
+  // Zuweisungs-Pass im quote-awaren Strom unten (deployZuweisung).
+  const namen = zugewieseneNamen(segmente);
+
   // Quote-aware Schlusspass: ein gequotetes Kommandowort (`'tofu' destroy`,
   // `'deploy.sh'`) rutscht am Quote-Stripping vorbei, und Wrapper-Bodies ueberleben
   // nur hier als eigenes Wort. Die Mustererkennung bleibt dabei bewusst auf die
   // KOMMANDOWORT-Position begrenzt — genau wie im FFG —, damit `echo "tofu destroy"`
-  // und `echo "deploy done"` weiterhin still bleiben.
+  // und `echo "deploy done"` weiterhin still bleiben. Die WERT-Entscheidung
+  // (deployZuweisung) ist die einzige Ausnahme: sie prueft ALLE Tokens, aber nur
+  // real zugewiesene Namen (namen).
   for (const tokens of quoteAwareSegments(raw)) {
-    const treffer = pruefeTokens(tokens, tiefe);
+    const treffer = pruefeTokens(tokens, tiefe, namen);
     if (treffer) return treffer;
   }
   return null;
@@ -403,16 +516,20 @@ function pruefeBash(command, tiefe = 0) {
 // `wsl -- tofu destroy`, `timeout 10 tofu apply` oder `env -S 'tofu destroy'` stumm,
 // waehrend das FFG dieselbe Flaeche laengst abdeckte. Muster bleiben auf die
 // Kommandowort-Position begrenzt (deployKommandowort), Fehlalarm-Verhalten unveraendert.
-function pruefeTokens(tokens, tiefe) {
+// `namen` reist durch die TOKEN-Rekursion (passthroughInner) mit, weil es dieselbe
+// Kommandozeile bleibt; ein WRAPPER-Body ist eine neue Zeichenkette und bekommt seine
+// eigenen `namen` frisch aus pruefeBash.
+function pruefeTokens(tokens, tiefe, namen) {
   if (tiefe > MAX_TIEFE || tokens.length === 0) return null;
-  const treffer = infraTreffer(tokens) || dbTreffer(tokens) || deployKommandowort(tokens);
+  const treffer = infraTreffer(tokens) || dbTreffer(tokens) || deployKommandowort(tokens)
+    || deployZuweisung(tokens, namen);
   if (treffer) return treffer;
   const body = wrapperBody(tokens);
   if (body) return pruefeBash(body, tiefe + 1);
   const res = passthroughInner(commandBasename(tokens[0]), tokens);
   if (!res) return null;
   if (res.kind === 'string') return pruefeBash(res.body, tiefe + 1);
-  return pruefeTokens(res.inner, tiefe + 1);
+  return pruefeTokens(res.inner, tiefe + 1, namen);
 }
 
 // --- mcp-Pruefung ------------------------------------------------------------------

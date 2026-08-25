@@ -82,6 +82,52 @@ test('Generisches deploy-Wort erzeugt einen Freigabedialog', () => {
   }
 });
 
+// --- Wertentscheidung bei NAME=wert (Port Onsite a9927b2, Mapping D33, Phase-J AP A1)
+// T1 — Alltags-Wert bleibt still (Fehlalarm-Schutz ist Abnahmekriterium, J-2).
+test('T1 — deploy-Wort im Namen mit Alltags-Wert bleibt still', () => {
+  for (const command of ['make up DEPLOYMENT_TYPE=dev', 'make up DEPLOYMENT_TYPE=local']) {
+    assertStill(runGate({ command }), command);
+  }
+});
+
+// T2 — Prod-Praefix im Wert fragt, unabhaengig von Region/Stufe.
+test('T2 — deploy-Wort im Namen mit Prod-Praefix-Wert fragt', () => {
+  for (const command of [
+    'make up DEPLOYMENT_TYPE=prod', 'make up DEPLOYMENT_TYPE=prod-eu',
+    'make up DEPLOYMENT_TYPE=prd-01', 'make up DEPLOYMENT_TYPE=live'
+  ]) {
+    const grund = askReason(runGate({ command }));
+    assert.match(grund, /PROD-Umgebung/, command);
+  }
+});
+
+// T3 — statisch unaufloesbarer Wert fragt konservativ.
+test('T3 — unaufloesbarer Wert ($VAR) an einer deploy-benannten Achse fragt', () => {
+  askReason(runGate({ command: 'DEPLOY_TARGET=$TARGET ./release.sh' }));
+});
+
+// T4 — eine Erwaehnung IM STRING ist keine Zuweisung und feuert nie.
+test('T4 — Erwaehnung in Commit-Message/grep-Treffer ist keine Zuweisung', () => {
+  for (const command of [
+    'git commit -m "DEPLOYMENT_TYPE=prod"',
+    'grep -r "DEPLOYMENT_TYPE=prod" .'
+  ]) {
+    assertStill(runGate({ command }), command);
+  }
+});
+
+// T5 — deploy-Wort im WERT fragt, unabhaengig vom Namen.
+test('T5 — deploy-Wort im Wert einer beliebig benannten Variable fragt', () => {
+  askReason(runGate({ command: 'MODE=deploy-prod make run' }));
+});
+
+// T6 — ein leerer Wert ist kein Prod-Ziel.
+test('T6 — leerer Wert an einer deploy-benannten Achse bleibt still', () => {
+  for (const command of ['DEPLOYMENT_TYPE= make up', 'DEPLOYMENT_TYPE="" make up']) {
+    assertStill(runGate({ command }), command);
+  }
+});
+
 // --- POSITIV: Muster 3 — mcp-Schreibverben --------------------------------------
 test('Schreibende mcp-Werkzeuge erzeugen einen Freigabedialog mit Vorlagepflicht', () => {
   for (const tool of [
