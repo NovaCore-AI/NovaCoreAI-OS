@@ -27,7 +27,11 @@ das Warum steht im Definitionsdokument `NovaCore-OS-Kriterienliste-Definition.md
 OS-Repos. Daraus folgt die Leitregel des Folgelaufs: **Der gemergte Inhalt ist das Ledger,
 nicht der PR-Zustand** — ein PR-Gesamtstatus kann eine zeilenweise Entscheidung grundsätzlich
 nicht abbilden. Der Skill gehört zum WP8-Zyklus (WP-Rahmen `wp-rahmen.md` dieses
-Kern-Plugins).
+Kern-Plugins). **Auslösung über denselben Session-Start-Fälligkeits-Hook** wie
+`/nc:queue-abteilung` (`nc-queue-faelligkeit.js` dieses Kern-Plugins, 14-Tage-Takt plus ein
+Tag Versatz, Bauplan Phase J AP A2): Er weist die Session an, den fälligen Lauf **jetzt**
+vorzubereiten — selbst ausführen oder einen Subagenten beauftragen; ein manueller Aufruf
+ohne fällige Erinnerung bleibt möglich.
 
 **Heutiger Übergangszustand (E1):** Solange keine Abteilung einen Satelliten hat, bricht der
 Lauf in Schritt 2 mit dem Übergangs-Befund ab — die Übergangs-Queue im OS-Repo läuft über

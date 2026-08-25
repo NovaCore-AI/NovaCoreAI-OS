@@ -23,9 +23,12 @@ diesen lokalen Wissenszuwachs **einmal** zu einem Pull Request — statt vieler 
 statt ungesicherter lokaler Commits. Er gehört an das Ende des WP8-Zyklus eines Arbeitszyklus
 (WP-Rahmen `wp-rahmen.md` dieses Kern-Plugins). Was hier gemergt wird, liest einen Tag später
 `/nc:queue-kern` als Grundlage seines Promotions-PR (Versatz-Regel des Queue-Flows) — dieser
-Skill schreibt **nie** in den Kern. Auslösung heute **manuell**; zusätzlich **erinnert** der
-Fälligkeits-Check im Sitzungsstart (Hook `nc-queue-faelligkeit.js` dieses Kern-Plugins,
-14-Tage-Takt) an den fälligen Zyklus-Lauf — er erinnert nur, er startet nichts.
+Skill schreibt **nie** in den Kern. **Auslösung über den Session-Start-Fälligkeits-Hook**
+(`nc-queue-faelligkeit.js` dieses Kern-Plugins, 14-Tage-Takt, Bauplan Phase J AP A2):
+Er weist die Session an, den fälligen Zyklus-Lauf **jetzt** vorzubereiten — selbst
+ausführen oder einen Subagenten damit beauftragen; ein manueller Aufruf ohne fällige
+Erinnerung bleibt möglich. Push, PR-Erstellung und Merge bleiben in jedem Fall beim
+Menschen (Schritt 9/„Regeln").
 
 **Heutiger Übergangszustand (E1):** Die interne Abteilung `development` ist repo-intern und
 hat keinen Satelliten — ihre Übergangs-Queue lebt im OS-Repo und wird über dessen regulären

@@ -985,23 +985,35 @@ function alterText(zeitpunkt) {
   return 'letzter Lauf vor ' + tage + ' Tag(en)';
 }
 
-// Bewusst OHNE Abschalt-Hinweis (Muster der PreCompact-Mahnung): ein Hinweis, der seine
-// eigene Abschaltung mitliefert, erzieht zum Abschalten. Der Opt-out steht im Dateikopf,
-// in hooks.json und im README.
+// Port Onsite oai-queue-faelligkeit.js@2b8938e (Mapping D28, Bauplan Phase J AP A2/J-E5):
+// Der Text WEIST AN statt nur zu erinnern — Maintainer-Entscheid 2026-08-24, weil
+// nicht-technische Nutzer keine PRs stellen koennen: die Maschine bereitet den faelligen
+// Lauf vor, der Mensch merged. Bewusst OHNE Abschalt-Hinweis (Muster der
+// PreCompact-Mahnung): ein Hinweis, der seine eigene Abschaltung mitliefert, erzieht zum
+// Abschalten. Der Opt-out steht im Dateikopf, in hooks.json und im README.
+// Suite-Invariante (T14): Titel, Adressatin ("Anweisung an die Session"), Subagenten-Weg
+// und Stempel-Kommando muessen im Text stehen — das ist KEIN Gate (J-3): additionalContext,
+// Exit immer 0, kein permissionDecision, hoechstens einmal je Faelligkeit und Sitzung.
 function erinnerungsText(faellig, stempelSkript) {
   const zeilen = faellig.map(f => '- **`/nc:' + f.skill + '`** — ' + f.befund + ' · ' + f.alter);
-  return '# NovaCore-OS — Queue-Flow fällig (Erinnerung, keine Blockade)\n\n'
+  return '# NovaCore-OS — Queue-Flow fällig: JETZT ausführen (keine Blockade)\n\n'
     + 'Der 14-Tage-Takt des Queue-Flows (standardprozesse/queue-flow.md des OS-Repos) ist '
     + 'überschritten:\n\n'
     + zeilen.join('\n') + '\n\n'
-    + 'Beide Skills arbeiten **bis zum fertigen PR** und nicht weiter: Merge, '
-    + 'Review-Resolves und alles Kundensichtbare bleiben Mensch. Der geprüfte '
-    + 'Stand ist der letzte lokal bekannte (kein Netzzugriff im Sitzungsstart) — vor dem '
-    + 'Lauf selbst nachziehen. **Nach dem Lauf** den Zeitpunkt festhalten, sonst erinnert '
-    + 'dieser Hinweis weiter:\n'
+    + '**Anweisung an die Session (Maintainer-Entscheid 2026-08-24): Der fällige Lauf wird '
+    + 'jetzt vorbereitet — nicht nur bemerkt.** Die Session führt den Skill selbst aus oder '
+    + 'beauftragt einen Subagenten damit; bei einer pausierten oder beschäftigten Session '
+    + 'genügt es, den Lauf als ersten Schritt nach der aktuellen Arbeit zu starten. '
+    + 'Begründung: Nicht-technische Nutzer können keine PRs stellen — die Maschine bereitet '
+    + 'sie vor, der Mensch merged. Beide Skills arbeiten **bis zum fertigen PR** und nicht '
+    + 'weiter: Merge, Review-Resolves und alles Kundensichtbare bleiben Mensch '
+    + '(standardprozesse/queue-flow.md des OS-Repos). Der geprüfte Stand ist der letzte '
+    + 'lokal bekannte (kein Netzzugriff im Sitzungsstart) — der Skill prüft und zieht selbst '
+    + 'nach. **Nach dem Lauf** den Zeitpunkt festhalten, sonst erscheint dieser Hinweis '
+    + 'wieder:\n'
     + faellig.map(f => '`node "' + stempelSkript + '" --lauf ' + f.skill + '`').join(' · ')
-    + '\n\nDiese Erinnerung erscheint höchstens einmal je Fälligkeit und Sitzung; sie '
-    + 'blockiert nichts.';
+    + '\n\nDieser Hinweis erscheint höchstens einmal je Fälligkeit und Sitzung und blockiert '
+    + 'nichts.';
 }
 
 // --- Lauf-Marker schreiben (CLI-Modus) ------------------------------------------------
