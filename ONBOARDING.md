@@ -105,26 +105,27 @@ die neue Struktur. Einmalig:
 
 Zusätzlich aufräumen (stammt vom alten Setup-Skript, wird nicht mehr genutzt):
 Staging-Verzeichnis `~/.nc-os/` löschen; einen globalen `ncos`-Befehl aus dem PATH nehmen.
-Projekt-Memory unter `.nc/erinnerung/` bleibt unverändert gültig.
+Sitzungswissen wohnt seit Kern 0.13.0 **nicht mehr** unter `.nc/erinnerung/` (BREAKING) —
+siehe Abschnitt 2 für den aktuellen Ablageort.
 
 ## 2. Arbeits-Repo einrichten (einmal pro Repo)
 
-```bash
-mkdir -p .nc/erinnerung/journal
-echo ".nc/" >> .gitignore             # Kunden-Interna nie committen
-```
+**Es gibt keinen manuellen Einrichtungsschritt mehr.** Seit Phase I (Kern 0.13.0) bestimmt
+`/nc:start` selbst, wo das Sitzungswissen wohnt:
 
-Initialen Stand anlegen (`.nc/erinnerung/stand.md`):
+- **Repo mit eigener Wissensbasis** (SSOT-Kategorie mit Master-Index — im OS-Repo:
+  `knowledge-base/`): Das Sitzungswissen liegt **committet** unter `sitzungswissen/`
+  (`roll-up.md`, `offene-straenge-register.md`, je Abteilung `stand.md` + `journal/`).
+  Fehlende Bausteine legt `/nc:start` nach dem Fakten-Stempel selbst an — nichts ist vorab
+  von Hand zu erzeugen.
+- **Repo ohne eigene Wissensbasis** (der Regelfall bei Kunden- und Fremd-Repos): **kein
+  Dateistrom.** Der Stand wird ausschließlich ins Projekt-Memory von Claude Code geschrieben
+  (`~/.claude/projects/<projekt-slug>/memory/`) — kein Verzeichnis, keine Datei, kein
+  `.gitignore`-Eintrag nötig.
 
-```markdown
-# Stand — <Projektname>
-
-## Überblick
-<Kurzbeschreibung des Projekts>
-
-## Aktueller Zustand
-<Branches, offene PRs, bekannte Risiken>
-```
+**Altstand:** Wer noch einen `.nc/erinnerung/`-Bestand aus früheren Kern-Versionen im Repo
+findet — der frühere lokale Strom ist abgeschafft. `/nc:start` meldet den Fund, liest ihn aber
+nicht als Quelle; Migration oder Löschung entscheidet der Mensch.
 
 **Wichtig — es gibt keinen Marker-Schritt mehr.** Seit dem Umbau 2026-08-10 arbeitet der
 Kern `nc` vollständig **markerlos**: Ein Gate, das man vergessen kann, ist kein Gate. Aktiv

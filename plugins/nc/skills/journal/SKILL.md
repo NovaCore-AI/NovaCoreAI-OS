@@ -25,8 +25,15 @@ Kontext auch dann, wenn eine Sitzung unerwartet endet.
       Repo ein Verzeichnis `Journal/` mit eigener `README.md`, gilt dieses **Team-Journal**
       (committet, team-geteilt, Wochendatei `<JAHR>-KW<NN>.md`). Eine dort hinterlegte Vorlage
       gewinnt über die Default-Vorlage unten.
-   b) Sonst das **persönliche Journal** `.nc/erinnerung/journal/<YYYY-MM-DD>.md` (lokal,
-      gitignored). Verzeichnis anlegen, falls es fehlt; `.nc/` muss in der `.gitignore` stehen.
+   b) Sonst, führt das aktuelle Repo eine **eigene Wissensbasis** (SSOT-Kategorie mit
+      Master-Index — im OS-Repo `knowledge-base/`): das **Sitzungswissen-Journal**
+      `sitzungswissen/<abteilung>/journal/<YYYY-MM-DD>.md` (committet). Fehlende Datei mit
+      Datumsüberschrift anlegen.
+   c) **Sonst entsteht kein Dateistrom** (der frühere lokale Strom `.nc/erinnerung/journal/`
+      ist abgeschafft): Dieses Repo hat weder eine Team-Journal-Konvention noch eine eigene
+      Wissensbasis — Einzelereignisse laufen hier über den konsolidierten Stand, den
+      `/nc:end-session` ins Projekt-Memory von Claude Code schreibt. Der Skill **meldet das
+      und legt keine lokale Ersatzdatei an**.
 2. **Datum bestimmen:** `date +%F` für die Tagesdatei, `date +%G-KW%V` für die Wochendatei.
    Fehlt die Zieldatei, sie mit Datums- bzw. Wochenüberschrift anlegen.
 3. **Typ wählen:** `Entscheidung` · `Fund` · `Blocker` · `Erledigt` · `Wartet auf Zuarbeit`.
@@ -69,10 +76,10 @@ Leere Felder weglassen — kein „N/A"-Platzhalter.
 - **Zeiger, nicht Source.** Fachliche Entscheidungen leben in der Projektdokumentation; das
   Journal verweist nur dorthin.
 - **Keine Secrets, Tokens, Kundendaten oder personenbezogenen Pfade** — auch nicht im
-  persönlichen Journal, das lokal bleibt. Die Disziplin gilt überall.
+  Sitzungswissen-Journal des Falls b. Die Disziplin gilt überall.
 - **Kein Auto-Commit.** Der Eintrag wird geschrieben, nicht committet oder gepusht — keine
   automatischen Pushes, Merges, Posts, Releases oder Deployments ohne explizite Nutzerfreigabe.
-  Im Team-Modus liegt die Datei im Git-Tree; der Commit bleibt Sache des Menschen.
+  In den Fällen a und b liegt die Datei im Git-Tree; der Commit bleibt Sache des Menschen.
 - **Kein Ersatz für den Sitzungsabschluss.** Journaleinträge entbinden nicht von
   `/nc:end-session` — der konsolidierte Stand entsteht nur dort.
 
@@ -81,6 +88,7 @@ Leere Felder weglassen — kein „N/A"-Platzhalter.
 - `tail -5` der Zieldatei zeigt den neuen Eintrag im erwarteten Format.
 - Die Datei ist um genau die geschriebenen Zeilen gewachsen (Zeilenzahl vorher/nachher nennen).
 - Jeder Eintrag enthält einen Beleg oder ist ausdrücklich als Vermutung markiert.
-- Der gewählte Modus ist im Ergebnis genannt (Team-Journal oder persönliches Journal) samt der
-  Regel, über die er bestimmt wurde (a oder b).
-- Im persönlichen Modus zeigt `git status --short` **keine** `.nc/`-Pfade (Ignore greift).
+- Der gewählte Modus ist im Ergebnis genannt (Team-Journal, Sitzungswissen-Journal oder kein
+  Dateistrom) samt der Regel, über die er bestimmt wurde (a, b oder c).
+- Im Fall **c** schreibt der Skill keine Datei — `git status --short` zeigt keinen neuen
+  Journal-Pfad.

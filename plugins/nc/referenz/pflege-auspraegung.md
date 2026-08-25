@@ -25,7 +25,7 @@
 2. [Schema v1 — Felder](#2-schema-v1--felder)
 3. [Auflösungsregel für Kern-Skills](#3-auflösungsregel-für-kern-skills)
 4. [Queue-Format v1](#4-queue-format-v1)
-5. [Kriterienliste v1 (firmenrelevant)](#5-kriterienliste-v1-firmenrelevant)
+5. [Kriterienliste v2 (firmenrelevant)](#5-kriterienliste-v2-firmenrelevant)
 6. [Prüfliste für Abteilungen](#6-prüfliste-für-abteilungen)
 
 ## 1. Zweck und Ablageort der Ausprägung
@@ -49,7 +49,7 @@ installiertes Plugin ohnehin nicht sehen würde.
 | `schemaVersion` | ja | `1`. Ein Kern-Skill, der eine höhere Version liest, arbeitet **nicht** einfach weiter, sondern meldet „Ausprägung neuer als der installierte Kern". |
 | `abteilung` | ja | Abteilungsname wie in der Abteilungs-Registry `module-registry.json` an der Wurzel des Kern-Plugins (`development`, …). Muss zum Plugin passen, sonst Abbruch mit Meldung. |
 | `queuePfad` | ja | Pfad der Queue-Datei **relativ zur Wurzel des Abteilungs-Repos**. Standard `knowledge-base/kandidaten-queue/queue.md` — dieselbe Kategorie-Konvention wie in der Wissensbasis des OS-Repos. |
-| `kriterienVerweis` | ja | Wo die geltende Kriterienliste steht. Ohne eigene Abteilungsliste: Verweis auf die Kriterienliste v1 in Abschnitt 5 dieser Kern-Referenz. |
+| `kriterienVerweis` | ja | Wo die geltende Kriterienliste steht. Ohne eigene Abteilungsliste: Verweis auf die Kriterienliste v2 in Abschnitt 5 dieser Kern-Referenz. |
 | `journalSonderregeln` | ja (Liste, darf leer sein) | Zusätzliche Regeln für Journal-/Sitzungseinträge dieser Abteilung — z. B. Pflichtfelder, Freigabevermerke, Aufbewahrungshinweise. Sonderregeln **verschärfen** nur; Kern-Regeln (append-only, Belegpflicht, keine Secrets) sind nicht abwählbar. |
 | `roteLinienDomaene` | ja (Liste, darf leer sein) | Domänen-spezifische rote Linien der Abteilung (z. B. „Deploys am Produktivsystem führt nur der Mensch aus"). Ergänzt die roten Linien des OS, ersetzt sie nie. |
 | `uebergang` | nein | Übergangsregel, solange die Abteilung noch keinen eigenen Satelliten hat: ein Satz, wohin Queue-Einträge stattdessen gehören. Wirksam, solange der Registry-Eintrag der Abteilung kein `repository` führt (Abschnitt 3). **Einreichungsweg:** Liegt die Übergangs-Queue in einem Arbeits- oder OS-Repo, wird sie über den **regulären Branch/PR-Fluss dieses Repos** eingebracht — `/nc:queue-abteilung` gilt ausschließlich für Abteilungs-Satelliten-Klone und ist hier nicht der Weg. |
@@ -61,7 +61,7 @@ Beispiel (die reale Datei enthält **keine** Kommentare — striktes JSON):
   "schemaVersion": 1,
   "abteilung": "development",
   "queuePfad": "knowledge-base/kandidaten-queue/queue.md", // Konvention wie im OS-Repo
-  "kriterienVerweis": "Kriterienliste v1, referenz/pflege-auspraegung.md des Kern-Plugins nc",
+  "kriterienVerweis": "Kriterienliste v2, referenz/pflege-auspraegung.md des Kern-Plugins nc",
   "journalSonderregeln": [
     "Einträge zum Produktivsystem nennen immer Umgebung und Freigabestand."
   ],
@@ -144,11 +144,24 @@ Ablehnungsgrund nachlesbar.
 - **Nur Belegtes.** Vermutungen werden als Vermutung gekennzeichnet oder gar nicht eingetragen.
 - **Keine Secrets, Tokens, Kundendaten oder personenbezogenen Pfade.**
 
-## 5. Kriterienliste v1 (firmenrelevant)
+## 5. Kriterienliste v2 (firmenrelevant)
 
-**Stand v1 — Erstfassung.** Die Liste umfasst von Beginn an die Kriterien **a–d**, die
-Gegenkriterien **GF1–GF4** und die **No-Duplicate-Regel**; NovaCore hatte nie eine
-Vorläuferfassung, es gibt daher keine Alt-Kürzel und keine Kompatibilitätsregel.
+**Stand v2 (2026-08-24).** Bis Kern 0.12.x hieß dieselbe Liste **„Kriterienliste v1"**;
+Verweise auf v1 meinen sie weiterhin. Der Inhalt von v1 — Kriterien **a–d**, Gegenkriterien
+**GF1–GF4**, **No-Duplicate-Regel** — bleibt **unverändert** gültig. **v2 ergänzt genau eines:
+den Abschnitt 5.5 mit den Stufen-Prüfungen GL1–GL5** an der unteren Stufengrenze. Es entfällt
+nichts, es wird nichts umbenannt, und **`schemaVersion` bleibt `1`** — es ändert sich kein Feld,
+nur Text.
+
+**Zwei Stufen, zwei Fragen — eine Datei.** Der Wissensfluss ist dreistufig (lokal → Abteilung →
+Kern; OS-Repo: `knowledge-base/grundwissen/NovaCore-OS-Systemachsen.md`, Achse 1).
+Die Abschnitte **5.1–5.4**
+gehören der **oberen** Stufe (Abteilung → Kern) und beantworten *„ist das firmenweit
+relevant?"*. Abschnitt **5.5** gehört der **unteren** Stufe (lokal → Abteilung) und beantwortet
+*„darf das den lokalen Scope überhaupt verlassen?"*. Beide Stufen führen **eigene
+Kürzel-Namensräume** (`a–d`/`GF…` oben, `GL…` unten), damit nie zweideutig wird, welche Prüfung
+ein Kürzel meint.
+
 Ausdrücklich offen bleibt die **Praxis-Kalibrierung an echten Daten** — die Buchstaben a–d sind
 aus dem Vorbild übernommen und plausibel, aber an keinem Bestand realer NovaCore-Grenzfälle
 gemessen.
@@ -207,6 +220,59 @@ Maintainer-Entscheid („Sofort-Pfad × GF1", `queue-flow.md` §6 des OS-Repos) 
 die Meldung — ein Sicherheitsvorfall in einem *fremden* Arbeits-Repo wird gemeldet, bekommt
 aber **keine** Queue-Zeile. Aufstiegslauf und Review brauchen den Zyklus-Kontext.
 
+### 5.5 Stufen-Prüfungen lokal → Abteilung (Stufe 1)
+
+Diese Prüfungen gelten an der **unteren** Stufengrenze und werden von `/nc:end-session`
+angewendet, **bevor** eine Zeile in die `queue.md` geschrieben wird. Die lokale Stufe ist dabei
+ein **Scope, kein Ort**: **Projekt-Scope** = Arbeits-Repo samt uncommitteten Änderungen +
+Projekt-Memory · **User-Scope** = Erinnerungen und Notizen auf User-Ebene · **Scratchpad-Scope**
+= das Session-Scratchpad (Standardprozess `scratchpad-nutzung.md` des OS-Repos).
+
+**5.5.1 Die Eintrittsfrage — unverändert die Kriterien der Abteilung.** Ein lokales Ergebnis ist
+Kandidat, wenn **mindestens eines** der Kriterien **a–d** (5.1) zutrifft; **GF3** (eigener
+Agenten-Fehler, 5.2) begründet die Zeile auch **ohne** a–d-Treffer. Es entsteht **kein neues
+Kriterien-Kürzel** und **keine neue Spalte**: Die Queue-Zeile trägt weiter das Kürzel aus
+5.1/5.2, das Queue-Format aus Abschnitt 4 bleibt unverändert.
+
+**5.5.2 Die Freigabe-Prüfungen GL1–GL5 — darf es den lokalen Scope verlassen?** Sie sind
+**Vetos mit Ziel-Routing**, keine Kriterien: Sie erscheinen **nie** in der Spalte
+`erfülltes Kriterium`, sondern verhindern die Zeile oder begrenzen ihren Inhalt.
+
+| Kürzel | Prüfung | Routing, wenn sie greift |
+|---|---|---|
+| **GL1** | **Sicherheitsbedenken beim Teilen** — trägt der Kandidat Zugangsdaten, Tokens, Schlüssel, Kundendaten oder interne Auszüge, die die Maschine nicht verlassen dürfen? | Der Inhalt geht **nicht** in die Queue. Zulässig ist allein die verallgemeinerte Lehre **ohne** Auszug; trägt sie ohne den Inhalt nicht, entfällt die Zeile. Ein Vorfall geht zusätzlich sofort und vollständig an den Menschen (5.4). |
+| **GL2** | **Ausdrückliches Verbot des Menschen** — hat der Mensch, der die Sitzung führt, für diesen Gegenstand gesagt, dass er lokal bleibt bzw. nicht remote gebracht wird? | **Keine Zeile.** Bindend ohne Abwägung und **ohne Überredungsversuch**, bis derselbe Mensch es aufhebt. Der Kandidat wird im Sitzungsergebnis als **bewusst nicht eingetragen** ausgewiesen — die Entscheidung bleibt sichtbar, der Inhalt bleibt lokal. |
+| **GL3** | **Personenbezogene Daten und Privatsphäre** — Namen, Kontaktdaten, personenbezogene Pfade; Inhalte des **User-Scopes** (persönliche Notizen, Erinnerungen) | In die SSOT geht die **Information ÜBER** ein Artefakt — Existenz, Ort, getragene Entscheidung —, **nie das Artefakt selbst**. Rollen statt Personen. Trägt die Zeile ohne die geschützte Angabe nicht, entfällt sie. |
+| **GL4** | **Duplikat** — steht der Inhalt inhaltlich schon in der Abteilungs-SSOT oder erkennbar in der Kern-SSOT? | Keine neue Zeile; stattdessen Verweis auf die vorhandene Stelle im Sitzungsergebnis. Die **Pflichtprüfung** gegen die Kern-SSOT bleibt beim Aufstiegslauf (5.3) — hier ist sie die günstige Vorprüfung, die eine Zeile spart. |
+| **GL5** | **Direkte Gegengründe** — (i) Befund an einem **fremden Repo** · (ii) unbelegte Vermutung · (iii) noch laufender, unabgeschlossener Strang | (i) → **GF1**: Ticket- bzw. Issue-Prozess des betreffenden Repos, **nie** die OS-Queue · (ii) → nicht eintragen oder ausdrücklich als Vermutung kennzeichnen · (iii) → **Offene-Stränge-Register**, nicht die Queue |
+
+**GL5(i) — was „fremdes Repo" bei NovaCore umfasst** (Abgrenzung nach den Maintainer-Entscheiden
+vom 2026-08-24). Drei Fälle, ein Ergebnis — **keine Queue-Zeile**:
+
+1. **Kunden- und Arbeits-Repos** außerhalb des OS: der Befund gehört dorthin, wo er behoben wird.
+2. **Affiliate-Plugins** (Marketplace-Kategorie `affiliate`, heute `kimi-code-plugin-cc` und
+   `mneme-kimi-code`): Sie sind **isolierte Abteilungen ohne SSOT-Anbindung** mit eigenen,
+   persönlich gepflegten Payloads und Dokumenten. Ein Befund an ihnen geht **nie** in die
+   Queue — auch dann nicht, wenn er inhaltlich interessant wäre.
+3. **Eigenständige Kollegen-OS-Satelliten** (`nc-felix`, `nc-biggi`): terminal, kein Queue-Weg,
+   kein Memory-Share.
+
+Wer hier eine Ausnahme bauen will, baut einen Queue-Weg, den es nicht geben darf.
+
+**5.5.3 Vorrang und Zweifelsregel.**
+
+- **GL2 sticht immer** — auch über GF3 („eigene Agenten-Fehler gehören immer in die Queue"). Ein
+  ausdrückliches Verbot des Menschen ist die **stärkste Regel dieser Stufe**.
+- **GL1 und GL3 begrenzen den Inhalt, nicht die Pflicht.** GF3 verlangt weiterhin eine Zeile —
+  lässt sich der Fehler nicht ohne den geschützten Inhalt beschreiben, entfällt sie. Der
+  **Pflichteintrag im Fehlerprotokoll** der Abteilung bleibt davon unberührt.
+- **Im Zweifel nicht eintragen** (unverändert 5.1). Für GF3 gilt die Umkehrung weiter — im
+  Zweifel eintragen —, aber erst **nachdem** GL1–GL3 durch sind.
+- **Kürzel-Vergabe:** `GL…` ist ein eigener, fortlaufender Namensraum. Ein einmal vergebenes
+  Kürzel wird **nie** neu belegt (gleiche Begründung wie in Abschnitt 4: die Queue ist
+  append-only, ein wiederverwendetes Kürzel würde Alt-Zeilen umdeuten). Abteilungslisten dürfen
+  auch diese Prüfungen nur **verschärfen** — **GL1, GL2 und GL3 sind unabänderlich**.
+
 ## 6. Prüfliste für Abteilungen
 
 - [ ] `pflege-auspraegung.json` liegt an der Plugin-Wurzel, `schemaVersion` ist `1`
@@ -214,8 +280,12 @@ aber **keine** Queue-Zeile. Aufstiegslauf und Review brauchen den Zyklus-Kontext
 - [ ] `queuePfad` ist relativ zur Wurzel des Abteilungs-Repos und zeigt auf eine existierende
       Queue-Kategorie (Wurzel-Invariante der Wissensbasis: nur der Index liegt oben)
 - [ ] Die Queue-Datei trägt Kopf-Blockquote und den Tabellenkopf aus Abschnitt 4
-- [ ] `kriterienVerweis` zeigt auf eine erreichbare Liste (eigene oder diese Kern-Referenz)
-- [ ] Sonderregeln und rote Linien **verschärfen** nur, schwächen nichts ab
+- [ ] `kriterienVerweis` zeigt auf eine erreichbare Liste (eigene oder diese Kern-Referenz) —
+      Beispielwert für die Kern-Referenz: `"kriterienVerweis": "nc:referenz/pflege-auspraegung.md#5"`;
+      eine eigene Liste wird **plugin-relativ** angegeben, nie über eine Repo-Pfad-Angabe
+- [ ] Sonderregeln, rote Linien **und eine eigene Kriterienliste verschärfen** nur, schwächen
+      nichts ab; **GF1 und GF4 stehen unverändert** (Abschnitt 5.2), ebenso **GL1–GL3**
+      (Abschnitt 5.5.3)
 - [ ] Solange die Abteilung kein eigenes `repository` in der Registry führt: `uebergang` gesetzt
 - [ ] Die Abteilung hängt wirklich am Kern (`dependencies`) — für eigenständige Kollegen-OS gibt
       es diese Datei nicht und darf es sie nicht geben

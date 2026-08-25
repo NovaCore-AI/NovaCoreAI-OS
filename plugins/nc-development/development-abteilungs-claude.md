@@ -39,8 +39,11 @@ lesen.
 - Zuständig ist die Wissensbasis des **OS-Repos** (`knowledge-base/SSOT-Document-Index.md`);
   lokal liegt sie als **Lesekopie** unter `~/.nc/ssot/`, angelegt und nachgezogen von
   `/nc:setup`. Eine eigene Abteilungs-Wissensbasis hat diese repo-interne Abteilung nicht.
-- **Sitzungswissen** (Stand, Journal, offene Stränge) wohnt unter `.nc/erinnerung/` des
-  Arbeits-Repos; geschrieben und gelesen wird es von `/nc:start` bzw. `/nc:end-session`.
+- **Sitzungswissen** (Stand, Journal, offene Stränge) wohnt im **OS-Repo** unter
+  `knowledge-base/sitzungswissen/`, weil diese Abteilung repo-intern ist und das OS-Repo eine
+  eigene Wissensbasis führt; in einem fremden Arbeits-Repo ohne eigene Wissensbasis legt das
+  OS nichts an — dessen Projekt-Memory trägt den Stand allein, kein Dateistrom. Geschrieben
+  und gelesen wird der zutreffende Fall von `/nc:start` bzw. `/nc:end-session`.
 - **Pflegekandidaten** klassifiziert `/nc:end-session`. Queue-Pfad, Kriterienverweis und
   Übergangsregel dieser Abteilung stehen deklarativ in `pflege-auspraegung.json` dieses
   Plugins; ein eigener Abteilungs-Queue-Skill ist nicht vorgesehen.

@@ -224,10 +224,43 @@ bleiben erhalten (Härtungs-Erhalt wie Bauplan 2026-08-15, I-Serie).
 - **Offen bleiben die Phasen I, J, K** (D10–D18 Rest, D14 inkl. Kriterienliste v2 +
   GL1–GL5, D19–D23, D26 Systemachsen-Port [Entscheid: portieren]).
 
+## Nachtrag N4 (2026-08-25) — Phase-I-Vollzug, Anker-Fortschreibung, vier neue Posten
+
+- **Phase I ist gebaut** (Pakete I-A/I-B/I-C, Branch `feat/onsite-delta-phase-i`, Commits
+  `e7e5f19`/`7a4db3a`/`bcb3f6b`, plus der gebündelte Nachzug dieses Zyklus): **D10**
+  (Sanierungs-Normen — Statuslegende, Bagatellgrenze, Batch-Kadenzen, Spec-Governance ohne
+  Versionszählung, Archivierungs-Sweep, `vorlagen/`-Umzug nach EN7), **D11**
+  (Aktualisierungs-Index §0/§3.6, Waypoint-Batch-Modell statt E7-Sammelrelease nach EN5),
+  **D12** (Team-Sync-Payload „Ein Archiv ist keine Wissensquelle" + Meta-Regeln +
+  Multi-Agent-Ruleset in `nc-sync.md`), **D13** (`referenz/`-Einstufung nach EN6, angepasst:
+  dokumentierter Review-Vorgang je Datei statt pauschalem `unreviewed`-Stempel), **D14**
+  (Sitzungswissen-Umzug: `.nc/erinnerung/` entfällt ersatzlos, `sitzungswissen/` im OS-Repo,
+  GL1–GL5, `end-session`/`start` neu gefasst, Kriterienliste v2), **D15** (`NC_SECRETS_REF`),
+  **D18** (Zähl-Wahrheits-Prüfung), **D26** (`NovaCore-OS-Systemachsen.md`). **D15 und D18**
+  waren ursprünglich Phase K („Kleinteile-Sweep", Abschnitt 4) zugeordnet — sie wurden als
+  kleine, unabhängige Posten in den Phase-I-Nachzug vorgezogen (Sonnet-Executor-Bündelung am
+  PR-Ende, Org-Ruleset N1.3), statt auf den Beginn von Phase K zu warten.
+- **Beobachtungs-Anker fortgeschrieben:** Onsite `origin/main` wanderte auf **`2530ced`**,
+  Kern **0.26.0** (zuvor `51e230f`, Kern 0.12.0-Referenzstand aus Nachtrag N3). Die nächste
+  Iteration misst ihr Delta **ab `2530ced`**.
+- **Vier neue Posten** (aus dem laufenden Nachbau, nicht Teil des ursprünglichen
+  D1–D26-Inventars):
+
+  | # | Posten | Klasse | Phase | Status |
+  |---|---|---|---|---|
+  | D27 | Scratchpad-Norm (`scratchpad-nutzung.md`, R1 Arbeiten/R2 Ersetzen/R3 Erfassen) | **N** | I | gebaut (C7) |
+  | D28 | Queue-Fälligkeit als Handlungsanweisung (nicht nur Hinweis) | **N** | J | offen |
+  | D29 | Standardprozess `jira-workflow.md` | **N** | J/K | offen |
+  | D30 | `workflow.md` abteilungsoptional (nicht jede Abteilung zwingend) | **P** | J | offen |
+
+- **Offen bleiben:** die Phasen J/K in vollem Umfang (D16, D17, D19–D23, D28–D30); D15/D18
+  sind mit diesem Nachtrag erledigt und aus dem Phase-K-Rest gestrichen.
+
 ---
 
 *Angelegt 2026-08-23 durch Claude (Fable 5, Claude Code) als Overseer-Mapping auf Weisung
 Lucas Vöhringer; Quellen: Onsite.ai-OS `origin/main@6d3f8db`, NovaCoreAI-OS `main@242b9e7`.
 Nachtrag N1 am selben Tag nach Maintainer-Weisung (Beauftragung, Onsite-Parität,
 Affiliate-Invariante); Nachtrag N2 am selben Tag (Node-Doks/Systemachsen/Kriterienliste-v2,
-Phase-G-Vollzug); Nachtrag N3 am 2026-08-24 (Phase-H-Vollzug, Anker `51e230f`).*
+Phase-G-Vollzug); Nachtrag N3 am 2026-08-24 (Phase-H-Vollzug, Anker `51e230f`); Nachtrag N4
+am 2026-08-25 (Phase-I-Vollzug, Anker `2530ced`, D27–D30).*

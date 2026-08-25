@@ -9,3 +9,10 @@ CLAUDE.md
 
 # Isolated agent/worktree workspaces
 .worktrees/
+
+# Sitzungswissen wohnt in diesem Repo in der Wissensbasis (knowledge-base/sitzungswissen/,
+# Mapping D14 / Onsite §15.29 — SSOT-Residenzpflicht). Der frühere lokale Strom
+# .nc/erinnerung/ ist mit Phase I aufgehoben; .nc/ bleibt hier ausschließlich als Schutz
+# gegen alte Skill-Stände, die noch dorthin schreiben würden — strikt nach Onsite
+# (§15.48.3): kein Ablageort, keine Ausnahme (Maintainer-Entscheid 2026-08-25).
+.nc/

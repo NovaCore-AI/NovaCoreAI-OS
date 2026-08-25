@@ -1,16 +1,18 @@
 ---
 name: end-session
 description: >-
-  Sichert am Sitzungsende den Arbeitsstand (WP8) — schreibt den append-only Journal-Eintrag
-  des Tages nach .nc/erinnerung/journal/, konsolidiert .nc/erinnerung/stand.md neu, spiegelt
-  den Stand commit-unabhängig ins Projekt-Memory von Claude Code, aktualisiert den
-  Mehrtages-Roll-up, pflegt das Offene-Stränge-Register, klassifiziert firmenrelevante
-  Ergebnisse gegen die Kriterienliste in die Kandidaten-Queue der Abteilung (Queue-Flow,
-  Station 1), übergibt offene Punkte samt empfohlenem Einstieg an die nächste Sitzung und
-  setzt den Abschluss-Stempel.
+  Sichert am Sitzungsende den Arbeitsstand (WP8) — bestimmt zuerst den Zielort (eigene
+  Wissensbasis oder Projekt-Memory), schreibt den append-only Journal-Eintrag des Tages,
+  konsolidiert den Stand neu, spiegelt ihn commit-unabhängig ins Projekt-Memory von Claude
+  Code, aktualisiert den Mehrtages-Roll-up, pflegt das Offene-Stränge-Register, schließt die
+  lokale Stufe über alle drei Scopes ab (Projekt, User, Scratchpad), klassifiziert
+  firmenrelevante Ergebnisse gegen Kriterien und Stufen-Prüfungen in die Kandidaten-Queue der
+  Abteilung (Queue-Flow, Station 1), übergibt offene Punkte samt empfohlenem Einstieg an die
+  nächste Sitzung und setzt den Abschluss-Stempel. Mit dem Argument „nachzug" schreibt er
+  stattdessen den nicht abgeschlossenen Vortag nach.
   Trigger-Begriffe: „Session beenden", „end-session", „Sitzungsabschluss", „Sitzung beenden",
   „Feierabend", „Stand sichern", „WP8", „Sitzung abschließen", „Übergabe", „für heute fertig",
-  „vor dem Kompaktieren".
+  „vor dem Kompaktieren", „nachzug", „Vortag nachtragen".
 ---
 
 # /nc:end-session — Sitzungsabschluss (WP8)
@@ -18,8 +20,8 @@ description: >-
 ## Zweck
 
 Letzter Pflichtschritt jeder Sitzung (WP8 im WP-Rahmen `wp-rahmen.md` dieses Kern-Plugins `nc`).
-Der Skill überführt das, was in dieser Sitzung passiert ist, in das Sitzungsgedächtnis unter
-`.nc/erinnerung/`, damit die nächste Sitzung mit `/nc:start` nahtlos daran anknüpfen kann. Er
+Der Skill überführt das, was in dieser Sitzung passiert ist, an den in Schritt 2 bestimmten
+Zielort, damit die nächste Sitzung mit `/nc:start` nahtlos daran anknüpfen kann. Er
 sichert **Wissen** — er stellt keine Commit-Reife her und ersetzt kein Review: den
 mechanischen Teil des Prüfzyklus trägt die CI-Suite, den urteilsabhängigen das
 Maintainer-Review am PR. Welche Doks eine Änderung mitziehen muss, beantwortet
@@ -33,23 +35,56 @@ Kompaktierungen durch, ob gestempelt oder nicht (Loop-Schutz — eine Dauerblock
 Auto-Compact wäre eine Sackgasse mit vollem Kontextfenster). Dass nicht mehr gemahnt wird, hebt
 die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Sitzung.
 
+## Zwei Fälle — das Argument entscheidet, nie eine Heuristik
+
+Der Skill kennt genau zwei Läufe. **Welcher gilt, sagt allein das Argument beim Aufruf:**
+
+| Aufruf | Fall | Beschriebener Tag |
+|---|---|---|
+| `/nc:end-session` | **Regellauf** — schließt die **laufende** Sitzung ab | **heute** |
+| `/nc:end-session nachzug` | **Nachzug** — trägt eine frühere Sitzung nach, die ohne Abschluss endete | **der nachzutragende Tag**, nicht heute |
+
+**Eine Heuristik ist ausdrücklich unzulässig.** Der Skill schließt **nie** aus einem fehlenden
+Stempel, einem alten Journaldatum oder einer Kontextlage selbst auf den Nachzugsfall. Fällt
+einem Lauf auf, dass ein Vortag ohne Abschluss blieb, **meldet** er das in der Übergabe und
+nennt den Aufruf `/nc:end-session nachzug` — er führt ihn nicht eigenmächtig aus. Grund: Ein
+falsch geratener Nachzug schreibt die Arbeit von heute unter das Datum von gestern und
+verfälscht damit genau die Chronologie, die das Sitzungswissen tragen soll.
+
+Im **Nachzugsfall** gilt zusätzlich: Journal-Eintrag und Roll-up-Zeile tragen das Datum des
+**nachgetragenen** Tages; `stand.md` wird trotzdem auf den **heutigen** Kenntnisstand
+konsolidiert (er ist der aktuelle Stand, kein historischer); die Übergabe weist den Lauf
+ausdrücklich als Nachzug aus.
+
 ## Ablauf
 
 1. **Sitzung erfassen:** `git status --short` und `git log --oneline` seit Sitzungsbeginn; dazu
    die eigenen Arbeitsschritte — was wurde entschieden, gefunden, gebaut, verworfen.
-2. **Ablage sicherstellen:** Wohnort des Sitzungswissens ist `.nc/erinnerung/` des
-   Arbeits-Repos; `.nc/erinnerung/journal/` anlegen, falls es fehlt. Prüfen, dass `.nc/` in der
-   `.gitignore` des Arbeits-Repos steht; fehlt der Eintrag, ihn **vorschlagen und ausdrücklich
-   darauf hinweisen — geändert wird die Datei nur nach Zustimmung** (dieselbe Politik wie in
-   `/nc:start` und `/nc:setup`: die `.gitignore` gehört dem Arbeits-Repo). *(Ausnahme nach
-   Maintainer-Entscheid E2a, Bauplan 2026-08-15: Ein **privates** Arbeits-Repo mit eigener
-   Wissensbasis darf sein Sitzungswissen als versionierte Kategorie `sitzungswissen/` führen —
-   für dieses **öffentliche** OS-Repo ist der Weg ausgeschlossen und hier nicht gebaut.)*
-3. **Journal fortschreiben:** Eintrag an `.nc/erinnerung/journal/<YYYY-MM-DD>.md` **anhängen**
-   (Datei mit Datumsüberschrift anlegen, falls sie fehlt). Inhalt: Uhrzeit, bearbeitete
+2. **Zielort bestimmen — zwei Fälle, kein dritter:**
+   - **Das Arbeits-Repo hat eine eigene Wissensbasis** (eine SSOT-Kategorie mit Master-Index —
+     im OS-Repo heißt sie `knowledge-base/`): Das Sitzungswissen wohnt **committet**
+     dort, unter `sitzungswissen/` — `sitzungswissen/roll-up.md`,
+     `sitzungswissen/offene-straenge-register.md` sowie je Abteilung
+     `sitzungswissen/<abteilung>/stand.md` und
+     `sitzungswissen/<abteilung>/journal/<YYYY-MM-DD>.md`. Fehlt ein Baustein, wird er
+     angelegt. Ist keine Abteilung bestimmbar, gilt `gemeinsam/`.
+   - **Das Arbeits-Repo hat keine eigene Wissensbasis** (der Regelfall bei Kunden- und
+     Fremd-Repos): Der Stand wird **allein** ins Projekt-Memory geschrieben (Schritt 5).
+     **In einem fremden Arbeits-Repo entsteht kein Dateistrom** — es wird dort **kein**
+     Verzeichnis angelegt, **keine** Datei geschrieben und **keine** `.gitignore` angefasst.
+
+   **Der frühere lokale Strom `.nc/erinnerung/` ist aufgehoben.** Findet sich ein Altbestand
+   unter `.nc/`, wird er **gemeldet, nicht benutzt und nicht weitergeschrieben**: Er ist eine
+   Fundsache aus einem früheren Stand, keine Quelle. Ob er migriert oder gelöscht wird,
+   entscheidet der Mensch — der Skill schlägt es vor und tut es nicht.
+3. **Journal fortschreiben:** Eintrag an `sitzungswissen/<abteilung>/journal/<YYYY-MM-DD>.md`
+   **anhängen** (Datei mit Datumsüberschrift anlegen, falls sie fehlt). Ohne eigene
+   Wissensbasis entfällt dieser Dateistrom ersatzlos — der Inhalt geht dann allein in
+   Schritt 5. Inhalt: Uhrzeit, bearbeitete
    Aufgaben, getroffene Entscheidungen mit Begründung, offene Punkte, nächste Schritte.
    Bestehende Zeilen werden nie geändert.
-4. **Stand konsolidieren:** `.nc/erinnerung/stand.md` **neu schreiben** — nicht anhängen.
+4. **Stand konsolidieren (Pflicht bei JEDEM Lauf, auch beim Nachzug):**
+   `sitzungswissen/<abteilung>/stand.md` **neu schreiben** — nicht anhängen.
    Erledigtes ersetzt Offenes, überholte Punkte fliegen raus. Struktur: aktueller Arbeitsstand ·
    offene Punkte · zuletzt getroffene Entscheidungen · aktive Branches und offene Pull Requests ·
    bekannte Risiken · nächster Schritt.
@@ -66,19 +101,32 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
    - **Keine Secrets, Tokens, Kundendaten oder personenbezogenen Pfade.**
    - Lässt sich der Memory-Pfad nicht auflösen, wird das **gemeldet**, nicht geraten; der
      Sitzungsabschluss läuft weiter (die Ablage aus Schritt 4 ist geschrieben).
-6. **Roll-up aktualisieren:** `.nc/erinnerung/roll-up.md` ist der verdichtete
+6. **Roll-up aktualisieren:** `sitzungswissen/roll-up.md` ist der verdichtete
    **Mehrtages-Überblick** über dem Tagesjournal — je Arbeitstag eine Zeile (Datum · Thema ·
    Ergebnis in einem Satz), jüngster Tag oben. Heutige Zeile ergänzen oder aktualisieren, ältere
    Zeilen bleiben unangetastet; fehlt die Datei, mit Kopfzeile und dieser Struktur anlegen.
-7. **Offene-Stränge-Register pflegen (Pflichtschritt):** `.nc/erinnerung/offene-straenge-register.md`
+7. **Offene-Stränge-Register pflegen (Pflichtschritt):** `sitzungswissen/offene-straenge-register.md`
    — **jeder** in dieser Sitzung ausgelagerte, geplante oder delegierte Strang (Pull Request,
    Bauplan, Backlog-Idee, vertagte Entscheidung, offener Praxistest, Folge-Session) wird
    eingetragen oder aktualisiert; Erledigtes bekommt ein Erledigt-Datum, Zeilen werden nie
    gelöscht. Fehlt die Datei, wird sie mit Kopf-Blockquote (Zweck + Pflege-Regeln) und der
    Tabelle `Datum · Strang · Verbleib · Nächster Schritt · Status` angelegt.
-8. **Klassifikation + Kandidaten-Queue (Queue-Flow, Station 1):** Die Sitzungsergebnisse gegen
-   die **Kriterien a–d** der Pflege-Ausprägung des installierten Abteilungsplugins halten
-   (`pflege-auspraegung.json` an dessen Plugin-Wurzel; Format und Kriterienliste v1:
+8. **Klassifikation + Kandidaten-Queue (Queue-Flow, Station 1).**
+   **Zuerst die Freigabe-Prüfungen GL1–GL5** (Abschnitt 5.5 der Kern-Referenz
+   `referenz/pflege-auspraegung.md`): Sie beantworten, ob ein Ergebnis den lokalen Scope
+   überhaupt **verlassen darf**, und sind **Vetos mit Ziel-Routing** — sie stehen **nie** in
+   der Spalte `erfülltes Kriterium`. **GL1** Sicherheitsbedenken (Zugangsdaten, Tokens,
+   Kundendaten) → nur die verallgemeinerte Lehre ohne Auszug, sonst keine Zeile. **GL2**
+   ausdrückliches Verbot des Menschen → **keine Zeile, ohne Abwägung und ohne
+   Überredungsversuch**; **GL2 sticht immer**, auch über GF3. **GL3** personenbezogene Daten
+   und User-Scope → Information **über** das Artefakt, nie das Artefakt; Rollen statt
+   Personen. **GL4** Duplikat → Verweis statt neuer Zeile. **GL5** direkte Gegengründe →
+   (i) Befund an einem fremden Repo, an einem **Affiliate-Plugin** oder an einem
+   eigenständigen Kollegen-OS-Satelliten → **nie** die OS-Queue; (ii) unbelegte Vermutung →
+   nicht eintragen oder als Vermutung kennzeichnen; (iii) laufender Strang → ins
+   **Offene-Stränge-Register**, nicht in die Queue.
+   **Danach** die Sitzungsergebnisse gegen die **Kriterien a–d** der Pflege-Ausprägung des installierten Abteilungsplugins halten
+   (`pflege-auspraegung.json` an dessen Plugin-Wurzel; Format und Kriterienliste v2:
    `referenz/pflege-auspraegung.md` dieses Kern-Plugins `nc`) — **und vor dem Anhängen die
    Gegenkriterien GF1–GF4 anwenden** (Abschnitt 5.2 der Kern-Referenz), sie sind
    Handlungsanweisung, nicht nur Verweis: **GF1** — Bug/Finding eines **fremden Arbeits-Repos**
@@ -110,13 +158,33 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
    **fehlendes Setup** melden und auf `/nc:setup` verweisen — nicht raten, keinen Ersatzort
    erfinden. Trifft **kein** Kriterium: kein Eintrag — das ist der Normalfall; Session-Agenten
    überschätzen die eigene Relevanz systematisch.
-9. **Fehlerprotokoll prüfen:** Sind alle eigenen Fehler dieser Sitzung festgehalten? Im OS-Repo
-   greift dessen append-only Fehlerprotokoll (`agent-learnings.md` der Wissensbasis), in jedem
-   anderen Arbeits-Repo die dort geltende Konvention. Fehlt ein Eintrag: nachholen.
+9. **Lokale Stufe abschließen — alle drei Scopes, keiner wird übersprungen.** Die lokale Ebene
+   ist ein **Scope-Begriff, kein Ort** (OS-Repo: `knowledge-base/grundwissen/NovaCore-OS-Systemachsen.md`).
+   Wer nur den Projekt-Scope
+   abschließt, verliert regelmäßig genau das, was nirgends committet wurde.
+   - **9a — Scratchpad-Scope erfassen (Pflicht):** Den Bestand des Session-Scratchpads
+     überblicken. **Jeder Fund wird entschieden:** entweder **gerettet** (Journal, Stand,
+     Memory — bei Firmenrelevanz zusätzlich die Queue-Zeile aus Schritt 8) **oder bewusst
+     verworfen**, und dann in der Übergabe als „bewusst verworfen" ausgewiesen. **Nichts
+     bleibt unbesehen liegen** — ein stiller Verlust ist ein Ausführungsfehler, kein
+     Schicksal. Regeln: Standardprozess `scratchpad-nutzung.md` des OS-Repos (R1–R3).
+     Existiert kein Scratchpad mehr (Aufräumlauf), wird **das** gemeldet.
+   - **9b — Projekt-Scope:** uncommittete Änderungen und der Working Tree gehören zur
+     Wissenslage. Was von ihnen erklärungsbedürftig ist, steht im Stand — nicht nur im Diff.
+   - **9c — User-Scope:** maschinenweite Notizen und Erinnerungen. Sie sind durch **GL3**
+     geschützt: In die SSOT geht die Information **über** ein Artefakt, nie das Artefakt.
+   - **9d — Fehlerprotokoll prüfen:** Sind alle eigenen Fehler dieser Sitzung festgehalten?
+     Im OS-Repo greift dessen append-only Fehlerprotokoll (`agent-learnings.md` der
+     Wissensbasis), in jedem anderen Arbeits-Repo die dort geltende Konvention. Fehlt ein
+     Eintrag: nachholen.
 10. **Übergabe ausgeben:** geschriebene Dateien mit Pfad (Repo-Ablage **und** Projekt-Memory),
    Kern des Stands, offene Punkte und Register-Änderungen, das Ergebnis der
    Queue-Klassifikation (angehängte Zeilen mit Kriterium bzw. der Befund „keine Kandidaten";
-   nicht abgelegte Kandidaten mit Handlungsbedarf), ein eventueller **Sofort-Pfad-Block**
+   nicht abgelegte Kandidaten mit Handlungsbedarf), **jeder durch GL1–GL5 zurückgehaltene
+   Kandidat als „bewusst nicht eingetragen"** — mit dem greifenden Kürzel, ohne den
+   geschützten Inhalt selbst (die Entscheidung bleibt sichtbar, der Inhalt bleibt lokal),
+   jeder Scratchpad-Fund aus Schritt 9a mit seiner Entscheidung (gerettet oder bewusst
+   verworfen), ein eventueller **Sofort-Pfad-Block**
    (Schritt 8), der empfohlene Einstieg der nächsten
    Sitzung — plus, falls ein Commit ansteht, der Hinweis auf `/nc:wissen-aendern` für den
    Änderungsumfang und darauf, dass dieser Commit die Freigabe des Menschen braucht.
@@ -143,7 +211,8 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
   geschrieben. „Läuft" ohne Beweis ist kein Stand.
 - **Keine Secrets, Tokens, Kundendaten oder personenbezogenen Pfade** ins Gedächtnis —
   Dateipfade und Ticket-Bezüge des Arbeits-Repos ja, Zugangsdaten nie.
-- **Kundenkontext bleibt im Arbeits-Repo** unter `.nc/` und wandert nie ins OS-Repo.
+- **Kundenkontext bleibt im Arbeits-Repo** bzw. dessen Projekt-Memory und wandert nie ins
+  OS-Repo (der frühere lokale Strom `.nc/erinnerung/` ist abgeschafft, siehe Schritt 2).
 - **Der Agent committet und pusht nie selbst.** Keine automatischen Pushes, Merges, Posts,
   Releases oder Deployments ohne explizite Nutzerfreigabe — auch nicht „nur schnell den
   Journal-Eintrag".
@@ -158,10 +227,10 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
 
 ## Verifikation
 
-- Der Journal-Eintrag ist per `tail -20 .nc/erinnerung/journal/<YYYY-MM-DD>.md` sichtbar und die
+- Der Journal-Eintrag ist per `tail -20 <zielort>/journal/<YYYY-MM-DD>.md` sichtbar und die
   Datei ist **länger** als vorher — Zeilenzahl vorher/nachher im Ergebnis ausweisen.
 - Kein bestehender Journal-Block wurde verändert (per Diff oder Zeilenzahl-Vergleich belegen).
-- `.nc/erinnerung/stand.md` existiert, ist unter 60 Zeilen und nennt einen konkreten nächsten
+- `stand.md` des Zielorts existiert, ist unter 60 Zeilen und nennt einen konkreten nächsten
   Schritt.
 - Die **Memory-Stand-Datei** ist mit Pfad und Änderungszeit ausgewiesen, ihre Indexzeile steht in
   `MEMORY.md`, und die abgelöste Vorgängerfassung ist in ihr als überholt benannt (nicht
@@ -174,8 +243,11 @@ die Pflicht **nicht** auf: Abschluss samt Stempel bleibt Pflichtschritt jeder Si
   Queue-Datei zeigt ausschließlich Anhänge — append-only) samt erfülltem Kriterium — oder der
   ausdrückliche Befund „keine Kandidaten" bzw. der Übergangs-/Setup-Befund mit
   Handlungsschritt. Ein Sofort-Pfad-Fall steht als markierter Block in der Übergabe.
-- `git status --short` zeigt **keine** `.nc/`-Pfade (Ignore greift) — sonst wird der fehlende
-  `.gitignore`-Eintrag samt Vorschlag gemeldet (geändert nur nach Zustimmung).
+- **Der Zielort ist ausgewiesen** — entweder die geschriebenen `sitzungswissen/`-Pfade der
+  eigenen Wissensbasis, oder ausdrücklich „kein Dateistrom, Projekt-Memory trägt allein".
+  Ein gefundener `.nc/`-Altbestand ist als Fundsache **gemeldet**, nicht benutzt worden.
+- **Jeder Scratchpad-Fund trägt eine Entscheidung** (gerettet oder bewusst verworfen) —
+  Schritt 9a lässt nichts unbesehen liegen.
 - Die Übergabe listet jede geschriebene Datei mit vollem Pfad.
 - Der **Abschluss-Stempel ist gesetzt** (Bestätigungszeile „Abschluss-Stempel gesetzt" des
   Stempel-Skripts liegt vor) — er ist der einzige Nachweis, dass WP8 lief; die Mahnung kommt

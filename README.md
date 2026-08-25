@@ -4,7 +4,7 @@
 **Familie von Claude-Code-Plugins** aus einem Marketplace: eine Methode für alle statt
 vieler Privat-Setups.
 
-**Status: Kern `nc` v0.12.0 · Abteilung `nc-development` v0.2.0 · Abteilung `nc-felix`
+**Status: Kern `nc` v0.13.0 · Abteilung `nc-development` v0.2.0 · Abteilung `nc-felix`
 v0.4.1 (erster Satellit, eigenständiges Felix-OS) · Abteilung `nc-biggi` v0.1.1 (zweiter
 Satellit, eigenständiges Biggi-OS) · Affiliate `kimi-code-plugin-cc` v1.4.0 (extern) ·
 Affiliate `mneme-kimi-code` v2.0.24 (extern) —
@@ -23,7 +23,7 @@ bringen ihren Kern als **Modul** selbst mit:
 
 | Plugin | Rolle | Namespace | Version |
 |---|---|---|---|
-| `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Infrapflege-Skills, SSOT-Präsenz-Router (`wissen-*`), Queue-Flow-Skills (`queue-abteilung`/`queue-kern`), Kontroll-Schicht (Gate 1 + Gate 2 + Gate 3 + Queue-Fälligkeits-Erinnerung + zwei Zeiger-Hooks), Doks-Autosync, WP-Rahmen, Registry, Formatregeln, `nc-sync.md`, Subagenten (`agents/`) | `/nc:` | 0.12.0 (= `VERSION`) |
+| `nc` | **Kern** — ständige Abteilung `gemeinsam`: Session-Zyklus, Infrapflege-Skills, SSOT-Präsenz-Router (`wissen-*`), Queue-Flow-Skills (`queue-abteilung`/`queue-kern`), Kontroll-Schicht (Gate 1 + Gate 2 + Gate 3 + Queue-Fälligkeits-Erinnerung + zwei Zeiger-Hooks), Doks-Autosync, WP-Rahmen, Registry, Formatregeln, `nc-sync.md`, Subagenten (`agents/`) | `/nc:` | 0.13.0 (= `VERSION`) |
 | `nc-development` | Abteilung development — Module `fe` / `be` / `flc` / `wzs` / `qs` / `rel` | `/nc-development:` | 0.2.0 |
 | `nc-felix` | Abteilung felix — **eigenständiges Felix-OS** (erster Satellit, privates Repo `NovaCore-AI/Felix-OS`): Kernmodul mit 7 Skills, eigene Kontroll-Schicht mit Gate 1 + Gate 2 (markerlos) und eigene isolierte Wissensbasis, hängt **nicht** am Kern | `/nc-felix:` | 0.4.1 |
 | `nc-biggi` | Abteilung biggi — **eigenständiges Biggi-OS** (zweiter Satellit, privates Repo `NovaCore-AI/Biggi-OS`): Kernmodul mit 6 Skills + Kontroll-Schicht (FFG + Session-Start-Zwang nach Onsite-Vorbild), hängt **nicht** am Kern; Arbeitsmodul-Konvention `ctrl` / `mdzn` / `doc`+`day` reserviert | `/nc-biggi:` | 0.1.1 |
@@ -36,8 +36,10 @@ bringen ihren Kern als **Modul** selbst mit:
   Plugin selbst).
 - **Hooks nur im Kern**, Module sind Skill-Präfixe, die `module-registry.json` ist reiner
   Metadaten-SSOT.
-- **Memory** pro Arbeits-Repo unter `.nc/erinnerung/` (Stand + append-only Journal), nie im
-  OS-Repo.
+- **Memory:** im OS-Repo selbst committet unter `knowledge-base/sitzungswissen/` (Stand,
+  append-only Journal, Register, Roll-up); in einem fremden Arbeits-Repo ohne eigene
+  Wissensbasis entsteht kein Dateistrom mehr — dort trägt das Projekt-Memory von Claude Code
+  den Stand allein.
 - **Satelliten:** `nc-felix` und `nc-biggi` leben in eigenen privaten Repos (das Repo IST
   das Plugin); der Marketplace-Eintrag pinnt per GitHub-Source auf einen Commit-SHA
   (`abteilungs-plugin-bau.md` §3a/§3b — der `sha` ist der effektive Pin).
@@ -60,7 +62,7 @@ bringen ihren Kern als **Modul** selbst mit:
 | `/nc:start` | WP0 | Session-Start: Stand, Journal, Git-Lage laden — kein Blind-Start; liest je installiertem Abteilungsplugin dessen CLAUDE-Ebene 2 (`<abteilung>-abteilungs-claude.md`); setzt zum Abschluss den Fakten-Stempel, der Gate 2 öffnet |
 | `/nc:end-session` | WP8 | Session-Ende (bis 0.7.x `save-session`): Journal schreiben, Stand + Roll-up + Offene-Stränge-Register konsolidieren, Projekt-Memory spiegeln, Sitzungsergebnisse gegen die Kriterienliste in die Kandidaten-Queue der Abteilung klassifizieren (Queue-Flow, Station 1); letzter Schritt setzt den Abschluss-Stempel, der die PreCompact-Mahnung der Sitzung abschaltet |
 | `/nc:journal` | laufend | Einzelne Ereignisse sofort festhalten |
-| `/nc:setup` | einmal pro Rechner, danach bei Bedarf | Reconciler über sechs Soll-Schichten S0–S6 (seit 0.8.0): Voraussetzungen + Plugin-Stand prüfen, Wissensbasis als Lesekopie bereitstellen (voller Klon nach `~/.nc/ssot/<repo-name>/`, Fast-Forward, Sparse-Heilung), Sitzungswissen-Gerüst im Arbeits-Repo anlegen, CLAUDE-Lokaldokumente verifizieren, Infra-Registry `~/.claude/nc/infra.json` schreiben — mehrfach ausführbar, kein Schritt legt doppelt an |
+| `/nc:setup` | einmal pro Rechner, danach bei Bedarf | Reconciler über sechs Soll-Schichten S0–S6 (seit 0.8.0): Voraussetzungen + Plugin-Stand prüfen, Wissensbasis als Lesekopie bereitstellen (voller Klon nach `~/.nc/ssot/<repo-name>/`, Fast-Forward, Sparse-Heilung), Sitzungswissen-Gerüst reconcilen (nur bei eigener Wissensbasis des Repos — sonst nicht anwendbar, kein Dateistrom), CLAUDE-Lokaldokumente verifizieren, Infra-Registry `~/.claude/nc/infra.json` schreiben — mehrfach ausführbar, kein Schritt legt doppelt an |
 | `/nc:update-doks` | Maintainer, bei Bedarf | **Eine Aufgabe seit 0.12.0:** Kreuzverweis-/Pfad-Pflege der harten SSOT-Dokumente — erhebt Drift (tote Links, verschobene Pfade, veraltete Kreuzverweise, Index-Lücken) gegen die Änderungs-Matrix und den SSOT-Document-Index, zeigt eine Vorschau vor dem Schreiben und zieht erst nach Bestätigung nach; nur Maintainer-Vokabular triggert |
 | `/nc:os-info` | jederzeit | Erklärt das OS **auf Basis der realen Installation** — Plugins, Module, nutzbare Skills, Gate-Status |
 | `/nc:skill-builder` | jederzeit | Führt durch den Bau eines Skills nach den OS-Regeln (Sandbox oder OS-Beitrag, inkl. Fork-back) |

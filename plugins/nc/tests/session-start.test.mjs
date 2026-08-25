@@ -143,20 +143,40 @@ test('Vorhandene Quellen landen im Kontext (VERSION, CHANGELOG, Registry)', () =
 
 // NovaCore-Mapping (Bauplan §2): kein Ordner „Aktive Baupläne" wie im Vorbild — gelistet
 // werden die juengsten 5 datierten Dateien aus knowledge-base/grundwissen/.
-test('Laufende Vorhaben: juengste 5 datierte Dateien aus grundwissen/, undatierte nie', () => {
+test('Laufende Vorhaben: juengste 5 datierte Dateien aus aktive-bauplaene/, undatierte nie', () => {
   const dateien = {};
   for (const tag of ['01', '02', '03', '04', '05', '06']) {
-    dateien['knowledge-base/grundwissen/2026-03-' + tag + '-plan-' + tag + '.md'] = 'x\n';
+    dateien['knowledge-base/aktive-bauplaene/2026-03-' + tag + '-plan-' + tag + '.md'] = 'x\n';
   }
-  dateien['knowledge-base/grundwissen/NovaCore-OS-Produktarchitektur.md'] = 'x\n';
+  dateien['knowledge-base/aktive-bauplaene/UEBERSICHT.md'] = 'x\n';
+  // Gegenprobe zum Phase-I-Schnitt (P-E1): grundwissen/ traegt seit dem Umzug nur noch
+  // dauerhafte Referenzen und Design-Specs. Eine datierte Spec DORT ist KEIN laufendes
+  // Vorhaben — laeuft der Hook wieder gegen die alte Quelle, schlaegt genau diese Zeile an.
+  dateien['knowledge-base/grundwissen/2026-03-09-alte-spec.md'] = 'x\n';
   const kontext = kontextVon(fixture(dateien));
 
   assert.match(kontext, /Laufende Vorhaben/);
+  assert.match(kontext, /aktive-bauplaene/, 'die Quelle muss im Abschnittstitel stehen');
   assert.match(kontext, /2026-03-06-plan-06\.md/, 'juengste Datei fehlt');
   assert.match(kontext, /2026-03-02-plan-02\.md/, 'fuenftjuengste Datei fehlt');
   assert.ok(!/2026-03-01-plan-01\.md/.test(kontext), 'hoechstens 5 Dateien');
-  assert.ok(!/Produktarchitektur/.test(kontext),
-    'undatierte Dauerreferenzen sind keine laufenden Vorhaben');
+  assert.ok(!/UEBERSICHT/.test(kontext),
+    'undatierte Dateien sind keine laufenden Vorhaben');
+  assert.ok(!/2026-03-09-alte-spec\.md/.test(kontext),
+    'datierte Specs aus grundwissen/ sind seit P-E1 KEINE laufenden Vorhaben mehr');
+});
+
+test('Session-Start nennt den Nachzugs-Aufruf, prueft ihn aber nicht (AP-C6)', () => {
+  // Der Hook soll den Aufruf BEKANNT machen — mehr nicht. Kein Gate, keine dritte
+  // Faelligkeit, kein zweiter Speicherort: Die Erkennung liegt in /nc:start, das
+  // Nachholen in /nc:end-session nachzug. Die Negativproben halten das fest.
+  const kontext = kontextVon(fixture({ 'VERSION': '9.9.9\n' }));
+  assert.match(kontext, /end-session nachzug/,
+    'der Nachzugs-Aufruf muss im Pflicht-Einstieg genannt sein');
+  assert.ok(!/faellig seit|ueberfaellig|Tage ohne Abschluss/i.test(kontext),
+    'der Hook darf KEINE Faelligkeit berechnen — das waere die dritte Faelligkeit');
+  assert.ok(!/permissionDecision/.test(kontext),
+    'der Hook bleibt ein Injektor, kein Gate');
 });
 
 test('Repo-Wurzel wird aus einem Unterverzeichnis gefunden (Git-Toplevel)', () => {

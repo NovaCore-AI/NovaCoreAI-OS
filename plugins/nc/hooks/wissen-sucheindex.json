@@ -303,7 +303,7 @@
     {
       "id": "bauplan-ssot-provisionierung",
       "titel": "SSOT-Provisionierung — Bauplan 2026-08-10",
-      "pfad": "knowledge-base/grundwissen/2026-08-10-ssot-provisionierung-bauplan.md",
+      "pfad": "knowledge-base/bauplan-archiv/2026-08-10-ssot-provisionierung-bauplan.md",
       "router": "wissen-planen",
       "hinweis": "wie die Wissensbasis überhaupt auf den Rechner kommt — Weg B, Ablageort, Fast-Forward-Regel",
       "stichworte": [
@@ -316,7 +316,7 @@
     {
       "id": "bauplan-onsite-align",
       "titel": "Onsite-Align-Umbau — Bauplan 2026-08-10",
-      "pfad": "knowledge-base/grundwissen/2026-08-10-onsite-align-umbau-bauplan.md",
+      "pfad": "knowledge-base/bauplan-archiv/2026-08-10-onsite-align-umbau-bauplan.md",
       "router": "wissen-planen",
       "hinweis": "Umbau nach dem Onsite-Vorbild: Ausgangslage, Rename-Regeln, AP1–AP8, harte Ausschlüsse",
       "stichworte": [
@@ -329,7 +329,7 @@
     {
       "id": "bauplan-prozesskorpus-nachzug",
       "titel": "Prozesskorpus-Nachzug + Satelliten-SSOT — Bauplan 2026-08-11",
-      "pfad": "knowledge-base/grundwissen/2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md",
+      "pfad": "knowledge-base/bauplan-archiv/2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md",
       "router": "wissen-planen",
       "hinweis": "Nachzug des Bau-/Prozesskorpus und eigene Wissensbasis je Satellit — Invarianten I1–I7",
       "stichworte": [
@@ -342,7 +342,7 @@
     {
       "id": "bauplan-onsite-endstand",
       "titel": "Onsite-Endstand-Nachbau — Bauplan 2026-08-15",
-      "pfad": "knowledge-base/grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md",
+      "pfad": "knowledge-base/bauplan-archiv/2026-08-15-onsite-endstand-nachbau-bauplan.md",
       "router": "wissen-planen",
       "hinweis": "Nachbau des Onsite-Endstands 0.22.0 in sechs Phasen A–F samt Invarianten und Testfällen",
       "stichworte": [
@@ -382,7 +382,7 @@
     {
       "id": "bauplan-nc-development-modernisierung",
       "titel": "Modernisierung `nc-development` — Bauplan 2026-08-16",
-      "pfad": "knowledge-base/grundwissen/2026-08-16-nc-development-modernisierung-bauplan.md",
+      "pfad": "knowledge-base/bauplan-archiv/2026-08-16-nc-development-modernisierung-bauplan.md",
       "router": "wissen-planen",
       "hinweis": "Drift-Matrix der Abteilung `nc-development`, Arbeitsliste F2.1–F2.8 und persistierte Rohdaten",
       "stichworte": [
@@ -395,7 +395,7 @@
     {
       "id": "mapping-onsite-delta",
       "titel": "Onsite-Delta-Mapping 0.23.0 → 0.25.0 — 2026-08-23",
-      "pfad": "knowledge-base/grundwissen/2026-08-23-onsite-delta-mapping.md",
+      "pfad": "knowledge-base/aktive-bauplaene/2026-08-23-onsite-delta-mapping.md",
       "router": "wissen-planen",
       "hinweis": "Delta-Inventar D1–D24 mit Klassifikation, Phasenvorschlag G–K und den Entscheiden EN1–EN8",
       "stichworte": [
@@ -521,6 +521,39 @@
         "debug log",
         "bug gefunden",
         "fehlbefund"
+      ]
+    },
+    {
+      "id": "systemachsen",
+      "titel": "Systemachsen-Definition",
+      "pfad": "knowledge-base/grundwissen/NovaCore-OS-Systemachsen.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "Die drei Systemachsen (Wissensfluss, Auslieferung, Instandhaltung) und die Definition der lokalen Ebene als Scope-Begriff mit ihren drei Scopes.",
+      "stichworte": [
+        "systemachse",
+        "systemachsen",
+        "wissensfluss",
+        "lokale ebene",
+        "projekt-scope",
+        "user-scope",
+        "scratchpad-scope",
+        "welche achse"
+      ]
+    },
+    {
+      "id": "scratchpad-nutzung",
+      "titel": "Standardprozess Scratchpad-Nutzung",
+      "pfad": "knowledge-base/standardprozesse/scratchpad-nutzung.md",
+      "router": "wissen-aendern",
+      "hinweis": "R1 Arbeiten, R2 Ersetzen, R3 Erfassen: das Scratchpad ist Arbeitsplatz, nie Finalitaets-Ort; jeder Fund wird beim Sitzungsabschluss entschieden.",
+      "stichworte": [
+        "scratchpad",
+        "session-scratchpad",
+        "fluechtig",
+        "finalitaet",
+        "zwischenstand",
+        "arbeitsverzeichnis",
+        "gebaut gilt erst nach push"
       ]
     }
   ]

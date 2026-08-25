@@ -21,7 +21,7 @@ Instruktionsebene).
 | **1 — Globale CLAUDE.md** | `~/.claude/CLAUDE.md` | firmengeführter Block per SessionStart-Autosync + Privat-Zone | Kern-SSOT | Firma (Block) / Mitarbeiter (Zone) | **gebaut** (2026-08-10, AP3) |
 | **1b — Team-Sync-Datei** | `~/.claude/nc-teamsync.md` | SessionStart-Autosync als **Ganzdatei** (Versions-Stempel Zeile 1, keine Marker, keine Privat-Zone); geladen per `@`-Import im Firmen-Block | Kern-SSOT (Methodik/Conventions) | Firma (vollständig) | **gebaut** (2026-08-15, Bauplan Onsite-Endstand AP-B2) |
 | **2 — Abteilungs-CLAUDE** | im Abteilungsplugin-Verzeichnis | Marketplace-Auto-Update (Plugin-Cache) | Abteilungs-SSOT | Abteilung | **gebaut** (2026-08-16: `development-abteilungs-claude.md` + Lese-Verdrahtung in `/nc:start`) |
-| **3 — Projekt-CLAUDE** | Arbeitsrepo (`CLAUDE.md`/`AGENTS.md`) | Git | Repo-Wissen (`.nc/erinnerung/`) | Repo-Team | aktiv |
+| **3 — Projekt-CLAUDE** | Arbeitsrepo (`CLAUDE.md`/`AGENTS.md`) | Git | Projekt-Memory (kein Dateistrom mehr; `sitzungswissen/` bei eigener Wissensbasis) | Repo-Team | aktiv |
 | **3b — OS-Repo-Doku** | dieses Repo: getrackte `AGENTS.md` + un-getrackte lokale `CLAUDE.md` | Git (nur `AGENTS.md`) | Aktualisierungs-Index, SSOT-Document-Index, CHANGELOG | Kern-Maintainer | aktiv |
 
 ## Ebene 0 — Org-Instructions
@@ -85,14 +85,17 @@ Instruktionsebene).
   Datei seitdem in `/nc:start` Schritt 7 aus dem Plugin-Root — Auslieferung ≠ Wirkung ist
   damit geschlossen). Zielname `<abteilung>-abteilungs-claude.md` an der Plugin-Wurzel,
   zweigeteilt (Teil 1 für alle Sessions der Abteilung, Teil 2 Werkstatt); verbindliche Vorlage
-  `vorlagen/abteilungsplugin/abteilungs-claude.md.vorlage`, Bauprozess
+  `../standardprozesse/vorlagen/abteilungsplugin/abteilungs-claude.md.vorlage`, Bauprozess
   [`claude-netz-bau.md`](../standardprozesse/claude-netz-bau.md). Kein
   Memory-Share zwischen affiliate-Satelliten (siehe SSOT-Definition).
 
 ## Ebene 3 — Projekt-CLAUDE
 
-- **Ort:** Arbeitsrepo. **Funktion:** Fachfakten des Repos; routet ins Repo-Wissen
-  (`.nc/erinnerung/`). **Owner:** Repo-Team. **Update-Kanal:** Git.
+- **Ort:** Arbeitsrepo. **Funktion:** Fachfakten des Repos; routet ins Sitzungswissen — ein
+  eigener Dateistrom entsteht nur, wenn das Arbeits-Repo selbst eine eigene Wissensbasis führt
+  (`sitzungswissen/`, Sonderfall Ebene 3b), sonst trägt das Projekt-Memory von Claude Code den
+  Stand allein (kein Dateistrom mehr; `.nc/erinnerung/` ist abgeschafft). **Owner:** Repo-Team.
+  **Update-Kanal:** Git.
 - **Grenzen:** keine Kern- oder Abteilungsinhalte duplizieren — nur Fachfakten des Repos.
 
 ## Ebene 3b — OS-Repo-Doku (Sonderfall von Ebene 3)

@@ -43,7 +43,7 @@ const GIT_TIMEOUT_MS = 2000;   // lieber Abschnitt weglassen als Session verzoeg
 const MAX_COMMITS = 5;
 const MAX_UNRELEASED_LINES = 8;
 const MAX_STATUS_FILES = 8;
-const MAX_VORHABEN = 5;        // juengste Planungsdateien aus grundwissen/
+const MAX_VORHABEN = 5;        // juengste Planungsdateien aus aktive-bauplaene/
 
 function isDisabled() {
   return OFF_VALUES.has(String(process.env.NC_START_GATE || '').trim().toLowerCase());
@@ -117,12 +117,15 @@ function unreleasedHead(root) {
 }
 
 // Laufende Vorhaben: reine Dateinamen, kein Inhalt (Triage macht der Agent).
-// NovaCore-Mapping (Bauplan §2): kein Ordner „Aktive Baupläne" wie im Vorbild — Pläne und
-// Specs liegen mit Datumspraefix in knowledge-base/grundwissen/, die juengsten zaehlen.
-// Dateien ohne Datumspraefix (Produktvision, Begriffsnormen) sind dauerhafte Referenzen
-// und gehoeren nicht in diese Liste.
+// QUELLE SEIT PHASE I (Entscheid P-E1, 2026-08-24): knowledge-base/aktive-bauplaene/ —
+// die Kategorie, die es beim Vorbild als „Aktive Baupläne" schon immer gab. Vorher stand
+// hier grundwissen/; seit dem Schnitt liegen dort nur noch dauerhafte Referenzen und
+// Design-Specs, also gerade NICHT das, was gerade laeuft. Waere die Quelle nicht
+// mitgezogen worden, haette der Hook in jeder Sitzung abgeschlossene Specs als
+// „laufende Vorhaben" praesentiert.
+// Dateien ohne Datumspraefix gehoeren nicht in diese Liste.
 function laufendeVorhaben(root) {
-  const dir = path.join(root, 'knowledge-base', 'grundwissen');
+  const dir = path.join(root, 'knowledge-base', 'aktive-bauplaene');
   try {
     const files = fs.readdirSync(dir)
       .filter(f => /^\d{4}-\d{2}-\d{2}-.+\.md$/i.test(f))
@@ -217,6 +220,18 @@ function buildContext(root, source, sessionKey) {
     + 'Aktualisierungs-Index-Zeile zur Änderungsart lesen · „zu klein für den Standardprozess" '
     + '→ gerade dann greift er.');
 
+  // Nachzugs-Hinweis (Phase I, AP-C6). BEWUSST nur ein Textbaustein: kein neuer Hook, kein
+  // Gate, KEINE dritte Faelligkeitspruefung neben Queue-Faelligkeit und PreCompact-Mahnung,
+  // und KEIN zweiter Speicherort fuer einen "offen"-Zustand. Der Hook prueft hier NICHTS —
+  // er kennt den Vortag nicht und soll ihn nicht kennen: Die Erkennung liegt in /nc:start
+  // (Schritt 7, gegen Journal und Roll-up), das Nachholen in /nc:end-session nachzug
+  // (Schritt 15, hinter dem Stempel). Dieser Satz stellt nur sicher, dass der Agent den
+  // Aufruf ueberhaupt kennt — ein Skill, den niemand nennt, wird nicht benutzt.
+  teile.push('**Vortag ohne Abschluss?** Endete die letzte Sitzung ohne `/nc:end-session` '
+    + '(Journal ohne Roll-up-Zeile, Stand veraltet), führe `/nc:end-session nachzug` aus — '
+    + 'er schreibt den **damaligen** Tag nach, nicht den heutigen. Nie raten: Ohne das '
+    + 'Argument gilt immer der Regellauf für heute.');
+
   teile.push('**Rote Linien (nie automatisiert, gelten auch hier):** Merges · Deploy-Klicks · '
     + 'Review-Resolves/Approvals · alles Kundensichtbare (PR-Texte, Ticket-Kommentare posten). '
     + '**Kein Commit/Push ohne explizite Freigabe des Maintainers.**');
@@ -247,7 +262,7 @@ function buildContext(root, source, sessionKey) {
 
   const vorhaben = laufendeVorhaben(root);
   if (vorhaben) {
-    teile.push('## Laufende Vorhaben (`knowledge-base/grundwissen/`, jüngste zuerst)\n'
+    teile.push('## Laufende Vorhaben (`knowledge-base/aktive-bauplaene/`, jüngste zuerst)\n'
       + vorhaben.map(f => '- ' + f).join('\n')
       + '\nDie jüngste Datei ist der aktuellste Planungsstand; Routing und Quellen-Triage '
       + 'stehen in `knowledge-base/SSOT-Document-Index.md`.');

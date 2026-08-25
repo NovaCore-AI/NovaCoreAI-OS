@@ -56,12 +56,19 @@ eigenständige Satelliten ohne Kern-Dependency.
    Gate-Status im aktuellen Repo · Konnektoren-Status · wie eine fehlende Abteilung
    nachinstalliert wird (`/plugin install nc-<abteilung>@novacore-os`; der Kern kommt
    transitiv mit) · Verweis auf das README **der Installation** für Details (CHANGELOG und
-   Wissensbasis liegen im OS-Repo, nicht in der Installation).
+   Wissensbasis liegen im OS-Repo, nicht in der Installation) · Sitzungswissen-Ort und
+   `NC_SECRETS_REF`-Status (Schritt 10).
 8. **Koexistenz-Warnung:** Sind neben `nc` auch Satelliten-Plugins (`nc-felix`, `nc-biggi`)
    installiert und aktiv, das ausdrücklich melden — sie tragen eigene Kopien der Gates, die
    dann **doppelt** feuern. Empfehlung: zum Arbeiten eines deaktivieren.
 9. Liegt zusätzlich ein lokal ausgechecktes OS-Repo vor, dessen Stand von der Installation
    abweicht: den Unterschied explizit benennen — **nutzbar ist der Installationsstand.**
+10. **Sitzungswissen-Ort ausweisen:** Führt das aktuelle Arbeits-Repo eine eigene
+    Wissensbasis (SSOT-Kategorie mit Master-Index — im OS-Repo `knowledge-base/`), liegt das
+    Sitzungswissen dort committet unter `sitzungswissen/`; sonst existiert dort **kein
+    Dateistrom** — das Projekt-Memory von Claude Code trägt den Stand allein. Beide Fälle
+    klar benennen, nie raten. Dazu **`NC_SECRETS_REF`** nur mit **gesetzt / nicht gesetzt**
+    ausweisen, nie ihren Wert lesen oder ausgeben.
 
 ## Regeln
 
@@ -89,4 +96,7 @@ eigenständige Satelliten ohne Kern-Dependency.
   markiert.
 - Der Gate-Status ist für alle drei Schalter belegt (`NC_FFG`, `NC_START_GATE`,
   `NC_AUTOSYNC`: Opt-out gesetzt ja/nein).
+- Der Sitzungswissen-Ort ist ausdrücklich benannt: entweder die `sitzungswissen/`-Kategorie
+  einer eigenen Wissensbasis, oder „kein Dateistrom, Projekt-Memory trägt allein".
+- `NC_SECRETS_REF` ist als **gesetzt** oder **nicht gesetzt** ausgewiesen — nie mit Wert.
 - Der Verlauf enthält ausschließlich Lese-Operationen.

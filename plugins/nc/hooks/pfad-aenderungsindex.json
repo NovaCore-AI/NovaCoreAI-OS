@@ -64,7 +64,7 @@
       "titel": "Pflege-Ausprägung / Queue-Format",
       "matrixKey": "Pflege-Ausprägung / Queue-Format geändert",
       "lesen": "die Datei selbst · queue-flow.md (Stationen, Takt, Prüfpunkte) · kriterien-pflege.md (Schema-Grenze) · die lesenden Kern-Skills end-session, journal, queue-abteilung, queue-kern",
-      "mitziehen": "pflege-auspraegung.json JEDER Abteilung — eine FELD-Änderung heißt schemaVersion hochzählen und alle Abteilungen nachziehen · die lesenden SKILL.md · vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage · README.md · CHANGELOG.md · Kern-Bump · queue-os.test.mjs · Queue bleibt append-only"
+      "mitziehen": "pflege-auspraegung.json JEDER Abteilung — eine FELD-Änderung heißt schemaVersion hochzählen und alle Abteilungen nachziehen · die lesenden SKILL.md · knowledge-base/standardprozesse/vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage · README.md · CHANGELOG.md · Kern-Bump · queue-os.test.mjs · Queue bleibt append-only"
     },
     {
       "id": "doks",
@@ -100,7 +100,7 @@
     },
     {
       "id": "vorlage",
-      "prefix": "vorlagen/abteilungsplugin/",
+      "prefix": "knowledge-base/standardprozesse/vorlagen/abteilungsplugin/",
       "titel": "Vorlage Abteilungsplugin",
       "matrixKey": "Vorlage geändert",
       "lesen": "abteilungs-plugin-bau.md §3 · die Vorlagendateien selbst",
@@ -108,11 +108,11 @@
     },
     {
       "id": "vorlage-ssot",
-      "prefix": "vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage",
+      "prefix": "knowledge-base/standardprozesse/vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage",
       "titel": "Vorlage `ssot-grundgeruest`",
       "matrixKey": "Vorlage `ssot-grundgeruest` geändert",
       "lesen": "ssot-aufbau.md §4 und §4a (Isolation) · abteilungs-plugin-bau.md §3b.1 · die Vorlagendatei selbst",
-      "mitziehen": "vorlagen/abteilungsplugin/VORLAGE.md (Inhaltsliste, Variablen, Kopierzeile) · CHANGELOG.md · der Abteilungs-Platzhalter muss stehenbleiben (Invariante „Vorlage ist kein Plugin\") · KEIN Rück-Nachzug in bereits gebaute Satelliten (eigenständige Repos, eigener Vorgang) · kein Bump, die Vorlage wird nicht ausgeliefert"
+      "mitziehen": "knowledge-base/standardprozesse/vorlagen/abteilungsplugin/VORLAGE.md (Inhaltsliste, Variablen, Kopierzeile) · CHANGELOG.md · der Abteilungs-Platzhalter muss stehenbleiben (Invariante „Vorlage ist kein Plugin\") · KEIN Rück-Nachzug in bereits gebaute Satelliten (eigenständige Repos, eigener Vorgang) · kein Bump, die Vorlage wird nicht ausgeliefert"
     },
     {
       "id": "wissen",

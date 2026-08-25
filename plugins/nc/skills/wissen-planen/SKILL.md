@@ -33,9 +33,11 @@ WP0/WP1 des Rahmens `wp-rahmen.md` im Kern-Plugin `nc`.
    (Lesekopie, die `/nc:setup` anlegt). Fehlen beide Felder oder das Verzeichnis dahinter,
    wird das **ausdrücklich als Übergangs-Befund gemeldet** und `/nc:setup` als Reparaturweg
    genannt — nicht raten, keinen Pfad erfinden, nicht schweigen. Das Sitzungswissen liegt
-   dagegen **im aktuellen Arbeits-Repo** unter
-   `.nc/erinnerung/`; fehlt es dort, ist das kein Registry-Problem, sondern ein noch nicht
-   eingerichtetes Repo.
+   dagegen **im aktuellen Arbeits-Repo**: Führt es eine eigene Wissensbasis (im OS-Repo
+   `knowledge-base/`), wohnt es dort unter `sitzungswissen/`; sonst entsteht **kein
+   Dateistrom** — das Projekt-Memory von Claude Code trägt den Stand allein (`/nc:start`
+   bestimmt den zutreffenden Fall). Der frühere lokale Strom `.nc/erinnerung/` ist
+   abgeschafft.
 2. **Vom Groben ins Feine.** Erst die Kategorie der laufenden Vorhaben sichten (Dateinamen
    tragen ein Datumspräfix), dann das einschlägige Dokument öffnen. Bei mehreren Ständen
    gewinnt der **jüngste Nachtrag**; Versionsnummern sind kein Aktualitätsnachweis.
@@ -49,17 +51,19 @@ WP0/WP1 des Rahmens `wp-rahmen.md` im Kern-Plugin `nc`.
 ## Zeiger
 
 Pfade der ersten Gruppe sind relativ zur Wissensbasis `knowledge-base/` des **OS-Repos**; die
-Pfade unter `.nc/erinnerung/` liegen im **aktuellen Arbeits-Repo**.
+`sitzungswissen/`-Pfade liegen dort ebenfalls, sofern das aktuelle Arbeits-Repo eine eigene
+Wissensbasis führt — sonst gibt es keinen Pfad, das Projekt-Memory trägt den Stand allein.
 
 | Quelle | Einschlägig wenn … |
 |---|---|
-| `grundwissen/` | zu klären ist, was gerade läuft — datierte Baupläne und Design-Specs mit Präfix `YYYY-MM-DD-`, je Vorhaben ein Dokument; **Arbeitsplatz**, eigene Pläne kommen hierher. Im selben Ordner liegen die dauerhaften Referenzen ohne Datumspräfix (Produktvision, Begriffsnormen) |
+| `grundwissen/` | ein Begriff (SSOT, Gate, CLAUDE-Ebene) erklärt oder ein Design begründet werden soll — dauerhafte Begriffsnormen und Design-Specs ohne Datumspräfix. Laufende Baupläne liegen seit Phase I **nicht mehr** hier, sondern in `aktive-bauplaene/` |
+| `aktive-bauplaene/` | zu klären ist, was gerade läuft — datierte Baupläne (inkl. Delta-Mappings, Ausführungsplänen) mit Präfix `YYYY-MM-DD-`, je Vorhaben ein Dokument; **Arbeitsplatz**, eigene Pläne kommen hierher |
 | `bauplan-archiv/` | das **Warum** einer bestehenden Struktur gebraucht wird — abgeschlossene und verworfene Pläne, unverändert übernommen, terminal |
 | `ideen-backlog/` | eine Idee auftaucht (ablegen statt vergessen) oder Kandidaten für die nächste Iteration gesucht werden — je Idee ein Dokument mit Datumspräfix; eine Idee ist **kein** Bauplan |
-| `.nc/erinnerung/offene-straenge-register.md` | gesucht wird, wo ein ausgelagerter, geplanter oder delegierter Strang verblieben ist — append/update, erledigte Zeilen bleiben mit Datum stehen |
-| `.nc/erinnerung/roll-up.md` | der Mehrtagesstand gestreift wird — eine Zeile je Arbeitstag (Datum · Thema · Ergebnis), jüngster Tag oben |
-| `.nc/erinnerung/stand.md` | der konsolidierte Sitzungsstand gebraucht wird |
-| `.nc/erinnerung/journal/` | der Verlauf eines bestimmten Arbeitstags gebraucht wird — je Tag eine Datei |
+| `sitzungswissen/offene-straenge-register.md` | gesucht wird, wo ein ausgelagerter, geplanter oder delegierter Strang verblieben ist — append/update, erledigte Zeilen bleiben mit Datum stehen |
+| `sitzungswissen/roll-up.md` | der Mehrtagesstand gestreift wird — eine Zeile je Arbeitstag (Datum · Thema · Ergebnis), jüngster Tag oben |
+| `sitzungswissen/<abteilung>/stand.md` | der konsolidierte Sitzungsstand gebraucht wird |
+| `sitzungswissen/<abteilung>/journal/` | der Verlauf eines bestimmten Arbeitstags gebraucht wird — je Tag eine Datei |
 | `standardprozesse/anker-reservierung.md` | ein knapper Anker vor Baubeginn zu vergeben ist (parallele Arbeitseinheiten, Freigabe-Regel, Aufräum-Pflicht) |
 | `grundwissen/NovaCore-OS-Anker-Reservierung-Definition.md` | begründet werden soll, **warum** Anker vor dem Bau reserviert werden |
 | `standardprozesse/sync-nachzug-bauzyklus.md` | mehrere Arbeitseinheiten parallel bauen und Konfliktzonen zu schneiden sind |
@@ -81,8 +85,9 @@ Pfade unter `.nc/erinnerung/` liegen im **aktuellen Arbeits-Repo**.
 ## Verifikation
 
 - Der genannte Wissensbasis-Pfad ist real, oder der Übergangs-Befund samt
-  `/nc:setup`-Hinweis ist ausgegeben; für das Sitzungswissen ist die Existenz von
-  `.nc/erinnerung/` im Arbeits-Repo geprüft.
+  `/nc:setup`-Hinweis ist ausgegeben; für das Sitzungswissen ist geprüft, ob das Arbeits-Repo
+  eine eigene Wissensbasis führt — dann die Existenz von `sitzungswissen/`, sonst der
+  ausdrückliche Befund „kein Dateistrom, Projekt-Memory trägt allein".
 - Jedes genannte Dokument wurde geöffnet; Datum und Status stehen in der Antwort.
 - Wurde nichts gefunden, steht der Satz „dazu existiert kein Plan" ausdrücklich da — statt
   einer stillen Leerantwort.

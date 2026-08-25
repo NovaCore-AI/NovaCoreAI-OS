@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "abteilung": "development",
   "queuePfad": "knowledge-base/kandidaten-queue/queue.md",
-  "kriterienVerweis": "Kriterienliste v1, referenz/pflege-auspraegung.md des Kern-Plugins nc",
+  "kriterienVerweis": "Kriterienliste v2, referenz/pflege-auspraegung.md des Kern-Plugins nc",
   "journalSonderregeln": [],
   "roteLinienDomaene": [
     "Deploys am WZS-Produktivsystem führt ausschließlich der Mensch aus.",

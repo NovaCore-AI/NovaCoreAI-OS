@@ -89,13 +89,17 @@ Behauptungen nur mit Beweis (grüner Test, Command-Output, beobachtetes Verhalte
 
 ```
 <repo-root>/
-├── .nc/                    # lokales nc-Memory (in .gitignore, nie committen)
-│   └── erinnerung/
-│       ├── stand.md        # konsolidierter Gesamtstand
-│       └── journal/<YYYY-MM-DD>.md   # append-only Tagesprotokoll
 ├── CLAUDE.md / AGENTS.md   # repo-eigene Anweisung (fachliche Source of Truth)
 └── <Projekt-Code/Doku>
 ```
+
+**Kein eigener Dateistrom mehr (BREAKING, seit Kern 0.13.0).** Ohne eigene Wissensbasis trägt
+das **Projekt-Memory von Claude Code** (`~/.claude/projects/<projekt-slug>/memory/`) den Stand
+allein — kein Verzeichnis, keine Datei im Arbeits-Repo. Führt das Arbeits-Repo selbst eine
+eigene Wissensbasis (SSOT-Kategorie mit Master-Index), wohnt das Sitzungswissen dort
+**committet** unter `sitzungswissen/` (Struktur wie in §3.2 für das OS-Repo). Der frühere
+lokale Strom `.nc/erinnerung/` ist abgeschafft; ein gefundener Altbestand wird von `/nc:start`
+gemeldet, nie gelesen.
 
 ### 3.2 OS-Repo (NovaCoreAI-OS selbst)
 
@@ -116,9 +120,10 @@ NovaCoreAI-OS/
 ├── plugins/nc-development/             # Abteilungsplugin, dependencies ["nc"]
 │   ├── workflow.md                     #   WP1–WP7 auf den NovaCore-Zyklus übersetzt
 │   └── skills/<modul>-<name>/SKILL.md  #   flaches Layout, Module = Namenspräfixe
-├── vorlagen/abteilungsplugin/          # Vorlage für weitere Abteilungen (kein Plugin)
 └── knowledge-base/                     # Wissensbasis im OS-Repo: grundwissen,
                                         # standardprozesse, debugging-findings
+    └── standardprozesse/vorlagen/abteilungsplugin/
+                                        # Vorlage für weitere Abteilungen (kein Plugin)
 ```
 
 Abteilungen können zusätzlich in **Satelliten-Repos** leben (das Repo IST das Plugin,
@@ -132,9 +137,11 @@ Install-Fallen: `knowledge-base/standardprozesse/abteilungs-plugin-bau.md` §3a/
 
 ### 3.3 Memory-Trennung (streng)
 
-Kunden-/Projekt-Kontext liegt **ausschließlich** im Arbeits-Repo unter `.nc/` (in `.gitignore`).
-**Nichts** davon ins OS-Repo. Das OS-Repo bleibt kontextfrei und stack-agnostisch. Das Journal ist
-**append-only** — bestehende Einträge nie verändern oder löschen.
+Kunden-/Projekt-Kontext bleibt **ausschließlich** im Arbeits-Repo bzw. dessen Projekt-Memory —
+**nie** im OS-Repo. Das OS-Repo bleibt kontextfrei und stack-agnostisch: Sein eigenes
+`sitzungswissen/` trägt nur den Baustand des OS selbst, nie Kundenkontext eines fremden
+Arbeits-Repos. Journal und Register sind **append-only** — bestehende Einträge nie verändern
+oder löschen.
 
 ### 3.4 Neue Dateien am richtigen Ort
 
@@ -145,6 +152,19 @@ ablegen. Kern-Skill → `plugins/nc/skills/<name>/SKILL.md`. Abteilungs-Skill �
 einfach zu erzeugen. Schicht-, Plugin- und Modulgrenzen nicht durchbrechen; in ausgelieferten
 Dateien **nie** über die Plugin-Grenze hinweg auf Pfade verweisen — auf Inhalte anderer Plugins
 per Name, auf Repo-Dokumente nur als Quellenangabe.
+
+### 3.5 Archiv ist keine Wissensquelle
+
+Jede SSOT führt Archiv-Kategorien — im OS-Repo `knowledge-base/bauplan-archiv/` und die
+append-only Protokolle unter `knowledge-base/debugging-findings/`. Sie sind **Log**: für
+Debugging, für Nachvollziehbarkeit und für Learning. Für normale operative Arbeit werden sie
+**nie** als Quelle herangezogen — operative Basis sind ausschließlich die **lebenden**
+Dokumente (Standardprozesse, aktuelle Baupläne, `CLAUDE.md`/`AGENTS.md`, `workflow.md`). Ins
+Archiv wird gegriffen, wenn ausdrücklich das **Warum** einer bestehenden Struktur gesucht, ein
+Fehler nachvollzogen oder geprüft wird, ob ein Symptom bekannt ist — nie, um eine aktuelle
+Frage nach dem Soll zu beantworten. Ein archivierter Bauplan beschreibt den Stand seines
+Entstehungstags, nicht die geltende Norm; wer ihn als Beleg für ein Soll zitiert, argumentiert
+mit einem abgelaufenen Zustand.
 
 ---
 
@@ -173,8 +193,9 @@ nur die Text-Guidance aus dieser Datei, ohne Plugin- oder Hook-Enforcement.
 Der verbindliche Rahmen steht in `wp-rahmen.md` des Kern-Plugins `nc` (WP0–WP8); die Abteilung
 übersetzt WP1–WP7 in ihrer eigenen `workflow.md`.
 
-1. **Session-Start (WP0):** `/nc:start` — lädt Stand (`.nc/erinnerung/stand.md`), letztes Journal,
-   Git-Lage und Werkzeuglage. **Kein Blind-Start.**
+1. **Session-Start (WP0):** `/nc:start` — bestimmt den Ablageort, liest das **Projekt-Memory
+   zuerst** (commit-unabhängig), dann Stand, letztes Journal, Register und Roll-up des
+   Zielorts, dazu Git-Lage und Werkzeuglage. **Kein Blind-Start.**
 2. **Feature-Arbeit (WP1–WP5):** `/nc-development:flc-feature-start` → `/nc-development:flc-plan`
    → implementieren → `/nc-development:flc-commit-prep` → `/nc-development:flc-pr`.
 3. **Review (WP6):** `/nc-development:fe-review` für Frontend-Diffs,
@@ -215,8 +236,13 @@ Der verbindliche Rahmen steht in `wp-rahmen.md` des Kern-Plugins `nc` (WP0–WP8
   ins OS-Repo.
 - **Fehlender Kontext:** Nachfragen statt raten; im Zweifel auf `/nc:start` zurückgreifen.
 - **Journal:** Append-only — bestehende Einträge nie verändern oder löschen.
-- **Secrets:** Keine Secrets/Tokens/Passwörter in Code, Logs, Commits oder Konversation. Im
-  Zweifel: Platzhalter plus Umgebungsvariable.
+- **Secrets:** Keine Secrets/Tokens/Passwörter in Code, Logs, Commits oder Konversation. Wo
+  die lokale Secrets-Quelle einer Maschine liegt, sagt allein die Umgebungsvariable
+  **`NC_SECRETS_REF`** — sie trägt einen **Verweis, nie einen Wert** (je nach Einrichtung ein
+  Dateipfad, der Name eines Passwort-Managers oder ein Kommando, das den Zugang liefert) und
+  wird **nie gelesen**. Ist sie nicht gesetzt, ist das kein Fehler — dann fragt der Mensch, kein
+  Abbruch. `/nc:setup` prüft das **nicht-blockierend**, `/nc:os-info` meldet ausschließlich
+  **gesetzt / nicht gesetzt**, nie den Inhalt.
 - **Eigene Fehler protokollieren:** Jeder selbst verursachte Fehler wandert append-only ins
   Fehlerprotokoll (`agent-learnings.md` der Wissensbasis des OS-Repos, sonst nach Konvention des
   Arbeits-Repos) — sofort, nicht am Ende.
@@ -255,6 +281,40 @@ Alle drei sind fail-open: ein interner Fehler blockiert nie die Arbeit.
   späteren Iterationen; abteilungsspezifische Regeln stehen in der `workflow.md` der Abteilung.
 - **Keine** Anweisung, die höher steht als eine **direkte User-Anweisung** — bei Konflikt gewinnt
   der User. Diese Datei ist Referenz, keine Autorität.
+
+---
+
+## 9. Meta-Regeln
+
+- **Eigener Worktree je Arbeitseinheit.** In einem aktiven Arbeits-Repo wird in einem eigenen
+  Worktree gearbeitet; er wird nach der finalen PR (Merge-Bereitschaft durch den Menschen)
+  aufgeräumt.
+- **Nie direkt auf `main` pushen** — auch nicht ins OS-Repo selbst: immer Branch → Pull
+  Request → Review → Merge (präzisiert die Rote Linie aus §6).
+- **Queue-Skills nur nach Tracker/Fälligkeit, nie spontan.** `/nc:queue-abteilung` und
+  `/nc:queue-kern` laufen ausschließlich nach der dokumentierten Fälligkeit (Standardprozess
+  `queue-flow.md` im OS-Repo) — einzige Ausnahme ist ein expliziter, direkter Nutzerauftrag
+  an genau diesen Skill.
+
+## 10. Multi-Agent-Ruleset
+
+1. **Overseer und Planer:** Jeder Workflow am NovaCore-OS wird von einem mindestens
+   **Opus**-Agenten (Basic Seat) oder einem **Fable**-Agenten (Premium Seat) geführt. Der
+   Overseer konzipiert die Beauftragung nötiger Subagenten, schreibt deren Bau- und
+   Handlungspläne und reviewt deren Ergebnisse persönlich; er gibt Feedback zur
+   Neuiteration. **Nur er** führt userbeauftragte Commits/Pushes aus.
+   - Bei infrastrukturkritischen Aktionen am OS — *cross-cutting infrastructure work*,
+     *distributed infrastructure work* oder *Shotgun-Surgeries* — führt der Overseer Planung
+     **und** Durchführung selbst durch. Nur **Bulk-Work** darf innerhalb eines solchen
+     Workflows beaufsichtigt delegiert werden, zur Schonung des Usage-Limits.
+2. **Reguläre Dev-Work** — isolierte Changes, lineare Workflows, prozessstandardisierte
+   Arbeit — wird nach Overseer-Planung an **Opus**-Agenten ausgelagert.
+3. **Aktualisierende Plugin-Maintenance** (Pfade, Links, Versionsnummern via den
+   Aktualisierungs-Index) bündelt entweder am Ende eines Workflows oder einer PR final ein
+   **Sonnet**-Agent.
+
+**Merke:** Vor jeder Delegation prüfen, ob der Agent für die Art der Arbeit geeignet und in
+der Lage ist. Opus ist die Baseline der operativen Arbeit unter dem Overseer.
 
 ---
 

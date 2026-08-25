@@ -26,9 +26,10 @@ NovaCoreAI-OS/                       = Marketplace-Wurzel (enthält .claude-plug
   plugins/nc/                        Kern: skills/ hooks/ tests/ wp-rahmen.md
                                      module-registry.json referenz/ doks/ nc-sync.md
   plugins/nc-development/            Dev-Abteilung (Kernheimat): skills/ workflow.md README.md
-  vorlagen/abteilungsplugin/         Vorlage für neue Abteilungen (kein Plugin) —
-                                     inkl. ssot-grundgeruest.md.vorlage für Satelliten
   knowledge-base/                    Wissensbasis des OS-Repos — wird NICHT ausgeliefert (§1a)
+    standardprozesse/vorlagen/abteilungsplugin/
+                                     Vorlage für neue Abteilungen (kein Plugin) —
+                                     inkl. ssot-grundgeruest.md.vorlage für Satelliten
 
 NovaCore-AI/<Name>-OS                    je ein PRIVATES Satelliten-Repo (Felix-OS, Biggi-OS)
   .claude-plugin/plugin.json             das Repo IST das Plugin (Manifest an der Wurzel);

@@ -1,5 +1,38 @@
 # Anker-Reservierung — Standardprozess
 
+> ## ⚠ Normänderung 2026-08-24 (Entscheid P-E2) — das Git-Ref-Mittel ist entfallen
+>
+> **Tags entstehen bei NovaCore ausschließlich als Teil eines Release**
+> ([Aktualisierungs-Index §3.6, Release-Zug](aktualisierungs-index.md)). **Reserve- und
+> Anker-Tags (`reserve/*`) gibt es nicht mehr.** Grund: Unter dem Waypoint-Modell wird die
+> Version erst am Release-Zug vergeben — der knappste und kollisionsträchtigste Anker existiert
+> im Arbeitsstrang also gar nicht mehr, und ein Tag-Namensraum, der nur noch Restfälle trägt,
+> kostet mehr Pflege, als er verhindert.
+>
+> **Was bleibt:** die **Begriffsnorm Anker** (was ein knapper Bezeichner ist, welche
+> Kollisionsklassen es gibt —
+> [Definition](../grundwissen/NovaCore-OS-Anker-Reservierung-Definition.md)), die **Pflicht zur
+> Abstimmung vor der ersten Zeile Arbeit** bei Skill-, Agent-, Hook- und Abteilungsnamen sowie
+> Nachtrags-/AP-Kennungen, und die **späte Testsuite-Invariante** gegen doppelt vergebene
+> CHANGELOG-Versionsüberschriften (`struktur.test.mjs`, unverändert scharf).
+>
+> **Was entfällt:** der Ablauf §2, die Aufräum-Pflicht §4, die Branch-Protection-Ausnahme §5
+> und die Kollisions-Auflösung §6 — sie beschreiben das abgeschaffte Mittel und stehen ab hier
+> **historisch**. Sie werden bewusst nicht gelöscht: Sie erklären die drei Alt-Refs unten.
+>
+> **Abstimmung ohne Tag:** Der knappe Bezeichner wird im **Bauplan** des Vorhabens
+> (`aktive-bauplaene/`) und in der **Zeile im Offene-Stränge-Register** festgeschrieben, bevor
+> gebaut wird. Läuft mehr als eine Arbeitseinheit, ist das der gemeinsame Ort — der Overseer
+> hält ihn.
+>
+> **Altbestand (Stand 2026-08-24):** `reserve/nc-0.9.0`, `reserve/abteilung-ui-ux`,
+> `reserve/abteilung-automation`. Sie werden **nicht** nachgepflegt und **nicht** erneuert; ihre
+> Entfernung ist eine reine Aufräum-Entscheidung des Maintainers, kein Vorgang dieses Prozesses.
+> Die Registry-Reservierungen `ui-ux`/`automation` bleiben unberührt — sie stehen in
+> `module-registry.json`, nicht in einem Ref.
+
+---
+
 > **Verbindlich**, sobald mehr als eine Arbeitseinheit gleichzeitig am OS arbeitet (zwei
 > Sessions, zwei Worktrees, zwei beauftragte Agenten). Reserviert werden **knappe Anker** —
 > Bezeichnungen, die genau einmal vergeben werden können und deren Wert sich aus einem

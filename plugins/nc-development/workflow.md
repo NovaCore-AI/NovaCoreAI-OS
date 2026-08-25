@@ -26,9 +26,11 @@ Plugins immer mitinstalliert und mitaktiviert wird.
 | WP8 | Session-Ende | Stand sichern, Entscheidungen protokollieren | `/nc:end-session` *(Kern)* | — |
 
 **Kern-Abhängigkeit:** WP0/WP8 laufen über die Kern-Skills `/nc:start` und `/nc:end-session`;
-einzelne Ereignisse hält `/nc:journal` fest. Sie arbeiten auf dem Sitzungsgedächtnis unter
-`.nc/erinnerung/`. Da der Kern als `dependencies`-Eintrag dieses Plugins immer mitkommt, kann
-WP0/WP8 nicht fehlen.
+einzelne Ereignisse hält `/nc:journal` fest. Sie arbeiten auf dem Sitzungsgedächtnis: im
+**OS-Repo** unter `knowledge-base/sitzungswissen/`, weil diese Abteilung repo-intern ist und
+das OS-Repo eine eigene Wissensbasis führt (kein Dateistrom mehr in fremden Arbeits-Repos ohne
+eigene Wissensbasis). Da der Kern als `dependencies`-Eintrag dieses Plugins immer mitkommt,
+kann WP0/WP8 nicht fehlen.
 
 **WP3 ehrlich ausgewiesen:** Für WP3 gibt es bewusst keinen Generalisten-Skill — die Umsetzung
 folgt der Test-First-Regel des Kerns, und die `wzs-*`-Skills liefern die produktspezifischen
@@ -128,10 +130,13 @@ Dokument „Relevant wenn …"), erst triagieren, dann lesen. Lokal liegt die Wi
 **Lesekopie** unter `~/.nc/ssot/`, angelegt und nachgezogen von `/nc:setup`. Pfade werden gegen
 den Index bestimmt, nicht geraten.
 
-**Sitzungswissen-Residenz:** Stand, Journal und offene Stränge wohnen unter `.nc/erinnerung/`
-des Arbeits-Repos (in dessen `.gitignore`) und werden von `/nc:start` bzw. `/nc:end-session`
-geschrieben und gelesen. Eine Residenz innerhalb der Wissensbasis gibt es hier nicht — das
-OS-Repo ist öffentlich und bleibt kundenkontextfrei.
+**Sitzungswissen-Residenz:** Diese Abteilung ist repo-intern; seit Phase I führt das **OS-Repo**
+selbst eine eigene Wissensbasis, darum wohnen Stand, Journal und offene Stränge dort committet
+unter `knowledge-base/sitzungswissen/development/` bzw. `knowledge-base/sitzungswissen/`
+(Register, Roll-up) — geschrieben und gelesen von `/nc:start` bzw. `/nc:end-session`. Der
+frühere lokale Strom `.nc/erinnerung/` ist abgeschafft; das OS-Repo bleibt trotzdem
+kundenkontextfrei — die Residenz trägt ausschließlich den Baustand des OS selbst, nie
+Kundenkontext eines fremden Arbeits-Repos.
 
 **Queue-Anbindung:** Die **Klassifikation** eines Pflegekandidaten leistet der Kern in Station 1
 des Queue-Flows, dem Abschlussschritt von `/nc:end-session`; die Abteilung liefert dazu nur ihre

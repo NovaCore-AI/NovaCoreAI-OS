@@ -16,7 +16,7 @@ Plugin — die Vorlage bleibt die geprüfte Quelle.
 ## Inhalt
 
 ```
-vorlagen/abteilungsplugin/
+knowledge-base/standardprozesse/vorlagen/abteilungsplugin/
   .claude-plugin/plugin.json.vorlage   Manifest-Gerüst mit dependencies ["nc"]
   README.md.vorlage                    Abteilungs-README-Gerüst
   abteilungs-claude.md.vorlage         Abteilungs-CLAUDE (Ebene 2), zweigeteilt — Pflicht

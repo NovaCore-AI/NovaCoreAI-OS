@@ -250,7 +250,7 @@ ihren Gegenstand?"
 | **nie vom Subagenten** | Commit, Push, Tag | Commit-Hoheit beim Führenden/Maintainer (§6) |
 | **nicht ins Plugin** | Agent mit `hooks`/`mcpServers`/`permissionMode` | stattdessen `.claude/agents/` des Arbeits-Repos |
 | **gesperrt** | `isolation: worktree` | bis Team-Mindestversion ≥ 2.1.210 (§3) |
-| **nie unter `plugins/`** | Agenten-**Vorlage** mit Platzhaltern | `vorlagen/abteilungsplugin/` — die Invariante „Keine offenen Vorlagen-Platzhalter in ausgelieferten Plugins" (`struktur.test.mjs`) würde sonst rot |
+| **nie unter `plugins/`** | Agenten-**Vorlage** mit Platzhaltern | `knowledge-base/standardprozesse/vorlagen/abteilungsplugin/` — die Invariante „Keine offenen Vorlagen-Platzhalter in ausgelieferten Plugins" (`struktur.test.mjs`) würde sonst rot |
 
 ---
 
