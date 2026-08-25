@@ -452,7 +452,7 @@ test('Repo-Wurzel: nur die bekannten getrackten Eintraege, kein Backup, kein doc
   const ERLAUBT = new Set([
     '.claude-plugin', '.gitattributes', '.github', '.gitignore',
     'AGENTS.md', 'CHANGELOG.md', 'CLAUDE.md', 'CONTRIBUTING.md', 'LICENSE', 'ONBOARDING.md',
-    'README.md', 'SECURITY.md', 'VERSION', 'knowledge-base', 'package.json', 'plugins',
+    'README.md', 'SECURITY.md', 'VERSION', 'knowledge-base', 'metaknowledge', 'package.json', 'plugins',
   ]);
   const getrackt = execFileSync('git', ['ls-files', '-z'], { cwd: REPO, encoding: 'utf8' })
     .split('\0').filter(Boolean)
