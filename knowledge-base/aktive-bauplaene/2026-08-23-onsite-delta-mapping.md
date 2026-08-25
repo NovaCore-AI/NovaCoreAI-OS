@@ -256,6 +256,320 @@ bleiben erhalten (Härtungs-Erhalt wie Bauplan 2026-08-15, I-Serie).
 - **Offen bleiben:** die Phasen J/K in vollem Umfang (D16, D17, D19–D23, D28–D30); D15/D18
   sind mit diesem Nachtrag erledigt und aus dem Phase-K-Rest gestrichen.
 
+## Nachtrag N5 (2026-08-25) — Onsite 0.27.0, Anker-Fortschreibung, sieben neue Posten
+
+- **Beobachtungs-Anker fortgeschrieben:** Onsite `origin/main` wanderte von `2530ced`
+  (Kern **0.26.0**, Anker aus Nachtrag N4) auf **`a9927b2`**, Kern **0.27.0** (Release
+  2026-08-25). Delta: **37 Commits, 53 Dateien, +2.036/−399 Zeilen** (`git diff --stat
+  2530ced..origin/main`). Die nächste Iteration misst ihr Delta **ab `a9927b2`**.
+- **Klarstellung zu „Team-Sync-Payload erweitert (#130)":** Der Eintrag steht zwar in
+  Onsites 0.27.0-Sektion, liegt aber **vor** dem Anker — `2530ced` **ist** der Merge von
+  #130. Der Posten ist als **D12** bereits in Phase I (PR #25) gebaut
+  (`plugins/nc/nc-sync.md`: Meta-Regeln + Multi-Agent-Ruleset + „Ein Archiv ist keine
+  Wissensquelle"). **Kein neuer Posten.** Onsite hat ihn nur deshalb im Release-Text,
+  weil dessen Waypoint-Batch alle seit 0.26.0 gemergten PRs zusammenfasst.
+- **Sieben neue Posten** (D31 ff., aus dem 0.27.0-Delta):
+
+  | # | Posten | Klasse | Phase | Status |
+  |---|---|---|---|---|
+  | D31 | Anker-Reservierung ersatzlos aufgehoben (Onsite #138, `7d172c1`) | **P + E** | J | offen |
+  | D32 | Setup-Hinweis-Hook `oai-setup-hinweis.js` + `hooks/lib/infra-registry.js` (OS-36, #137) | **N** | J | offen |
+  | D33 | Safety-Gate: Fehlalarm-Härtung `NAME=wert`-Wertentscheidung (#131) | **N** | J | offen |
+  | D34 | Contributing-Flow S1–S7 + Strang-Definition (#132, Jira OS-14) | **N + E** | J | offen |
+  | D35 | SSOT-Sichtbarkeitsmodell der Abteilungs-SSOT (#134, `b18016d`) | **P + E** | J | offen |
+  | D36 | `oai-development` v0.13.3 — ISENTO-Jira-Ticket-Schreibkonvention (#139) | **X** | — | entfällt (Prozessteil in D29) |
+  | D37 | Ideen-Backlog „Referenz-Testbaustein für Satelliten-Suiten" (2026-08-25) | **B** | — | beobachten |
+
+### N5.1 D31 — Anker-Reservierung ersatzlos aufgehoben (**P + E**, Phase J)
+
+**Onsite-Fundstelle:** Maintainer-Entscheid 2026-08-25, PR #138, Commit `7d172c1`. Gelöscht
+wurden **beide** Dokumente: `plugin-maintanance-ruleset-source/anker-reservierung.md` und
+`project-meta-infos/Onsite.ai-OS-Anker-Reservierung-Definition.md` (`git diff --name-status`
+führt sie als `D`). Die letzte verbliebene Ankerklasse (Skill-/Agent-/Hook-**Name**) entfällt;
+die Absicherung trägt jetzt allein die Mechanik: Merge-Konflikt bei Dateikollision,
+Suite-Invariante gegen doppelte Spec-Abschnittsnummern. Bereinigt wurden im selben Zug
+`skills/skill-builder`, `wissen-aendern`, `wissen-planen`, `fit-pruefung/rubrik.md` und der
+tote Eintrag in `hooks/wissen-sucheindex.json`; die Kettenzeile „Anker gesetzt
+(`anker-reservierung.md`) →" verschwand aus `kern-plugin-bau.md`, `abteilungs-plugin-bau.md`,
+`subagenten-bau.md`, `wissens-router-bau.md` und `abteilungs-inhalts-pruefung.md`, und
+`Aktualisierungs-Index` §3.3 sagt jetzt wörtlich „**Es wird nichts reserviert**" — was bleibt,
+ist Pflichtschritt 8: fremde Worktrees vor dem ersten Schreiben prüfen.
+
+**Befund gegen NovaCore-Ist:** Wir haben am 2026-08-24 mit Entscheid **P-E2** das Gegenteil
+gebaut — *Begriffsnorm behalten, Git-Ref-Mittel entfernen*. Belegt durch die Banner beider
+Dateien: `knowledge-base/standardprozesse/anker-reservierung.md` Z. 3–12 („das Git-Ref-Mittel
+ist entfallen … **Was bleibt:** die **Begriffsnorm Anker**") und
+`knowledge-base/grundwissen/NovaCore-OS-Anker-Reservierung-Definition.md` Z. 3–10 („Die
+Begriffsnorm dieses Dokuments gilt unverändert … Aufgehoben ist das Mittel"). Onsite ist einen
+Schritt weiter gegangen und hat auch die Begriffsnorm gestrichen.
+
+**Nach N1.2 gilt Onsite-Parität als Default, Vorschlag also:** beide Dateien ersatzlos
+streichen, Ketten-/Verweiszeilen und Sucheindex bereinigen. Der Posten trägt trotzdem ein
+**E**, weil er einen erst gestern getroffenen eigenen Entscheid (P-E2) überstimmt — das ist
+Maintainer-Sache, nicht Agenten-Sache.
+
+**Verweis-Sweep (`git grep -il 'anker-reservierung|Anker-Reservierung'`, 31 Dateien):**
+`AGENTS.md` · `CHANGELOG.md` · `README.md` · `knowledge-base/SSOT-Document-Index.md` ·
+`aktive-bauplaene/2026-08-16-nc-development-modernisierung-bauplan.md` ·
+`aktive-bauplaene/2026-08-24-onsite-delta-phase-i-bauplan.md` ·
+`bauplan-archiv/2026-08-15-onsite-endstand-nachbau-bauplan.md` ·
+`debugging-findings/agent-learnings.md` · drei Berichte in `firmenkernprozesse/`
+(2026-08-14-Bericht, 2026-08-15-Entwicklungs-Recap, 2026-08-15-USPs) ·
+`firmenkernprozesse/prozesskarten/00-FAMILIE-UND-VERDRAHTUNG.md`,
+`…/01-aktualisierungs-index.md`, `…/09-anker-reservierung.md`, `…/README.md` ·
+`firmenkernprozesse/team-rollout-infrastruktur/03-META-PROZESSE-UND-DATENFLUESSE.md` ·
+`grundwissen/2026-08-16-novacore-agent-sdk-gui-architektur.md` ·
+`grundwissen/NovaCore-OS-Anker-Reservierung-Definition.md` ·
+`grundwissen/NovaCore-OS-Kriterienliste-Definition.md` ·
+`grundwissen/NovaCore-OS-Node-Doks-Definition.md` ·
+`sitzungswissen/gemeinsam/journal/2026-08-16.md` ·
+`sitzungswissen/offene-straenge-register.md` ·
+`standardprozesse/abteilungs-inhalts-pruefung.md`, `…/aktualisierungs-index.md`,
+`…/anker-reservierung.md`, `…/os-bau-methode.md` · `plugins/nc/hooks/wissen-sucheindex.json` ·
+`plugins/nc/skills/wissen-aendern/SKILL.md`, `…/wissen-nachschlagen/SKILL.md`,
+`…/wissen-planen/SKILL.md` · `plugins/nc/tests/struktur.test.mjs`.
+**Sechs davon sind Historie und bleiben unangetastet** (CHANGELOG, Bauplan-Archiv, Journal,
+die drei datierten Firmenkernprozess-Berichte); der Rest ist echter Nachzug. Zwei Grenzfälle:
+`plugins/nc/tests/struktur.test.mjs` hängt eine Struktur-Invariante am Dateinamen — sie fällt
+mit der Datei und muss im selben Paket geändert werden, sonst ist die Suite rot; und die
+Prozesskarte `09-anker-reservierung.md` ist ein eigenes Dokument mit eigener
+Familien-Verdrahtung (`00-FAMILIE-UND-VERDRAHTUNG.md`), ihre Löschung zieht Nummernkreis und
+Verdrahtung nach. Das ist der aufwendigste Teil des Postens.
+
+### N5.2 D32 — Setup-Hinweis-Hook (**N**, Phase J)
+
+**Onsite-Fundstelle:** OS-36, PR #137, Commits `48153ab` (Hook v1 + Registry-Lib), `9de9e02`
+(Zustandsmaschine), `f0483ec` (Tests), `2145ecf` (Registrierung), `214a991` (Review-Fixes);
+Dateien `plugins/oai/hooks/oai-setup-hinweis.js`, `plugins/oai/hooks/lib/infra-registry.js`,
+`plugins/oai/tests/oai-setup-hinweis.test.mjs` (21 Tests), Bauplan
+`Aktive Baupläne/2026-08-25-setup-hinweis-hook.md`, Betriebshandbuch §6.5b.
+
+**Mechanik aus der Quelle** (Hook-Kopf und Betriebshandbuch §6.5b, live gelesen):
+SessionStart, **kein Gate** — SessionStart kann laut Doku ohnehin nicht blocken. Geprüft wird
+der **init-Beleg** der Maschine, die Infra-Registry `~/.claude/oai/infra.json` (der
+`init`-Skill ist ihr einziger Schreiber — „die Platte ist die Wahrheit").
+**Pflichtfelder:** `schemaVersion`, `abteilung`, `szenario` (String-tolerant), dazu
+Pfad-Liveness je `kernRepoPfad`/`abteilungsRepoPfad` (`.git` als **Datei** zählt →
+Worktree-Lage; die Windows-8.3-Kurzpfad-Tilde ist **kein** Relativ-Pfad-Indiz, Debug-Log
+`0763260`; `"ausstehend"` ist allein im `abteilungsRepoPfad` grün).
+**Zustandsmaschine, erster Treffer gewinnt:** `fehlt` · `neuer` (`schemaVersion` höher als der
+installierte Kern → Anweisung *Marketplace-Update*, nicht init) · `defekt` (Pflichtfeld fehlt,
+toter Pfad, unzulässiges `ausstehend` im `kernRepoPfad`) · `gruen` = **stumm** (null Token auf
+eingerichteten Maschinen). Bei den ersten drei injiziert er **höchstens einmal je Sitzung**
+eine **Anweisung zum Handeln** (Muster Queue-Fälligkeit): `/oai:init` ausführen oder an einen
+Subagenten delegieren. Der Sitzungsmarker liegt in `os.tmpdir()` und verhindert den
+**Compact-Hijack** (Review-Befund H1: sonst stünde die Anweisung nach jeder
+Auto-Kompaktierung erneut mitten in laufender Arbeit); ein defekter Marker gilt als *bereits
+gezeigt* (Noise-Safety). **Opt-out `OAI_SETUP_HINWEIS=off`**, **Subagenten ausgenommen**,
+**fail-open** (jede Exception → Exit 0). Kein Cron, kein Scheduler, kein Netz, kein
+Git-Aufruf. Test-Umleitungen `OAI_SETUP_STATE_DIR` / `OAI_SETUP_SESSION_DIR`. Die neue Lib
+`hooks/lib/infra-registry.js` konsolidiert die **vierte** Lesestelle der Registry; die
+Bewertung bleibt im Hook.
+
+**Befund gegen NovaCore-Ist:** `plugins/nc/hooks/hooks.json` registriert **neun** Hooks
+(`nc-session-start`, `nc-doks-autosync`, `nc-queue-faelligkeit`, `nc-wissens-hinweis`,
+`nc-end-mahnung`, `nc-ffg`, `nc-start-gate`, `nc-safety-gate`, `nc-pfad-hinweis`) — **keiner
+prüft den Setup-Beleg**. `infra.json` wird bei uns an drei Stellen gelesen
+(`nc-queue-faelligkeit.js:229`, `nc-wissens-hinweis.js:115`, `nc-pfad-hinweis.js:104`), eine
+gemeinsame Lib fehlt — Onsites Konsolidierungsgrund gilt bei uns also genauso.
+**`nc-session-start.js` liest `infra.json` nicht** (kein Treffer im Grep über
+`plugins/nc/hooks/`). Der Port bringt damit zwei Dinge: den Hook **und** die Lib-Extraktion
+der drei Bestands-Lesestellen.
+
+**Affiliate-Invariante (N1.1):** Der Hook iteriert über die Registry-Pfade. Affiliate-Plugins
+und Kollegen-OS stehen per Isolations-Invariante nie in der Registry und werden folglich nie
+belegt-geprüft — die Port-Formulierung muss das benennen statt es stillschweigend mitzunehmen.
+
+**Bekannte NovaCore-Vorbedingung:** `/nc:setup` schreibt `kernRepoPfad` heute nicht (offener
+Strang seit Phase H, Registerzeile 2026-08-24). Der Zustand `defekt` würde bei uns also
+flächendeckend feuern, solange das nicht gebaut ist — der Port hängt an jenem Vorgang, oder
+das Feld muss im NC-Zuschnitt optional bleiben. **Overseer-Entscheid, hier bewusst offen
+gelassen.**
+
+### N5.3 D33 — Safety-Gate: Fehlalarm-Härtung der `NAME=wert`-Zuweisung (**N**, Phase J)
+
+**Onsite-Fundstelle:** PR #131, Commits `d2e5342`/`eaa4149`,
+`git diff 2530ced..origin/main -- plugins/oai/hooks/oai-safety-gate.js` (+98 Testzeilen).
+
+**Mechanik in drei Sätzen:** Bei einem `NAME=wert`-Token entscheidet nicht mehr der Name,
+sondern der **Wert**, in drei Stufen — deploy-Wort **im Wert** fragt (`MODE=deploy-prod`),
+deploy-Wort **im Namen** mit Prod-Wert fragt ebenfalls (`DEPLOYMENT_TYPE=prod` *ist* die
+Auslieferungs-Entscheidung), jeder andere Wert bleibt still (`DEPLOYMENT_TYPE=dev`). Als Prod
+zählt jeder Wert mit **Präfix** `prod`/`prd`/`live` (Konstante `PROD_PRAEFIXE`, deshalb auch
+`prod-eu`, `prod2`, `production-blue`, `prd-01`; `preprod` braucht keine Ausnahme, weil es
+nicht mit `prod` beginnt) sowie jeder statisch nicht auflösbare Wert (`$VAR`, `${…}`,
+Kommando-Substitution, Backticks) — konservativ wie Muster 2. Der Zuweisungs-Pass läuft auf
+dem **quote-awaren** Tokenstrom (sonst fiele `DEPLOYMENT_TYPE="prod"` durch), bewertet aber
+nur Namen, die im quote-**bereinigten** Strom als echte Zuweisung auftauchen — sonst feuerte
+`git commit -m "DEPLOYMENT_TYPE=prod"`; ein leerer Wert ist kein Prod-Ziel. Anlass war ein
+belegter Fehlalarm im Arbeits-Repo `partsens` (`make up DEPLOYMENT_TYPE=dev`, der lokale
+Containerstart).
+
+**Befund gegen NovaCore-Ist:** `plugins/nc/hooks/nc-safety-gate.js` hat die
+Verbpositions-Regel (`DEPLOY_AUSNAHMEN` Z. 171, `deployTreffer` Z. 218–223) und kennt
+Zuweisungen nur als **Präfix-Überspringer** (`ZUWEISUNG` Z. 123, benutzt in Z. 132, um
+führende `VAR=wert` vor dem Binary zu überlesen). `TRAEGT_DEPLOY` ist bei uns unverändert
+`(t) => /deploy/i.test(t)` (Z. 172) — **keine Wertentscheidung, kein `PROD_PRAEFIXE`**. Die
+Fehlalarm-Klasse existiert bei uns damit unverändert: jedes `make up DEPLOYMENT_TYPE=dev`
+erzeugt einen Freigabedialog. Unsere NC-Härtung „reine Lesekommandos mit deploy-Wort nur im
+Argument fragen nie" deckt den Fall **nicht** ab, weil `make`/`env` keine Lesekommandos sind.
+Fehlalarm-Schutz ist auch bei uns Abnahmekriterium (Hook-Kopf) — der Port ist keine Kür.
+
+### N5.4 D34 — Contributing-Flow S1–S7 + Strang-Definition (**N + E**, Phase J)
+
+**Onsite-Fundstelle:** PR #132, Jira OS-14 (aus Desktop-TODO T11), Commits `c0536e3`
+(Standardprozess + Begriffsnorm), `270a228` (Challenger-Review: 1 Critical, 5 Important),
+`2b2751d` (Rollenbesetzung). Neue Dateien:
+`plugin-maintanance-ruleset-source/contributing-flow.md` und
+`project-meta-infos/Onsite.ai-OS-Strang-Definition.md`; dazu `CONTRIBUTING.md` um einen
+Flow-Absatz erweitert und der Wissens-Sucheindex ergänzt.
+
+**Inhalt aus der Quelle:** Ein **Strang** ist die beauftragte Arbeitseinheit von der Übernahme
+(Jira-Ticket „In Arbeit" oder Maintainer-Auftrag) bis zum gemergten PR — genau ein Ziel-Repo,
+genau ein Branch im Schema `<typ>/<thema>` (`feat`/`fix`/`docs`/`chore`/`update`), genau ein
+Worktree `.worktrees/<branch>`, genau ein PR-Ergebnismemo als Wissensträger, und ein Ende, das
+das Aufräumen von Branch und Worktree einschließt. Der Standardprozess führt die Stationen
+**S1 Vorlauf · S2 Strang anlegen · S3 Bauen (versionslos) · S4 Abschluss · S5 Einreichen
+(Freigabe nötig) · S6 Review + Merge · S7 Übergabe an den Release-Zug** mit je einer
+QS-Spalte. Tragende Regel: *Agenten bereiten bis zum fertigen PR vor, Menschen entscheiden*;
+Versionen vergibt ausschließlich der Release-Zug. **S6 und S7 trägt namentlich der
+Systemarchitekt Lucas Vöhringer — bewusst kein Agent.** Abgrenzungen sind explizit gesetzt:
+Queue-Flow = Aufstieg von *Wissen*, dieser Prozess = *Arbeits*-Beitrag; das Release-Runbook
+bleibt `Aktualisierungs-Index` §3.6; das *Was* regeln `kern-plugin-bau.md` /
+`abteilungs-plugin-bau.md`.
+
+**Befund gegen NovaCore-Ist:** `git grep -il 'contributing-flow|Strang-Definition'` über den
+Worktree ist **leer** — beides fehlt vollständig. Wir führen ein Offene-**Stränge**-Register
+und benutzen den Begriff durchgehend, haben ihn aber nirgends definiert; dieselbe Lücke, die
+Onsite mit OS-14 geschlossen hat.
+
+**Warum zusätzlich E:** Die Rollenbesetzung ist bei uns nicht deckungsgleich. Onsite hat einen
+Systemarchitekten, der S6/S7 persönlich trägt; bei NovaCore steht in der Firmenspezifikation
+ein Team mit den Abteilungen dev, ui-ux und automation, dazu ein Multi-Agent-Ruleset, in dem
+der Overseer plant und reviewt und der Maintainer mergt. Der Zuschnitt von S6/S7 auf reale
+NovaCore-Rollen ist ein Maintainer-Entscheid, kein Übersetzungsschritt.
+
+**Affiliate-Invariante (N1.1):** Der Prozess spricht von „Kern oder Satellit" und iteriert
+damit über die Plugin-Landschaft. Affiliate-Plugins sind **ausgenommen** — sie folgen dem
+Beitrags-Flow des OS nicht und stehen nie in der Infra-Registry.
+
+### N5.5 D35 — SSOT-Sichtbarkeitsmodell der Abteilungs-SSOT (**P + E**, Phase J)
+
+**Onsite-Fundstelle:** Maintainer-Entscheid 2026-08-25, PR #134, Commit `b18016d`
+(Spec-Nachtrag 2026-08-25, präzisiert §15.24 E3, deutet E6/AP3 um). Berührt:
+`Onsite.ai-OS-SSOT-Definition.md`, `kern-ssot-aufbau.md` §1/§4, `abteilungs-plugin-bau.md`
+§3.1 Schritt 5, `queue-flow.md` §5/§6.2, `skills/queue-kern/SKILL.md` Schritt 9 + Regelblock,
+Plugin-README.
+
+**Der Entscheid:** Die Abteilungs-SSOTs bleiben **privat**. In den Kern steigt je beförderter
+Sache ein **konzentriertes Fakten-Dokument** auf — die firmenweit handlungsnötigen Fakten,
+Datum und Herkunftsabteilung im Kopf, die **auflösbare** Fundstelle (Pfad, PR oder Commit; bei
+Ideen die Queue-Zeile). Das Vollprotokoll bleibt in der Abteilung, Zugriff darauf wird **bei
+Bedarf angefragt**. Die Verbindungsregel wechselt damit von „Kern verlinkt, Abteilung
+dokumentiert" auf **„Kern verdichtet und verweist, Abteilung dokumentiert vollständig"** —
+nie eine Volltext-Kopie, nie das umgezogene Original. Zwei abgeleitete Regeln: fehlt einer
+Queue-Zeile der auflösbare Verweis, ist das ein **Befund für den Kurator** im Prüfprotokoll
+(kein Formfehler, den der Skill still heilt); und der Cross-Abteilungs-Zugriff ist kein
+Standing-Read mehr, sondern eine Anfrage — der Bau dieses Anfragewegs bleibt bei Onsite als
+`AP3` in neuer Deutung offen.
+
+**Befund gegen NovaCore-Ist:** Wir tragen durchgehend die **alte** Formel.
+`plugins/nc/skills/queue-kern/SKILL.md` Z. 191–192: „Inhalt ist **Einzeiler + Verweis auf die
+Abteilungsquelle** — ‚Kern verlinkt, Abteilung dokumentiert', nie eine Volltext-Kopie", und
+Z. 288 im Regelblock: „**Kein Volltext im Kern** — Einzeiler + Verweis". Dazu
+`knowledge-base/standardprozesse/queue-flow.md` Z. 61 (Spalte „Verweis statt Volltext") und
+Z. 65 (Station 6 wörtlich „Kern verlinkt, Abteilung dokumentiert") sowie
+`knowledge-base/grundwissen/NovaCore-OS-SSOT-Definition.md` Z. 90. Der Port ist damit ein
+Vier-Dateien-Nachzug plus Kern-Bump (Skill-Änderung = Produktklasse).
+
+**Warum zusätzlich E:** Die Privatheits-Prämisse ist bei Onsite real — dort sind die
+Abteilungs-Satelliten getrennte, teils fremd-gelesene Repos. Bei uns gilt der
+Übergangszustand E1: die Abteilungs-Queue lebt noch im OS-Repo selbst, es gibt also derzeit
+gar keine Grenze, über die hinweg angefragt werden müsste. Ob wir das Modell **jetzt**
+übernehmen (Vorratsnorm) oder erst mit dem echten Satelliten-Split, ist Maintainer-Sache.
+
+**Affiliate-Invariante (N1.1):** Das Modell spricht von „allen Abteilungen". Affiliate-Plugins
+haben keine Abteilungs-SSOT im Sinne dieses Flows und sind aus Aufstieg wie Anfrageweg
+**ausgenommen**.
+
+### N5.6 D36 / D37 — nicht zu bauen
+
+- **D36 (X):** Marketplace-Pin `oai-development` v0.13.2 → v0.13.3 (#139, `c76ccab`) trägt die
+  **ISENTO**-Jira-Ticket-Schreibkonvention — eine Kundenkonvention von Onsites Abteilung,
+  firmenspezifisch und für NovaCore gegenstandslos. Der **Prozessteil** (wie Jira-Tickets
+  überhaupt geschrieben und bewegt werden) ist bei uns bereits als **D29**
+  (`jira-workflow.md`) erfasst und geht dort auf.
+- **D37 (B):** `Feature-idea-backlog/2026-08-25-referenz-testbaustein-satelliten-suiten.md` —
+  versionierter Referenz-Testbaustein für die Satelliten-Testsuiten, damit deren
+  Near-Duplikate nicht auseinanderdriften. **Bei Onsite selbst Idee, nicht beauftragt**
+  („Status: Idee, nicht beauftragt"); der Mechanismus existiert dort erst für genau eine Datei
+  (`agenten.test.mjs` mit Baustein-Version im Kopf, `subagenten-bau.md` §7). Beobachten, bis
+  Onsite entscheidet.
+
+### N5.7 Restprüfung der übrigen geänderten Onsite-Dateien
+
+Jede weitere Datei des `--name-status`-Laufs wurde per
+`git diff 2530ced..origin/main -- <pfad>` gesichtet. **Kein weiterer eigenständiger Posten
+gefunden** — alle gehen in D31–D35 auf:
+
+- `Aktualisierungs-Index.md` (§3.3 „Es wird nichts reserviert", Ref-Zeile der Design-Matrix,
+  gestrichener `reserve/*`-Aufräumschritt) · `abteilungs-inhalts-pruefung.md` ·
+  `kern-plugin-bau.md` · `subagenten-bau.md` · `wissens-router-bau.md` ·
+  `Onsite.ai-OS-Kriterienliste-Definition.md` (Beispielzeile umformuliert) — **geprüft, geht
+  in D31 auf.**
+- `Onsite.ai-OS-Gates-Definition.md` (Gate-3-Zeile um die Wertentscheidung ergänzt) ·
+  `SECURITY.md` (Musterlisten-Absatz Gate 3 **und** neue Garantie-Zeile für den
+  Setup-Hinweis) · `Onsite.ai-OS-Betriebshandbuch.md` (Reifegrad Ebene 5, neuer §6.5b,
+  Muster-/Fehlalarm-Tabelle, Opt-out-Liste) · `plugins/oai/skills/os-info/SKILL.md`
+  (Opt-out-Liste) · `plugins/oai/README.md`, `AGENTS.md`, `CLAUDE.md`,
+  `module-registry.json`, `VERSION`, `plugin.json`, `.claude-plugin/marketplace.json` —
+  **geprüft, reine Doku- und Release-Nachzüge zu D32/D33**; unsere Pendants fallen ohnehin
+  erst mit dem jeweiligen Bau an.
+- `queue-flow.md` (neue Regel „Der Kern-Beitrag ist ein Fakten-Dokument", AP3 in neuer
+  Deutung, AP-K10 auf „erster realer `queue-kern`-Lauf am 2026-08-25 läuft" fortgeschrieben) ·
+  `kern-ssot-aufbau.md` (Verbindungsregel + zwei Tabellenzeilen) ·
+  `Onsite.ai-OS-SSOT-Definition.md` (neuer Sichtbarkeits-Absatz) ·
+  `abteilungs-plugin-bau.md` §3.1 · `skills/queue-kern/SKILL.md` — **geprüft, geht in D35
+  auf.** Der AP-K10-Fortschritt ist Onsite-Betriebslage; unsere eigene Queue-Praxisprobe
+  steht bereits als Registerzeile (2026-08-16).
+- `CONTRIBUTING.md` — **geprüft, geht in D34 auf.**
+- `plugins/oai/skills/init/SKILL.md`: nimmt den vierten Satelliten `mikrobiologie` in die
+  Abteilungsliste auf (Drift-Korrektur, `35d1253`). **Onsite-eigener Bestand, kein
+  NovaCore-Posten** — unsere Abteilungen sind dev, ui-ux und automation.
+- `Debugging + findings/debug-log.md` (`0763260`, Windows-8.3-Kurzpfad-Tilde als Fehlalarm im
+  Pfad-Check) und `agent-learnings.md` (`caa1a8e`, stdin-Hänger durch Rest-`cat` im
+  verketteten Bash-Zug): Onsite-Sitzungswissen. Der Tilde-Befund ist als Umsetzungsdetail in
+  D32 vermerkt, der stdin-Befund betrifft Arbeitsweise, nicht Produkt. **Kein eigener Posten.**
+- `Queue-Protokolle/queue-protokoll-development-2026-08-25.md` (`006212d`) und
+  `Bauplan-archiv/2026-08-25-zuordnungshilfe-rote-linien-sammelklausel.md` (`356763d`,
+  Kuration nach PR #133): Onsite-Betriebsartefakte des eigenen Queue-Laufs. **Kein Posten.**
+- `Aktive Baupläne/2026-08-13-claude-ebenen-inhalts-standards.md`: bei Onsite weiterhin
+  **aktiv** — bleibt auf der Beobachtungsliste (D24), kein Nachbau-Posten.
+
+### N5.8 D24-Beobachtungsliste — Delta gegen N3
+
+`git ls-tree --name-only origin/main "knowledge base/Aktive Baupläne/"` gegen `a9927b2` zeigt
+**zwölf Dateien / elf Stränge** (mneme-dreaming zählt mit Makro- und Mikroarchitektur zwei
+Dateien):
+
+- **Unverändert aus der N3-Liste, alle noch aktiv:** mneme-dreaming (Makro + Mikro) ·
+  ssot-krake (`2026-08-17`) · init-cli-Bootstrap (`2026-08-18`) ·
+  Nachzug-Kadenz/Executor-Umbau (`2026-08-18`) · Node-Doks-Folgeplan
+  (`2026-08-18-node-doks-definition-und-gate2-ssot-bezug`) · Claude-Ebenen-Inhalts-Standards
+  (`2026-08-13`) · dev-Plugin-Inhalts-Modernisierung (`2026-08-14`) · SSOT-Sanierung
+  (`2026-08-21-ssot-sanierung-governance`).
+- **Neu auf der Liste (drei):** `2026-08-21-doku-nachzug-nachtlauf.md` ·
+  `2026-08-23-scratchpad-norm.md` (bei uns als **D27** bereits gebaut — der Onsite-Plan steht
+  dort noch aktiv) · **`2026-08-25-setup-hinweis-hook.md`** (die Planquelle zu D32).
+- **Archiviert seit N3: keiner.** Neu im `Bauplan-archiv/` liegt allein die
+  Zuordnungshilfe-Sammelklausel (`2026-08-25`), die nie auf der aktiven Liste stand.
+
+Die Beobachtungsliste wächst also, ohne dass etwas abgeräumt wurde — für die nächste Iteration
+relevant, weil jeder dieser Stränge ein künftiger D-Posten werden kann.
+
+**Offen bleiben: Phasen J/K (D16, D17, D19–D23, D28–D30) plus D31–D37 aus 0.27.0;
+Phase-J-Bauplan `2026-08-25-onsite-delta-phase-j-bauplan.md` schneidet sie.**
+
 ---
 
 *Angelegt 2026-08-23 durch Claude (Fable 5, Claude Code) als Overseer-Mapping auf Weisung
@@ -263,4 +577,5 @@ Lucas Vöhringer; Quellen: Onsite.ai-OS `origin/main@6d3f8db`, NovaCoreAI-OS `ma
 Nachtrag N1 am selben Tag nach Maintainer-Weisung (Beauftragung, Onsite-Parität,
 Affiliate-Invariante); Nachtrag N2 am selben Tag (Node-Doks/Systemachsen/Kriterienliste-v2,
 Phase-G-Vollzug); Nachtrag N3 am 2026-08-24 (Phase-H-Vollzug, Anker `51e230f`); Nachtrag N4
-am 2026-08-25 (Phase-I-Vollzug, Anker `2530ced`, D27–D30).*
+am 2026-08-25 (Phase-I-Vollzug, Anker `2530ced`, D27–D30); Nachtrag N5 am 2026-08-25
+(Onsite 0.27.0, Anker `a9927b2`, D31–D37).*
