@@ -1,0 +1,118 @@
+[
+ {
+  "key": "EP-1",
+  "summary": "E0 · Klärungen & Zugänge (Kundenblocker)",
+  "issuetype": "Epic",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": null,
+  "description": "**Ziel:** Alle kundenseitigen Entscheidungen (A1–A5), Annahmen (B3–B10), Zugänge und Lieferungen einholen und in Plan §11.C dokumentieren. **Dieses Epic blockt alle Bau-Epics** — jedes Ticket hat ein Due-Date vor der Phase, die es blockt.\n\n**Quelle:** Projektplan v2.2 §11 + §12 (`Empfehlungssystem-dev/Dokumente/Projektplan Empfehlungssystem v2.md`)\n\n**Fertig-Kriterium:** Alle A1–A5 mit Ergebnis, Datum und Beleg in Plan §11.C eingetragen; Zugänge funktionsfähig getestet."
+ },
+ {
+  "key": "EP-2",
+  "summary": "E1 · Infrastruktur & Deployment (M0, ~24 h)",
+  "issuetype": "Epic",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": null,
+  "description": "**Ziel:** Lauffähige Basis: Hetzner-Server gehärtet, PostgreSQL, Docker Compose (Staging + Prod), GitHub-Actions-Deploy, n8n verdrahtet, Backup mit Restore-Test, Testzugänge.\n\n**Quelle:** Projektplan v2.2 §9 Phase 0\n\n**Milestone M0 (Fertig-Kriterium):** Server/DB/CI/Staging laufen, DNS aktiv, Testzugänge da, A1–A5 entschieden (§11.C gefüllt)."
+ },
+ {
+  "key": "EP-3",
+  "summary": "E2 · Datenmodell & Core-Backend (M1, ~40 h)",
+  "issuetype": "Epic",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": null,
+  "description": "**Ziel:** Schema/Migrations (alle Entitäten Plan §5), Token-/Short-Link + Redirect, Tracking-Endpoint (idempotent, Preview-Bot-Filter), NPS-API, Promotor-Upsert + KlickTipp-Prefill, Consent-/Opt-out-API, QR, Branding-Basis.\n\n**Quelle:** Projektplan v2.2 §9 Phase 1\n\n**Milestone M1 (Fertig-Kriterium):** Ein Link wird erzeugt, geteilt und ein Klick sauber & doppel-sicher getrackt; NPS-Weiche live (Staging)."
+ },
+ {
+  "key": "EP-4",
+  "summary": "E3 · Attribution & Reward — Herzstück (M2, ~61 h)",
+  "issuetype": "Epic",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": null,
+  "description": "**Ziel:** Der geldrelevante Kern: Lead-Capture mit Normalisierung, Order-Ingest inkl. Refund, Reconciliation-Cron, bidirektionales Matching, Mehrfach-Match-Guard, Karenzzeit, Fraud-Flags, Reward-State-Machine mit doppelter Idempotenz, Gutschein-Mail, manuelle Zuordnung.\n\n**Quelle:** Projektplan v2.2 §4 + §9 Phase 2\n\n**Regeln:** Geld-Pfad test-first (Ziel ≥ 80 % Abdeckung), jeder PR im Vier-Augen-Review.\n\n**Milestone M2 (Fertig-Kriterium):** Ein geworbener Kauf wird zugeordnet und löst genau EINE 25-€-Auszahlung aus (Doppelzahlungs-Schutz, Karenz, Approval) — adversarial gegen die dokumentierten Fälle geprüft."
+ },
+ {
+  "key": "EP-5",
+  "summary": "E4 · Öffentliche Seiten (M3, ~33 h)",
+  "issuetype": "Epic",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": null,
+  "description": "**Ziel:** Alle Kunden-Flows: C1/D1 (mobil, wa.me + Mail-App-Share), E1 Neukunden-Page (Vimeo, Lead-Feld, CTA-Gating, Consent), Interessenten-Fragebogen, C2/D2 (Desktop, Kopieren + QR), Feedback (strukturell anonym), Rechtstexte-Seiten.\n\n**Quelle:** Projektplan v2.2 §3 + §9 Phase 3\n\n**Achtung:** Start erst, wenn A5 (Share-Kanal-Design) und A3 (Reward-Wording) in §11.C bestätigt sind — sonst wird E1/D2 zweimal gebaut.\n\n**Milestone M3 (Fertig-Kriterium):** Alle Kunden-Flows mobil UND Desktop bedienbar (Empfehlen, Teilen, Neukunde, Feedback)."
+ },
+ {
+  "key": "EP-6",
+  "summary": "E5 · Admin-Panel (M4, ~30 h)",
+  "issuetype": "Epic",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": null,
+  "description": "**Ziel:** Auth (NextAuth + TOTP-2FA + Lockout), Audit-Log, Promotoren CRUD/CSV, Referral-Liste + Statuspflege, Lookup + manuelle Zuordnung, Reward-Approval (mit Karenz-/Fraud-Anzeige), Pause-Schalter + Ausgaben-Report, Dashboard.\n\n**Quelle:** Projektplan v2.2 §3 Flow D + §9 Phase 4\n\n**Milestone M4 (Fertig-Kriterium):** Team kann Promotoren, Empfehlungen, Status, Auszahlungen & Lookup vollständig verwalten."
+ },
+ {
+  "key": "EP-7",
+  "summary": "E6 · Integration, Test & Launch (M5, ~26 h)",
+  "issuetype": "Epic",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": null,
+  "description": "**Ziel:** n8n-Flows final, KlickTipp-Kampagnen-Verdrahtung mit Kunde, E2E-Tests aller Flows (inkl. Refund-, Karenz-, Fraud-, No-Match-Fällen), Cross-Browser, Go-Live.\n\n**Quelle:** Projektplan v2.2 §9 Phase 5 + §13 (Launch-Checkliste = Go/No-Go-Gate)\n\n**Milestone M5 (Fertig-Kriterium):** System produktiv auf empfehlung.wasserzisterne.de, E2E grün, Monitoring aktiv, Launch-Checkliste §13 vollständig abgehakt."
+ },
+ {
+  "key": "EP-8",
+  "summary": "A1 · Klären: Promotor-Identität / KlickTipp-Subscriber-ID + Link-Personalisierung",
+  "issuetype": "Task",
+  "status": "Code-Review",
+  "labels": [
+   "kundenblocker"
+  ],
+  "priority": "Medium",
+  "duedate": "2026-07-24",
+  "parent": "EP-1",
+  "description": "**Blockt:** Phase 1 (Epic E2). **Plan:** §11.A1.\n\n**Default (baubar):** Eigene DB führt Referral-State, gespiegelt per `klicktipp_subscriber_id`.\n\n**Zu klären mit Hein:**\n\n1. Ist die KlickTipp-Subscriber-ID verfügbar/exportierbar?\n2. Kann KlickTipp personalisierte Kampagnen-Links mit subscriber-Parameter ausspielen (für D1-Formular-Prefill)?\n\n**Fertig:** Ergebnis + Datum + Beleg in Plan §11.C eingetragen."
+ },
+ {
+  "key": "EP-9",
+  "summary": "A2 · Klären: WooCommerce-Webhook + Match-Felder + Refund-Events + REST-Zugriff",
+  "issuetype": "Task",
+  "status": "In Arbeit",
+  "labels": [
+   "kundenblocker"
+  ],
+  "priority": "Medium",
+  "duedate": "2026-08-07",
+  "parent": "EP-1",
+  "description": "**Blockt:** Phase 2/3 (Epics E3/E4). **Plan:** §11.A2.\n\n**Default (baubar):** Order-Webhook → Match über E-Mail + Telefon (hart, normalisiert), Name (fuzzy).\n\n**Zu klären/testen:**\n\n1. Order-Webhook verfügbar? Welche Felder liefert er (E-Mail, Telefon, Name, Betrag, SKUs)?\n2. Feuern Status-/Refund-Events?\n3. REST-API-Zugriff für den Reconciliation-Poll vorhanden?\n4. Ergebnis bestimmt, ob das E1-Lead-Feld E-Mail oder Telefon priorisiert.\n\n**Fertig:** Testaufruf dokumentiert + Eintrag in Plan §11.C."
+ },
+ {
+  "key": "EP-10",
+  "summary": "A3 · Klären: Reward-Bedingung + Karenzzeit",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [
+   "kundenblocker"
+  ],
+  "priority": "Medium",
+  "duedate": "2026-08-07",
+  "parent": "EP-1",
+  "description": "**Blockt:** Phase 2 UND Phase 3 (Epics E3/E4 — steuert Logik UND Wording auf C1/E1 UND Teilnahmebedingungen). **Plan:** §11.A3.\n\n**Default (baubar):** Fester Mindestbestellwert ODER definierte Produktliste (+ SKU-Feld in `orders.products`); Karenzzeit 21 Tage nach Order-Abschluss (deckt 14 Tage Widerruf + Puffer).\n\n**Zu klären mit Hein:**\n\n1. Welche Regel: Mindestbestellwert oder Produktliste? Welche konkreten Werte/SKUs?\n2. Karenzzeit 21 Tage ok?\n\n**Fertig:** Eintrag in Plan §11.C."
+ }
+]

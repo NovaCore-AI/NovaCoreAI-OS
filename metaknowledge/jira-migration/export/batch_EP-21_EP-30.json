@@ -1,0 +1,112 @@
+[
+ {
+  "key": "EP-21",
+  "summary": "n8n-Verdrahtung, Secret-Mgmt, Backup inkl. Offsite + Restore-Test (~5 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-2",
+  "description": "**Plan:** §7 (Backup/Monitoring) + §9 Phase 0. **Aufwand:** \\~5 h.\n\n**Akzeptanzkriterien:**\n\n1. n8n erreicht die App-API (Staging) und umgekehrt.\n2. Nightly `pg_dump` → Hetzner Storage Box (Offsite).\n3. **Restore-Test erfolgreich durchgeführt und dokumentiert.**\n4. Uptime-Monitoring + Fehler-Alert (App, n8n, DB) aktiv.\n\n"
+ },
+ {
+  "key": "EP-22",
+  "summary": "Testzugänge verifizieren: KlickTipp-API, Woo-Webhook inkl. Refund-Event, Streamendous (~5 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-2",
+  "description": "**Plan:** §9 Phase 0. **Aufwand:** \\~5 h.\n\n**Akzeptanzkriterien:**\n\n1. KlickTipp-API: Test-Call (Subscriber lesen/taggen) erfolgreich.\n2. Woo: Test-Order feuert Webhook; **Refund-Event getestet**; REST-API-Poll funktioniert (Input für A2!).\n3. Streamendous: Ablauf einmal durchgespielt/dokumentiert (Input für A4).\n\n**Abhängigkeit:** Zugänge-Ticket (E0)."
+ },
+ {
+  "key": "EP-23",
+  "summary": "Klärungs-Workshop A1–A5 durchführen + Plan §11.C dokumentieren (~2 h)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-2",
+  "description": "**Plan:** §9 Phase 0 + §11.C. **Aufwand:** \\~2 h.\n\n**Akzeptanzkriterien:**\n\n1. Termin mit Hein: A1–A5 entschieden, B3–B10 bestätigt.\n2. Ergebnisse mit Datum + Beleg in Plan §11.C eingetragen.\n3. Zugehörige E0-Tickets geschlossen.\n\n**Hinweis:** A5 (Share-Kanäle) und A3 (Karenzzeit) aktiv vorstellen — beides weicht von der PDF-Erwartung ab."
+ },
+ {
+  "key": "EP-24",
+  "summary": "Schema + Migrations: alle Entitäten aus Plan §5 (~8 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-3",
+  "description": "**Plan:** §5. **Aufwand:** \\~8 h.\n\n**AK:** (1) Alle Entitäten inkl. v2-Felder (`risk_flags`, `eligible_at`, `woo_status/completed_at/refunded_at`, `feedback_responses`) als Migrations. (2) Partial-Unique-Guards auf `rewards` (referral_id + matched_order_id, status ∈ {approved,sent}). (3) Indizes auf normalisierte email/telefon-Felder (Matching). (4) `promotors.email` unique."
+ },
+ {
+  "key": "EP-25",
+  "summary": "Token-/Short-Link-Generierung + Redirect-Service /r/:short_code (~6 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-3",
+  "description": "**Plan:** §5 `referral_links` + §6. **Aufwand:** \\~6 h.\n\n**AK:** (1) `token` + `short_code` unique, ausreichende Entropie gegen Brute-Force. (2) `/r/:short_code` redirected auf E1 und trackt den Klick idempotent. (3) Rate-Limit auf dem Redirect."
+ },
+ {
+  "key": "EP-26",
+  "summary": "Tracking-Endpoint: Idempotenz, Preview-Bot-Filter, Session-Stitching (~8 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-3",
+  "description": "**Plan:** §5 `tracking_events` + §7. **Aufwand:** \\~8 h.\n\n**AK:** (1) Doppelklick-Dedup via `idempotency_key`. (2) **Preview-Bots gefiltert** (WhatsApp-/Meta-Linkvorschau, Mail-SafeLink-Scanner-UAs) — zählen nicht. (3) `session_id`-Stitching über den Flow. (4) IP nur als Hash mit verwaltetem Salt."
+ },
+ {
+  "key": "EP-27",
+  "summary": "NPS-API + Routing (9–10 → Empfehlung, 0–8 → Feedback) (~3 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-3",
+  "description": "**Plan:** §5 `nps_responses` + §6. **Aufwand:** \\~3 h.\n\n**AK:** (1) Score 0–10 gespeichert (`promotor_id` nullable, session-Anker). (2) Routing-Antwort korrekt. (3) Feedback-Inhalte landen NICHT hier (eigene anonyme Tabelle)."
+ },
+ {
+  "key": "EP-28",
+  "summary": "Promotor-Upsert + KlickTipp-Prefill + Consent-/Opt-out-API (~8 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-3",
+  "description": "**Plan:** §5 `promotors`/`consents` + §6. **Aufwand:** \\~8 h. **Abhängigkeit:** A1 (EP-8).\n\n**AK:** (1) `POST /api/promotor` = Upsert über normalisierte E-Mail — zweiter Durchlauf liefert bestehenden Link, kein Duplikat. (2) Signierter subscriber-Parameter aus KlickTipp-Link befüllt D1-Formular vor. (3) Consent typisiert (`tracking_cookie` vs `data_processing`) + `POST /api/optout` je Typ. (4) Honeypot + Rate-Limit."
+ },
+ {
+  "key": "EP-29",
+  "summary": "QR-Code-Generierung (Kampagnen-Einstieg + Desktop→Handy-Wechsel) (~3 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-3",
+  "description": "**Plan:** §8 #4. **Aufwand:** \\~3 h.\n\n**AK:** (1) QR für Kampagnen-Einstieg (Landing) generierbar. (2) QR auf D2 kodiert den persönlichen Short-Link-Kontext für den Kanalwechsel aufs Handy."
+ },
+ {
+  "key": "EP-30",
+  "summary": "Design-System Branding-Basis (Farben, Fonts, Logo, Komponenten) (~4 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-3",
+  "description": "**Plan:** §8 #10. **Aufwand:** \\~4 h. **Abhängigkeit:** Branding-Assets (EP-15).\n\n**AK:** (1) Design-Tokens (Farben/Typo/Spacing) zentral definiert. (2) Basis-Komponenten (Button, Input, Card) mobil-first. (3) wasserzisterne-Branding sichtbar korrekt."
+ }
+]

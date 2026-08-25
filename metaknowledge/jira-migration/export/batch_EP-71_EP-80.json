@@ -1,0 +1,112 @@
+[
+ {
+  "key": "EP-71",
+  "summary": "🔶 B5 — Match-Zeitfenster (Default: 90 Tage Link-Öffnung → Kauf)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**🔶 Annahme (Default) — kundenseitig in einem Satz bestätigen.** Quelle: Plan v2.3 §11.B.\n\n**Default:** 90 Tage zwischen Link-Öffnung und Kauf.\n\n**Klären:** realistische Kauf-Latenz?\n\n**Fertig:** Bestätigung in Plan §11.C."
+ },
+ {
+  "key": "EP-72",
+  "summary": "🔶 B6 — Transaktionaler Mailversand an Promotoren (Default: KlickTipp)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**🔶 Annahme (Default) — kundenseitig in einem Satz bestätigen.** Quelle: Plan v2.3 §11.B.\n\n**Default:** KlickTipp (Gutschein-Code-Mail).\n\n**Klären:** doch Exchange?\n\n**Fertig:** Bestätigung in Plan §11.C."
+ },
+ {
+  "key": "EP-73",
+  "summary": "🔶 B7 — Repo/CI (Default: GitHub + GitHub Actions, Deploy auf Hetzner)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**🔶 Annahme (Default) — kundenseitig in einem Satz bestätigen.** Quelle: Plan v2.3 §11.B/H10.\n\n**Default:** **GitHub + GitHub Actions** (bereits im Einsatz), Deploy auf Hetzner; Code-Repo bleibt privat.\n\nSelf-hosted GitLab nur, falls Kunde Repo-Datensouveränität explizit fordert (dann +6 h Setup + laufende Wartung).\n\n**Fertig:** Bestätigung in Plan §11.C."
+ },
+ {
+  "key": "EP-74",
+  "summary": "🔶 B8 — Retention-Fristen (DSGVO, Kunde/Datenschutz bestätigen)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**🔶 Annahme (Default) — kundenseitig bestätigen (DSGVO-relevant).** Quelle: Plan v2.3 §11.B/H11.\n\n**Defaults nach §5:**\n\n* Tracking 12 Monate\n* Leads ohne Kauf 12 Monate → anonymisieren\n* Consents 3 Jahre nach Bezugsende\n\n**Klären:** mit Datenschutz-Verantwortlichem des Kunden bestätigen.\n\n**Fertig:** Bestätigung in Plan §11.C."
+ },
+ {
+  "key": "EP-75",
+  "summary": "🔶 B9 — E1-CTA-Gating (Default: CTA aktiv erst nach Lead-Angabe)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**🔶 Annahme (Default) — kundenseitig bestätigen.** Quelle: Plan v2.3 §11.B/H7.\n\n**Default:** Termin-/WhatsApp-CTA erst nach Lead-Angabe aktiv (Attribution vor Conversion).\n\n**Klären:** Kunde einverstanden? A/B-Test nach Launch möglich (bei messbarem Conversion-Einbruch Gate lockern, Attribution-Verlust bewusst in Kauf nehmen).\n\n**Fertig:** Bestätigung in Plan §11.C."
+ },
+ {
+  "key": "EP-76",
+  "summary": "🔶 B10 — Content-Verantwortung (Team draftet, Hein gibt frei; Rechtstexte vom Kunden)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**🔶 Annahme (Default) — kundenseitig bestätigen.** Quelle: Plan v2.3 §11.B/H15.\n\n**Default:** Team draftet alle Texte (C1/C2/E1, WhatsApp-/Mail-Share-Text, Gutschein-Mail), Kunde (Hein) gibt frei; Rechtstexte + Teilnahmebedingungen liefert der Kunde (ggf. anwaltlich).\n\n**Fertig:** Bestätigung in Plan §11.C."
+ },
+ {
+  "key": "EP-77",
+  "summary": "⚠️ Rechtstexte + Teilnahmebedingungen beim Kunden anstoßen (Launch-Blocker, langer Vorlauf)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**⚠️ LAUNCH-BLOCKER — früh beim Kunden anstoßen (langer Vorlauf).** Quelle: Plan v2.3 §12 + §9 Phase 0/3 + §13 Launch-Checkliste + H11.\n\n**Hintergrund:** Rechtstexte und Teilnahmebedingungen **liefert der Kunde** (ggf. anwaltlich). Sie sind sowohl für Phase 3 (Rechtstexte-Seiten, \\~2 h) als auch für das Go-Live-Gate (§13) zwingend. Ohne sie kein Launch.\n\n**Liefergegenstand (vom Kunden):**\n\n1. Datenschutzerklärung (DSGVO) für `empfehlung.wasserzisterne.de`\n2. Impressum\n3. Teilnahmebedingungen fürs Prämienprogramm — inkl. Missbrauchs-Klausel (H2) UND Reward-Bedingung/Karenz (abhängig von ⛔ A3)\n\n**Abhängigkeiten:** A3 (Karenz/Wording) muss entschieden sein, bevor die Teilnahmebedingungen finalisiert werden.\n\n**Fertig:** Texte liegen vor, vom Team eingebaut und verlinkt; in §13 abhakbar."
+ },
+ {
+  "key": "EP-78",
+  "summary": "E3.1 — E1-Lead-Capture-API + Normalisierung (E.164/E-Mail) (~6 h)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-4",
+  "description": "**E3 / Phase 2 — \\~6 h.** Quelle: Plan v2.3 §9 Phase 2, §4.\n\n**Aufgabe:** E1-Lead-Capture-API + Datenfluss inkl. Normalisierung (E.164 für Telefon, E-Mail lowercase/trim — H6).\n\n**Kritisch:** Härtere Matches hängen von der Normalisierung ab. Bestimmt auch das primäre Lead-Feld (E-Mail vs. Telefon → abhängig von ⛔ A2).\n\n**Abhängigkeit:** A2 geklärt."
+ },
+ {
+  "key": "EP-79",
+  "summary": "E3.2 — WooCommerce-Order-Ingest (n8n) + Status/Refund-Updates (~9 h)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-4",
+  "description": "**E3 / Phase 2 — \\~9 h.** Quelle: Plan v2.3 §9 Phase 2, §4.3.\n\n**Aufgabe:** WooCommerce-Order-Ingest via n8n: `webhook_events` verarbeiten, Status- und Refund-Updates abbilden (H1/H4).\n\n**Kritisch (Geld):** Refund-Events müssen zuverlässig erkannt werden — sonst Reward auf stornierten Kauf.\n\n**Abhängigkeit:** A2 (Refund-Events + Webhook-Verfügbarkeit)."
+ },
+ {
+  "key": "EP-80",
+  "summary": "E3.3 — Order-Reconciliation-Cron (n8n-Poll, idempotent) (~3 h)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-4",
+  "description": "**E3 / Phase 2 — \\~3 h.** Quelle: Plan v2.3 §9 Phase 2, §4.3/H4.\n\n**Aufgabe:** n8n-Poll-Cron (Woo REST, 48 h) als Fallback für Webhook-Verlust; idempotenter Nachtrag über `woo_order_id`.\n\n**Kritisch (Betrieb):** WooCommerce deaktiviert Webhooks nach Fehlversuchen → Orders gehen verloren, unbemerkt. Cron + Monitoring-Alert verhindert das.\n\n**Abhängigkeit:** A2 (REST-API-Zugriff)."
+ }
+]

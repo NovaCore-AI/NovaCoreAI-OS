@@ -1,0 +1,57 @@
+[
+  {
+    "key": "EP-46",
+    "summary": "C2 Desktop Info-Seite (tiefer erklärend, Vimeo, Branding/Responsive) (~5 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §3 Flow B + §8 #15. **Aufwand:** \\~5 h.\n\n**AK:** (1) Erklärt das Programm TIEFER als mobil (F8). (2) Vimeo-Video eingebunden (F11). (3) Professionell/aufgeräumt, Branding, responsive."
+  },
+  {
+    "key": "EP-47",
+    "summary": "D2 Desktop: Nachricht-/Link-Kopieren + QR-Kanalwechsel (kein E-Mail-Schritt) (~3 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §3 Flow B + §8 #16. **Aufwand:** \\~3 h. **Abhängigkeit:** A5 (EP-12).\n\n**AK:** (1) „Nachricht kopieren\" (vorgefertigter Text + Short-Link) und „Nur Link kopieren\" in die Zwischenablage. (2) QR zum Kanalwechsel aufs Handy (dort WhatsApp + Mail-App). (3) `copy_click` getrackt. (4) KEIN mailto, keine Empfänger-Maske, kein Systemversand."
+  },
+  {
+    "key": "EP-48",
+    "summary": "Feedback-Flow (Kategorien-Mehrfachauswahl + Freitext, strukturell anonym) (~2 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §3 + §5 `feedback_responses` + §8 #17. **Aufwand:** \\~2 h.\n\n**AK:** (1) Kategorien-Mehrfachauswahl + anonymer Freitext → Danke-Seite. (2) Speicherung OHNE session/subject/promotor-Bezug. (3) Hinweis im UI: keine personenbezogenen Daten in den Freitext."
+  },
+  {
+    "key": "EP-49",
+    "summary": "Rechtstexte-Seiten: Datenschutzerklärung, Impressum, Teilnahmebedingungen (~2 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §7 + §8 #11 (P0). **Aufwand:** \\~2 h. **Abhängigkeit:** Rechtstexte vom Kunden (EP-16).\n\n**AK:** (1) Drei Seiten live und aus allen Flows verlinkt (C1/C2/D1/D2/E1/Footer). (2) Texte = Kundenlieferung, unverändert übernommen. (3) Ohne finale Texte: Platzhalter-Seiten mit deutlichem Draft-Hinweis (Launch-Blocker in §13)."
+  },
+  {
+    "key": "EP-50",
+    "summary": "Admin-Auth: NextAuth + TOTP-2FA + Login-Lockout + Audit-Log-Basis (~5 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §7 (Admin-Sicherheit) + §9 Phase 4. **Aufwand:** \\~5 h.\n\n**AK:** (1) Credentials-Login + TOTP-2FA verpflichtend. (2) Login-Rate-Limit/Lockout + Session-Timeout. (3) Audit-Log-Infrastruktur (before/after je Aktion) steht."
+  }
+]

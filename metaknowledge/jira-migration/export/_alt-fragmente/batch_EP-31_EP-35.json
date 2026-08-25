@@ -1,0 +1,67 @@
+[
+  {
+    "key": "EP-31",
+    "summary": "E1-Lead-Capture-API + Normalisierung (E-Mail lowercase, Telefon E.164) (~6 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [
+      "geld-pfad"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §4.1. **Aufwand:** \\~6 h.\n\n**AK:** (1) `POST /api/referral` consent-gated (eigener data_processing-Consent, unabhängig vom Cookie-Consent). (2) Mind. E-Mail ODER Telefon Pflicht → `referrals` Status `neu`. (3) Speicherung normalisiert; Test: `+49 151…` == `0151…`. (4) Honeypot + Rate-Limit."
+  },
+  {
+    "key": "EP-32",
+    "summary": "Woo-Order-Ingest (n8n → API) + webhook_events + Status-/Refund-Updates (~9 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [
+      "geld-pfad"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §4.2 + §6. **Aufwand:** \\~9 h. **Abhängigkeit:** A2 (EP-9).\n\n**AK:** (1) `POST /api/webhooks/woocommerce` mit Signaturprüfung. (2) Idempotenz über `webhook_events.idempotency_key` (order_id+event). (3) Status-Updates setzen `woo_status`/`completed_at`; Refund setzt `refunded_at` und erlischt ggf. `reward_condition_met`."
+  },
+  {
+    "key": "EP-33",
+    "summary": "Order-Reconciliation-Cron (n8n-Poll 48 h → idempotenter Nachtrag) (~3 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [
+      "geld-pfad"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §4.3. **Aufwand:** \\~3 h.\n\n**AK:** (1) n8n-Cron pollt Woo-REST (Orders letzte 48 h) → `POST /api/internal/orders/reconcile`. (2) Nachtrag idempotent über `woo_order_id` (kein Duplikat). (3) Test: absichtlich verpasster Webhook wird nachgezogen; Alert bei Poll-Fehlern."
+  },
+  {
+    "key": "EP-34",
+    "summary": "Matching 1/3: neue Order → offene Referrals (hart: E-Mail/Telefon) (~5 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [
+      "geld-pfad"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §4.4. **Aufwand:** \\~5 h. Test-first.\n\n**AK:** (1) Eingehende Order matcht gegen offene `referrals` über normalisierte E-Mail/Telefon (hart). (2) Treffer setzt `matched_order_id` + `match_method=hard`. (3) Unit-Tests für Treffer/Nicht-Treffer/Mehrfach-Kandidaten."
+  },
+  {
+    "key": "EP-35",
+    "summary": "Matching 2/3: neues Referral → unmatched Orders + Name-Fuzzy als Vorschlag (~5 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [
+      "geld-pfad"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §4.4 (bidirektional). **Aufwand:** \\~5 h. Test-first.\n\n**AK:** (1) Neues `referral` matcht rückwirkend gegen bereits eingegangene unmatched `orders`. (2) Name-Fuzzy erzeugt nur VORSCHLÄGE (`match_method=fuzzy`), nie Auto-Match. (3) Unit-Tests."
+  }
+]

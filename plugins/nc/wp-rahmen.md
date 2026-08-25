@@ -2,10 +2,14 @@
 
 > **Normative Metastruktur des NovaCore-OS.** Sie liegt im Kern-Plugin `nc`, weil sie für
 > **jede** Abteilung gilt. Jedes Abteilungsplugin übersetzt WP1–WP7 in seinen realen
-> Arbeitszyklus und legt diese Übersetzung in seiner eigenen `workflow.md` ab (Beispiel:
-> `workflow.md` des Abteilungsplugins `nc-development` für den NovaCore-Entwicklungszyklus).
-> Bei Widerspruch gilt für die Rahmenpunkte diese Datei, für den Fachablauf die
-> Abteilungs-`workflow.md`. Grundlage: Design-Spec vom 2026-07-28, §4 (OS-Repo).
+> Arbeitszyklus — **wo** diese Übersetzung liegt (eigene `workflow.md` oder
+> Abteilungs-CLAUDE), entscheidet der Anlass-Test im Standardprozess
+> „Workflow-md-Implementierung" der Repo-Wissensbasis (Mapping D30): die `workflow.md` ist
+> **optional, nicht universell** — die Abbildung ist Pflicht, ihr Ort nicht (Beispiel:
+> `workflow.md` des Abteilungsplugins `nc-development`; Gegenbeispiel: die Satelliten
+> `nc-felix`/`nc-biggi` tragen keine). Bei Widerspruch gilt für die Rahmenpunkte diese
+> Datei, für den Fachablauf die Abteilungs-`workflow.md`. Grundlage: Design-Spec vom
+> 2026-07-28, §4 (OS-Repo).
 
 ## Grundsatz
 
@@ -68,8 +72,10 @@ Abschluss — Evidence statt Zusicherung.
 
 ## Für Abteilungsplugins verbindlich
 
-1. WP1–WP7 in der eigenen `workflow.md` auf den realen Zyklus abbilden, mit mindestens einem
-   auto-triggerbaren Skill je Punkt und **disjunkten** Trigger-Begriffen.
+1. WP1–WP7 auf den realen Zyklus abbilden, mit mindestens einem auto-triggerbaren Skill je
+   Punkt und **disjunkten** Trigger-Begriffen. **Ort nach Anlass-Test**
+   (`workflow-md-implementierung.md` §1): eigene `workflow.md` bei positivem Ergebnis,
+   Abteilungs-CLAUDE bei negativem — die Abbildung entfällt nie.
 2. WP0/WP8 **nicht** nachbauen — sie kommen aus dem Kern-Plugin `nc`.
 3. Rote-Linien-Ownership je Skill benennen.
 4. Diese Datei per Namen verlinken, ihre Inhalte **nicht** duplizieren.

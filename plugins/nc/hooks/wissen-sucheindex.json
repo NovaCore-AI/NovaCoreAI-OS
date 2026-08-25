@@ -621,6 +621,36 @@
         "ci-kostenschnitt",
         "anker-aufhebung"
       ]
+    },
+    {
+      "id": "workflow-md-implementierung",
+      "titel": "Standardprozess Workflow-md-Implementierung",
+      "pfad": "knowledge-base/standardprozesse/workflow-md-implementierung.md",
+      "router": "wissen-planen",
+      "hinweis": "Anlass-Test mit drei Fragen entscheidet, ob eine Abteilung eine eigene workflow.md braucht; die WP1-WP7-Abbildung bleibt Pflicht, nur ihr Ort ist optional",
+      "stichworte": [
+        "workflow-md",
+        "anlass-test",
+        "abteilungs-workflow",
+        "trigger-matrix",
+        "wp-rahmen",
+        "optional"
+      ]
+    },
+    {
+      "id": "jira-workflow",
+      "titel": "Standardprozess Jira-Workflow",
+      "pfad": "knowledge-base/standardprozesse/jira-workflow.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "Zwei Sites, zwei Wege (MCP vs. REST), Token nur als Env-Zeiger, Artefakt-Heimat metaknowledge/ fuer Skripte/Exporte (Manuals in feature-manuals/), Schreiblaeufe mit ID-Mapping und Freigabe-Pflicht",
+      "stichworte": [
+        "jira",
+        "rest",
+        "atlassian-mcp",
+        "migration",
+        "metaknowledge",
+        "jira-rest-zugang"
+      ]
     }
   ]
 }

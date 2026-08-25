@@ -1,0 +1,61 @@
+[
+  {
+    "key": "EP-16",
+    "summary": "Rechtstexte anstoßen: Datenschutzerklärung, Impressum, Teilnahmebedingungen",
+    "issuetype": "Task",
+    "status": "In Arbeit",
+    "labels": [
+      "kundenblocker"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §7 (Recht) + §8 #11 + §12. Kunde liefert (ggf. anwaltlich), Team baut die Seiten (E4). **Wird sonst Launch-Blocker** (§13).\n\nInhalte Teilnahmebedingungen (Plan §7): Reward-Bedingung, Karenzzeit, ein Gutschein je geworbenem Neukunden, Ausschluss Selbstwerbung/Missbrauch, Änderungs-/Einstellungsvorbehalt.\n\n**Fertig:** Finale Texte liegen vor und sind freigegeben."
+  },
+  {
+    "key": "EP-17",
+    "summary": "DNS-Freigabe: empfehlung.wasserzisterne.de",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [
+      "kundenblocker"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §12. Subdomain-DNS-Eintrag auf den Hetzner-Server (A/AAAA bzw. CNAME) — benötigt für SSL-Zertifikat und Staging/Prod-Setup in E1.\n\n**Fertig:** DNS aufgelöst, SSL via Reverse-Proxy aktiv."
+  },
+  {
+    "key": "EP-18",
+    "summary": "Hetzner: Server-Grundhärtung, PostgreSQL, Reverse-Proxy/SSL, Subdomain (~5 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §9 Phase 0. **Aufwand:** \\~5 h.\n\n**Akzeptanzkriterien:**\n\n1. Server gehärtet (SSH-Key-only, Firewall, Updates).\n2. PostgreSQL läuft (nur intern erreichbar).\n3. Reverse-Proxy mit SSL für `empfehlung.wasserzisterne.de` (Staging-Subdomain zusätzlich).\n\n**Abhängigkeit:** DNS-Freigabe (E0)."
+  },
+  {
+    "key": "EP-19",
+    "summary": "Docker-Compose-Setup: App/DB/Proxy, Staging + Prod getrennt (~3 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §2 + §9 Phase 0. **Aufwand:** \\~3 h.\n\n**Akzeptanzkriterien:**\n\n1. Compose-Stack (App, PostgreSQL, Reverse-Proxy) startet reproduzierbar.\n2. Staging und Prod als getrennte Umgebungen (eigene DB, eigene Env).\n3. Secrets ausschließlich über Env/Secret-Store, nichts im Repo.\n\n"
+  },
+  {
+    "key": "EP-20",
+    "summary": "GitHub-Actions-CI/CD: Build + Deploy auf Hetzner (Staging/Prod) (~4 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §2 + §9 Phase 0 (🔶 B7: GitHub statt GitLab). **Aufwand:** \\~4 h.\n\n**Akzeptanzkriterien:**\n\n1. Pipeline: Lint + Test + Build bei jedem PR.\n2. Deploy auf Staging bei Merge in `main`; Prod-Deploy manuell getriggert.\n3. Kein direkter `main`-Push möglich (Branch-Protection).\n\n"
+  }
+]

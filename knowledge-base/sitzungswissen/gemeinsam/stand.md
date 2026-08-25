@@ -6,10 +6,16 @@
   `knowledge-base/aktive-bauplaene/2026-08-23-onsite-delta-mapping.md` (Nachträge N1–**N4**),
   Anker jetzt Onsite `origin/main@2530ced` / Kern **0.26.0**. Phasen G, H und I sind fertig;
   **J und K stehen aus**.
-- **Phase I → PR #25** (`feat/onsite-delta-phase-i`, Kern **0.13.0**), offen und `MERGEABLE`,
+- **Phase-I → PR #25** (`feat/onsite-delta-phase-i`, Kern **0.13.0**), offen und `MERGEABLE`,
   **10/10 CI-Checks grün**, Suite 312 → **315**. Fünf Bau-Commits: I-A Fugen · I-B Umzug ·
   I-C Mechanik · Nachzug + Bump · Waypoint-Schnitt — dazu Abschluss- und Nachpflege-Commits
   (Session-Abschluss, `.nc/`-Fix, Follow-up-Iteration Punkte 3–7).
+- **Phase-J-Frühzug** (Maintainer-Weisung 2026-08-25, Branch `feat/phase-j-fruehzug`):
+  D29 `jira-workflow.md` (Eigenbau, Jira-Heimat **`metaknowledge/`**) · D30
+  `workflow-md-implementierung.md` (Port, `wp-rahmen.md` auf Optionalität) ·
+  **Muster-4-DB-Hälfte** im Safety-Gate (Prisma + compose-exec-psql, Eigentums-Entscheid
+  curl/wp → Gate 3). Cherry-Pick des N5/Bauplan-Commits der Parallel-Session; Bauplan-
+  Nachtrag N1 dokumentiert die Abweichungen von J-E10/§9.
 - **Zwei neue Kategorien in der Wissensbasis:** `aktive-bauplaene/` (laufende Pläne;
   `grundwissen/` trägt nur noch dauerhafte Referenzen und Design-Specs) und `sitzungswissen/`
   (dieses Dokument liegt darin). `vorlagen/` ist von der Repo-Wurzel nach

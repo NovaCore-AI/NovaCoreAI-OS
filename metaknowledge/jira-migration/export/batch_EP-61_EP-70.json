@@ -1,0 +1,114 @@
+[
+ {
+  "key": "EP-61",
+  "summary": "Bugfix-Puffer Phase 5 (~4 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-7",
+  "description": "**Plan:** §9 Phase 5. **Aufwand:** \\~4 h. Sammel-Task für Findings aus E2E/Cross-Browser; größere Bugs als eigene Bug-Tickets anlegen."
+ },
+ {
+  "key": "EP-62",
+  "summary": "Go-Live: DNS-Umstellung, Monitoring scharf, Launch-Checkliste §13, Mini-Doku (~3 h)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-7",
+  "description": "**Plan:** §9 Phase 5 + §13. **Aufwand:** \\~3 h.\n\n**AK:** (1) **Launch-Checkliste Plan §13 vollständig abgehakt** (Go/No-Go-Gate — inkl. Restore-Test, 2FA-Check, Rechtstexte live, Gutschein-Durchstich). (2) Prod live auf empfehlung.wasserzisterne.de. (3) Mini-Betriebsdoku (Deploy, Backup/Restore, Alerts, Pause-Schalter)."
+ },
+ {
+  "key": "EP-63",
+  "summary": "DSGVO-Löschpfad & Betroffenenrechte (Löschung/Auskunft über subject_email ODER subject_phone)",
+  "issuetype": "Task",
+  "status": "Zu erledigen",
+  "labels": [
+   "dsgvo"
+  ],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-3",
+  "description": "**\\[Review-Pass v2.3 · Plan §7 / §16 H22\\]**\n\nBisher decken die Tickets Consent-Erfassung + Opt-out (EP-28) ab, aber keinen expliziten Lösch-/Auskunftspfad für Betroffenenrechte (Art. 15/17 DSGVO).\n\n**Umfang:**\n\n* Löschung/Anonymisierung eines `data_processing`-Consents auffindbar über `subject_email` **ODER** `subject_phone` (Telefon-only-Leads!) bzw. `consent_id`.\n* Tracking-Consent-Löschung über `session_id`.\n* Verknüpfte `referrals`-Kontaktfelder beim Löschen nullen (Statistik bleibt erhalten).\n* Auskunftsfunktion: welche Daten liegen zu einer E-Mail/Telefonnummer vor.\n* Zusammenspiel mit Retention-Job (🔶 B8).\n\nHängt an der Schema-Ergänzung `consents.subject_phone` (EP-24). Verortung: Datenmodell/Consent-API (Phase 1/2)."
+ },
+ {
+  "key": "EP-64",
+  "summary": "🔍 A1 — KlickTipp-Recherche (Plan ≥ Premium, Keys, Link-Personalisierung) — vor Phase 1, kein Gate mehr",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**⛔ BLOCKER — muss VOR Phase 1 geklärt sein.** Quelle: Plan v2.3 §11.A.\n\n**Default:** Eigene DB führt Referral-State, gespiegelt per `klicktipp_subscriber_id`.\n\n**Zu klären (Kunde):**\n\n1. Ist die KlickTipp-Subscriber-ID verfügbar/lieferbar?\n2. Kann KlickTipp personalisierte Kampagnen-Links mit subscriber-Parameter ausspielen (für D1/D2-Prefill)?\n\n**Steuert:** Schema (§5), Promotor-Upsert (Phase 1), Prefill-Logik.\n\n**Fertig:** Ergebnis + Datum + Beleg (Mail/Protokoll) in Plan §11.C eingetragen."
+ },
+ {
+  "key": "EP-65",
+  "summary": "🔧 A2 — Woo einrichten: WP-User, REST-Key, Webhooks + Secret, Versand-Ereignis feststellen",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**⛔ BLOCKER — muss VOR Phase 2/3 geklärt sein.** Quelle: Plan v2.3 §11.A.\n\n**Default:** Order-Webhook → Match über E-Mail+Telefon (hart, normalisiert), Name (fuzzy).\n\n**Zu klären (Kunde):**\n\n1. Webhook verfügbar? Welche Felder genau?\n2. Feuern Status-/Refund-Events?\n3. REST-API-Zugriff für Reconciliation-Poll vorhanden?\n\n**Bestimmt auch:** ob das E1-Lead-Feld E-Mail oder Telefon priorisiert (kritisch für Attribution-Quote).\n\n**Steuert:** Attribution-Matching (Phase 2, der kritische Geld-Pfad), Reconciliation-Cron, E1-Design.\n\n**Fertig:** Ergebnis + Datum + Beleg in Plan §11.C."
+ },
+ {
+  "key": "EP-66",
+  "summary": "⚠️ A3 entschieden (60 € / Anker Versand) — OFFEN: Karenz-Dauer 28 T ab Versand bestätigen lassen",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**⛔ BLOCKER — muss VOR Phase 2 UND Phase 3 geklärt sein.** Quelle: Plan v2.3 §11.A/H20 (§ 356 Abs. 2 Nr. 1a BGB).\n\n**Default:** Fester Mindestbestellwert ODER definierte Produktliste (+ SKU-Feld in `orders.products`). **Karenzzeit 21 Tage ab Warenerhalt/Lieferung** (nicht ab Kaufabschluss — Widerrufsfrist beginnt bei Waren erst mit Erhalt).\n\n**Zu klären (Kunde):**\n\n1. Welche Reward-Bedingung und welche Werte (Betrag/Produkte)?\n2. Welches WooCommerce-Ereignis bildet „geliefert/erhalten\" ab (Karenz-Anker `delivered_at`)? → ohne Lieferdatum: konservativer Fallback `completed_at` + größerer Puffer.\n\n**Steuert:** Logik UND Wording (C1/E1) UND Teilnahmebedingungen — three-way dependency.\n\n**Fertig:** Ergebnis + Datum + Beleg in Plan §11.C."
+ },
+ {
+  "key": "EP-67",
+  "summary": "⛔ A4 — Streamendous Gutschein-Ausführung + failed-Handling (gates Phase 2)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**⛔ BLOCKER — muss VOR Phase 2 geklärt sein.** Quelle: Plan v2.3 §11.A.\n\n**Default:** Backend prüft + triggert, Streamendous führt Amazon-Kauf aus, Code per Mail an Promotor, Status manuell auf `sent`.\n\n**Zu klären (Kunde):**\n\n1. API/Webhook von Streamendous vorhanden?\n2. Wie wird der Workflow ausgelöst (API vs. manuell)?\n3. `failed`-Handling: was passiert bei fehlgeschlagenem Gutschein-Kauf?\n\n**Steuert:** Gutschein-Trigger (Phase 2), Reward-State-Machine (`failed`-Zustand).\n\n**Fertig:** Ergebnis + Datum + Beleg in Plan §11.C."
+ },
+ {
+  "key": "EP-68",
+  "summary": "⛔ A5 — Share-Kanäle ohne System-Versand: Desktop Kopieren+QR, Mobil WhatsApp+Mail-App (gates Phase 3)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "High",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**⛔ BLOCKER — muss VOR Phase 3 geklärt sein.** Quelle: Plan v2.3 §11.A/H3/H18/H19.\n\n**Default (rechtssicher, baubar):**\n\n* **Desktop** = Nachricht-/Link-kopieren + QR, **kein E-Mail-Schritt im Web** (Login-Hürde am PC).\n* **Mobil** = WhatsApp primär (`wa.me`) + „Per E-Mail teilen\" sekundär (`mailto:` → Mail-App des Handys).\n* In allen Fällen versendet der **Promotor selbst** — das System versendet **nie** an Dritte.\n\n**Weicht sichtbar von PDF F9–F11** („E-Mail-Weiterleitung über KlickTipp\") **und F5** („nur WhatsApp\" mobil) **ab** → dem Kunden aktiv vorlegen und bestätigen lassen.\n\n**Nur falls Kunde zwingend Unternehmens-Versand über KlickTipp will:** dokumentierte anwaltliche Freigabe erforderlich (BGH I ZR 208/12; Abmahn-/Haftungsrisiko beim Unternehmen).\n\n**Fertig:** Ergebnis + Datum + Beleg in Plan §11.C."
+ },
+ {
+  "key": "EP-69",
+  "summary": "🔶 B3 — WordPress-Anbindung (Default: Subdomain + Verlinkung, kein Plugin)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**🔶 Annahme (Default) — kundenseitig in einem Satz bestätigen.** Quelle: Plan v2.3 §11.B.\n\n**Default:** Subdomain + Verlinkung, kein Plugin.\n\n**Klären:** Embedding/SSO nötig?\n\n**Fertig:** Bestätigung in Plan §11.C."
+ },
+ {
+  "key": "EP-70",
+  "summary": "🔶 B4 — etermin-Anbindung (Prefill + Buchungsdaten als 2. Attributionsquelle?)",
+  "issuetype": "Task",
+  "status": "Erledigt",
+  "labels": [],
+  "priority": "Medium",
+  "duedate": null,
+  "parent": "EP-1",
+  "description": "**🔶 Annahme (Default) — kundenseitig in einem Satz bestätigen.** Quelle: Plan v2.3 §11.B.\n\n**Default:** Best-effort-Prefill (Token/Kontakt als URL-Parameter, falls unterstützt).\n\n**Zusätzlich prüfen:** Liefert etermin Buchungsdaten (Webhook/Export) als zweite Attributionsquelle?\n\n**Fertig:** Bestätigung in Plan §11.C."
+ }
+]

@@ -1,0 +1,67 @@
+[
+  {
+    "key": "EP-36",
+    "summary": "Matching 3/3: match_confidence + Zeitfenster (B5: 90 Tage) (~4 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [
+      "geld-pfad"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §4.4 + §11.B5. **Aufwand:** \\~4 h. Test-first.\n\n**AK:** (1) `match_confidence` konsistent berechnet (hart > fuzzy). (2) Matches nur innerhalb des Zeitfensters (Default 90 Tage, konfigurierbar). (3) Unit-Tests inkl. Fenster-Grenzfälle."
+  },
+  {
+    "key": "EP-37",
+    "summary": "Mehrfach-Match-Guard + Bedingungsprüfung (A3) + Karenzzeit/eligible_at (~8 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [
+      "geld-pfad"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §4.5 + §4.7. **Aufwand:** \\~8 h. **Abhängigkeit:** A3 (EP-10). Test-first.\n\n**AK:** (1) Eine Order → genau EIN Reward; Tie-Break: höchste Confidence, dann frühestes Referral. (2) Bedingung: Mindestbestellwert/Produktliste UND Order abgeschlossen UND `eligible_at` (= completed_at + Karenz) erreicht. (3) Refund vor Ablauf erlischt Bedingung. (4) Unit-Tests für alle Fälle inkl. „zwei Promotoren, eine Order\"."
+  },
+  {
+    "key": "EP-38",
+    "summary": "Fraud-Flags: Self-Referral, IP-/Session-Nähe, Velocity, Wegwerf-Domains (~4 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [
+      "geld-pfad"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §4.6. **Aufwand:** \\~4 h. Test-first.\n\n**AK:** (1) Flags in `referrals.risk_flags` (self_referral | same_ip | velocity | disposable_email). (2) Kein Auto-Block — nur Kennzeichnung fürs Approval. (3) Unit-Tests: Promotor-E-Mail == Neukunden-E-Mail wird geflaggt."
+  },
+  {
+    "key": "EP-39",
+    "summary": "Reward-State-Machine: doppelte Idempotenz, Audit, failed-Recovery (test-first, ≥80 %) (~9 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [
+      "geld-pfad"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §4.10 + §7 (Reward-Guardrails). **Aufwand:** \\~9 h. **Abhängigkeit:** A4 (EP-11). Test-first, Ziel ≥ 80 % Abdeckung.\n\n**AK:** (1) Status `pending → approved → sent`, `failed` erlaubt Neuversuch als NEUE Zeile (alte nicht mutieren). (2) Partial-unique-Guards greifen — Doppelzahlung im Test unmöglich. (3) Approval erst ab `eligible_at`. (4) Audit-Log für jede Statusänderung. (5) Refund nach Auszahlung wird geloggt (keine Rückforderung)."
+  },
+  {
+    "key": "EP-40",
+    "summary": "Gutschein-Code-Mail an Promotor (n8n/KlickTipp) + code_sent_to_email (~4 h)",
+    "issuetype": "Task",
+    "status": "Zu erledigen",
+    "labels": [
+      "geld-pfad"
+    ],
+    "priority": "Medium",
+    "duedate": null,
+    "parent": null,
+    "description": "**Plan:** §4.10 + §7. **Aufwand:** \\~4 h. **Abhängigkeit:** A4 (EP-11), B6.\n\n**AK:** (1) Nach `sent`: n8n triggert Code-Mail an Promotor via KlickTipp. (2) `code_sent_to_email` protokolliert. (3) Trigger idempotent wiederholbar (kein Doppelversand)."
+  }
+]

@@ -28,10 +28,15 @@
 //      Verben mitbringt. Deckt „Kundensichtbares nur der Mensch" fuer Konnektoren.
 // BEWUSSTE ABWEICHUNG VOM VORBILD: Onsites Muster „Prod-SQL-Schutz-Flag
 // (OFFSITE_RUN_SQL_SCRIPTS_DISABLE_READ_ONLY_PROD)" ist an deren offsite-Repo
-// gebunden und waere hier ein totes Muster. Die WZS-Pendants (DB-/Webhook-Kommandos)
-// sind laut Firmenspezifikation (Bauplan 2026-08-15 §9 N6: „Deploy-Mechanik-Details
-// offen") noch nicht benannt — sie werden nachgetragen, sobald der Maintainer die
-// realen Kommandos/Flags nennt (ergaenzen erlaubt, erfinden nicht).
+// gebunden und waere hier ein totes Muster. Die WZS-Pendants sind MIT der
+// Zulieferung des Live-Umgebungs-Kollegen (2026-08-24) und den Maintainer-
+// Entscheid 2026-08-25 (curl/wp-Eigentumsfrage -> Gate 3) nachgetragen:
+//   4. DB-Schreibweg WZS (DB-Haelfte): Prisma 7 als EINZIGER Prod-DB-Schreibweg
+//      (migrate dev|deploy|reset, db push|execute|seed, db:*-npm-Skripte) plus
+//      Admin-Pfad `docker compose exec postgres psql`. Die Deploy-Haelfte
+//      (gh workflow run deploy-prod.yml, docker compose pull/up -d) wartet auf
+//      die Maintainer-Weiche Actions+SSH vs. Coolify (Register 2026-08-24) —
+//      ergaenzen erlaubt, erfinden nicht.
 //
 // KEIN STATE (Onsite §15.26 Nr. 2): gefragt wird bei JEDEM Treffer — der
 // Freigabedialog IST die Kontrolle; ein zweites `tofu apply` verdient eine zweite
@@ -235,7 +240,89 @@ function deployKommandowort(tokens) {
   return { muster: 'deploy', wirkung: 'stoesst eine Auslieferung an' };
 }
 
-// --- Bash-Pruefung ----------------------------------------------------------------
+// --- Muster 4: DB-Schreibweg WZS (DB-Haelfte) ---------------------------------------
+// Zulieferung 2026-08-24: Prisma 7 ist der einzige Prod-DB-Schreibweg; der Admin-Pfad
+// laeuft ueber `docker compose exec postgres psql`. Beides fragt — die DB ist die
+// rote Linie „Datenveraenderung an Prod-Systemen". Lokales psql (Dev-Datenbank,
+// --version) bleibt bewusst still: WZS-Prod ist nur ueber die zwei benannten Wege
+// erreichbar, alles andere waere Fehlalarm (Abnahmekriterium).
+const PRISMA_BINARIES = new Set(['prisma']);
+const PRISMA_SUBKOMMANDOS = new Set(['push', 'execute', 'seed', 'migrate', 'db']);
+const PRISMA_MIGRATE_SUBS = new Set(['dev', 'deploy', 'reset']);
+// npm/yarn/pnpm run <script>: db:*-Skripte sind laut Zulieferung Schreibskripte.
+const RUN_MANAGER = new Set(['npm', 'yarn', 'pnpm', 'bun']);
+const DB_SKRIPT_PRAEFIX = /^db:.+/;
+
+function prismaTreffer(tokens) {
+  const bi = binaerIndex(tokens);
+  if (bi === -1) return null;
+  if (!['prisma', 'npx', 'pnpx'].includes(commandBasename(tokens[bi]).toLowerCase())) return null;
+  const klein = tokens.map(t => commandBasename(t).toLowerCase());
+  const pi = klein.indexOf('prisma');
+  if (pi === -1) return null;
+  const args = tokens.slice(pi + 1).filter(t => !t.startsWith('-'));
+  const sub1 = (args[0] || '').toLowerCase();
+  const sub2 = (args[1] || '').toLowerCase();
+  if (sub1 === 'migrate') {
+    if (PRISMA_MIGRATE_SUBS.has(sub2)) {
+      return { muster: 'prisma migrate ' + sub2, wirkung: 'veraendert das Prod-DB-Schema (Prisma)' };
+    }
+    return null; // migrate status/diff — lesend
+  }
+  if (sub1 === 'db') {
+    if (['push', 'execute', 'seed'].includes(sub2)) {
+      return { muster: 'prisma db ' + sub2, wirkung: 'schreibt in die Datenbank (Prisma)' };
+    }
+    return null; // db pull — lesend
+  }
+  if (['push', 'execute', 'seed'].includes(sub1)) {
+    return { muster: 'prisma ' + sub1, wirkung: 'schreibt in die Datenbank (Prisma)' };
+  }
+  return null;
+}
+
+// npm/yarn/pnpm/bun run <db:*-Skript> — Schreibskripte laut Zulieferung.
+function npmDbTreffer(tokens) {
+  const bi = binaerIndex(tokens);
+  if (bi === -1) return null;
+  if (!RUN_MANAGER.has(commandBasename(tokens[bi]).toLowerCase())) return null;
+  const klein = tokens.map(t => t.toLowerCase());
+  const runIdx = klein.indexOf('run');
+  if (runIdx === -1) return null;
+  const skript = tokens[runIdx + 1];
+  if (skript && DB_SKRIPT_PRAEFIX.test(skript)) {
+    return { muster: 'run ' + skript, wirkung: 'schreibt in die Datenbank (db-Skript)' };
+  }
+  return null;
+}
+
+// docker compose exec postgres psql — Admin-Pfad per SSH. Der psql-Body selbst wird
+// NICHT zerlegt (SELECT vs. DROP): der Admin-Pfad als ganzer ist die rote Linie.
+function composePsqlTreffer(tokens) {
+  const bi = binaerIndex(tokens);
+  if (bi === -1) return null;
+  const base = commandBasename(tokens[bi]).toLowerCase();
+  if (base !== 'docker' && base !== 'docker-compose') return null;
+  const klein = tokens.map(t => commandBasename(t).toLowerCase());
+  const execIdx = klein.indexOf('exec');
+  if (execIdx === -1) return null;
+  const nachExec = klein.slice(execIdx + 1).filter(w => w && !w.startsWith('-'));
+  if (nachExec.length < 2) return null;
+  if (nachExec[0] !== 'postgres' || nachExec[1] !== 'psql') return null;
+  // Fehlalarm-Schutz: `psql --version` / `psql -V` druckt nur die lokale Version,
+  // keine DB-Interaktion — still. Alles andere im Admin-Pfad fragt (auch SELECT:
+  // der Pfad als ganzer ist die rote Linie).
+  const psqlIdx = klein.indexOf('psql', execIdx + 1);
+  const nurVersion = tokens.slice(psqlIdx + 1).every(t => ['--version', '-V', '-W'].includes(t));
+  if (nurVersion) return null;
+  return { muster: 'docker compose exec postgres psql', wirkung: 'oeffnet den Prod-DB-Admin-Pfad (psql)' };
+}
+
+function dbTreffer(tokens) {
+  return prismaTreffer(tokens) || npmDbTreffer(tokens) || composePsqlTreffer(tokens);
+}
+
+
 // Zerlegung wie im FFG: quote-bereinigt und subshell-aufgeloest (eine Erwaehnung IN
 // einem String — Commit-Message, echo — ist kein Kommando und darf nie feuern).
 // Zusaetzlich werden Gruppierungsklammern zu Trennern, sonst waere `(tofu destroy)`
@@ -290,7 +377,9 @@ function pruefeBash(command, tiefe = 0) {
   if (tiefe === 0 && isReadOnlyGitIntrospection(raw)) return null;
 
   for (const tokens of segmentTokens(raw)) {
-    const treffer = infraTreffer(tokens) || deployTreffer(tokens);
+    // dbTreffer VOR deployTreffer: `prisma migrate deploy` ist primaer ein
+    // DB-Schema-Eingriff, kein App-Deploy — die spezifischere Klasse gewinnt.
+    const treffer = infraTreffer(tokens) || dbTreffer(tokens) || deployTreffer(tokens);
     if (treffer) return treffer;
   }
 
@@ -316,7 +405,7 @@ function pruefeBash(command, tiefe = 0) {
 // Kommandowort-Position begrenzt (deployKommandowort), Fehlalarm-Verhalten unveraendert.
 function pruefeTokens(tokens, tiefe) {
   if (tiefe > MAX_TIEFE || tokens.length === 0) return null;
-  const treffer = infraTreffer(tokens) || deployKommandowort(tokens);
+  const treffer = infraTreffer(tokens) || dbTreffer(tokens) || deployKommandowort(tokens);
   if (treffer) return treffer;
   const body = wrapperBody(tokens);
   if (body) return pruefeBash(body, tiefe + 1);

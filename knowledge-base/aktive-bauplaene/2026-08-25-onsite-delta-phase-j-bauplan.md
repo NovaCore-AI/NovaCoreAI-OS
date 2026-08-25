@@ -307,3 +307,35 @@ Vöhringer. Quellen live gelesen: Onsite.ai-OS `origin/main@a9927b2` (Kern 0.27.
 `Onsite.ai-OS-Development@v0.13.3` (`agents/*.md`, `plugin.json`); NovaCore-Gegenprobe im
 Worktree auf `feat/onsite-delta-phase-i@3d8bb63`. Entscheide J-E1–J-E10 sind Vorschläge
 (Default Onsite-Parität, N1.2) bis zur Maintainer-Bestätigung am Phase-J-PR.*
+
+---
+
+## Nachtrag N1 — Frühzug D29/D30/Muster-4-DB (2026-08-25, Kimi K3)
+
+**Maintainer-Weisung 2026-08-25 (übersteilt J-E10 und §9):** D29, D30 und die DB-Hälfte
+des WZS-Safety-Gate-Slots werden **sofort** gebaut — nicht erst mit Phase J nach dem
+Merge von PR #25. Begründete Abweichungen von den Plan-Defaults:
+
+- **D29 statt Vertagung (J-E10):** `jira-workflow.md` als Eigenbau mit benannten Lücken
+  (Onsite hat kein Pendant); **Heimat-Entscheid des Maintainers: Jira-Artefakte wohnen in
+  `metaknowledge/`** (Repo-Wurzel, außerhalb der indexpflichtigen Wissensbasis). Der
+  Prozess setzt die Regeln für die Restarbeit, solange Block B/C zurückgestellt ist.
+- **D30 vorgezogen (Planteil J-B/AP B6):** Port von Onsite
+  `workflow-md-implementierung.md` (Anker `a9927b2`) in NovaCore-Zuschnitt;
+  `wp-rahmen.md`-Kopf auf Optionalität korrigiert („Abbildung Pflicht, Ort optional",
+  Verweis auf den Anlass-Test); Registry ist bereits im Sollzustand (nur `development`
+  trägt das Feld; Satelliten bewusst ohne).
+- **Muster-4-DB-Hälfte (statt „eigener Posten" in §9):** WZS-Zulieferung 2026-08-24
+  umgesetzt in `nc-safety-gate.js` — Prisma-Schreibwege, compose-exec-psql, mit
+  Lese-Ausnahmen als Fehlalarm-Schutz; **Eigentums-Entscheid des Maintainers: schreibende
+  curl/wp-Aufrufe gegen Live-Domains gehören zu Gate 3** (keine FFG-Seite). Deploy-Hälfte
+  wartet weiter auf die Weiche Actions+SSH vs. Coolify. Getrennt vom Fehlalarm-Fix A1
+  (D33) gehalten — der bleibt Phase J.
+- **Artefakt-Migration:** `.nc/jira-migration/` + `.nc/erinnerung/jira-rest-zugang.md`
+  (Scratchpad-Funde D27) nach `metaknowledge/` übernommen — `.nc/` bleibt leerer
+  Altstand-Schutz.
+
+Gebaut auf Branch `feat/phase-j-fruehzug` (Basis `f3363cf` + Cherry-Pick des
+N5/Bauplan-Commits `7e51117` aus dem Parallel-Worktree). Die übrige Phase J
+(J-D/J-A/J-B-Rest/J-C/J-E) bleibt unverändert geplant; dieser Nachtrag ist kein
+Phasen-Vollzug.
