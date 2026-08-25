@@ -64,8 +64,9 @@ Instruktionsebene).
   (zeilenenden-normalisiert) identischem Stand, Backup vor jedem Schreiben; beide Ziele
   (1 und 1b) laufen unabhängig — ein defektes nimmt das andere nicht mit. Opt-out
   `NC_AUTOSYNC=off` (ein Schalter für beide), Test-Override `NC_AUTOSYNC_TEAMSYNC_TARGET`.
-- **Payload:** `plugins/nc/nc-sync.md` — bewusst **keine** Kopie unter `doks/`
-  (Doppelpflege-Verbot; Bauplan 2026-08-15, Nachtrag N2). Geladen wird die Zieldatei über
+- **Payload:** `plugins/nc/doks/nc-teamsync.md` — seit 2026-08-25 wie beim Vorbild UNTER
+  `doks/` (Bauplan 2026-08-15, Nachtrag N2 damit aufgehoben; kein Doppelpflege-Verstoß, da
+  es nach wie vor die eine ausgelieferte Quelle ist). Geladen wird die Zieldatei über
   die `@`-Import-Zeile `@~/.claude/nc-teamsync.md` im Firmen-Block und als Lese-Schritt
   in `/nc:start`.
 - **Grenzen:** In der Präzedenzkette wird 1b nicht gesondert gerankt — sie ordnet sich im
@@ -109,8 +110,8 @@ Instruktionsebene).
 ## Begriffsklärung: Repo-Doku ≠ Plugin-CLAUDE
 
 Der Kern ist per Definition die ständige Abteilung `gemeinsam` — also trägt das Kern-Plugin
-den **ausgelieferten** Anteil (heute: `nc-sync.md` und die Autosync-Payload unter
-`plugins/nc/doks/`), und daraus wird Ebene 1 materialisiert. Ein Repo, das mehrere Plugins
+den **ausgelieferten** Anteil (heute: die Autosync-Payloads unter `plugins/nc/doks/`, u. a.
+`nc-teamsync.md`), und daraus wird Ebene 1 materialisiert. Ein Repo, das mehrere Plugins
 hostet (heute `nc`, `nc-development`), hat entsprechend je Plugin ausgelieferte Doku und
 **eine** Repo-Doku (`AGENTS.md`, nicht ausgeliefert). Die Artefakt-Arten haben verschiedene
 Leser: **ausgelieferte Plugin-Doku** = alle Nutzer des Plugins, überall; **Repo-Doku** = wer

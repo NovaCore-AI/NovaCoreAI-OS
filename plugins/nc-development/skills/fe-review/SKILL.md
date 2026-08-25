@@ -51,7 +51,7 @@ damit nicht nur das auffällt, was zuerst ins Auge springt. Er **bewertet**; die
    - **LOW** — Hinweis, optional.
 7. **Review-Kommentar entwerfen:** Befunde nach Severity gruppieren, je Befund Fundstelle,
    Begründung und konkreten Änderungsvorschlag nennen. Den Entwurf ausgeben und ausdrücklich
-   als **Entwurf** kennzeichnen. Entwurfssprache nach `nc-sync.md` §6 des Kern-Plugins `nc`.
+   als **Entwurf** kennzeichnen. Entwurfssprache nach `nc-teamsync.md` §6 des Kern-Plugins `nc`.
 8. **Übergabe:** Auf die menschliche Entscheidung hinweisen (posten, approven, resolven) und
    auf `/nc:journal` für festzuhaltende Entscheidungen verweisen.
 

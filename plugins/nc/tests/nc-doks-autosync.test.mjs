@@ -233,7 +233,7 @@ test('Ebene 1b: Erstlauf legt nc-teamsync.md mit Stempel in der ERSTEN Zeile an'
     'erste Zeile muss der Versions-Stempel der Kern-Version sein');
   assert.ok(!inhalt.includes('NC:BLOCK:START'),
     'die Ganzdatei-Payload darf keine Block-Marker tragen — sie hat keine Privat-Zone');
-  assert.match(inhalt, /Verhaltens-Defaults/, 'Payload-Inhalt (nc-sync.md) fehlt');
+  assert.match(inhalt, /Verhaltens-Defaults/, 'Payload-Inhalt (doks/nc-teamsync.md) fehlt');
 });
 
 test('Ebene 1b: alter Stempel wird durch die ganze Datei ersetzt, Backup entsteht', () => {

@@ -100,9 +100,9 @@ Nutzerakzeptanz), und **lieber veraltet als zerstört**.
   Linien, SSOT-Verweis; sie ist nicht versioniert, nicht getestet, nicht abteilungsfähig und hat
   keine Privat-Zone. Ein **Textentwurf für Ebene 0 geht zur Maintainer-Freigabe**, bevor er in die
   Admin-Oberfläche wandert; die Verteilwege selbst beschreibt der Team-Distributions-Prozess.
-- **Ebene-1b-Payload ist `plugins/nc/nc-sync.md`** — bewusst **keine** Kopie unter `doks/`
-  (Bauplan-Nachtrag N2): die Datei wird von über zehn ausgelieferten Dateien referenziert, ein
-  Umzug bräche sie alle, eine Kopie wäre verbotene Doppelpflege. Der Hook liest sie direkt.
+- **Ebene-1b-Payload ist `plugins/nc/doks/nc-teamsync.md`** — seit 2026-08-25 wie beim Vorbild
+  UNTER `doks/` (Bauplan-Nachtrag N2 damit aufgehoben): der Fundstellen-Sweep zog alle über zehn
+  ausgelieferten Referenzen auf den neuen Pfad nach, keine Doppelpflege. Der Hook liest sie direkt.
 
 ## 3. Bau-Ablauf (Reihenfolge mit Begründung)
 
@@ -139,7 +139,7 @@ Nutzerakzeptanz), und **lieber veraltet als zerstört**.
 |---|---|---|---|---|
 | 0 | — (Textentwurf zur Freigabe, noch kein Repo-Artefakt) | Admin-Settings des Team-Workspace | jeder Client der Org | zentral, ohne Sync-Mechanik |
 | 1 | `plugins/nc/doks/global-claude-firmenblock.md` | `~/.claude/CLAUDE.md`, Block zwischen `NC:BLOCK`-Markern | jede Session | SessionStart-Autosync `nc-doks-autosync.js` |
-| 1b | `plugins/nc/nc-sync.md` | `~/.claude/nc-teamsync.md` (Ganzdatei) | jede Session per `@`-Import aus Ebene 1, zusätzlich Lese-Schritt in `/nc:start` | derselbe Autosync, Datei-Ersatz |
+| 1b | `plugins/nc/doks/nc-teamsync.md` | `~/.claude/nc-teamsync.md` (Ganzdatei) | jede Session per `@`-Import aus Ebene 1, zusätzlich Lese-Schritt in `/nc:start` | derselbe Autosync, Datei-Ersatz |
 | 2 | `knowledge-base/standardprozesse/vorlagen/abteilungsplugin/abteilungs-claude.md.vorlage` → `plugins/<plugin>/<abteilung>-abteilungs-claude.md` | Plugin-Cache der Maschine | Einstiegs-Ritual `/nc:start` (Schritt 7 liest die Ebene-2-Datei je installiertem Abteilungsplugin; Erstauslieferung `nc-development` 0.2.0) | Marketplace-Auto-Update bei Plugin-Bump |
 | 3 | Arbeitsrepo: `CLAUDE.md` / `AGENTS.md` | dort | Verzeichnisbaum-Ladung beim Start | Git |
 | 3b | dieses Repo: getrackte `AGENTS.md` + un-getrackte lokale `CLAUDE.md` | dort | wer **im** Repo baut | Git (nur `AGENTS.md`) |
@@ -195,8 +195,8 @@ Nutzerakzeptanz), und **lieber veraltet als zerstört**.
   `grundwissen/NovaCore-OS-CLAUDE-Ebenen-Definition.md` und den jeweiligen Bauplan.
 - **Ebene 0:** Vorbild „aktiv", NovaCore „bespielbar, nicht bespielt" (§2.5) — der Workspace
   existiert, der Text ist Maintainer-Sache.
-- **Ebene-1b-Payload** bleibt am eingeführten Ort `plugins/nc/nc-sync.md` statt unter `doks/`
-  (Nachtrag N2) — Onsite legt sie als `doks/oai-teamsync.md` ab.
+- **Ebene-1b-Payload** liegt seit 2026-08-25 wie beim Vorbild unter `plugins/nc/doks/nc-teamsync.md`
+  (Nachtrag N2 aufgehoben) — Onsite legt sie als `doks/oai-teamsync.md` ab, wir als `doks/nc-teamsync.md`.
 - **Rollen statt Klarnamen** in allen ausgelieferten Payloads: Dieses OS-Repo ist **öffentlich**,
   das Vorbild-Repo ist privat (Bauplan §1f / N6, Invariante I9).
 - **Marker-Präfix** `NC:` statt `NS:`/`OAI:`, Envs `NC_*`, Skills `/nc:` (Mapping-Regeln §2 des

@@ -94,7 +94,7 @@ Gedächtnis — genau der Blind-Start, den das OS verhindert.
    darüber auf statt zu raten; fehlt sie, ist das **kein Fehler** — sie wird als „nicht
    vorhanden" ausgewiesen und der Skill arbeitet ohne sie weiter.
 10. **Projekt-Doku prüfen:** `AGENTS.md` bzw. `CLAUDE.md` des Arbeits-Repos auf Regeln, die für
-   diese Sitzung gelten. Ergänzend gilt `nc-sync.md` dieses Kern-Plugins als globale
+   diese Sitzung gelten. Ergänzend gilt `nc-teamsync.md` dieses Kern-Plugins als globale
    Methodik-Anweisung; bei Widerspruch gewinnt die repo-eigene Fachanweisung für Fachfragen.
 11. **Team-Sync beachten (Ebene 1b):** `nc-teamsync.md` im `.claude`-Ordner des
     Home-Verzeichnisses trägt die firmenweiten Instruktionen und ist über den Firmen-Block der

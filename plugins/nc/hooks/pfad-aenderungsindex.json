@@ -76,8 +76,8 @@
     },
     {
       "id": "plugin-claude",
-      "prefix": "plugins/nc/nc-sync.md",
-      "titel": "Plugin-CLAUDE `nc-sync.md`",
+      "prefix": "plugins/nc/doks/nc-teamsync.md",
+      "titel": "Plugin-CLAUDE `nc-teamsync.md`",
       "matrixKey": "Abteilungs-/Plugin-CLAUDE geändert",
       "lesen": "NovaCore-OS-CLAUDE-Ebenen-Definition.md · die Datei selbst. Sie ist ZUGLEICH Ebene-1b-Payload — es gilt zusätzlich die Matrix-Zeile **Team-globale CLAUDE-Anteile geändert**",
       "mitziehen": "README.md des Plugins · AGENTS.md, falls die Ebene dort beschrieben ist · CHANGELOG.md · Kern-Bump, weil die Datei ausgeliefert wird · Plugin-Grenze: keine Repo-Pfade, keine ../-Verweise (testerzwungen)"
@@ -175,8 +175,16 @@
       "prefix": "CHANGELOG.md",
       "titel": "CHANGELOG (Historie)",
       "matrixKey": "Konvention/Prozess geändert",
-      "lesen": "Abschnitt 3 des Aktualisierungs-Index (Version, Release, Tag) · der bestehende `[Unreleased]`-Abschnitt",
-      "mitziehen": "Eintrag unter `[Unreleased]` nach Keep-a-Changelog MIT Namenszeichnung — Pflicht für jede integrierte Änderung · Bump des betroffenen Plugins am einzig richtigen Ort (Kern: + VERSION + Registry) · Alteinträge sind historisch und werden nie umgeschrieben · keine doppelte Versionsüberschrift (späte Anker-Invariante)"
+      "lesen": "§0 (Zwei-Klassen-Buchführung) und §3.6 (Release-Zug) des Aktualisierungs-Index · der jüngste Waypoint-Abschnitt",
+      "mitziehen": "Im Strang NICHTS: kein Eintrag, kein Bump — Wissensträger des Strangs ist das PR-Ergebnismemo (§0, seit 2026-08-24). Den Waypoint-Abschnitt schreibt allein der Release-Zug auf Maintainer-Kommando (§3.6): eine Version je Batch und Plugin, Bump am einzig richtigen Ort (Kern: plugin.json + VERSION + Registry) · Alteinträge sind historisch und werden nie umgeschrieben · keine doppelte Versionsüberschrift (Suite-Invariante)"
+    },
+    {
+      "id": "wissens-router-referenz",
+      "prefix": "plugins/nc/referenz/wissens-router.md",
+      "titel": "Referenz Wissens-Router (Laufzeit-Mechanik)",
+      "matrixKey": "Wissens-Router oder Zeiger-Index geändert",
+      "lesen": "die Datei selbst · standardprozesse/wissens-router-bau.md (Prozess-Ebene) · NovaCore-OS-Node-Doks-Definition.md (Begriff und Knotenbestand) · die vier Router-SKILL.mds",
+      "mitziehen": "die vier Router-SKILL.mds, falls sich Mechanik-Aussagen ändern · wissen-sucheindex.json · nc-wissens-hinweis.js · Node-Doks-Definition, falls Bestand/Geltungsbereich berührt · README.md · Kern-Bump erst am Release-Zug (Produktklasse, §0)"
     }
   ]
 }

@@ -45,7 +45,7 @@ PR bleibt beim Menschen.
    und keine im **Log**. Ein Fund ist immer mindestens HIGH und wird gemeldet, nicht
    stillschweigend entfernt.
 7. **Dimension 6 — Testtiefe kritischer Pfade:** Für Geldfluss, Auth und Datenschutz gilt
-   Test-First mit **≥ 80 % Coverage** (`nc-sync.md` §2.2 des Kern-Plugins `nc`; das Arbeits-Repo
+   Test-First mit **≥ 80 % Coverage** (`nc-teamsync.md` §2.2 des Kern-Plugins `nc`; das Arbeits-Repo
    kann eine abweichende Grenze festlegen). Prüfen, ob die Tests **Absicht** prüfen — ein Test,
    der nicht scheitert, wenn sich die Logik ändert, ist schwach.
 8. **Befunde einordnen:** Jeden Befund mit **Severity** und **Fundstelle** `Datei:Zeile`
@@ -57,7 +57,7 @@ PR bleibt beim Menschen.
    - **LOW** — Hinweis, optional.
 9. **Review-Kommentar entwerfen:** Befunde nach Severity gruppieren, je Befund Fundstelle,
    Begründung und konkreten Änderungsvorschlag nennen. Den Entwurf ausgeben und ausdrücklich
-   als **Entwurf** kennzeichnen. Entwurfssprache nach `nc-sync.md` §6 des Kern-Plugins `nc`.
+   als **Entwurf** kennzeichnen. Entwurfssprache nach `nc-teamsync.md` §6 des Kern-Plugins `nc`.
 10. **Übergabe:** Auf die menschliche Entscheidung hinweisen (posten, approven, resolven).
 
 ## Regeln

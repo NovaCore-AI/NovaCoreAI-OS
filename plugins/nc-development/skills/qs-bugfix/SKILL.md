@@ -37,7 +37,7 @@ WP0–WP8 steht in `wp-rahmen.md` des Kern-Plugins `nc` und wird hier nicht wied
    Befehle stammen aus der Projekt-Konfiguration des Arbeits-Repos — nichts erfinden. Rot →
    erst grün machen, dann weiter.
 6. **Befund festhalten:** Ursache, Behebung, betroffene Stellen und Nachweis in einem kurzen
-   Befund zusammenfassen. Entwurfssprache nach `nc-sync.md` §6 des Kern-Plugins `nc`.
+   Befund zusammenfassen. Entwurfssprache nach `nc-teamsync.md` §6 des Kern-Plugins `nc`.
 7. **Ticketstand vorbereiten:** Statuswechsel oder Feldänderung als **Vorschlag** formulieren
    und die Einzelfreigabe einholen; wo kein Zugang zum Ticketsystem besteht, den manuellen
    Weg ausschreiben (welcher Vorgang, welches Feld, welcher Zielstatus, welcher Text).

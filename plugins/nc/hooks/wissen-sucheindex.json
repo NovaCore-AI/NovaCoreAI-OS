@@ -555,6 +555,38 @@
         "arbeitsverzeichnis",
         "gebaut gilt erst nach push"
       ]
+    },
+    {
+      "id": "standardprozess-authoring",
+      "titel": "Standardprozess Standardprozess-Authoring",
+      "pfad": "knowledge-base/standardprozesse/standardprozess-authoring.md",
+      "router": "wissen-aendern",
+      "hinweis": "Form und Ablauf für neue Standardprozesse: Kopf-Form, sechs Rubriken, die vier Nachzüge",
+      "stichworte": [
+        "standardprozess-authoring",
+        "neuer standardprozess",
+        "prozess-authoring",
+        "sechs rubriken",
+        "kopf-form",
+        "ergebnis-output",
+        "kette-zeile"
+      ]
+    },
+    {
+      "id": "wissens-router-bau",
+      "titel": "Standardprozess Wissens-Router-Bau",
+      "pfad": "knowledge-base/standardprozesse/wissens-router-bau.md",
+      "router": "wissen-aendern",
+      "hinweis": "Anlass-Test, Ablauf und Nachzüge für Router, Sucheindex und Wissens-Zeiger-Hook",
+      "stichworte": [
+        "wissens-router",
+        "router-bau",
+        "sucheindex",
+        "wissens-zeiger",
+        "zeiger-index",
+        "kontext-budget",
+        "stichwort-regel"
+      ]
     }
   ]
 }

@@ -30,7 +30,7 @@ in `wp-rahmen.md` des Kern-Plugins `nc` und wird hier nicht wiederholt.
    gezogen? Wo die Version steht und nach welcher Regel sie steigt, entscheidet die Doku des
    **Arbeits-Repos** — nicht der Skill.
 3. **CHANGELOG prüfen:** Jede Änderung, die Nutzer erreicht, hat einen Eintrag. Fehlende
-   Einträge auflisten und als Vorschlag entwerfen. Entwurfssprache nach `nc-sync.md` §6 des
+   Einträge auflisten und als Vorschlag entwerfen. Entwurfssprache nach `nc-teamsync.md` §6 des
    Kern-Plugins `nc`.
 4. **Nachweise sammeln:** Tests, Lint und Build ausführen bzw. den letzten CI-Lauf des Stands
    zitieren — je mit Befehl oder Lauf-Kennung und Ergebnis. Rot heißt: keine Vorbereitung

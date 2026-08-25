@@ -43,7 +43,7 @@ Produktivsystem entlangprüft. Der Rahmen WP0–WP8 steht in `wp-rahmen.md` des 
 6. **Ergebnis entscheiden:** „stabil", „stabil mit benannter Nacharbeit" oder „Rückweg
    empfohlen". Die Empfehlung trägt immer die Belege, auf denen sie beruht.
 7. **Protokoll entwerfen:** Erwartung, Ankunft, Smoke-Ergebnisse, Fehlerbild und Empfehlung
-   zusammenfassen. Entwurfssprache nach `nc-sync.md` §6 des Kern-Plugins `nc`.
+   zusammenfassen. Entwurfssprache nach `nc-teamsync.md` §6 des Kern-Plugins `nc`.
 8. **Übergabe:** Bei Befunden auf `/nc-development:qs-bugfix` verweisen; die Entscheidung über
    Rückweg oder Weiterbetrieb trifft die Rolle Maintainer/Admin.
 

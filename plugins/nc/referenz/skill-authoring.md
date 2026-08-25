@@ -91,7 +91,7 @@ description: >-
 1. **Fakten nur mit Quelle.** Fachliche Fakten (Schwellenwerte, Datenmodelle, API-Verträge,
    Geschäftslogik, Branch-Konventionen) stammen **ausschließlich** aus dem jeweiligen
    Arbeits-Repo — dessen `CLAUDE.md`/`AGENTS.md`, Projekt-Doku und echtem Quellcode. Die
-   methodischen Defaults stehen in `nc-sync.md` des Kern-Plugins `nc`. Selbst generierte Zahlen
+   methodischen Defaults stehen in `nc-teamsync.md` des Kern-Plugins `nc`. Selbst generierte Zahlen
    oder Regeln kennzeichnet der Skill als **KI-Vorschlag**. Quelle nicht auffindbar → STOPP,
    benennen, fragen — nicht raten.
 2. **Rote Linien verankern.** Pushes auf geteilte Branches, Merges, Review-Resolves/Approvals,

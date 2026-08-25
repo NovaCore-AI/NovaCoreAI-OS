@@ -24,7 +24,7 @@ NovaCoreAI-OS/                       = Marketplace-Wurzel (enthält .claude-plug
   .claude-plugin/marketplace.json    ein Eintrag je Plugin: source "./plugins/<name>" (lokal)
                                      oder github-Source mit ref + sha-Pin (Satellit)
   plugins/nc/                        Kern: skills/ hooks/ tests/ wp-rahmen.md
-                                     module-registry.json referenz/ doks/ nc-sync.md
+                                     module-registry.json referenz/ doks/ (inkl. nc-teamsync.md)
   plugins/nc-development/            Dev-Abteilung (Kernheimat): skills/ workflow.md README.md
   knowledge-base/                    Wissensbasis des OS-Repos — wird NICHT ausgeliefert (§1a)
     standardprozesse/vorlagen/abteilungsplugin/

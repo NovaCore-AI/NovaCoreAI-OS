@@ -16,7 +16,7 @@
 > `hooks/`, keine Kern-Dependency) gilt `abteilungs-plugin-bau.md` §1 / **§1a** (Auslieferungsgrenze)
 > und **§3b** (Kollegen-OS) — dort nachlesen, nicht hier wiederholen. Onsite-Firmenspezifika
 > (GitLab/Jira/isento-Bezüge, feste Spec-Randnummern) sind **bewusst nicht** übernommen: Normquellen
-> sind ausschließlich NC-eigene Standardprozesse, Definitionsdokumente und `AGENTS.md`/`nc-sync.md`.
+> sind ausschließlich NC-eigene Standardprozesse, Definitionsdokumente und `AGENTS.md`/`nc-teamsync.md`.
 
 ## 1. Zweck in einem Satz
 
@@ -56,7 +56,7 @@ Fehlt ein Beleg oder eine Fundstelle, ist der Punkt **offen** — nicht still al
 
 | # | Normquelle | Liefert | Hinweis |
 |---|---|---|---|
-| 1 | `plugins/nc/nc-sync.md` (Ebene 1b) | Prozesse, Methodik, Sprachregeln, Rangfolge | NC-Pendant zu Onsites `oai-teamsync.md` |
+| 1 | `plugins/nc/doks/nc-teamsync.md` (Ebene 1b) | Prozesse, Methodik, Sprachregeln, Rangfolge | NC-Pendant zu Onsites `oai-teamsync.md` |
 | 2 | `plugins/nc/doks/global-claude-firmenblock.md` (Ebene 1) | Rote Linien, Freigabe, Konfliktordnung | Abteilung/Satellit: Kurzverweis + Ownership, **kein** Duplikat |
 | 3 | Der zum Prüfungsgegenstand **einschlägige** Bauplan/Design-Spec in `grundwissen/` | Verifizierte Fachfakten des Arbeits-Repos | NovaCore führt **keine** Einzel-Spec mit Fußzeilenkette wie Onsite — das jüngste einschlägige, datierte Dokument ist die Quelle |
 | 4 | Nachträge desselben Bauplans mit Abteilungs-/Satelliten-Pflichten | Pflichten seit dem letzten Prüflauf | z. B. §10/§11 der Multi-Plugin-Architektur-Design (Felix/Biggi) oder Phase F des Onsite-Endstand-Nachbau-Bauplans (`nc-development`) |
@@ -75,8 +75,8 @@ Typ `Kommende Änderung` (Quelle 6 u. a.) füllt die Drift-Matrix, nicht die Sof
 |---|---|
 | 1 | Konnektoren zu externen Systemen: zentral im Kern `nc` vs. lokal in Abteilung/Satellit — gegen den aktuellen Bauplan- und Registry-Stand, nicht gegen eine feste Spec-Randnummer |
 | 2 | Reale Prozessketten (Review-/QS-/Abnahme-Ablauf der Abteilungs-Skills, z. B. `be-review`/`fe-review`); Rollen als **Besetzung**, nie Namen |
-| 3 | Sprach-/Formatregeln für Text-Entwürfe — NC-Grundregel „alle Artefakte Deutsch" (`nc-sync.md`, Kopf); Abweichungen je Fremdsystem nur benennen, sofern belegt |
-| 4 | Fremdsystem-Fakten der Abteilung gegen die Quellen-Hierarchie (Quelle vor Gedächtnis, `nc-sync.md` §2.1) |
+| 3 | Sprach-/Formatregeln für Text-Entwürfe — NC-Grundregel „alle Artefakte Deutsch" (`nc-teamsync.md`, Kopf); Abweichungen je Fremdsystem nur benennen, sofern belegt |
+| 4 | Fremdsystem-Fakten der Abteilung gegen die Quellen-Hierarchie (Quelle vor Gedächtnis, `nc-teamsync.md` §2.1) |
 | 5 | Rote Linien: Kurzverweis auf Normquelle (`global-claude-firmenblock.md`) statt Duplikat; Ownership je Skill klar |
 | 6 | SSOT-Anbindung: Pfade gegen `SSOT-Document-Index.md` (Teil 1/2) statt geraten; Sitzungswissen-Residenz korrekt (kein Dateistrom im Arbeits-Repo ohne eigene Wissensbasis — Projekt-Memory trägt allein; `sitzungswissen/` bei eigener Wissensbasis/Satelliten-SSOT, `ssot-aufbau.md` §4); Registry-Eintrag (`module-registry.json`) stimmig |
 | 7 | Verweise auf Kern-Skills: Umbenennungen/Entfernungen nachgezogen; Kommendes nur als Merker |
@@ -167,4 +167,4 @@ Ist-Inventur, Synthese-Bauplan), **bevor** **AP-F2** auf Basis des AP-F1-Befunds
 auf NC-Verhältnisse gemappt (oai→nc; repo-interne Abteilung `nc-development` vs.
 Kollegen-OS-Satelliten mit eigener Kontroll-Schicht). Onsite-Firmenspezifika (GitLab/Jira/isento,
 feste Spec-Randnummern) bewusst nicht übernommen — Normquellen sind ausschließlich NC-eigene
-Standardprozesse, Definitionsdokumente und `nc-sync.md`/`AGENTS.md`.*
+Standardprozesse, Definitionsdokumente und `nc-teamsync.md`/`AGENTS.md`.*

@@ -42,10 +42,10 @@
 //   globalen CLAUDE.md ausserhalb der NC-Marker. Geladen wird die Datei ueber eine
 //   @-Import-Zeile im Firmen-Block der Ebene 1 und zusaetzlich als Lese-Schritt in
 //   /nc:start.
-//   NC-ABWEICHUNG VOM VORBILD (Bauplan-Nachtrag N2): Die Payload ist die bestehende,
-//   ausgelieferte Datei plugins/nc/nc-sync.md — KEINE Kopie nach doks/ (Doppelpflege-
-//   Verbot: nc-sync.md wird von Skills, workflow.md und Standardprozessen referenziert
-//   und bleibt die eine Quelle; Onsite fuehrt die Payload als doks/oai-teamsync.md).
+//   Die Payload ist die ausgelieferte Datei plugins/nc/doks/nc-teamsync.md — seit
+//   2026-08-25 wie beim Vorbild UNTER doks/ (die frueher dokumentierte Abweichung
+//   "keine Kopie nach doks/" ist damit aufgehoben; Onsite fuehrt die Payload als
+//   doks/oai-teamsync.md, wir als doks/nc-teamsync.md).
 //
 // CRLF-HAERTUNG (NC ueber das Vorbild hinaus, Review-Finding 2026-08-15): Der Vergleich
 // „identisch?" laeuft ueber ZEILENENDEN-NORMALISIERTE Texte (\r\n → \n). Windows-Editoren
@@ -78,9 +78,9 @@ const ENDE = '<!-- NC:BLOCK:ENDE ' + BLOCK_NAME + ' -->';
 const PAYLOAD_DATEI = path.join(__dirname, '..', 'doks', 'global-claude-firmenblock.md');
 const MANIFEST = path.join(__dirname, '..', '.claude-plugin', 'plugin.json');
 
-// Ebene 1b (Team-Sync): Ganzdatei, Stempel in der ersten Zeile. Payload = nc-sync.md
-// (die eine ausgelieferte Quelle, siehe NC-Abweichung im Kopf).
-const TEAMSYNC_PAYLOAD = path.join(__dirname, '..', 'nc-sync.md');
+// Ebene 1b (Team-Sync): Ganzdatei, Stempel in der ersten Zeile. Payload = doks/nc-teamsync.md
+// (die eine ausgelieferte Quelle, siehe Kopf).
+const TEAMSYNC_PAYLOAD = path.join(__dirname, '..', 'doks', 'nc-teamsync.md');
 const TEAMSYNC_STEMPEL = '<!-- NC:TEAMSYNC:VERSION ';
 
 function isDisabled() {

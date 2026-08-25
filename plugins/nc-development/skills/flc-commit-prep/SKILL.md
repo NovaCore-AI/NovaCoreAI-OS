@@ -34,7 +34,7 @@ letzte Netz vor dem Festschreiben — ein roter Zustand wird hier sichtbar, nich
    festgeschrieben wird.
 5. **Commit-Message vorschlagen:** Format `<typ>: <beschreibung>` mit einem Typ aus `feat`,
    `fix`, `refactor`, `docs`, `test`, `chore`, `perf`, `ci`. Ein optionaler Body erklärt das
-   **Warum**, nicht das Was. Entwurfssprache nach `nc-sync.md` §6 des Kern-Plugins `nc`.
+   **Warum**, nicht das Was. Entwurfssprache nach `nc-teamsync.md` §6 des Kern-Plugins `nc`.
 6. **Freigabe einholen:** Vorschlag zeigen und erst nach Bestätigung committen.
 7. **Übergabe:** Ist der Slice fertig, auf `/nc-development:flc-pr` (WP5) verweisen.
 
