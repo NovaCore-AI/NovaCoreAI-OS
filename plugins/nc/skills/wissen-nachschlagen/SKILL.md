@@ -4,7 +4,7 @@ description: >-
   Nennt den Einstieg in die Wissensbasis des OS-Repos, wenn unklar ist, welches Dokument zu
   einem Thema existiert — Master-Index mit Ordner-Routing und Quellen-Triage, Einstiegs-Karte
   und Repo-Karte, Produktarchitektur, die datierten Design-Specs und die normativen
-  Begriffsdokumente zu SSOT, Node-Doks, Gates, CLAUDE-Ebenen, Kriterienliste und Ankern.
+  Begriffsdokumente zu SSOT, Node-Doks, Gates, CLAUDE-Ebenen und Kriterienliste.
   Liefert Zeiger auf die Quellen, nie deren Inhalt. Einschlägig bei Fragen wie „gibt es dazu
   ein Dokument", „wo steht das", „wie ist der gebaute Ist-Stand", „was bedeutet dieser
   Begriff", „wohin gehört eine neue Wissensdatei", „was sagt die Spec dazu". Trigger-Begriffe:
@@ -65,7 +65,6 @@ Angaben nennen eine Datei an der Repo-Wurzel bzw. im Kern-Plugin.
 | `grundwissen/NovaCore-OS-Gates-Definition.md` | die Gates der Kontroll-Schicht erklärt oder abgegrenzt werden |
 | `grundwissen/NovaCore-OS-CLAUDE-Ebenen-Definition.md` | die CLAUDE-Ebenen samt Träger, Update-Kanal und Präzedenzregel erklärt oder abgegrenzt werden |
 | `grundwissen/NovaCore-OS-Kriterienliste-Definition.md` | zu entscheiden ist, ob ein Sitzungsergebnis firmenrelevant ist, und warum es diesen Filter gibt |
-| `grundwissen/NovaCore-OS-Anker-Reservierung-Definition.md` | begründet werden soll, warum knappe Bezeichner vor dem Bau reserviert werden |
 | `firmenkernprozesse/` | der Stand des **Vorbild-Systems** oder der Firmenebene abgeglichen wird — extern geführt, **nicht** normativ für dieses Repo |
 
 ## Regeln

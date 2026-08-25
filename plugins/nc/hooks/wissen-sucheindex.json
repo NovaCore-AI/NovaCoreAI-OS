@@ -36,21 +36,6 @@
       ]
     },
     {
-      "id": "anker-reservierung",
-      "titel": "Standardprozess Anker-Reservierung",
-      "pfad": "knowledge-base/standardprozesse/anker-reservierung.md",
-      "router": "wissen-aendern",
-      "hinweis": "Handgriffe vor der ersten Zeile, wenn mehr als eine Arbeitseinheit gleichzeitig baut",
-      "stichworte": [
-        "anker-reservierung",
-        "anker reservieren",
-        "reserve/",
-        "parallelbau",
-        "namenskollision",
-        "worktree"
-      ]
-    },
-    {
       "id": "kern-plugin-bau",
       "titel": "Standardprozess Kern-Plugin-Bau",
       "pfad": "knowledge-base/standardprozesse/kern-plugin-bau.md",
@@ -272,19 +257,6 @@
         "praezedenzregel",
         "privat-zone",
         "ebene 1b"
-      ]
-    },
-    {
-      "id": "anker-reservierung-definition",
-      "titel": "NovaCore-OS-Anker-Reservierung-Definition",
-      "pfad": "knowledge-base/grundwissen/NovaCore-OS-Anker-Reservierung-Definition.md",
-      "router": "wissen-nachschlagen",
-      "hinweis": "das Warum der Anker-Reservierung: Begriffsnorm, Kollisionsklassen, Abgrenzungen",
-      "stichworte": [
-        "anker-reservierung-definition",
-        "warum anker",
-        "kollisionsklasse",
-        "anker-begriff"
       ]
     },
     {
@@ -635,6 +607,33 @@
         "trigger-matrix",
         "wp-rahmen",
         "optional"
+      ]
+    },
+    {
+      "id": "contributing-flow",
+      "titel": "Standardprozess Contributing-Flow",
+      "pfad": "knowledge-base/standardprozesse/contributing-flow.md",
+      "router": "wissen-aendern",
+      "hinweis": "Stationen S1-S7 eines Strangs, Rollen (Agent unter Overseer, Maintainer bei Merge/Release), rote Linien",
+      "stichworte": [
+        "contributing-flow",
+        "strang-stationen",
+        "pr-memo",
+        "plan-sandwich",
+        "release-zug"
+      ]
+    },
+    {
+      "id": "strang-definition",
+      "titel": "NovaCore-OS-Strang-Definition",
+      "pfad": "knowledge-base/grundwissen/NovaCore-OS-Strang-Definition.md",
+      "router": "wissen-nachschlagen",
+      "hinweis": "normative Begriffsquelle Strang: Ziel-Repo, Branch, Worktree, PR-Memo, Ende inkl. Aufraeumen",
+      "stichworte": [
+        "strang-definition",
+        "was ist ein strang",
+        "offener strang",
+        "worktree-pflicht"
       ]
     },
     {

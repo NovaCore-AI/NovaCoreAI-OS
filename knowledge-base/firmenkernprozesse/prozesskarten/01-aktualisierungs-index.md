@@ -3,9 +3,15 @@
 > **Was das ist:** Visuelle Landkarte des Standardprozesses „ich ändere X — was muss ich anfassen“. Sie verdichtet die Nachschlageliste gegen Vergessen: Pflichtlektüre vorher, Nachzüge in derselben Änderung, Version/Release/Tag, Protokolle und Abschluss.
 > **Quelle (normativ):** `Onsite.ai-OS/knowledge base/plugin-maintanance-ruleset-source/Aktualisierungs-Index.md`
 > **Stand der Karte:** 2026-08-15 · gegen die Quelldatei auf der Platte
+> **Nachtrag 2026-08-25:** Onsite hat die Anker-Reservierung (§5.3 unten) ersatzlos
+> gestrichen (D31) — Prozesskarte 09 entfällt (Nummer bleibt frei), `anker-reservierung.md`
+> ist gelöscht. §5.3 bleibt als **historische** Beschreibung der bis dahin geltenden
+> Onsite-Mechanik stehen; Ersatz ist reine Mechanik (Merge-Konflikt bei Dateikollision,
+> Suite-Invariante gegen doppelte Versionsüberschriften), Pflichtschritt „fremde Worktrees
+> vor dem ersten Schreiben prüfen" bleibt (Phase J, AP D1).
 > **Nicht normativ.** Bei Widerspruch gewinnt die Quelldatei.
 
-Verwandte Karte: [00-FAMILIE-UND-VERDRAHTUNG.md](00-FAMILIE-UND-VERDRAHTUNG.md) (wann welcher Prozess greift). Anker-Details: `anker-reservierung.md` (Einzelkarte 09). Index §3 nennt zusätzlich die Register-Zeile.
+Verwandte Karte: [00-FAMILIE-UND-VERDRAHTUNG.md](00-FAMILIE-UND-VERDRAHTUNG.md) (wann welcher Prozess greift). Index §3 nennt zusätzlich die Register-Zeile.
 
 ---
 
@@ -300,16 +306,22 @@ flowchart TD
     Q -->|ja| Share["mehrere Änderungen teilen die Nummer<br/>kein zweiter Bump"]
     Q -->|getaggt| Next["nächste Nummer Pflicht"]
 
-    Share --> Res["Anker-Reservierung VOR Baubeginn"]
+    Share --> Res["Anker-Reservierung VOR Baubeginn<br/>(historisch, aufgehoben 2026-08-25)"]
     Next --> Res
     Res --> Reg["Zeile im Offene-Stränge-Register<br/>sitzungswissen/offene-straenge-register.md"]
     Reg --> First["wer zuerst reserviert, hat den Anker"]
-    First --> Detail["Details: anker-reservierung.md<br/>Index §3 nennt die Register-Zeile"]
 ```
 
-**Anker-Reservierung** (verbindlich, Maintainer-Entscheid 2026-08-14): Bei parallelen Bauzyklen werden **Spec-§-Nummer und Ziel-Version VOR Baubeginn** per Zeile im Offene-Stränge-Register reserviert. Anlass: Am 2026-08-14 belegten zwei Nachtschichten unabhängig **§15.33 und Kern 0.20.0** — Kollision erst beim Merge, Umnummerierung durch fünf Dokumente. Gilt für **jeden** knappen Anker: Spec-§, Version, Skill-Namen, Hook-Dateinamen, Matrix-Zeilen.
+**Anker-Reservierung** (**historisch** — verbindlich von Maintainer-Entscheid 2026-08-14 bis zur
+ersatzlosen Aufhebung 2026-08-25, D31): Bei parallelen Bauzyklen wurden **Spec-§-Nummer und
+Ziel-Version VOR Baubeginn** per Zeile im Offene-Stränge-Register reserviert. Anlass: Am
+2026-08-14 belegten zwei Nachtschichten unabhängig **§15.33 und Kern 0.20.0** — Kollision erst
+beim Merge, Umnummerierung durch fünf Dokumente.
 
-Die Reservierung hält die *Nummern* auseinander — den Konflikt in der **Spec-Fußzeile** verhindert sie nicht (beide Nachträge schreiben dieselbe Zeile neu). Auflösung laut `anker-reservierung.md` §6: beide Glieder behalten, höhere Version in den Kopf; zwei Testsuite-Invarianten fangen ein verlorenes Glied.
+Die Reservierung hielt die *Nummern* auseinander — den Konflikt in der **Spec-Fußzeile**
+verhinderte sie nicht (beide Nachträge schrieben dieselbe Zeile neu). Seit der Aufhebung trägt
+allein die Mechanik: Merge-Konflikt bei Dateikollision, Suite-Invariante gegen doppelte
+Versionsüberschriften; zwei Testsuite-Invarianten fangen ein verlorenes Glied.
 
 ### 5.4 Kern-Release nach Merge (Schritte 6.1–6.6 der Quelle)
 
@@ -471,7 +483,6 @@ Nur was die Quelle nennt bzw. was die Familienkarte als Kante aus dem Index able
 |---|---|
 | `SSOT-Document-Index` | Triage vor diesem Index |
 | `abteilungs-plugin-bau.md` / `kern-plugin-bau.md` | Standardprozesse, die §1 Schritt 5 prüft |
-| `anker-reservierung.md` | parallele Stränge, Anker-Details; Index §3 nennt die Register-Zeile |
 | `claude-team-distribution.md` | wie der Stand die Maschinen erreicht (nach Bump/Tag/Pin) |
 | `/oai:doku-sync` | führt die Abschluss-Checkliste aus, setzt Stempel |
 | `struktur.test.mjs` | Index-Vollständigkeit, Versionsgleichstand, Tag-Absicherung |
@@ -492,8 +503,8 @@ Zurück in die Quelle und die von ihr genannten Orte.
 | Betriebshandbuch | `knowledge base/project-meta-infos/Onsite.ai-OS-Betriebshandbuch.md` |
 | Roadmap | `knowledge base/Aktive Baupläne/2026-07-24-roadmap.md` |
 | Offene-Stränge-Register | `knowledge base/sitzungswissen/offene-straenge-register.md` |
-| Anker-Reservierung (Prozess) | `knowledge base/plugin-maintanance-ruleset-source/anker-reservierung.md` |
-| Anker-Definition | `knowledge base/project-meta-infos/Onsite.ai-OS-Anker-Reservierung-Definition.md` |
+| Anker-Reservierung (Prozess, **historisch — aufgehoben 2026-08-25**) | entfallen (D31) |
+| Anker-Definition (**historisch — aufgehoben 2026-08-25**) | entfallen (D31) |
 | Zielplan Kontroll-Schicht | `knowledge base/Aktive Baupläne/2026-07-30-zielplan-kontrollschicht.md` |
 | skill-authoring | `plugins/oai/referenz/skill-authoring.md` |
 | agent-authoring | `plugins/oai/referenz/agent-authoring.md` |

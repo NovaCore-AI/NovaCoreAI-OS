@@ -2,7 +2,7 @@
 
 > **Status:** 🟢 Konzeption & Bauplan (gehärtet durch 3 spezialisierte Subagenten-Reviews, 2026-08-16)  
 > **Auftrag:** Lucas Vöhringer, 2026-08-16 — Konzeption einer eigenen Claude-Code-gestützten SDK- und UI-Plattform für NovaCore-OS mit flexibler Modellwahl, Desktop/Web-UI und nativer Gate-Integration.  
-> **Verbindliche Normen:** `NovaCore-OS-Produktarchitektur.md`, `NovaCore-OS-Gates-Definition.md`, `NovaCore-OS-CLAUDE-Ebenen-Definition.md`, `NovaCore-OS-Anker-Reservierung-Definition.md`.
+> **Verbindliche Normen:** `NovaCore-OS-Produktarchitektur.md`, `NovaCore-OS-Gates-Definition.md`, `NovaCore-OS-CLAUDE-Ebenen-Definition.md`.
 
 ---
 

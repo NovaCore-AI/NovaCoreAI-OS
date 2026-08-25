@@ -1,5 +1,12 @@
 // ============================================================================
-// nc-agenten-invarianten — PORTABLER PRUEFBAUSTEIN, Baustein-Version 1.4.2
+// nc-agenten-invarianten — PORTABLER PRUEFBAUSTEIN, Baustein-Version 1.4.3
+// 1.4.3 (2026-08-26, Phase J/J-E3): Diagnose-Klasse implementiert (der 1.4.0-Kommentar
+// kündigte sie an: "eine eigene, ausdrückliche Kennzeichnung"). Marker
+// <!-- nc:diagnose --> direkt unter der Frontmatter erlaubt als EINZIGES Zusatzwerkzeug
+// Bash — nur lesende Built-ins/MCP bleiben daneben zulässig; Pflichtdisziplin wie bei
+// schreibend: maxTurns, Grenze in der description sichtbar ("nicht-mutierend"/"Allowlist"),
+// und der Body muss die benannten Kommandoklassen der Allowlist tragen. schreibend und
+// diagnose schließen sich gegenseitig aus.
 // 1.4.2 (2026-08-16, Codex-Review Runde 3): Defense-Grundsatz 4 als kanonischer
 // Pflichtsatz auf whitespace-normalisiertem Text (eingeschobene Negation unterbricht die
 // Wortfolge und faellt durch); Negativprobe mit "nicht als verdaechtig" ergaenzt.
@@ -202,9 +209,10 @@ const SCHREIB_TOOLS = ['Write', 'Edit', 'MultiEdit', 'NotebookEdit'];
  *  Autor); jedes nicht gelistete Built-in ist unzulaessig — Bash, PowerShell, Monitor
  *  und Unbekanntes fallen damit automatisch durch, ohne dass eine Denylist gepflegt
  *  werden muesste. */
-function unzulaessigeTokens(tokens, schreibend) {
+function unzulaessigeTokens(tokens, schreibend, diagnose) {
   const erlaubt = new Set(LESE_BUILTINS);
   if (schreibend) for (const t of SCHREIB_TOOLS) erlaubt.add(t);
+  if (diagnose) erlaubt.add('Bash');
   return tokens.filter((t) => !MCP_FORM.test(t) && !erlaubt.has(t));
 }
 
@@ -245,6 +253,15 @@ model: inherit`;
     'Gegenprobe fehlgeschlagen: PowerShell/Monitor rutschen als read-only durch');
   assert.deepEqual(unzulaessigeTokens(['Write', 'Edit', 'Bash'], true), ['Bash'],
     'Gegenprobe fehlgeschlagen: Bash rutscht im Schreibend-Fall durch');
+  // (c2, 1.4.3) Diagnose-Klasse: genau Bash kommt dazu — Schreib-Tools und andere
+  // exec-faehige Built-ins fallen auch hier durch; ohne Marker bleibt Bash draussen.
+  assert.deepEqual(unzulaessigeTokens(['Read', 'Grep', 'Bash', 'mcp__srv__x'], false, true), [],
+    'Gegenprobe fehlgeschlagen: lesendes Bash + lesende Built-ins sollte als Diagnose zulaessig sein');
+  assert.deepEqual(unzulaessigeTokens(['Read', 'Bash', 'Write', 'PowerShell'], false, true),
+    ['Write', 'PowerShell'],
+    'Gegenprobe fehlgeschlagen: Diagnose oeffnet nicht fuer Schreib-Tools/andere exec-Built-ins');
+  assert.deepEqual(unzulaessigeTokens(['Read', 'Bash'], false), ['Bash'],
+    'Gegenprobe fehlgeschlagen: Bash ohne Diagnose-Marker rutscht als read-only durch');
   // (d) Token-Formpruefung: Kommentare/Quotes sind keine kanonischen Tokens.
   assert.equal(TOKEN_FORM.test('# Kommentar'), false);
   assert.equal(TOKEN_FORM.test('"Read, Write"'), false);
@@ -358,8 +375,9 @@ test('Werkzeuggrenzen-Regel (Allowlist-Prinzip): Grenze steht in tools, positiv 
   //     PowerShell & Co. bleiben in BEIDEN Klassen draussen (Referenzmuster
   //     sync-nachzug-executor; das FFG-Datei-Gate greift bei Subagenten nicht).
   // disallowedTools ist optionale Zusatzsicherung, kein Traeger der Grenze mehr.
-  // Eine kuenftige Diagnose-Klasse (Bash lesend, Command-Disziplin) braucht eine eigene,
-  // ausdrueckliche Kennzeichnung — bis dahin ist dieser Test bewusst hart.
+  // 1.4.3: Die Diagnose-Klasse (Bash lesend, Command-Disziplin) ist jetzt implementiert —
+  // Kennzeichnung per Marker <!-- nc:diagnose --> direkt unter der Frontmatter (Bauplan
+  // Phase J, J-E3: pipeline-praeflight ist das Referenzmuster).
   for (const a of agentenBestand()) {
     const fm = frontmatter(a.file);
     const tools = feldWert(fm, 'tools');
@@ -373,24 +391,45 @@ test('Werkzeuggrenzen-Regel (Allowlist-Prinzip): Grenze steht in tools, positiv 
       + 'Built-in-Namen oder server-qualifizierte MCP-Tools, keine Kommentare/Quotes');
     // 1.3.0: Der Marker zaehlt nur DIREKT unter der Frontmatter (agent-authoring.md) — ein
     // im Fliesstext zitierter Marker deklariert nichts. Ein Marker an falscher Stelle ist
-    // ein eigener Befund, kein stiller Schreibend-Status.
+    // ein eigener Befund, kein stiller Schreibend-/Diagnose-Status.
     const b = body(a.file);
     const markerVorn = /^\s*<!-- nc:schreibend -->/.test(b);
     assert.equal(!markerVorn && b.includes('<!-- nc:schreibend -->'), false,
       `${a.file}: Marker <!-- nc:schreibend --> steht nicht direkt unter der Frontmatter — `
       + 'dorthin verschieben (agent-authoring.md, Werkzeuggrenzen-Regel)');
-    if (markerVorn) {
-      // 1.3.0: Schreibende Agenten begrenzen ihre Runden immer (agent-authoring.md).
+    const diagnoseVorn = /^\s*<!-- nc:diagnose -->/.test(b);
+    assert.equal(!diagnoseVorn && b.includes('<!-- nc:diagnose -->'), false,
+      `${a.file}: Marker <!-- nc:diagnose --> steht nicht direkt unter der Frontmatter — `
+      + 'dorthin verschieben (agent-authoring.md, Werkzeuggrenzen-Regel)');
+    assert.equal(markerVorn && diagnoseVorn, false,
+      `${a.file}: schreibend und diagnose schliessen sich aus — ein Agent ist entweder `
+      + 'schreibend (ohne Bash) oder Diagnose (nur lesendes Bash), nie beides');
+    if (markerVorn || diagnoseVorn) {
+      // 1.3.0: Agenten ausserhalb der reinen Leseklasse begrenzen ihre Runden immer.
       assert.ok(/^maxTurns:[ \t]*\d+[ \t]*$/m.test(fm),
-        `${a.file}: schreibender Agent ohne maxTurns — Rundenobergrenze ist Pflicht `
-        + '(agent-authoring.md, Werkzeuggrenzen-Regel Punkt 2)');
+        `${a.file}: ${diagnoseVorn ? 'Diagnose-' : 'schreibender '}Agent ohne maxTurns — `
+        + 'Rundenobergrenze ist Pflicht (agent-authoring.md, Werkzeuggrenzen-Regel)');
     }
-    const verboten = unzulaessigeTokens(tokens, markerVorn);
+    if (diagnoseVorn) {
+      // 1.4.3: Diagnose-Disziplin — die Grenze steht in der description sichtbar und die
+      // benannten Kommandoklassen der Allowlist muessen im Body stehen (agent-authoring.md:
+      // "Bash-Nutzung im Prompt auf benannte, lesende Kommandoklassen begrenzen").
+      const desc = feldWert(fm, 'description') || '';
+      assert.ok(/nicht-mutierend|nicht mutierend|allowlist/i.test(desc),
+        `${a.file}: Diagnose-Agent nennt die Bash-Grenze nicht in der description — `
+        + 'sichtbar machen ("nicht-mutierende Kommandos aus einer festen Allowlist")');
+      assert.ok(/allowlist/i.test(b),
+        `${a.file}: Diagnose-Agent traegt keine Kommando-Allowlist im Body — die benannten, `
+        + 'lesenden Kommandoklassen muessen im Prompt stehen (agent-authoring.md)');
+    }
+    const verboten = unzulaessigeTokens(tokens, markerVorn, diagnoseVorn);
     assert.deepEqual(verboten, [],
       `${a.file}: unzulaessige Werkzeuge in der Allowlist (${verboten.join(', ')}) — `
       + (markerVorn
         ? 'auch schreibende Agenten fuehren nur die vier Schreib-Tools plus lesende Built-ins/MCP (kein Bash, kein PowerShell)'
-        : 'read-only erlaubt nur lesende Built-ins (Read, Grep, Glob, WebFetch, WebSearch) plus MCP; fuer Schreib-Tools Marker <!-- nc:schreibend --> setzen'));
+        : diagnoseVorn
+          ? 'Diagnose-Agenten fuehren lesende Built-ins/MCP plus genau Bash — jedes weitere exec-faehige Werkzeug ist unzulaessig'
+          : 'read-only erlaubt nur lesende Built-ins (Read, Grep, Glob, WebFetch, WebSearch) plus MCP; fuer Schreib-Tools Marker <!-- nc:schreibend --> setzen, fuer lesendes Bash <!-- nc:diagnose -->'));
   }
 });
 

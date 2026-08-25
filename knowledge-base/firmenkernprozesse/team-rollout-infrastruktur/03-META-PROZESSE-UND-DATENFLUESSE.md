@@ -159,8 +159,14 @@ Kommt es zu widersprüchlichen Anweisungen zwischen verschiedenen Ebenen, gilt f
 
 Wer am Onsite.ai-OS selbst entwickelt, unterliegt strengen Qualitäts- und Kollisionsschutz-Regeln:
 
-### 5.1 Anker-Reservierung per Git-Ref-Tags (`reserve/*`)
-Vor Beginn eines Baus, der neue Spezifikations-Paragrafen oder Versionen belegt, wird ein atomarer Tag gepusht:
+### 5.1 Anker-Reservierung per Git-Ref-Tags (`reserve/*`) — **historisch, aufgehoben 2026-08-25**
+> **Nachtrag 2026-08-25:** Onsite hat diesen Standardprozess ersatzlos gestrichen (PR #138,
+> Commit `7d172c1`) — die Absicherung trägt seither allein die Mechanik (Merge-Konflikt bei
+> Dateikollision, Suite-Invariante gegen Doppelvergabe). Dieser Abschnitt bleibt als Snapshot
+> des Stands vom 14. August 2026 stehen.
+
+Vor Beginn eines Baus, der neue Spezifikations-Paragrafen oder Versionen belegt, wurde bis
+zur Aufhebung ein atomarer Tag gepusht:
 ```bash
 # Beispiel für Spec-Paragraf
 git tag -a reserve/spec-15.36 -m "Reserviert für Queue-Flow-Bau"

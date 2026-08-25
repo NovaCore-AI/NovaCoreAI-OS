@@ -244,3 +244,22 @@
   Ziel-Objekt, synthetisch) — nie mit einem Analogie-Konstrukt. Vor jedem „widerlegt"
   in einer Review-Kette: den Repro-Befehl des Reviewers wörtlich nachfahren; erst wenn
   DER fehlschlägt, ist die Ablehnung tragfähig.
+
+### 2026-08-25 — Hintergrund-Agent vom 600s-Standard-Timeout getötet (Nachtschicht Phase J, J-D)
+
+- **Kontext/Aufgabe:** Orchestrierung der Nachtschicht Phase J: Paket J-D an einen per
+  Bash gespawnten Claude-Code-Agenten (`claude -p --model sonnet`) delegiert, Lauf mit
+  `run_in_background=true` gestartet.
+- **Was schiefging:** Der Hintergrund-Bash-Task trägt standardmäßig 600s Timeout. Der
+  Agent brauchte länger — der Task wurde hart beendet (exit -1, `timed_out`), das Log
+  blieb leer (`claude -p` druckt erst am Ende), die Arbeit lag uncommittiert und
+  unvollständig im Worktree (lebende N5.1-Fundstellen noch nicht bereinigt, Suite
+  ungelaufen, kein Commit). Wertvolle Agentenlaufzeit vernichtet, Fortschritt nur
+  durch Worktree-Inspektion rekonstruierbar.
+- **Ursache:** Timeout-Parameter des Hintergrund-Tasks nicht bedacht; Agentenläufe in
+  dieser Größenordnung brauchen 15–60+ Minuten.
+- **Lernerkenntnis/Präventionsregel:** Langlebige gespawnte Agenten immer mit
+  explizitem großen `timeout` (bis 86400) oder `disable_timeout=true` starten. Zusätzlich:
+  gespawnte Bau-Agenten anweisen, **inkrementell zu committen** (je AP), damit ein Abbruch
+  nicht den ganzen Arbeitsstand ohne Anker lässt; Bericht zusätzlich in eine Datei im
+  Worktree schreiben lassen, nicht nur auf stdout.

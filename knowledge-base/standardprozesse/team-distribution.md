@@ -207,6 +207,7 @@ Zahlen werden **hier bewusst nicht übernommen** — sie veralten, und dieses Re
 | Bauplan `2026-08-15-onsite-endstand-nachbau-bauplan.md` §9 N6 | Firmenspezifische Grundlage: Team/Rollen, Jira-Zwei-Stufen-Regel, Workspace-Vorhandensein, Sprachmuster |
 | [`ONBOARDING.md`](../../ONBOARDING.md) §1/§1a/§1b/§4 | Installationsschritte, Wissensbasis-Bereitstellung, Kollegen-OS-Install, Aktualisierungshinweis — Quelle der Wahrheit für Befehle |
 | [`abteilungs-plugin-bau.md`](abteilungs-plugin-bau.md) §3a/§3b | SSH-Falle, Install-Probe in isoliertem `CLAUDE_CONFIG_DIR`, Koexistenz-Regel für eigenständige Satelliten |
+| [`abteilungs-plugin-bau.md`](abteilungs-plugin-bau.md) §3.0 | Anlageweg-Weiche: warum `ui-ux`/`automation` heute reine Registry-Reservierungen ohne Plugin und ohne Marketplace-Eintrag sind — und warum das befristet gilt (nur solange inhaltsleer) |
 | [`aktualisierungs-index.md`](aktualisierungs-index.md) §3/§5 | Vollständiger Update-/Release-/Prüfzyklus, hier nur referenziert |
 | [`NovaCore-OS-CLAUDE-Ebenen-Definition.md`](../grundwissen/NovaCore-OS-CLAUDE-Ebenen-Definition.md) | Ebene 0 im Gesamtbild der CLAUDE-Ebenen; Status-Diskrepanz zu Bauplan N6 (§2.1) |
 | Anthropic Issues #49410, #60219 | Auto-Update-Fallen, aus Karte 06 unverändert übernommen |

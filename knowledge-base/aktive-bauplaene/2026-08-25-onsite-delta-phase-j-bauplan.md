@@ -400,3 +400,32 @@ zeichengleich; dieser Nachtrag korrigiert und ergänzt.
 Gebaut wird Phase J von `main` aus, nach Merge des Frühzugs; Delegation nach Org-Ruleset:
 Kontroll-Schicht Overseer, J-B/J-C Opus mit Plan-Sandwich, Nachzüge und Release-Zug
 Sonnet-Executor.
+
+## Nachtrag N3 — Diagnose-Klasse im Agenten-Prüfbaustein (2026-08-26, Orchestrator-Nachtschicht)
+
+**Anlass:** AGENT-WEST meldete nach J-B einen belegten Normkonflikt (R3): Bauplan §6/AP B2
+und J-E3 verlangen für `pipeline-praeflight` `tools: Read, Grep, Glob, Bash` mit Allowlist
+nicht-mutierender Kommandos — gleichzeitig steht `agenten.test.mjs` in der No-Diff-Zone
+von §6 („Baustein 1.4.2 … wird nicht angefasst, sondern erfüllt"), und dessen
+Werkzeuggrenzen-Regel verbietet `Bash` ausnahmslos. Beides ist nicht gleichzeitig erfüllbar.
+
+**Entscheid (Orchestrator, im Rahmen der Nachtschicht):** Der Widerspruch löst sich über
+den Wortlaut des Bausteins selbst — sein Kommentar kündigte die Diagnose-Klasse an („Eine
+künftige Diagnose-Klasse (Bash lesend, Command-Disziplin) braucht eine eigene,
+ausdrückliche Kennzeichnung — bis dahin ist dieser Test bewusst hart"), und
+`agent-authoring.md` definiert die Klasse normativ bereits. Die No-Diff-Zone wollte den
+Baustein vor einem Downgrade auf Onsites 1.3.0 schützen, nicht vor der von J-E3 verlangten
+Klassen-Erweiterung. Umgesetzt als **Upgrade 1.4.2 → 1.4.3** (Commit `142d9e7`):
+
+- Marker `<!-- nc:diagnose -->` direkt unter der Frontmatter (denselben Platzierungs- und
+  Zitier-Schutz wie `nc:schreibend`); schreibend und diagnose schließen sich aus.
+- Genau `Bash` kommt zu den lesenden Built-ins/MCP dazu — Schreib-Tools, `PowerShell`,
+  `Monitor` und Unbekanntes fallen weiterhin fail-closed durch (Gegenproben ergänzt).
+- Disziplin suite-geprüft: `maxTurns` Pflicht, Bash-Grenze in der `description` sichtbar
+  („nicht-mutierend"/„Allowlist"), benannte Kommandoklassen der Allowlist im Body.
+- `agent-authoring.md`: Diagnose-Klasse als eigener Punkt 2 der Werkzeuggrenzen
+  (Referenzmuster `pipeline-praeflight`); bisheriger „Ideen-Backlog"-Verweis entfällt.
+
+Suite 323/323 grün, beide `--strict`-Validierungen grün. Maintainer bestätigt oder
+korrigiert am Phase-J-PR (Merge = Bestätigung). `pipeline-praeflight` wurde
+spezifikationsgetreu gebaut (AGENT-WEST, Commits `0be6e75`/`f6c5d8e`/`a1d9e7b`).

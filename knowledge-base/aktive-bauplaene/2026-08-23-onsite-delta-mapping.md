@@ -579,3 +579,38 @@ Affiliate-Invariante); Nachtrag N2 am selben Tag (Node-Doks/Systemachsen/Kriteri
 Phase-G-Vollzug); Nachtrag N3 am 2026-08-24 (Phase-H-Vollzug, Anker `51e230f`); Nachtrag N4
 am 2026-08-25 (Phase-I-Vollzug, Anker `2530ced`, D27–D30); Nachtrag N5 am 2026-08-25
 (Onsite 0.27.0, Anker `a9927b2`, D31–D37).*
+
+## Nachtrag N6 — Phase-J-Vollzug (2026-08-26, Orchestrator-Nachtschicht)
+
+**Vollzogen** auf `feat/onsite-delta-phase-j` (Basis: main nach PR #30), Bauplan
+`2026-08-25-onsite-delta-phase-j-bauplan.md` mit Nachträgen N1–N3, Nachtschicht-Plan
+`2026-08-25-nachtschicht-phase-j.md` (zwei Sonnet-Bau-Agenten + Orchestrator):
+
+- **D31 Anker-Aufhebung** (J-D): beide Dateien + Prozesskarte 09 gelöscht, Begriffsnorm
+  als Absatz in `os-bau-methode.md`, N5.1-Sweep über alle lebenden Fundstellen;
+  `aktualisierungs-index.md` §3 sagt jetzt „Es wird nichts reserviert".
+- **D22 CI-Kostenschnitt** (J-D, J-E2): `ci.yml` Regelfall ein Job `pruefung`
+  (ubuntu/node 24), Vollmatrix nur bei Dispatch/Tag `nc--v*`; Bot-Registerzeile ohne
+  Handlungsbedarf geschlossen.
+- **D33 Safety-Gate-Wertentscheidung** (J-A): `NAME=wert` bewertet nur real zugewiesene
+  Namen, Wert entscheidet dreistufig; Härtungen zeichengleich (J-1), T1–T7 in der Suite.
+- **D28 Queue-Handlungsanweisung** (J-A): Titel „JETZT ausführen (keine Blockade)",
+  Anweisung an die Session inkl. Subagenten-Weg und Stempel-Kommando (T14).
+- **D32 Setup-Hinweis** (J-A): zehnter Hook `nc-setup-hinweis.js` (kein Gate, kein Netz,
+  fail-open, `NC_SETUP_HINWEIS=off`), `/nc:setup` schreibt `kernRepoPfad` + Pflichtfelder,
+  `lib/infra-registry.js` als eine Leseimplementierung, `os-info` zeigt den Beleg (T8–T13).
+- **D19 Subagenten** (J-B): `code-reviewer`/`pipeline-praeflight`/`test-luecken-scout`,
+  Overlap-Matrix, Registry-`agents`; **Diagnose-Klasse** im Prüfbaustein 1.4.3
+  implementiert (Nachtrag N3 des Bauplans — Konflikt J-E3 ↔ No-Diff-Zone gelöst).
+- **D20/D21/D34/D35** (J-C): Hook-Norm W4 mit Struktur-Invariante, Anlageweg-Weiche §3.0
+  mit Befristung, `contributing-flow.md` + `NovaCore-OS-Strang-Definition.md`,
+  SSOT-Sichtbarkeitsmodell als Vorratsnorm.
+
+**Anker-Fortschreibung:** Die Suite-Invariante „keine doppelte CHANGELOG-Versionsüberschrift"
+ist jetzt die einzige deterministische Anker-Prüfung (so auch `os-bau-methode.md`).
+
+**Rest für Phase K:** D16 (`skill-builder`/`os-info` Metaflow-Stand), D17 (Fit-Prüfung),
+D24-Beobachtungsliste, Migration der drei Registry-Leser auf `lib/infra-registry.js`,
+WZS-Deploy-Muster (wartet auf Maintainer-Weiche), Jira Block B/C, Betriebshandbuch,
+Achse-2-Task, Skill-Größendeckel, Satellitenanschluss Queue-Flow. Nicht aufgenommen:
+`oai-development` ISENTO-Jira-Konvention (X), Referenz-Testbaustein-Backlog (B).

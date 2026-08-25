@@ -1,7 +1,7 @@
 {
   "name": "nc",
   "displayName": "NovaCore-OS (Kern)",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam — Session-Zyklus start/end-session, Journal, Infrapflege setup/os-info/skill-builder/update-doks, SSOT-Präsenz-Router wissen-aendern/wissen-planen/wissen-nachschlagen/wissen-protokolle, Queue-Flow queue-abteilung/queue-kern, Kontroll-Schicht mit Gate 1 (FFG, Fact-Forcing-Gate), Gate 2 (Session-Start-Zwang: Injektion + Start-Gate mit Fakten-Stempel), PreCompact-Mahnung des Sitzungsabschlusses (nc-end-mahnung + Abschluss-Stempel), Queue-Fälligkeits-Erinnerung (nc-queue-faelligkeit, 14-Tage-Takt, kein Gate) sowie zwei Zeiger-Hooks der SSOT-Präsenz (nc-wissens-hinweis, nc-pfad-hinweis — beide kein Gate), Doks-Autosync der team-globalen CLAUDE-Anteile (Ebene 1 Firmen-Block + Ebene 1b Team-Sync-Ganzdatei), WP-Rahmen WP0–WP8, Abteilungs-Registry sowie Subagenten (agents/, erster Agent sync-nachzug-executor). Jedes Abteilungsplugin setzt diesen Kern als Dependency voraus — wer eine Abteilung installiert, bekommt ihn transitiv aktiviert.",
   "author": {
     "name": "NovaCore AI"

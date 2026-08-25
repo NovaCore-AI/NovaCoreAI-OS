@@ -109,11 +109,12 @@ Die Synthese trennt zwei Klassen von Befunden:
 - **Kommende Änderungen** — nur als **Merker mit benannter Abhängigkeit** („nach Merge von X"),
   **nie** als Sofort-Fix. Maintainer-Fragen dazu im Bauplan-üblichen Muster stellen.
 
-**Anker-Bedarf prüfen:** Verlangt die Synthese eine reservierbare Bezeichnung (Spec-Abschnitt,
-Zielversion, Skill-/Agent-/Hook-Name) und arbeiten mehr als eine Einheit gleichzeitig am OS, gilt
-`standardprozesse/anker-reservierung.md` — dieser Standardprozess entsteht parallel zu diesem
-Dokument (Bauplan 2026-08-15, AP-C2); der Verweis wird **hier trotzdem gesetzt**, unabhängig davon,
-ob die Datei zum Zeitpunkt des Lesens bereits existiert.
+**Anker-Bedarf prüfen:** Verlangt die Synthese eine knappe Bezeichnung (Zielversion,
+Skill-/Agent-/Hook-Name, Abteilungsname — Begriffsnorm „Anker" in `os-bau-methode.md`) und
+arbeiten mehr als eine Einheit gleichzeitig am OS, trägt die Absicherung seit 2026-08-25
+(Phase J, D31) allein die Mechanik: fremde Worktrees vor dem ersten Schreiben prüfen
+(`git worktree list` + Status), Merge-Konflikt bei Dateikollision, die Suite-Invariante gegen
+doppelte CHANGELOG-Versionsüberschriften. Eine vorgelagerte Reservierung entfällt.
 
 **Persistenz-Pflicht:** Die Rohdaten beider Läufe (vollständiges Soll-Register, vollständige
 Drift-Matrix) werden als **Anhänge am zugehörigen Bauplan in `grundwissen/`** abgelegt — niemals
@@ -135,8 +136,8 @@ Quelldatei nachgezogen, nicht stillschweigend nur im Bauplan vermerkt.
 Aufbewahrungsort der Rohdaten.
 
 **Kopplung:** Normquelle 10 und der Fix-Pfad laufen über `abteilungs-plugin-bau.md`. Anker-Bedarf
-läuft über `anker-reservierung.md` (§7). Schwester-Prozess: `struktur.test.mjs` (Form statt
-Inhalt).
+läuft über die Begriffsnorm in `os-bau-methode.md` (§7). Schwester-Prozess: `struktur.test.mjs`
+(Form statt Inhalt).
 
 ## 9. Erster geplanter Anwendungsfall
 
@@ -153,7 +154,7 @@ Ist-Inventur, Synthese-Bauplan), **bevor** **AP-F2** auf Basis des AP-F1-Befunds
 |---|---|
 | Weisungsquelle (Karte 10, Onsite-Vorbild) | `firmenkernprozesse/prozesskarten/10-abteilungs-inhalts-pruefung.md` |
 | Bau-Prozesse (Fix-Pfad, §1a/§3b) | `standardprozesse/abteilungs-plugin-bau.md` · `standardprozesse/kern-plugin-bau.md` |
-| Anker-Bedarf | `standardprozesse/anker-reservierung.md` (entsteht parallel) |
+| Anker-Bedarf | `standardprozesse/os-bau-methode.md` (Begriffsnorm „Anker") |
 | SSOT-Struktur der Satelliten | `standardprozesse/ssot-aufbau.md` §4 |
 | Gebündelter Doku-Nachzug | `standardprozesse/sync-nachzug-bauzyklus.md` |
 | Struktur-Schwester (Form statt Inhalt) | `plugins/nc/tests/struktur.test.mjs` |

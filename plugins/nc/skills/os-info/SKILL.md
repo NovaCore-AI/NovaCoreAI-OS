@@ -69,6 +69,11 @@ eigenständige Satelliten ohne Kern-Dependency.
     Dateistrom** — das Projekt-Memory von Claude Code trägt den Stand allein. Beide Fälle
     klar benennen, nie raten. Dazu **`NC_SECRETS_REF`** nur mit **gesetzt / nicht gesetzt**
     ausweisen, nie ihren Wert lesen oder ausgeben.
+11. **Setup-Beleg ausweisen** (Bauplan Phase J AP A6): denselben Diagnose-Modus des
+    Setup-Hinweis-Hooks abrufen — `echo '{}' | node "<hooks-pfad>/nc-setup-hinweis.js"
+    --pruefe` — und die Zeile **„Setup-Beleg: grün / fehlt / defekt (Grund)"** ausgeben.
+    Die Bewertung **nicht selbst nachbauen** (Prüfungs-Eigentum: der Hook trägt die
+    Zustandslogik, `os-info` liest nur ihr Ergebnis).
 
 ## Regeln
 
@@ -99,4 +104,6 @@ eigenständige Satelliten ohne Kern-Dependency.
 - Der Sitzungswissen-Ort ist ausdrücklich benannt: entweder die `sitzungswissen/`-Kategorie
   einer eigenen Wissensbasis, oder „kein Dateistrom, Projekt-Memory trägt allein".
 - `NC_SECRETS_REF` ist als **gesetzt** oder **nicht gesetzt** ausgewiesen — nie mit Wert.
+- Die Zeile „Setup-Beleg: grün / fehlt / defekt (Grund)" stammt aus dem `--pruefe`-Aufruf
+  von `nc-setup-hinweis.js`, nicht aus einer eigenen Nachbewertung.
 - Der Verlauf enthält ausschließlich Lese-Operationen.

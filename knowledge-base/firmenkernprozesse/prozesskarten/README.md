@@ -1,6 +1,6 @@
 # Onsite.ai-OS — Prozesskarten
 
-Visuelle Begleiter der zehn Standardprozesse in
+Visuelle Begleiter der neun Standardprozesse in
 `Onsite.ai-OS/knowledge base/plugin-maintanance-ruleset-source/`.
 
 **Nicht normativ.** Bei Widerspruch gewinnt die Quelldatei.
@@ -16,7 +16,7 @@ Visuelle Begleiter der zehn Standardprozesse in
 | 06 | [Claude Team Distribution](06-claude-team-distribution.md) | `claude-team-distribution.md` |
 | 07 | [Subagenten-Bau](07-subagenten-bau.md) | `subagenten-bau.md` |
 | 08 | [Sync-Nachzug je Bauzyklus](08-sync-nachzug-bauzyklus.md) | `sync-nachzug-bauzyklus.md` |
-| 09 | [Anker-Reservierung](09-anker-reservierung.md) | `anker-reservierung.md` |
+| 09 | — (aufgehoben 2026-08-25, Onsite hat den Standardprozess ersatzlos gestrichen; Nummer bleibt frei, keine Umnummerierung) | — |
 | 10 | [Abteilungs-Inhalts-Prüfung](10-abteilungs-inhalts-pruefung.md) | `abteilungs-inhalts-pruefung.md` |
 
 Produkt-Gesamtbild (Skills, Gates, Satelliten): `Desktop/Onsite.ai-OS-Featurekarte.md`.

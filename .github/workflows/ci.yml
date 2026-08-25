@@ -1,13 +1,17 @@
 name: CI
 
-# Die Hooks (FFG, Start-Gate) laufen beim Team auf Windows UND Linux, deshalb beide
-# Plattformen. Node-Spanne 20-24: das Team-Minimum ist nicht gepinnt, und
-# `node --test` mit Glob-Argumenten verhält sich je Version unterschiedlich -
-# darum expandiert hier immer die Bash das Glob (shell: bash, auch auf Windows).
+# KOSTENSCHNITT (Onsite-Delta Phase J, AP D4/J-E2, 2026-08-25): der bisherige Regelfall fuhr
+# eine volle Matrix (ubuntu+windows x node 20/22/24 = 6 Laeufe) bei JEDEM Push auf main UND
+# jedem Pull-Request - Kosten ohne Erkenntnisgewinn, weil die Hooks plattform-/node-stabil
+# sind und die Matrix seit ihrer Einfuehrung keinen Plattform-spezifischen Fehler gefunden hat.
+# Regel (Invariante J-7): "Breite reduziert, Pruefung nie" - der Pflicht-Job faehrt dieselben
+# Schritte wie der lokale Pruefzyklus (AGENTS.md, Abschluss-Checkliste: Suite + Validierung
+# beider Ebenen je Plugin). Nur die Plattform-/Node-BREITE wandert an Tag und manuellen
+# Dispatch; kein Push auf main triggert mehr automatisch.
 on:
-  push:
-    branches: [main]
   pull_request:
+  push:
+    tags: ["nc--v*"]
   workflow_dispatch:
 
 permissions:
@@ -18,16 +22,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: ${{ matrix.os }} / node ${{ matrix.node }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        node: ["20", "22", "24"]
+  pruefung:
+    name: Pflicht-Pruefung (ubuntu / node 24)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      # Actions per Full-SHA gepinnt: mutable Major-Tags wären derselbe
+      # Actions per Full-SHA gepinnt: mutable Major-Tags waeren derselbe
       # Supply-Chain-Vektor, gegen den der Marketplace seine Satelliten pinnt.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -38,24 +38,13 @@ jobs:
 
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: ${{ matrix.node }}
+          node-version: "24"
 
       # Aufrufform wortgleich aus der Abschluss-Checkliste (AGENTS.md):
       # explizites Glob, nie ein Verzeichnis-Argument.
       - name: Testsuite (Gate- + Struktur-Invarianten)
         shell: bash
         run: node --test plugins/nc/tests/*.test.mjs
-
-  plugin-validate:
-    name: Plugin-Validierung (beide Ebenen)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        with:
-          node-version: "24"
 
       # Version gepinnt: @latest hieße, das Validierungsverhalten kann sich unter
       # den Füßen ändern. Bump bewusst zusammen mit der Team-Mindestversion pflegen
@@ -94,16 +83,32 @@ jobs:
       - name: Marketplace-Manifest (Wurzel-Ebene)
         run: claude plugin validate .
 
-      # Die Wurzel-Variante allein genügt nie - sie prüft keine Skills
-      # (AGENTS.md, Abschluss-Checkliste). Deshalb zusätzlich jedes Plugin.
-      # Fehler werden gesammelt statt beim ersten roten Plugin abzubrechen -
-      # ein Lauf zeigt den Gesamtzustand.
-      - name: Jedes Plugin inkl. Skills (--strict)
-        run: |
-          fail=0
-          for p in plugins/*/; do
-            echo "::group::${p}"
-            claude plugin validate "$p" --strict || fail=1
-            echo "::endgroup::"
-          done
-          exit "$fail"
+      # Beide ausgelieferten Plugins einzeln benannt statt per Schleife: ein neues
+      # Plugin muss hier bewusst ergaenzt werden (kein stilles Uebergehen).
+      - name: Kern-Plugin inkl. Skills (--strict)
+        run: claude plugin validate plugins/nc --strict
+
+      - name: Abteilungs-Plugin nc-development inkl. Skills (--strict)
+        run: claude plugin validate plugins/nc-development --strict
+
+  vollmatrix:
+    name: Vollmatrix ${{ matrix.os }} / node ${{ matrix.node }}
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/nc--v')
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: ["20", "22", "24"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-tags: true
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Testsuite (Gate- + Struktur-Invarianten)
+        shell: bash
+        run: node --test plugins/nc/tests/*.test.mjs

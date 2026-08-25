@@ -46,11 +46,19 @@ NovaCore-AI/<Name>-OS                    je ein PRIVATES Satelliten-Repo (Felix-
   Satelliten-Repos (`nc-felix`, `nc-biggi`) führen **keine** Kern-Dependency — sie bringen
   Kernmodul und Kontroll-Schicht selbst mit und werden nicht parallel zum Kern betrieben (sonst
   doppelte Gates). Ablauf für diesen Fall: §3b.
-- **Hooks nur im Kern — für repo-interne Abteilungen.** Ein Abteilungsplugin im OS-Repo bringt
-  keine Hooks mit, sonst feuert die Kontroll-Schicht mehrfach (testerzwungen in
-  `struktur.test.mjs`). Ein **eigenständiger Satellit** trägt seine eigene Kopie, weil er
-  Kern-Hooks technisch nicht erreichen kann — die Ausnahme ist in der Governance-Tabelle
-  `kern-plugin-bau.md` §1a dokumentiert und gilt nur dort.
+- **Hook-Norm W4 (verbindlich, alle Auslieferungsformen):** Bei der Auslieferung trägt **nur
+  der Kern** Hooks; ein **etablierter Satellit** darf **eigene, nicht-redundante,
+  nicht-kollidierende, spezialisierte Hooks** — nichts anderes. Für **repo-interne**
+  Abteilungen heißt das konkret: Ein Abteilungsplugin im OS-Repo bringt **keine** Hooks mit,
+  sonst feuert die Kontroll-Schicht mehrfach — geprüft durch die **Struktur-Invariante**
+  `Hooks liegen ausschliesslich im Kern` in `struktur.test.mjs`: Sie iteriert **jedes** Plugin
+  auf der Platte und verlangt `hooks/hooks.json` beim Kern, verbietet es überall sonst — ein
+  neu angelegtes `plugins/nc-development/hooks/` schlägt die Suite rot, unabhängig davon, ob
+  es befüllt ist. Ein **eigenständiger Satellit** trägt seine eigene Kopie, weil er Kern-Hooks
+  technisch nicht erreichen kann — die Ausnahme ist in der Governance-Tabelle
+  `kern-plugin-bau.md` §1a dokumentiert und gilt nur dort; „eigen" heißt dort ausdrücklich
+  **nicht** „beliebig viele" — redundante oder mit dem Kern kollidierende Matcher sind auch
+  im Satelliten ein Verstoß gegen die Prüfungs-Eigentums-Regel.
 - **Ein eigenständiger Satellit führt eine eigene Wissensbasis** nach
   `vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage` — eigener Master-Index, zwei
   append-only-Protokolle, eigener mechanischer Wächter, gepflegt von seinen **eigenen** Hooks und
@@ -121,6 +129,41 @@ und der Troubleshooting-Abschnitt „Relative paths don't resolve" nennt als Abh
    Git-Tags im Schema `{plugin-name}--v{version}` auf (`claude plugin tag --push`). Solange die
    Abhängigkeit als bloßer Name (`"nc"`) notiert ist, sind **keine** Tags nötig — genau deshalb
    ist es hier so gelöst.
+
+## 3.0 Anlageweg-Weiche — bevor der erste Skill entsteht
+
+Bevor ein Name in der Registry, im Marketplace oder als Plugin-Verzeichnis auftaucht,
+entscheidet **eine** Frage den Weg, nicht Bequemlichkeit oder Reihenfolge der Anfrage:
+
+**Prüffrage: Müsste dieser Inhalt morgen wieder herausgezogen werden — eigenes Team, eigene
+Vertraulichkeit, eigenes Repo?**
+
+| Antwort | Weg | Ergebnis |
+|---|---|---|
+| Nein — der Inhalt bleibt dauerhaft im OS-Repo | **Direktanlage** (§3 unten) — der **Regelfall** | Abteilungsplugin `plugins/nc-<abteilung>/` im OS-Repo, Kern-Dependency |
+| Ja, aber noch **kein** Inhalt vorhanden — nur der Name soll gesichert werden | **Reservierungsanlage**: Registry-Eintrag unter `reservierungen` (kein Plugin, kein Marketplace-Eintrag) | Namensreservierung gegen Doppelvergabe — **nur** zulässig, solange inhaltsleer und befristet (siehe unten) |
+| Ja, Inhalt existiert bereits oder entsteht jetzt | **Satelliten-Weg** (§3a/§3b) **vor** der ersten Zeile Inhalt | eigenes Repo von Anfang an, kein Umzug später fällig |
+
+**Weichenwechsel-Regel:** Wurde ein Abteilungsplugin als Direktanlage im OS-Repo begonnen und
+stellt sich erst danach heraus, dass es ein Satellit werden muss, läuft §3a als eigener,
+vollständiger Durchlauf — **nicht** als schleichender Nebeneffekt eines anderen Vorhabens. Der
+Wechsel geschieht **vor** dem nächsten Inhalts-Zuwachs, nie parallel dazu, sonst driften
+Registry, Marketplace-Eintrag und Plugin-Anteil auseinander, während niemand mehr sagen kann,
+welcher Ort gerade die Wahrheit trägt.
+
+**§3a-Atomar-Regel:** Ein Satelliten-Umzug ist **ein** PR — Pin-Umstellung im
+Marketplace-Eintrag **und** Rückbau des OS-Repo-Anteils (`plugins/nc-<abteilung>/` entfernen,
+§3a Schritt 7) geschehen in **derselben** Änderung. Ein halb umgezogenes Plugin (Pin gesetzt,
+alter Ordner noch da — oder umgekehrt) ist ein Zwischenzustand ohne definierten Träger der
+Wahrheit und wird nicht als Zwischenstand geduldet.
+
+**Reservierungen sind bewusst zeitlich begrenzt.** Eine Registry-Reservierung ohne Plugin
+(heute: `ui-ux`, `automation` — Maintainer-Entscheid 2026-08-15, Bauplan-Nachtrag N6, Feld
+Design/Frontend/UX bzw. Automatisierung/Hardware/Prozessoptimierung) bleibt gültig, **solange
+sie inhaltsleer bleibt**. Der erste geplante Skill oder Inhalt ist der Auslöser, der diese
+Weiche erneut durchläuft — nicht der Anlass, die Reservierung stillschweigend fortzuschreiben,
+während anderswo schon Inhalt entsteht. Eine Reservierung ist ein Platzhalter bis zur ersten
+echten Entscheidung, kein Dauerzustand.
 
 ## 3. Ablauf: neues Abteilungsplugin im OS-Repo anlegen
 

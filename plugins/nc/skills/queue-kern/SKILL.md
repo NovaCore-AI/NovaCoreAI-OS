@@ -27,7 +27,11 @@ das Warum steht im Definitionsdokument `NovaCore-OS-Kriterienliste-Definition.md
 OS-Repos. Daraus folgt die Leitregel des Folgelaufs: **Der gemergte Inhalt ist das Ledger,
 nicht der PR-Zustand** — ein PR-Gesamtstatus kann eine zeilenweise Entscheidung grundsätzlich
 nicht abbilden. Der Skill gehört zum WP8-Zyklus (WP-Rahmen `wp-rahmen.md` dieses
-Kern-Plugins).
+Kern-Plugins). **Auslösung über denselben Session-Start-Fälligkeits-Hook** wie
+`/nc:queue-abteilung` (`nc-queue-faelligkeit.js` dieses Kern-Plugins, 14-Tage-Takt plus ein
+Tag Versatz, Bauplan Phase J AP A2): Er weist die Session an, den fälligen Lauf **jetzt**
+vorzubereiten — selbst ausführen oder einen Subagenten beauftragen; ein manueller Aufruf
+ohne fällige Erinnerung bleibt möglich.
 
 **Heutiger Übergangszustand (E1):** Solange keine Abteilung einen Satelliten hat, bricht der
 Lauf in Schritt 2 mit dem Übergangs-Befund ab — die Übergangs-Queue im OS-Repo läuft über
@@ -185,11 +189,15 @@ dessen regulären Branch/PR-Fluss.
    OS-Repos), dann gezielt in der Zielkategorie suchen. Existiert der Inhalt bereits, wird die
    Zeile **nicht** befördert — Fundstelle als Begründung protokollieren. Jede Zeile endet als
    **angenommen** oder **abgelehnt** mit einem Satz Begründung; im Zweifel abgelehnt.
-9. **Kern-Beitrag entwerfen und das Prüfprotokoll als Datei schreiben:** Je angenommener Zeile
-   die Zielkategorie nach Teil 1 des SSOT-Document-Index bestimmen, das Kern-Dokument dort
-   anlegen **und** die zugehörige Zeile in Teil 2 des Index ergänzen (Link, Status, „Relevant
-   wenn …"). Inhalt ist **Einzeiler + Verweis auf die Abteilungsquelle** — „Kern verlinkt,
-   Abteilung dokumentiert", nie eine Volltext-Kopie.
+9. **Kern-Beitrag als Fakten-Dokument entwerfen und das Prüfprotokoll als Datei schreiben:** Je
+   angenommener Zeile die Zielkategorie nach Teil 1 des SSOT-Document-Index bestimmen, das
+   Kern-Dokument dort anlegen **und** die zugehörige Zeile in Teil 2 des Index ergänzen (Link,
+   Status, „Relevant wenn …"). Inhalt ist ein **konzentriertes Fakten-Dokument** — Datum,
+   Herkunftsabteilung, eine **auflösbare Fundstelle** in der Abteilungsquelle, sonst nichts:
+   „Kern verdichtet und verweist, Abteilung dokumentiert vollständig" (Sichtbarkeitsmodell,
+   `NovaCore-OS-SSOT-Definition.md`), nie eine Volltext-Kopie und nie ein Umzug. **Fehlt eine
+   auflösbare Fundstelle in der Abteilungsquelle, wird die Zeile zurückgestellt** — als
+   ungeklärt protokolliert, nicht mit geratenem oder unvollständigem Verweis übernommen.
    **Das Protokoll ist Pflicht und der Ankerpunkt des Folgelaufs:** Es entsteht im Kern-Klon
    (dem Klon des OS-Repos) als Datei
    `knowledge-base/queue-protokolle/queue-protokoll-<abteilung>-<YYYY-MM-DD>.md`

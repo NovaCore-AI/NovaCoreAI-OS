@@ -14,7 +14,11 @@
 Gemeinsame Eigenschaften aller Gates: **deterministisch** (die KI hat kein Veto),
 **fail-open** bei internen Fehlern (ein kaputtes Gate blockiert nie die Arbeit),
 **kein Marker** — Aktivierungsbedingung ist die Installation des Kern-Plugins, Opt-out nur
-per Env **je Gate**. Alle Hooks liegen im Kern `nc`.
+per Env **je Gate**. **Hook-Norm W4:** Im OS-Repo liegen alle Hooks ausschließlich im Kern
+`nc` (testerzwungen, `struktur.test.mjs`); ein **eigenständiger Satellit** (§„Satelliten"
+unten) darf **eigene, nicht-redundante, nicht-kollidierende, spezialisierte** Hooks führen,
+weil er den Kern technisch nicht erreicht — das ist die einzige Ausnahme von „alle Hooks im
+Kern", keine zweite Kontroll-Schicht-Variante.
 
 | # | Gate | Erzwingt | Mechanik | Fragt den Menschen? | Status | Opt-out | Quelle |
 |---|---|---|---|---|---|---|---|

@@ -90,6 +90,18 @@ Was aus dem Vorbild **trotzdem** gilt, als reine Redaktionsdisziplin ohne jede M
 **„Kern verlinkt, Abteilung dokumentiert"** — dieselbe Sache wird nicht an zwei Orten
 ausformuliert (Doppelpflege-Verbot); der Kern verweist, die Abteilung beschreibt.
 
+**Merksatz Sichtbarkeitsmodell (Nachtrag 2026-08-26, Phase J, Mapping D35):** Abteilungs-SSOTs
+bleiben privat; in den Kern steigt bei einer Promotion nie eine Kopie oder ein Umzug, sondern
+ein **konzentriertes Fakten-Dokument** — Datum, Herkunftsabteilung, eine auflösbare Fundstelle,
+sonst nichts. **Kern verdichtet und verweist, Abteilung dokumentiert vollständig.** Fehlt die
+auflösbare Fundstelle, wird die Zeile im Aufstiegslauf **zurückgestellt**, nicht mit
+geratenem oder unvollständigem Verweis übernommen (`queue-kern`-Schritt „Kern-Beitrag
+entwerfen", [`queue-flow.md`](../standardprozesse/queue-flow.md) Station „Kern-Entwurf +
+Protokoll"). Der heutige Übergangszustand E1 (keine Abteilung mit Satelliten-Repo) macht diese
+Norm zu einer **Vorratsnorm**: Sie gilt ab sofort, damit der künftige Satelliten-Split von
+`nc-development` sie vorfindet statt sie nachzuholen — der Anfrageweg selbst wird dafür noch
+nicht gebaut.
+
 ---
 
 ## Nachtrag 2026-08-24 — SSOT-Wissen vs. ausgeliefertes Laufzeit-Regelwerk

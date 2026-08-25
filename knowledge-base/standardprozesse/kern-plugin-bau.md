@@ -48,7 +48,7 @@ diesem Dokument und `abteilungs-plugin-bau.md`; sie steht **nur hier**.
 
 | | Kern `nc` (team-shared) | Abteilungsplugin / Satellit (individuell) |
 |---|---|---|
-| **Sicherheitsnetz** | **Basis-Gate**: universelle Destruktiv-Liste, Datei-Gate, Routine-Bash — domänen-frei, einmal gepflegt (das heutige FFG) | **Repo-interne Abteilung: keine eigenen Hooks** (sonst feuern die Gates doppelt; testerzwungen „Hooks nur im Kern"). Fachliche Prüfwünsche werden als Anforderung an den Kern gestellt. **Eigenständiger Satellit:** trägt eine **eigene Kopie** der Kontroll-Schicht, weil er Kern-Hooks technisch nicht erreichen kann |
+| **Sicherheitsnetz** | **Basis-Gate**: universelle Destruktiv-Liste, Datei-Gate, Routine-Bash — domänen-frei, einmal gepflegt (das heutige FFG) | **Hook-Norm W4:** Bei der Auslieferung trägt nur der Kern Hooks; ein etablierter Satellit darf eigene, **nicht-redundante, nicht-kollidierende, spezialisierte** Hooks — nichts anderes. **Repo-interne Abteilung: keine eigenen Hooks** (sonst feuern die Gates doppelt; testerzwungen durch die Struktur-Invariante „Hooks liegen ausschliesslich im Kern" in `struktur.test.mjs`, die jedes Plugin auf der Platte prüft). Fachliche Prüfwünsche werden als Anforderung an den Kern gestellt. **Eigenständiger Satellit:** trägt eine **eigene Kopie** der Kontroll-Schicht, weil er Kern-Hooks technisch nicht erreichen kann — „eigen" erlaubt keine Duplikate der Kern-Prüfungen |
 | **Infrastruktur** | Session-Start (Injektion + Erzwingungs-Begleiter), Doks-Autosync, SSOT-Präsenz (Wissens-Router `wissen-*` + zwei Zeiger-Hooks; der frühere `/nc:doku-sync` ist ersatzlos entfallen — Träger: CI-Prüfzyklus + Maintainer-Review am PR), Shared-Skills, geteiltes Fehlerprotokoll | Fach-Skills · Fach-Workflow (`workflow.md`) · eigene Konnektoren · beim eigenständigen Satelliten zusätzlich die **eigene Wissensbasis** samt mechanischem Wächter (`ssot-aufbau.md` §4) |
 | **Verbot** | keine Abteilungs-Fachprüfungen im Kern | **keine Kern-Prüfung duplizieren oder abschwächen** |
 
@@ -163,8 +163,11 @@ vorbeirauscht, gilt:
   `VERSION` und `module-registry.json`, testerzwungen — sonst beginnt die Drift-Serie von Neuem.
 - **Basis-Gate bleibt domänen-frei.** Was eine einzelne Abteilung prüfen will, gehört in deren
   Domänen-Ausprägung — der Kern fragt nie nach Branch-Regeln oder Empfängern.
-- **Hooks bleiben im Kern.** Repo-interne Abteilungsplugins bringen keine mit (testerzwungene
-  Invariante); eigenständige Satelliten sind die dokumentierte Ausnahme (§1a).
+- **Hooks bleiben im Kern (Hook-Norm W4).** Repo-interne Abteilungsplugins bringen keine mit
+  (testerzwungene Invariante `Hooks liegen ausschliesslich im Kern`, `struktur.test.mjs`);
+  eigenständige Satelliten sind die dokumentierte Ausnahme (§1a) und dürfen dort ausschließlich
+  eigene, nicht-redundante, nicht-kollidierende, spezialisierte Hooks führen — nie eine
+  Kern-Prüfung duplizieren oder abschwächen.
 - **Mindest-Client des Produkts.** Das Abteilungsmodell hängt an der Dependency-Mechanik:
   transitives Enable-/Disable-Blocking ab Claude Code **2.1.143**, `defaultEnabled` ab
   **2.1.154**, `renames` ab **2.1.193**. Das Team fordert **≥ 2.1.193**; ältere Clients melden

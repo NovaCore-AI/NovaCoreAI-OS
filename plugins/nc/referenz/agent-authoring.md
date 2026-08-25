@@ -150,16 +150,21 @@ Grenze entfällt; die Suite erzwingt die bewusste Entscheidung je Klasse:
    `Grep`, `Glob`, `WebFetch`, `WebSearch` plus server-qualifizierte MCP-Tools zu —
    Unbekanntes fällt fail-closed durch. Ein
    `disallowedTools`-Feld ist hier **nicht** mehr nötig: Die enge Allowlist **ist** die
-   Sperre, und die Suite prüft sie. Ein Agent, der `Bash` für **lesende** Diagnose braucht
-   (Statusabfragen, Log-Auszüge, Lese-SQL), ist **kein** Read-only-Agent im Sinne dieser
-   Regel, sondern eine ausdrücklich zu kennzeichnende Diagnose-Ausnahme: Bash-Nutzung im
-   Prompt auf benannte, lesende Kommandoklassen begrenzen und die Grenze in der
-   `description` sichtbar machen (Klassifikations-Ausbau: Ideen-Backlog des OS-Repos).
-2. **Schreibender Agent:** Marker `<!-- nc:schreibend -->` im Body (direkt unter der
+   Sperre, und die Suite prüft sie.
+2. **Diagnose-Agent (seit Baustein 1.4.3, Phase J/J-E3):** Wer `Bash` für **lesende**
+   Diagnose braucht (Statusabfragen, Log-Auszüge, lokal nachgestellte CI-Schritte), ist
+   **kein** Read-only-Agent im Sinne von Punkt 1: Marker `<!-- nc:diagnose -->` im Body
+   (direkt unter der Frontmatter) **plus** `tools: Read, Grep, Glob, Bash` — genau `Bash`
+   kommt dazu, kein weiteres ausführungsfähiges Built-in und kein Schreib-Werkzeug.
+   Disziplin (suite-geprüft): `maxTurns` begrenzen, die Bash-Nutzung im Prompt auf
+   **benannte, lesende Kommandoklassen** einer festen Allowlist begrenzen und die Grenze
+   in der `description` sichtbar machen (Referenzmuster: `pipeline-praeflight` der
+   Abteilung development). Diagnose und schreibend schließen sich gegenseitig aus.
+3. **Schreibender Agent:** Marker `<!-- nc:schreibend -->` im Body (direkt unter der
    Frontmatter) **plus** begründete `tools`-Allowlist, die genau die benötigten
    Schreib-Werkzeuge nennt — weiterhin **ohne `Bash`** (der gebaute `sync-nachzug-executor`
    ist das Referenzmuster). `maxTurns` immer begrenzen.
-3. **`disallowedTools` als Zusatzsicherung (Sonderfälle):** zulässig bleibt es dort, wo die
+4. **`disallowedTools` als Zusatzsicherung (Sonderfälle):** zulässig bleibt es dort, wo die
    Allowlist nicht greift — insbesondere das globale `mcp__*` gegen ererbte MCP-Server (nur
    in `disallowedTools` dokumentiert). Es ist nie Ersatz für eine fehlende `tools`-Allowlist.
 

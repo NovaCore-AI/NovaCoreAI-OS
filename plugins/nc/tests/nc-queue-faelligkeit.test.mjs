@@ -283,6 +283,18 @@ test('Der Hinweis nennt den 14-Tage-Takt, nicht den Onsite-Wochentakt (N6)', { s
     'der Erinnerungstext darf keinen Wochen-Takt behaupten (Firmenspezifikation N6)');
 });
 
+// T14 (Bauplan Phase J AP A2/J-E5, Port Onsite 2b8938e): der Hinweis WEIST AN statt nur
+// zu erinnern — Titel, Adressatin, Subagenten-Weg und Stempel-Kommando sind Pflicht.
+test('T14 — der Hinweis weist an (Titel, Adressatin, Subagenten-Weg, Stempel-Kommando)',
+  { skip: !GIT_DA }, () => {
+    const klon = macheKlon([OFFENE_ZEILE]);
+    const text = kontext(runHook(macheState(klon)));
+    assert.match(text, /Queue-Flow fällig: JETZT ausführen \(keine Blockade\)/, 'Titel');
+    assert.match(text, /Anweisung an die Session/, 'Adressatin');
+    assert.match(text, /beauftragt einen Subagenten damit/, 'Subagenten-Weg');
+    assert.match(text, /node ".*nc-queue-faelligkeit\.js" --lauf queue-kern/, 'Stempel-Kommando im Text');
+  });
+
 test('NC_QUEUE_PFAD lenkt den Queue-Pfad um', { skip: !GIT_DA }, () => {
   const klon = macheKlon([]);
   const anders = path.join(klon, 'knowledge-base', 'anders.md');
