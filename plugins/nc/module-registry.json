@@ -36,7 +36,11 @@
         "qs": "QS & Abnahme (WP7): qs-bugfix, qs-abnahme [beide gebaut]",
         "rel": "Release-Zyklus (WP7, nur manuell aufrufbar): rel-vorbereitung, rel-verifikation [beide gebaut]"
       },
-      "agents": {}
+      "agents": {
+        "code-reviewer": "isoliertes 4-Augen-Review eines Diffs, read-only, Findings als Entwurf (BLOCKER/MAJOR/MINOR/NIT)",
+        "pipeline-praeflight": "Grün-Prognose der CI-Pipeline vor dem Push, sekundär read-only Root-Cause eines roten Laufs (Diagnose-Klasse, kein MCP)",
+        "test-luecken-scout": "Querschnitts-Analyse fehlender Testabdeckung über einen Scope, priorisierte Testgerüst-Vorschläge, schreibt keine Tests"
+      }
     },
     {
       "name": "felix",
