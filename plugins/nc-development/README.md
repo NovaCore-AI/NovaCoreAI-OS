@@ -50,6 +50,25 @@ wird hier nicht dupliziert.
 | | `wzs-blocker-gate` | Phasen-Start-Sperre: kein Bau ohne dokumentierte ⛔-Entscheidung in Plan §11.C | WP3 |
 | | `wzs-webhook-contract` | Integrations-Contract: Idempotenz, Signatur, Refund-/Status-Events, Reconciliation-Fallback, n8n als alleiniger Fremdsystem-Zugang | WP3/WP6 |
 
+## Subagenten (isolierter Kontext)
+
+Drei Subagenten unter `agents/` ergänzen die geführten Skills um Arbeit, die einen vom
+Erstellungskontext getrennten oder gebündelten Lauf braucht. Aufruf per `@`-Mention unter
+`nc-development:<agent>`. Format nach `referenz/agent-authoring.md` des Kern-Plugins `nc`;
+Invarianten testerzwungen in `plugins/nc/tests/agenten.test.mjs`.
+
+| Agent | `tools` | Trägt (isoliert) | Nächstliegender Skill (geführt in der Haupt-Session) | Abgrenzung |
+|---|---|---|---|---|
+| `code-reviewer` | Read, Grep, Glob | 4-Augen-Review eines übergebenen Diffs im eigenen, frischen Kontextfenster; Findings als Severity-Entwurf (BLOCKER/MAJOR/MINOR/NIT) | `fe-review`, `be-review` | Die beiden Skills führen das Review geführt mit dem Menschen in der Haupt-Session; der Agent liefert nur einen isolierten Entwurf und postet, resolvt, approvt nichts |
+| `pipeline-praeflight` | Read, Grep, Glob, Bash (Diagnose-Klasse, Command-Allowlist im Prompt) | Grün-Prognose der GitHub-Actions-Pipeline (`ci.yml`) vor dem Push; sekundär Root-Cause eines roten Laufs, read-only über `gh run` | `flc-commit-prep` | `flc-commit-prep` prüft Format/Lint/Tests geführt im Commit-Fluss vor dem ersten Commit; dieser Agent bündelt alle CI-Schritte nachträglich in einem isolierten, nachgestellten Lauf und liest bei Bedarf einen realen Lauf nach — kein `mcp__*`-Werkzeug, kein GitLab-MCP |
+| `test-luecken-scout` | Read, Grep, Glob | Querschnitts-Analyse fehlender Testabdeckung über einen Modul- oder PR-Scope; priorisierte Testgerüst-Vorschläge als Entwurf | `qs-bugfix` | `qs-bugfix` reproduziert einen konkreten Fehler geführt im Slice-Zyklus als roten Test; der Agent analysiert Bestandslücken über viele Dateien und schreibt selbst keine Tests |
+
+Keiner der drei Agenten dupliziert einen `wissen-*`-Router des Kern-Plugins `nc`
+(`wissen-aendern`/`wissen-planen`/`wissen-nachschlagen`/`wissen-protokolle`) — sie greifen
+auf keine Wissensbasis zu und lösen dort keine Kollision aus. Alle drei sind read-only im
+Sinne der Abteilung: kein Agent merged, released, deployt, postet oder approvt; das bleibt
+den geführten Skills und dem Menschen vorbehalten (Rote Linien unten).
+
 ## Kundenspezifisches Modul `wzs`
 
 > **Achtung:** Die `wzs-*`-Skills sind **kein** generisches Stack-Modul. Sie gelten
