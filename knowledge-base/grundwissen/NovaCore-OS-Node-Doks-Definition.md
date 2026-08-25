@@ -84,7 +84,7 @@ vier Pendants plus zwei eigene.
 | — (dort kein Knoten) | `AGENTS.md` | **NC-Zusatz.** Beim Vorbild existiert die Datei ebenfalls, zählt aber nicht zur Knotenklasse. NovaCore braucht sie als Knoten, weil sein Pflicht-Einstieg und seine Repo-Karte hier und nur hier vollständig stehen |
 | — (dort kein Knoten) | `plugins/nc/module-registry.json` | **NC-Zusatz**, siehe Grenzfall oben. Das Vorbild führt eine gleichnamige Datei, zählt sie aber nicht zur Knotenklasse |
 | Betriebshandbuch (dort ausdrücklich **kein** Knoten) | **kein Pendant** | NovaCore führt kein Betriebshandbuch. Die Ist-Stand-Frage beantworten `CHANGELOG.md` (autoritativ) und die Modul-Metadaten; entsteht ein Betriebshandbuch, ist es nach dem Vorbild-Entscheid ein **Blatt** |
-| `referenz/wissens-router.md` (dort ausgeliefertes Laufzeit-Regelwerk, kein Knoten und nicht im Master-Index) | **kein Pendant** | Bei uns tragen die vier Router die Pfadauflösung über die Infra-Registry **selbst**. **Offener Punkt:** Entsteht später eine solche Referenzdatei im Kern-Plugin, folgt sie der Produktklasse (Version, Release-Zug), steht **nicht** im Master-Index — und bei Abweichungen gewinnt dieses Dokument als Begriffsquelle |
+| `referenz/wissens-router.md` (dort ausgeliefertes Laufzeit-Regelwerk, kein Knoten und nicht im Master-Index) | `plugins/nc/referenz/wissens-router.md` (seit 2026-08-25, Struktur-Paritätsaudit) | Produktklasse (reist im Plugin-Paket, Bump am Release-Zug), steht **nicht** im Master-Index und nicht im Sucheindex; bei Abweichungen gewinnt dieses Dokument als Begriffsquelle. **Übergangszustand:** Die vier Router tragen die Registry-Auflösung heute noch **selbst** (je ein Ablauf-Schritt 1) — die Referenz ist damit vorerst eine fünfte Fassung, nicht deren Ersatz; die Entdopplung ist ein eigener Vorgang (Register 2026-08-25) |
 
 ## Der Master-Index ist der einzige generelle Knoten der Wissensbasis
 
@@ -151,9 +151,11 @@ Knoten braucht keine.
 - **Der Zeiger-Mechanismus ist zweiteilig** (seit Kern 0.12.0, Delta D4/D7 in derselben
   Phase H): die vier Router-Skills **plus** der `UserPromptSubmit`-Hook
   `nc-wissens-hinweis.js` mit dem handgepflegten Sucheindex `wissen-sucheindex.json` —
-  beide zeigen auf Knoten bzw. indizierte Quellen, nie auf Volltexte. Kleiner als beim
-  Vorbild ist nur der Regelapparat: ein eigenes `referenz/wissens-router.md` gibt es bei
-  uns nicht, die Auflösungsregeln tragen die Router selbst.
+  beide zeigen auf Knoten bzw. indizierte Quellen, nie auf Volltexte. Der Regelapparat ist
+  seit 2026-08-25 vollständig: `plugins/nc/referenz/wissens-router.md` trägt die gemeinsame
+  Laufzeit-Mechanik (Zeiger-Regeln, Registry-Auflösung inkl. NovaCore-Zweitquelle
+  `kernSsotPfad`, Hook-Eigenschaften); den Bauweg regelt
+  `standardprozesse/wissens-router-bau.md`.
 - **Abgrenzung zur SSOT-Definition.** Dort ist der Begriff **verankert** und in die
   Hybrid-Definition der SSOT eingeordnet; hier steht seine **Ausführung** — Bestand,
   Geltungsbereiche, Konstruktionsregel, Abgrenzungen.

@@ -441,6 +441,60 @@ test('Wissensbasis-Wurzel: nur der Index liegt oben', () => {
     'direkt in knowledge-base/ darf nur SSOT-Document-Index.md liegen — jede weitere Datei gehoert in eine Kategorie');
 });
 
+// --- Repo-Wurzel und Instruktions-Traeger (Struktur-Paritaetsaudit 2026-08-25) -----------
+// Drei Abweichungen vom Vorbild lagen wochenlang unbemerkt an der Wurzel: zwei Alt-Backup-
+// Ordner (`_wzs-*-backup-*`), ein `docs/`-Seitenarm mit der Design-Spec ausserhalb der
+// Wissensbasis und eine un-getrackte CLAUDE.md. Keine Checkliste hat sie gemeldet — deshalb
+// jetzt Waechter. Geprueft wird der GETRACKTE Bestand (`git ls-files`), nicht das Verzeichnis:
+// lokale Artefakte (.worktrees/, .nc/, CLAUDE.local.md, node_modules) sind gitignored und
+// gehoeren nicht zur Struktur. Neue Wurzeldatei = neue Zeile in der Liste, bewusst.
+test('Repo-Wurzel: nur die bekannten getrackten Eintraege, kein Backup, kein docs/-Seitenarm', () => {
+  const ERLAUBT = new Set([
+    '.claude-plugin', '.gitattributes', '.github', '.gitignore',
+    'AGENTS.md', 'CHANGELOG.md', 'CLAUDE.md', 'CONTRIBUTING.md', 'LICENSE', 'ONBOARDING.md',
+    'README.md', 'SECURITY.md', 'VERSION', 'knowledge-base', 'package.json', 'plugins',
+  ]);
+  const getrackt = execFileSync('git', ['ls-files', '-z'], { cwd: REPO, encoding: 'utf8' })
+    .split('\0').filter(Boolean)
+    .map((f) => f.split('/')[0]);
+  const wurzel = [...new Set(getrackt)].sort();
+  const fremd = wurzel.filter((e) => !ERLAUBT.has(e));
+  assert.deepEqual(fremd, [],
+    `Unbekannte Eintraege an der Repo-Wurzel: ${fremd.join(', ')} — entweder gehoert es in eine `
+    + 'Wissensbasis-Kategorie / ein Plugin, oder es ist eine bewusste neue Wurzeldatei (dann hier eintragen)');
+  assert.ok(!fs.existsSync(p('docs')),
+    'docs/ existiert — Design-Specs und Doku gehoeren in knowledge-base/ (Spec seit 2026-08-25 in bauplan-archiv/)');
+});
+
+test('Instruktions-Traeger: die Team-Sync-Payload wohnt in doks/, nicht an der Plugin-Wurzel', () => {
+  // Onsite-Paritaet (Mapping D13, 2026-08-25): `doks/` ist der einzige freigegebene
+  // Instruktions-Traeger im Paket. Bis dahin lag die Ebene-1b-Payload als nc-sync.md an der
+  // Plugin-Wurzel — eine dokumentierte Abweichung, die mit dem Umzug aufgehoben ist.
+  assert.ok(!fs.existsSync(p('plugins', KERN, 'nc-sync.md')),
+    'plugins/nc/nc-sync.md existiert noch — die Payload heisst seit 2026-08-25 doks/nc-teamsync.md');
+  assert.ok(fs.existsSync(p('plugins', KERN, 'doks', 'nc-teamsync.md')),
+    'plugins/nc/doks/nc-teamsync.md fehlt — der Doks-Autosync (Ebene 1b) haette keine Quelle');
+  const autosync = fs.readFileSync(p('plugins', KERN, 'hooks', 'nc-doks-autosync.js'), 'utf8');
+  assert.ok(/doks[\\/'"+, ]+nc-teamsync\.md/.test(autosync),
+    'nc-doks-autosync.js zeigt nicht auf doks/nc-teamsync.md — Payload-Quelle und Datei sind auseinander');
+});
+
+test('CLAUDE.md ist getrackt und importiert AGENTS.md', () => {
+  // Claude Code liest CLAUDE.md, nicht AGENTS.md (Claude-Code-Doku "How Claude remembers your
+  // project", Abschnitt AGENTS.md, 2026-08-25). Ohne getrackte CLAUDE.md hat ein frischer Klon
+  // keinen Pflicht-Einstieg. Die Import-Zeile muss AUSSERHALB von Code-Spans stehen —
+  // `@AGENTS.md` in Backticks ist laut Doku nur Text.
+  assert.ok(fs.existsSync(p('CLAUDE.md')), 'CLAUDE.md fehlt an der Repo-Wurzel');
+  const gitignore = fs.readFileSync(p('.gitignore'), 'utf8').split(/\r?\n/).map((l) => l.trim());
+  assert.ok(!gitignore.includes('CLAUDE.md'),
+    '.gitignore ignoriert CLAUDE.md — dann kommt sie in keinem Klon an (persoenliche Notizen: CLAUDE.local.md)');
+  const ohneCode = fs.readFileSync(p('CLAUDE.md'), 'utf8')
+    .replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
+  assert.ok(/^@AGENTS\.md\s*$/m.test(ohneCode),
+    'CLAUDE.md importiert AGENTS.md nicht (Zeile `@AGENTS.md` ausserhalb von Code-Spans fehlt)');
+  assert.ok(fs.existsSync(p('AGENTS.md')), 'AGENTS.md fehlt — der Import liefe ins Leere');
+});
+
 // Tag-Luecke (Lehre aus dem 0.2.0-Release): Der Tag-Schritt liegt hinter dem Merge, also
 // hinter dem Ende der Arbeitseinheit, die ihn haette setzen koennen — und keine Pruefung
 // sieht ihn. Absichtlich geprueft wird nur "alle AUSSER der juengsten": die oberste Version

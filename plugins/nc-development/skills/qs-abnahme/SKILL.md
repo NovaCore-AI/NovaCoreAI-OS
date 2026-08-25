@@ -41,7 +41,7 @@ Kern-Plugins `nc` und wird hier nicht wiederholt.
    beschrieben. Blockierende Befunde gehen über `/nc-development:qs-bugfix` zurück in die
    Schleife.
 7. **Abnahme-Protokoll entwerfen:** Gegenstand, Stand, Kriterien mit Beleg, Befunde,
-   Restrisiken und Empfehlung in einem Text zusammenfassen. Entwurfssprache nach `nc-sync.md`
+   Restrisiken und Empfehlung in einem Text zusammenfassen. Entwurfssprache nach `nc-teamsync.md`
    §6 des Kern-Plugins `nc`.
 8. **Übergabe:** Das Protokoll der Rolle **Maintainer/Admin** vorlegen — sie nimmt ab und
    merged. Steht ein Release an, auf `/nc-development:rel-vorbereitung` verweisen.

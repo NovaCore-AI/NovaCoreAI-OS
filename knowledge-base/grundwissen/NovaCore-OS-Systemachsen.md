@@ -77,7 +77,7 @@ mit dem ersten Abteilungs-Satelliten wirksam — die **Praxisprobe steht damit a
 
 Diese Achse verteilt **Instruktions-Payloads**, nicht Wissen: Der Doks-Autosync-Hook schreibt
 die CLAUDE-Ebene 1 (`doks/global-claude-firmenblock.md` als Markerblock) und die Ebene 1b
-(`nc-sync.md` als Ganzdatei nach `~/.claude/nc-teamsync.md`) auf die Maschine. Die
+(`doks/nc-teamsync.md` als Ganzdatei nach `~/.claude/nc-teamsync.md`) auf die Maschine. Die
 **Wissensbasis selbst wird nie ausgeliefert** — sie wird von `/nc:setup` nach
 `~/.nc/ssot/<repo-name>/` **geklont** und per Fast-Forward aktuell gehalten.
 

@@ -10,6 +10,58 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
+## [0.14.0] — 2026-08-25
+
+> **Zweiter Waypoint-Schnitt** (Release-Zug §3.6, Batch seit `nc--v0.13.0`): PR #27
+> (Wissensklasse — kein CHANGELOG-Anteil) und PR #28 (Struktur-Paritätsaudit gegen
+> Onsite.ai-OS `a9927b2`) sowie der Sucheindex-Pfadfix aus dem Phase-I-Follow-up. Nur der
+> Produktanteil steht hier; die Wissensklasse trägt Datum, Status und SSOT-Index-Zeile.
+> `nc-development` **0.2.0 → 0.2.1** (reiner Pfad-Nachzug in zehn Skill-/Workflow-Dateien).
+> Gezeichnet: Claude Fable 5 (Overseer); Sweep Sonnet-Agent, Ports Opus-Agenten.
+
+### Added
+
+- **`plugins/nc/referenz/wissens-router.md`** — gemeinsame Laufzeit-Referenz der vier
+  Wissens-Router und des Wissens-Zeiger-Hooks (Port von Onsite `referenz/wissens-router.md`):
+  Zeiger-Regeln, Registry-Auflösung inkl. NovaCore-Zweitquelle `kernSsotPfad` (Lesekopie,
+  Schreibsperre), Hook-Eigenschaften, **Affiliate-Grenze**. Übergangszustand benannt: die
+  Router tragen die Registry-Auflösung heute noch selbst — die Referenz ist fünfte Fassung,
+  nicht Ersatz (Entdopplung als eigener Strang).
+- **Sucheindex** (`hooks/wissen-sucheindex.json`): vier neue Zeiger — Standardprozess-Authoring,
+  Wissens-Router-Bau, Feature-Manual Jira-REST-Zugang, Phase-J-Bauplan. Deckungsprüfung
+  Index-Teil-2 ↔ Sucheindex eingeführt (Smoke-Test „wie komme ich per REST an Jira" feuert).
+- **Pfad-Änderungsindex** (`hooks/pfad-aenderungsindex.json`): Klasse
+  `wissens-router-referenz` (längster Prefix schlägt `referenz/`) mit Matrix-Anker
+  **Wissens-Router oder Zeiger-Index geändert**.
+- **Struktur-Invarianten** (`tests/struktur.test.mjs`, +3): Repo-Wurzel als Allowlist über
+  `git ls-files` (kein Backup-Ordner, kein `docs/`-Seitenarm) · Team-Sync-Payload wohnt in
+  `doks/` und der Autosync zeigt dorthin · `CLAUDE.md` ist getrackt und importiert
+  `AGENTS.md` außerhalb von Code-Spans.
+
+### Changed
+
+- **Team-Sync-Payload (Ebene 1b) `plugins/nc/nc-sync.md` → `plugins/nc/doks/nc-teamsync.md`**
+  (Onsite-Parität, Mapping D13: `doks/` ist der einzige freigegebene Instruktions-Träger im
+  Paket). `nc-doks-autosync.js` liest die Payload am neuen Ort; **der Ziel-Dateiname auf den
+  Nutzer-Maschinen ist unverändert** — kein Migrationsschritt für installierte Nutzer.
+  `hooks.json`-description, Pfad-Index, Test, `skills/start`, `referenz/skill-authoring.md`
+  nachgezogen; die frühere „bewusste Abweichung (keine `doks/`-Kopie)" ist aufgehoben.
+- **Pfad-Index-Klasse `changelog`** auf das Waypoint-Modell umgestellt: im Strang kein
+  Eintrag, kein Bump — Wissensträger ist das PR-Ergebnismemo; den Waypoint-Abschnitt schreibt
+  der Release-Zug (§0/§3.6). Bis dahin verlangte der Pfad-Zeiger bei jeder
+  CHANGELOG-Berührung noch den `[Unreleased]`-Eintrag.
+- **`nc-development` 0.2.1:** Verweise auf die Team-Sync-Payload in neun Skills
+  (`be-review`, `fe-review`, `flc-commit-prep`, `flc-feature-start`, `flc-pr`, `qs-abnahme`,
+  `qs-bugfix`, `rel-verifikation`, `rel-vorbereitung`) und `workflow.md` auf
+  `doks/nc-teamsync.md`. Keine Verhaltensänderung.
+
+### Fixed
+
+- **Sucheindex-Pfad des archivierten `nc-development`-Modernisierungsplans** zeigte nach dem
+  Archiv-Umzug (Phase-I-Follow-up) noch nach `aktive-bauplaene/` — jetzt `bauplan-archiv/`
+  (Maintainer-Commit `f3363cf`; die Suite-Invariante „jeder Sucheindex-Pfad existiert" hätte
+  das im nächsten Lauf gemeldet).
+
 ## [0.13.0] — 2026-08-25
 
 > **Erster Waypoint-Schnitt.** Dieser Abschnitt schneidet den seit 0.6.1 aufgelaufenen

@@ -26,7 +26,7 @@ bzw. `/nc-development:be-review` den Diff.
 2. **Gesamtdiff analysieren:** `git diff main...HEAD` **und** die komplette Commit-Historie des
    Branches betrachten, nicht nur den letzten Commit. Der Selbst-Review bezieht sich auf den
    Gesamtdiff, nicht auf den zuletzt geänderten Ausschnitt.
-3. **PR-Beschreibung entwerfen** mit vier Teilen. Entwurfssprache nach `nc-sync.md` §6 des
+3. **PR-Beschreibung entwerfen** mit vier Teilen. Entwurfssprache nach `nc-teamsync.md` §6 des
    Kern-Plugins `nc`:
    - **Zusammenfassung:** Was ändert sich und warum (1–3 Sätze).
    - **Änderungen:** Stichpunkte der wesentlichen Änderungen.

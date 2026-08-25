@@ -106,13 +106,14 @@ Kriterienliste), liegt deshalb unter `plugins/<name>/referenz/` und wird ausgeli
 damit **Produktklasse**, nicht Wissensklasse (Aktualisierungs-Index §0): Es wird mit dem Plugin
 versioniert, erscheint im CHANGELOG — und bekommt **keine** SSOT-Index-Zeile.
 
-**Freigegebene Instruktions-Träger — dokumentierte Abweichung vom Vorbild.** Onsite kennt genau
-einen freigegebenen Träger im Paket: `doks/`. **Bei uns sind es zwei:** `doks/` **und**
-`plugins/nc/nc-sync.md`. Grund ist eine bewusste Bauentscheidung, belegt im Code
-(`plugins/nc/hooks/nc-doks-autosync.js`, Z. 45–48): Die Ebene-1b-Payload **ist** die bestehende
-Datei `nc-sync.md`, **keine Kopie** nach `doks/` — sie wird von Skills, `workflow.md` und
-Standardprozessen referenziert und bleibt die eine Quelle. Onsite führt dieselbe Payload als
-`doks/oai-teamsync.md`. Die Abweichung ist **Doppelpflege-Vermeidung**, kein Versehen.
+**Freigegebene Instruktions-Träger — Abweichung vom Vorbild seit 2026-08-25 aufgehoben.** Onsite
+kennt genau einen freigegebenen Träger im Paket: `doks/`. **Bei uns ist es seit 2026-08-25 ebenfalls
+nur noch `doks/`** — die frühere Zweitausnahme (`plugins/nc/nc-sync.md` außerhalb von `doks/`, belegt
+im damaligen Code `plugins/nc/hooks/nc-doks-autosync.js`, Z. 45–48) ist mit dem Umzug der
+Ebene-1b-Payload nach `plugins/nc/doks/nc-teamsync.md` entfallen: dieselbe Datei, derselbe Inhalt,
+jetzt am selben Ort wie Onsites `doks/oai-teamsync.md`. Der Fundstellen-Sweep zog alle Referenzen
+(Skills, `workflow.md`, Standardprozesse) auf den neuen Pfad nach — weiterhin **eine** Quelle, keine
+Doppelpflege.
 
 **Einstufung des Bestands (P-E5 — Beleg je Datei, kein pauschaler Stempel).** Geprüft wurde die
 PR-Historie je Datei:

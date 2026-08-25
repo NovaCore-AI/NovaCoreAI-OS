@@ -1,4 +1,4 @@
-# nc-sync — Globale Agenten-Anweisung (NovaCore-OS)
+# nc-teamsync — Globale Agenten-Anweisung (NovaCore-OS)
 
 > **Was diese Datei ist:** Die **gemeinsame, höchste Instruktion** für alle Agenten, die mit dem
 > NovaCore-OS arbeiten. Sie wird mit dem Kern-Plugin `nc` ausgeliefert und gilt in **jeder
@@ -116,7 +116,7 @@ NovaCoreAI-OS/
 │   ├── wp-rahmen.md                    #   Pflicht-Zyklus WP0–WP8 (normativ)
 │   ├── module-registry.json            #   Metadaten-SSOT Abteilung → Plugin → Module → Skills
 │   ├── referenz/skill-authoring.md     #   verbindliche SKILL.md-Formatregeln
-│   └── nc-sync.md                      #   diese Datei
+│   └── doks/nc-teamsync.md             #   diese Datei
 ├── plugins/nc-development/             # Abteilungsplugin, dependencies ["nc"]
 │   ├── workflow.md                     #   WP1–WP7 auf den NovaCore-Zyklus übersetzt
 │   └── skills/<modul>-<name>/SKILL.md  #   flaches Layout, Module = Namenspräfixe
@@ -177,7 +177,7 @@ mit einem abgelaufenen Zustand.
 | **Codex CLI** | sanktionierte Variante | `AGENTS.md` | Text-Guidance (kein Tool-Hook-Enforcement) |
 
 `CLAUDE.md` und `AGENTS.md` sind in diesem OS **Synonyme** und bezeichnen dieselbe repo-lokale
-Agenten-Anweisung. **Diese `nc-sync.md` gilt identisch in allen drei CLIs.** Implementiert ist
+Agenten-Anweisung. **Diese `nc-teamsync.md` gilt identisch in allen drei CLIs.** Implementiert ist
 bisher allein die Claude-Code-Plugin-Familie; bis Kimi- und Codex-Support existieren, gilt dort
 nur die Text-Guidance aus dieser Datei, ohne Plugin- oder Hook-Enforcement.
 

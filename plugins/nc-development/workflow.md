@@ -18,7 +18,7 @@ Plugins immer mitinstalliert und mitaktiviert wird.
 | WP0 | Session-Start | Kontext laden (Stand, Journal, Git-Status) — kein Blind-Start | `/nc:start` *(Kern)* | — |
 | WP1 | Verstehen | Anforderung klären, Abgrenzung bestätigen, betroffene Stellen finden, Branch vorbereiten | `flc-feature-start` | Ziel/Abgrenzung bestätigen; Branch-Name freigeben |
 | WP2 | Planen | Aufgabe in vertikale, PR-große Slices zerlegen, Abhängigkeiten und Risiken benennen | `flc-plan` | Plan bestätigen, bevor Code entsteht |
-| WP3 | Umsetzen | Test-First auf kritischem Pfad (`nc-sync.md` §2.2 des Kerns); Produkt-Invarianten prüfen, wo WZS betroffen ist | *(kein eigener Skill)*, `wzs-*` als Invarianten-Checklisten | — |
+| WP3 | Umsetzen | Test-First auf kritischem Pfad (`nc-teamsync.md` §2.2 des Kerns); Produkt-Invarianten prüfen, wo WZS betroffen ist | *(kein eigener Skill)*, `wzs-*` als Invarianten-Checklisten | — |
 | WP4 | Quality-Gate | Format/Lint/Tests/Secrets vor jedem Commit; roter Zustand → erst grün, dann committen | `flc-commit-prep` | Commit-Freigabe durch den Menschen |
 | WP5 | Selbst-Review + PR | Gesamtdiff gegen `main` reviewen, PR-Text entwerfen, pushen und PR anlegen | `flc-pr` | Push und PR-Anlage: nur nach expliziter Freigabe |
 | WP6 | Review | Fremden oder eigenen Diff prüfen, Befunde nach Severity belegen, Review-Kommentar entwerfen | `fe-review`, `be-review`; `wzs-*` bei WZS-Berührung | Approven/Resolven/Posten: nur der Mensch |
