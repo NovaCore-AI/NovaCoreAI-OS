@@ -543,16 +543,16 @@ test('Release-Tags: jede veroeffentlichte CHANGELOG-Version ausser der juengsten
     + 'nie vom Versions-Commit trennen)');
 });
 
-// SPAETE ANKER-INVARIANTE (Bauplan 2026-08-15, AP-C2; Onsite-Muster Karte 09 §7):
-// Die fruehe Absicherung gegen parallele Doppelvergabe ist der reserve/*-Tag
-// (standardprozesse/anker-reservierung.md); diese Invariante ist die SPAETE Ebene und
-// faengt, was trotzdem durchrutscht — z. B. wenn zwei Straenge ohne Reservierung dieselbe
-// Versionsueberschrift anlegen und Git die Bloecke konfliktfrei nebeneinander merged.
-// Onsites zweite Invariante (Spec-Fusszeilen-Glied) entfaellt bewusst: NovaCore fuehrt
-// keine Einzel-Spec mit Fusszeilen-Kette (Bauplan Nachtrag, AP-C2).
+// ANKER-INVARIANTE (Bauplan 2026-08-15, AP-C2; Onsite-Muster Karte 09 §7; Aufhebung des
+// Reservierungs-Mittels: Bauplan 2026-08-25 Phase J, AP D1 — Onsite-Parität, D31):
+// Das fruehere Reservierungs-Mittel (reserve/*-Tag) ist ersatzlos aufgehoben. Diese
+// Suite-Invariante ist seither die EINZIGE deterministische Absicherung gegen parallele
+// Doppelvergabe eines knappen Bezeichners — sie faengt den Fall, dass zwei Straenge ohne
+// Absprache dieselbe Versionsueberschrift anlegen und Git die Bloecke konfliktfrei
+// nebeneinander merged. Begriffsnorm „Anker": standardprozesse/os-bau-methode.md.
 // Gegenprobe eingebaut: die Extraktion wird erst gegen eine synthetische Dublette
 // verifiziert — ein Muster-Drift im Regex kann den Test damit nicht still leeren.
-test('CHANGELOG: keine Versionsueberschrift doppelt vergeben (spaete Anker-Invariante)', () => {
+test('CHANGELOG: keine Versionsueberschrift doppelt vergeben (Anker-Invariante)', () => {
   const extrahiere = (text) =>
     [...text.matchAll(/^## \[(\d+(?:\.\d+)+)\]/gm)].map((m) => m[1]);
 
@@ -568,8 +568,8 @@ test('CHANGELOG: keine Versionsueberschrift doppelt vergeben (spaete Anker-Invar
   const doppelt = versionen.filter((v) => (gesehen.has(v) ? true : (gesehen.add(v), false)));
   assert.deepEqual(doppelt, [],
     `doppelt vergebene CHANGELOG-Versionsueberschrift: ${doppelt.join(', ')} — zwei `
-    + 'Straenge haben denselben Anker belegt; Aufloesung nach '
-    + 'standardprozesse/anker-reservierung.md (naechste freie Nummer, Eintraege mergen)');
+    + 'Straenge haben denselben Anker belegt; Aufloesung: naechste freie Nummer, '
+    + 'Eintraege mergen (Begriffsnorm Anker: standardprozesse/os-bau-methode.md)');
 });
 
 test('Vorlage ist kein Plugin und enthaelt keine ausgefuellten Werte', () => {

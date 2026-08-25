@@ -27,10 +27,6 @@ flowchart TB
         CNB["claude-netz-bau<br/>Instruktions-Schicht der SSOT"]
     end
 
-    subgraph Parallel["Parallele Arbeit"]
-        AR["anker-reservierung<br/>Spec-§ · Version · Name als Git-Tag"]
-    end
-
     subgraph Zyklusende["Zyklusende"]
         SN["sync-nachzug-bauzyklus<br/>Protokoll → Executor → Review"]
         AIP["abteilungs-inhalts-pruefung<br/>Soll · Ist · Drift · Bauplan"]
@@ -40,9 +36,6 @@ flowchart TB
         CTD["claude-team-distribution<br/>Marketplace · Install · Auto-Update"]
     end
 
-    AR --> KPB
-    AR --> APB
-    AR --> SAB
     KPB --> AI
     APB --> AI
     SAB --> AI
@@ -65,7 +58,6 @@ flowchart TB
 | `claude-team-distribution.md` | Wie ein Stand die Maschinen erreicht (Marketplace, Pins, Auto-Update) | [06](06-claude-team-distribution.md) |
 | `subagenten-bau.md` | Wann Agent statt Skill, 7 Bauschritte, Gates, portabler Testbaustein | [07](07-subagenten-bau.md) |
 | `sync-nachzug-bauzyklus.md` | Abgeleitete Doku nicht nebenbei, sondern gebündelt per Executor | [08](08-sync-nachzug-bauzyklus.md) |
-| `anker-reservierung.md` | Knappe Nummern/Namen vor Baubeginn als `reserve/*`-Tag | [09](09-anker-reservierung.md) |
 | `abteilungs-inhalts-pruefung.md` | Inhalts-Schwester der Struktur-Tests: Soll/Ist/Drift vor Modernisierung | [10](10-abteilungs-inhalts-pruefung.md) |
 
 Zwei davon sind **generische NovaCore-Prozesse** (IP-Zeichnung im Kopf, Extraktion vor Live-Gang in eine Firmen-Org): `kern-ssot-aufbau.md` und `claude-netz-bau.md`. Onsite.ai-OS ist die erste Instanz, nicht die Pflichtform.
@@ -76,10 +68,7 @@ Zwei davon sind **generische NovaCore-Prozesse** (IP-Zeichnung im Kopf, Extrakti
 
 ```mermaid
 flowchart TD
-    Start["Arbeit am OS steht an"] --> Q1{"Mehr als eine Einheit<br/>gleichzeitig?"}
-    Q1 -->|ja| AR2["anker-reservierung<br/>VOR der ersten Zeile"]
-    Q1 -->|nein| Q2
-    AR2 --> Q2{"Was wird gebaut?"}
+    Start["Arbeit am OS steht an"] --> Q2{"Was wird gebaut?"}
 
     Q2 -->|"Kern oai"| KPB2["kern-plugin-bau"]
     Q2 -->|"Abteilung / Satellit"| APB2["abteilungs-plugin-bau"]
@@ -146,13 +135,12 @@ Ein häufiger Fehler: Inhalt in die falsche Schicht legen. Dann ist er entweder 
 sequenceDiagram
     autonumber
     participant F as Führender Agent
-    participant A as anker-reservierung
     participant P as Bau-Prozess
     participant I as Aktualisierungs-Index
     participant X as sync-nachzug-executor
     participant T as claude-team-distribution
 
-    F->>A: reserve/* taggen falls parallel
+    F->>F: fremde Worktrees pruefen falls parallel
     F->>P: kern / abteilung / agent / netz / ssot
     loop Jede inhaltliche Änderung
         F->>I: Matrix-Zeile lesen
@@ -179,8 +167,7 @@ flowchart LR
     APB4 --- SAB4["subagenten-bau"]
     KPB4 --- SAB4
     SAB4 --- SN4["sync-nachzug-bauzyklus"]
-    AI4["Aktualisierungs-Index"] --- AR4["anker-reservierung"]
-    AI4 --- SN4
+    AI4["Aktualisierungs-Index"] --- SN4
     APB4 --- AIP4["abteilungs-inhalts-pruefung"]
     APB4 --- CTD4["claude-team-distribution"]
 ```
@@ -192,7 +179,6 @@ Diese Kanten stehen in den Quellen, sie sind keine Erfindung:
 - `kern-ssot-aufbau` ↔ `claude-netz-bau` — Wissen vs. Instruktion, ausdrücklich Schwestern.
 - `subagenten-bau` → beide Plugin-Prozesse — Agenten sitzen in einem der beiden Plugins.
 - `sync-nachzug-bauzyklus` → Index-Matrix und `sync-nachzug-executor`.
-- `anker-reservierung` → Index §3 (parallele Stränge) und umgekehrt.
 - `abteilungs-inhalts-pruefung` → `abteilungs-plugin-bau` (Satelliten-Pflichten als Normquelle 10).
 - `claude-team-distribution` → Marketplace-Fakten, die `abteilungs-plugin-bau` §2 wiederholt.
 

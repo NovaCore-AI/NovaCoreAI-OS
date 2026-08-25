@@ -5,8 +5,7 @@
 > [`SSOT-Definition`](NovaCore-OS-SSOT-Definition.md), der
 > [`Gates-Definition`](NovaCore-OS-Gates-Definition.md), der
 > [`CLAUDE-Ebenen-Definition`](NovaCore-OS-CLAUDE-Ebenen-Definition.md), der
-> [`Kriterienliste-Definition`](NovaCore-OS-Kriterienliste-Definition.md) und der
-> [`Anker-Reservierung-Definition`](NovaCore-OS-Anker-Reservierung-Definition.md).
+> [`Kriterienliste-Definition`](NovaCore-OS-Kriterienliste-Definition.md).
 > **Grundlage:** die Begriffsnorm des Onsite-Vorbilds (dortige Design-Spec **§15.40**,
 > Begriffsnormierung 2026-08-17, samt Maintainer-Entscheid 2026-08-21), portiert am
 > **2026-08-24** nach Mapping **D25** des

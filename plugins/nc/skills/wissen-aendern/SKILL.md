@@ -9,7 +9,7 @@ description: >-
   das ins CHANGELOG", „gibt es dafür einen Standardprozess", „wie läuft ein Release".
   Trigger-Begriffe: Aktualisierungs-Index, Änderungs-Matrix, Nachzug, Doku-Sync,
   Sync-Nachzug, Version-Bump, CHANGELOG, Release-Tag, Standardprozess, Kern-Plugin-Bau,
-  Abteilungs-Plugin-Bau, Subagenten-Bau, Queue-Flow, Anker-Reservierung, Plugin-Grenze.
+  Abteilungs-Plugin-Bau, Subagenten-Bau, Queue-Flow, Plugin-Grenze.
   Nicht zuständig für laufende Vorhaben (Router wissen-planen), für die Frage, welches
   Dokument überhaupt existiert (Router wissen-nachschlagen), und für Fehler- oder
   Bug-Protokolle (Router wissen-protokolle).
@@ -63,7 +63,6 @@ Kern-Plugin-Datei gekennzeichnet.
 | `standardprozesse/kern-plugin-bau.md` | am Kern-Plugin `nc` gebaut wird (Scope, Governance-Schichten, Doks-Autosync, Mindest-Client-Schwellen) |
 | `standardprozesse/abteilungs-plugin-bau.md` | an einem Abteilungsplugin, an der Auslieferungsgrenze, am Marketplace, an einer Satelliten-Extraktion (§3a) oder an einem eigenständigen Kollegen-OS (§3b) gebaut wird |
 | `standardprozesse/subagenten-bau.md` | ein Subagent angelegt oder geändert wird (Agent-vs-Skill, Werkzeuggrenzen, Gate-Semantik) |
-| `standardprozesse/anker-reservierung.md` | parallel gearbeitet wird und ein knapper Anker (Ziel-Version, Skill-/Agent-/Hook-Name, Abteilungsname) vor Baubeginn zu vergeben ist |
 | `standardprozesse/sync-nachzug-bauzyklus.md` | am Ende eines Bauzyklus die abgeleiteten Doku-Nachzüge anstehen oder Konfliktzonen für Parallelbau zu schneiden sind |
 | `standardprozesse/queue-flow.md` | der Weg eines Wissensstücks in die Kern-SSOT gebraucht oder geändert wird |
 | `standardprozesse/kriterien-pflege.md` | die Kriterienliste „firmenrelevant" geändert oder geschärft wird |

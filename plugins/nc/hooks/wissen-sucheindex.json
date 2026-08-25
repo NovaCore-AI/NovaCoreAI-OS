@@ -36,21 +36,6 @@
       ]
     },
     {
-      "id": "anker-reservierung",
-      "titel": "Standardprozess Anker-Reservierung",
-      "pfad": "knowledge-base/standardprozesse/anker-reservierung.md",
-      "router": "wissen-aendern",
-      "hinweis": "Handgriffe vor der ersten Zeile, wenn mehr als eine Arbeitseinheit gleichzeitig baut",
-      "stichworte": [
-        "anker-reservierung",
-        "anker reservieren",
-        "reserve/",
-        "parallelbau",
-        "namenskollision",
-        "worktree"
-      ]
-    },
-    {
       "id": "kern-plugin-bau",
       "titel": "Standardprozess Kern-Plugin-Bau",
       "pfad": "knowledge-base/standardprozesse/kern-plugin-bau.md",
@@ -272,19 +257,6 @@
         "praezedenzregel",
         "privat-zone",
         "ebene 1b"
-      ]
-    },
-    {
-      "id": "anker-reservierung-definition",
-      "titel": "NovaCore-OS-Anker-Reservierung-Definition",
-      "pfad": "knowledge-base/grundwissen/NovaCore-OS-Anker-Reservierung-Definition.md",
-      "router": "wissen-nachschlagen",
-      "hinweis": "das Warum der Anker-Reservierung: Begriffsnorm, Kollisionsklassen, Abgrenzungen",
-      "stichworte": [
-        "anker-reservierung-definition",
-        "warum anker",
-        "kollisionsklasse",
-        "anker-begriff"
       ]
     },
     {
