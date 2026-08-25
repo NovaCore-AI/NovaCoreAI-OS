@@ -4,7 +4,7 @@
 **Familie von Claude-Code-Plugins** aus einem Marketplace: eine Methode für alle statt
 vieler Privat-Setups.
 
-**Status: Kern `nc` v0.13.0 · Abteilung `nc-development` v0.2.0 · Abteilung `nc-felix`
+**Status: Kern `nc` v0.14.0 · Abteilung `nc-development` v0.2.1 · Abteilung `nc-felix`
 v0.4.1 (erster Satellit, eigenständiges Felix-OS) · Abteilung `nc-biggi` v0.1.1 (zweiter
 Satellit, eigenständiges Biggi-OS) · Affiliate `kimi-code-plugin-cc` v1.4.0 (extern) ·
 Affiliate `mneme-kimi-code` v2.0.24 (extern) —
