@@ -23,4 +23,9 @@
 | Pfad | Inhalt | Herkunft |
 |---|---|---|
 | `jira-migration/` | EP→WZ-Migrationswerkzeug (2026-08-24/25): `import_wz.py`, `comments_wz.py`, `links_wz.py`, Link-/Kommentar-Maps, `export/` (EP-Batches EP-1–EP-87 als JSON) | Jira-Vorgang, aus `.nc/jira-migration/` (Scratchpad-Fund D27) übernommen |
-| `jira-rest-zugang.md` | Zeiger-Dokument Jira-REST/MCP: Env-Variablen, zwei Sites (`novacore-ai` via MCP, `novacore-ai-team` via REST), cloudIds, Rotation-Hinweis | aus `.nc/erinnerung/` übernommen |
+
+**Nicht hier, sondern in der Wissensbasis:** Der Zugangs-Zeiger
+`jira-rest-zugang.md` wohnt als Fremdsystem-Manual in
+`knowledge-base/feature-manuals/` (dorthin zuvor via PR #28 migriert — die
+metaknowledge-Kopie des Frühzugs wurde als Dublette fallen gelassen; Maintainer-Lage:
+Manuals in die Wissensbasis, Arbeitsartefakte hier).

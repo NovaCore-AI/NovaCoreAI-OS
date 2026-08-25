@@ -22,7 +22,7 @@
 **Regeln:**
 
 1. **Token niemals in Dateien, Commits oder Konversation** — nur Env-Variablen
-   (Windows: `setx`). Zeiger-Dokument: `metaknowledge/jira-rest-zugang.md`.
+   (Windows: `setx`). Zeiger-Dokument: `knowledge-base/feature-manuals/jira-rest-zugang.md`.
 2. **Ein MCP-Connector gibt nur EINE Site frei.** Nach Re-Authenticate zeigt
    `getAccessibleAtlassianResources`, welche gilt. Site-übergreifende Arbeit läuft nach
    dem Muster der EP→WZ-Migration: **Quelle per MCP lesen, Ziel per REST schreiben.**
@@ -66,7 +66,7 @@ Neue Skripte folgen dem Bestandsmuster: Env-only-Zugang, Kopfkommentar mit Zweck
 ## 5. Verifikation / Abnahme
 
 - [ ] Zugangs-Zeiger aktualisiert (Rotation, neue Env-Variable) — nur in
-      `metaknowledge/jira-rest-zugang.md`
+      `knowledge-base/feature-manuals/jira-rest-zugang.md`
 - [ ] Schreiblauf-IDs in der Map dokumentiert (§3.4)
 - [ ] Kein Token/Secret in irgendeiner committeten Datei (grep-Sweep)
 - [ ] Fundstellen protokolliert (§3.6)
