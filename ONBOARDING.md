@@ -43,7 +43,8 @@ Voraussetzungen und Plugin-Stand, klont die nötigen Quellen vollständig nach
 `~/.nc/ssot/<repo-name>/` (die Verlinkung läuft über diesen festen Pfad, den der
 Firmen-Block in der globalen `CLAUDE.md` als Einstieg nennt), legt das
 Sitzungswissen-Gerüst im Arbeits-Repo an, verifiziert die CLAUDE-Lokaldokumente und
-schreibt die Infra-Registry `~/.claude/nc/infra.json`. Er ist idempotent: bei jedem
+schreibt die Infra-Registry `~/.claude/nc/infra.json` (seit Kern 0.15.0 inkl. `kernRepoPfad`
+und aller Pflichtfelder). Er ist idempotent: bei jedem
 weiteren Aufruf zieht er nur per Fast-Forward nach und überspringt Erledigtes. Später
 erneut aufrufen, wenn die Wissensbasis veraltet ist — automatisch geschieht das **nicht**.
 
@@ -51,6 +52,11 @@ erneut aufrufen, wenn die Wissensbasis veraltet ist — automatisch geschieht da
 > Doks-Autosync vergleicht seine Ziele inzwischen zeilenenden-normalisiert (kein
 > Dauer-Rewrite mehr durch CRLF), aber einheitliche LF-Zeilenenden ersparen Diff-Rauschen
 > in allen anderen Werkzeugen.
+
+> **Setup-Hinweis (Kern ≥ 0.15.0):** Der SessionStart-Hook `nc-setup-hinweis.js` prüft den
+> Registry-Beleg je Sitzungsstart — fehlt oder ist er defekt, weist er zur Instandsetzung
+> an (`/nc:setup` bzw. Marketplace-Update bei neuerer `schemaVersion`); bei grünem Beleg
+> bleibt er stumm. Kein Gate, kein Netz; Opt-out `NC_SETUP_HINWEIS=off`.
 
 - **Voraussetzung:** `git` im PATH **und** Zugriff auf das private OS-Repo (z. B. per
   `gh auth login` oder Git-Credential-Helper). Fehlt eines von beidem, sagt der Skill das

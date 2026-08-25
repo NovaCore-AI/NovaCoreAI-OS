@@ -1,7 +1,7 @@
 {
   "name": "nc-development",
   "displayName": "NovaCore-OS — Abteilung development",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Abteilung development des NovaCore-OS: 15 Skills in 6 Modulen (fe, be, flc, wzs, qs, rel) entlang des GitHub-Flows — Auftrag, Branch, PR, Review, Merge. Dazu 3 Subagenten (code-reviewer, pipeline-praeflight, test-luecken-scout) für Arbeit, die einen getrennten Kontext braucht. Aufruf /nc-development:<skill>; der Kern nc kommt als Dependency mit.",
   "author": {
     "name": "NovaCore AI"

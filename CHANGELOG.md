@@ -10,6 +10,72 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
+## [0.15.0] — 2026-08-26
+
+> **Dritter Waypoint-Schnitt** (Release-Zug §3.6): Onsite-Delta Phase J komplett —
+> Nachtschicht 2026-08-25/26 mit zwei Sonnet-Bau-Agenten (J-D/J-A an OST, J-B/J-C an WEST)
+> und Orchestrator-Abnahmen; J-E (Nachzüge, Bump, Waypoint) durch den Orchestrator.
+> Basis: main nach PR #30 (Frühzug D29/D30/Muster-4-DB). `nc-development` **0.2.1 → 0.3.0**
+> (Produktklasse: drei Subagenten + Overlap-Matrix). Bauplan-Nachträge N1–N3; Entscheide
+> J-E1–J-E10 werden mit dem Merge dieses Abschnitts bestätigt.
+
+### Added
+
+- **Setup-Hinweis-Hook** (`nc-setup-hinweis.js`, zehnter registrierter Hook, D32): prüft
+  den Infra-Registry-Beleg je Sitzungsstart (Zustände fehlt/neuer/defekt/grün, erster
+  zutreffender gewinnt), Anweisung höchstens einmal je Sitzung, Worktree-`.git`-Datei und
+  Windows-8.3-Kurzpfade bekannt, **kein Gate, kein Netz, fail-open**, Opt-out
+  `NC_SETUP_HINWEIS=off`. `/nc:setup` schreibt jetzt `kernRepoPfad` und garantiert die
+  Pflichtfelder; neue gemeinsame Lese-Lib `hooks/lib/infra-registry.js` (Invariante: ein
+  Beleg, ein Schreiber — `infra.json` schreibt nur `/nc:setup`); `os-info` zeigt den
+  Setup-Beleg. 24 neue Tests (T8–T13).
+- **Drei Subagenten der Abteilung development** (D19): `code-reviewer` (4-Augen-Review als
+  Findings-Entwurf, `model: inherit`), `pipeline-praeflight` (lokale CI-Nachstellung mit
+  Grün-Prognose, `model: sonnet`, **Diagnose-Klasse**), `test-luecken-scout` (priorisierte
+  Testgerüst-Vorschläge, `model: sonnet`) — samt Registry-`agents`-Segment,
+  Overlap-Matrix im Plugin-README und `plugin.json`-description („plus 3 Subagenten").
+- **Diagnose-Klasse im Agenten-Prüfbaustein 1.4.3** (Nachtrag N3): Marker
+  `<!-- nc:diagnose -->` erlaubt als einziges Zusatzwerkzeug `Bash` — mit benannter,
+  lesender Kommando-Allowlist im Prompt, sichtbarer Grenze in der `description` und
+  `maxTurns`-Pflicht; schreibend und diagnose schließen sich aus. `agent-authoring.md`
+  führt die Klasse als eigenen Punkt.
+- **Contributing-Flow** (`standardprozesse/contributing-flow.md`, D34): Strang-Ablauf
+  S1–S7 — S1–S5 bauender Agent unter Overseer-Planung/-Review, S6 Review/Merge und S7
+  Release-Zug beim Maintainer; rote Linien (versionslos im Strang, kein Merge/Force-Push
+  durch Agenten), Branch-/Worktree-Norm, benannte Jira-Lücke, Affiliate-Abgrenzung. Dazu
+  die Begriffsnorm `grundwissen/NovaCore-OS-Strang-Definition.md`.
+- **SSOT-Sichtbarkeitsmodell als Vorratsnorm** (D35): Merksatz in der SSOT-Definition —
+  in den Kern steigt nur ein konzentriertes Fakten-Dokument (Datum, Herkunftsabteilung,
+  auflösbare Fundstelle), nie Volltext-Kopie oder Umzug; `queue-kern` und `queue-flow.md`
+  entsprechend gefasst.
+
+### Changed
+
+- **Safety-Gate-Wertentscheidung** (D33): Bei `NAME=wert` bewertet das Gate nur im
+  quote-bereinigten Strom **real zugewiesene** Namen; der **Wert** entscheidet dreistufig
+  (deploy-Wort im Wert fragt · deploy-Wort im Namen mit Prod-Präfix `prod*`/`prd*`/`live*`
+  oder unauflösbarem Wert fragt · jeder andere Wert bleibt still). `make up
+  DEPLOYMENT_TYPE=dev` ist still, `…=prod` fragt. Die vier GLM-Bypass-Härtungen, der
+  WZS-Kopf und die Muster-4-DB-Hälfte bleiben zeichengleich (Invariante J-1).
+- **Queue-Hook weist an statt zu erinnern** (D28, teamweit sichtbar): Titel „Queue-Flow
+  fällig: JETZT ausführen (keine Blockade)", Anweisung an die Session (Skill selbst oder
+  Subagent beauftragen, erster Schritt nach aktueller Arbeit), rote Linie bis zum fertigen
+  PR, Stempel-Kommando — als Suite-Invariante gesichert (T14).
+- **Anker-Reservierung ersatzlos aufgehoben** (D31): beide Dokumente und Prozesskarte 09
+  gelöscht, Nennungen bereinigt (N5.1-Sweep), Begriffsnorm „Anker" als ein Absatz in
+  `os-bau-methode.md` — Absicherung allein über Mechanik (Merge-Konflikt,
+  CHANGELOG-Versions-Invariante, Worktree-Pflichtschritt). `aktualisierungs-index.md` §3:
+  „Es wird nichts reserviert."
+- **CI-Kostenschnitt** (D22, J-E2): Regelfall ein Job `pruefung` (ubuntu/node 24: Suite +
+  beide Validierungsebenen + Positivkontrolle), Vollmatrix (ubuntu+windows × 20/22/24)
+  nur bei `workflow_dispatch` und Tag `nc--v*`; kein Push auf main triggert mehr —
+  „Breite reduziert, Prüfung nie" (J-7).
+- **Hook-Norm W4** (D20): Nur der Kern trägt Hooks bei der Auslieferung; etablierte
+  Satelliten dürfen eigene, nicht-redundante, spezialisierte Hooks — als
+  Struktur-Invariante in der Suite gesichert. **Anlageweg-Weiche §3.0** (D21): Direktanlage
+  als Satellit ist Regelfall, Reservierungsanlage nur inhaltsleer und befristet
+  (`ui-ux`/`automation` mit Vermerk).
+
 ## [0.14.0] — 2026-08-25
 
 > **Zweiter Waypoint-Schnitt** (Release-Zug §3.6, Batch seit `nc--v0.13.0`): PR #27
