@@ -183,13 +183,13 @@ claude plugin validate plugins/nc-development --strict
 
 Verbindliche Prozesse: [`kern-plugin-bau.md`](knowledge-base/standardprozesse/kern-plugin-bau.md)
 (Kern-Plugin) · [`abteilungs-plugin-bau.md`](knowledge-base/standardprozesse/abteilungs-plugin-bau.md)
-(Abteilungen und Satelliten) · [`ssot-aufbau.md`](knowledge-base/standardprozesse/ssot-aufbau.md)
+(Abteilungen und Satelliten) · [`kern-ssot-aufbau.md`](knowledge-base/standardprozesse/kern-ssot-aufbau.md)
 (Wissensbasis) · [`sync-nachzug-bauzyklus.md`](knowledge-base/standardprozesse/sync-nachzug-bauzyklus.md)
-(Nachzüge je Bauzyklus) · [`os-bau-methode.md`](knowledge-base/standardprozesse/os-bau-methode.md)
-(Gesamt-Methode) · [`claude-netz-bau.md`](knowledge-base/standardprozesse/claude-netz-bau.md)
+(Nachzüge je Bauzyklus) · [`skill-bau.md`](knowledge-base/standardprozesse/skill-bau.md)
+(Skill-Bau: Ebene, Skript, Fremdsystem, Vorlagepflicht) · [`claude-netz-bau.md`](knowledge-base/standardprozesse/claude-netz-bau.md)
 (CLAUDE-Ebenen) · [`subagenten-bau.md`](knowledge-base/standardprozesse/subagenten-bau.md)
 (Subagenten) · [`abteilungs-inhalts-pruefung.md`](knowledge-base/standardprozesse/abteilungs-inhalts-pruefung.md)
-(Inhalts-Audit je Abteilung) · [`team-distribution.md`](knowledge-base/standardprozesse/team-distribution.md)
+(Inhalts-Audit je Abteilung) · [`claude-team-distribution.md`](knowledge-base/standardprozesse/claude-team-distribution.md)
 (Team-Rollout) · [`queue-flow.md`](knowledge-base/standardprozesse/queue-flow.md) (Weg eines
 Wissensstücks von der Sitzung in die Kern-SSOT, nur Abteilungen mit Kern-Dependency) ·
 [`kriterien-pflege.md`](knowledge-base/standardprozesse/kriterien-pflege.md)

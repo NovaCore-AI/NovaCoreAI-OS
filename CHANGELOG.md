@@ -10,6 +10,36 @@ Single-Plugin-Layout und bleiben historisch unverändert.
 
 ## [Unreleased]
 
+## [0.15.1] — 2026-08-30
+
+> **Vierter Waypoint-Schnitt** (Release-Zug §3.6): Nachzug-Schnitt nach der
+> OAI-Prozessumstellung (Maintainer-Commits `57e5368`/`626d0c6`, Wissensklasse: Jira-Workflow
+> überarbeitet, Standardprozess-Korpus auf OAI-Struktur umgestellt). **Produktanteil des
+> Batches** sind die zwei ausgelieferten Zeiger-Indizes, deren Pfade die Umbenennungen
+> nachzogen; der Rest (Index-Zeilen, AGENTS/README, Queue-Flow-Takt) ist Wissensklasse und
+> steht im PR-Memo. Suite-Stand vor dem Schnitt: 5 Fail → 0 Fail. `nc-development` bleibt
+> **0.3.0** (keine Produktänderung).
+
+### Fixed
+
+- **Wissens-Sucheindex** (`hooks/wissen-sucheindex.json`): Pfade der OAI-Umbenennung
+  nachgezogen — `claude-team-distribution.md`, `kern-ssot-aufbau.md`, `skill-bau.md` statt
+  der ersatzlos ersetzten `os-bau-methode.md`, und `Aktualisierungs-Index.md` inklusive
+  Groß-/Kleinschreibung (case-sensitiv für die Linux-CI); Stichworte und Hinweistexte
+  mitgenommen, Alt-Namen bleiben als Stichwort auffindbar.
+- **Pfad-Änderungsindex** (`hooks/pfad-aenderungsindex.json`): drei `matrixKey`-Anker an die
+  neue Änderungs-Matrix angeglichen (`Agent neu/geändert`, `Vorlage geändert`,
+  `Wissens-Router oder Sucheindex geändert`) — der Hook verspräche sonst Matrix-Zeilen, die
+  es nicht mehr gibt; `_hinweis`-Pfad auf `Aktualisierungs-Index.md` und der Vorlagen-
+  Leseverweis auf `kern-ssot-aufbau.md` korrigiert.
+- **Case-Rename `Aktualisierungs-Index.md` ins Git nachgezogen:** Die Nur-Groß-/Klein-
+  Umbenennung stand auf Windows nur auf der Platte — Git trackte weiter
+  `aktualisierungs-index.md` (`core.ignorecase`), die Ubuntu-CI fiel auf den neuen
+  Verweisen rot. `git mv` nachgezogen; mitgeschaltet die ausgelieferten Verweise auf den
+  neuen Pfad: Hook-Quellenzeile (`nc-pfad-hinweis.js`), Router-Referenz
+  (`referenz/wissens-router.md`), Router-Skill-Tabelle (`wissen-aendern`), Test-Pfade
+  und der `release.yml`-Kommentar.
+
 ## [0.15.0] — 2026-08-26
 
 > **Dritter Waypoint-Schnitt** (Release-Zug §3.6): Onsite-Delta Phase J komplett —

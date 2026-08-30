@@ -5,22 +5,22 @@
 > Stufen-Prüfungen GL1–GL5, §15.48.5). Verbindlich für alle
 > Abteilungen. Normative Grundlage: Spec **§15.36** (löst den Kurationslauf aus §15.24/§15.31
 > ab), Format und Kriterien: `referenz/pflege-auspraegung.md` des Kern-Plugins.
-> **Das Warum** — warum Kuration kein Skill ist — steht in Spec §15.36.1 und im
-> Definitionsdokument `project-meta-infos/Onsite.ai-OS-Kriterienliste-Definition.md`.
+> **Das Warum** — warum Kuration kein Skill ist — steht im Definitionsdokument
+> `grundwissen/NovaCore-OS-Kriterienliste-Definition.md`.
 > Hier stehen Stationen, Takt und Prüfpunkte.
-> **Kette:** `/oai:end-session` klassifiziert → **dieser Prozess** → Marker-Rückschreibung schließt den Zyklus (Folgelauf `queue-kern`)
+> **Kette:** `/nc:end-session` klassifiziert → **dieser Prozess** → Marker-Rückschreibung schließt den Zyklus (Folgelauf `queue-kern`)
 
 ## 1. Der Flow auf einen Blick
 
 ```
 Sitzung
-  └─ /oai:end-session   klassifiziert gegen Kriterien a–d + Gegenkriterien GF1–GF4
+  └─ /nc:end-session   klassifiziert gegen Kriterien a–d + Gegenkriterien GF1–GF4
        │                 + Freigabe-Prüfungen GL1–GL5 — untere Stufengrenze lokal → Abteilung
        └─ Queue-Zeile (append-only) in der Abteilungs-Wissensbasis   [Agent]
             ↑ ab hier Stufe Abteilung: die Queue-Datei ist der Eintrittspunkt in die SSOT (§15.48.1)
-            └─ /oai:queue-abteilung   Wochenlauf, bündelt zu EINEM Abteilungs-PR   [Agent]
+            └─ /nc:queue-abteilung   14-Tage-Lauf, bündelt zu EINEM Abteilungs-PR   [Agent]
                  └─ Review + Merge des Abteilungs-PR                 [MENSCH]
-                      └─ /oai:queue-kern   +1 Tag: prüft die GEMERGTE Queue, entwirft
+                      └─ /nc:queue-kern   +1 Tag: prüft die GEMERGTE Queue, entwirft
                          Kern-Dokument + Index-Zeile, committet das PRÜFPROTOKOLL
                          und stellt den Promotions-PR                 [Agent]
                            ↑ obere Stufengrenze Abteilung → Kern (§15.48.1)
@@ -39,32 +39,33 @@ entscheiden. Die stehende Freigabe für die PR-**Erstellung** steht in der Ebene
 
 | # | Stufe (§15.48) | Station | Wer | Was geprüft wird (QS) |
 |---|---|---|---|---|
-| 1 | **lokal** — trägt die untere Stufengrenze lokal → Abteilung | **Klassifikation** (`/oai:end-session`, Schritt 9) | Agent | Kriterium **belegt** benannt (a–d), Gegenkriterien GF1–GF4 **und** Freigabe-Prüfungen GL1–GL5 geprüft (§15.48.5); im Zweifel **nicht** eintragen — Session-Agenten überschätzen die eigene Relevanz systematisch |
+| 1 | **lokal** — trägt die untere Stufengrenze lokal → Abteilung | **Klassifikation** (`/nc:end-session`, Schritt 9) | Agent | Kriterium **belegt** benannt (a–d), Gegenkriterien GF1–GF4 **und** Freigabe-Prüfungen GL1–GL5 geprüft (§15.48.5); im Zweifel **nicht** eintragen — Session-Agenten überschätzen die eigene Relevanz systematisch |
 | 2 | ab hier **Abteilung** — die Queue-Datei ist der Eintrittspunkt in die SSOT | **Queue-Zeile** | Agent | Fünf Spalten, ISO-Datum, Einzeiler ohne Kontextbedarf, Verweis statt Volltext, Status `offen`; keine Secrets/Kundendaten |
-| 3 | Abteilung | **Abteilungs-PR** (`/oai:queue-abteilung`) | Agent | Nur-Wissensbasis-Pfadbedingung (hart) · Standardbranch-Sync: Divergenz ⇒ Abbruch, und **`behind > 0` ⇒ kein neuer Commit** (sonst entstünde die Divergenz erst durch den eigenen Commit) · Queue-Format als **strukturierter Tabellenvergleich** (Multimengen je Schlüssel aus den ersten vier Spalten, one-to-one-Verbrauch, einzig erlaubte Transition `offen → befördert/abgelehnt (PR #n)`; doppeldeutige Zeilen-Identität ist selbst ein Befund) · **ein** PR je Lauf |
+| 3 | Abteilung | **Abteilungs-PR** (`/nc:queue-abteilung`) | Agent | Nur-Wissensbasis-Pfadbedingung (hart) · Standardbranch-Sync: Divergenz ⇒ Abbruch, und **`behind > 0` ⇒ kein neuer Commit** (sonst entstünde die Divergenz erst durch den eigenen Commit) · Queue-Format als **strukturierter Tabellenvergleich** (Multimengen je Schlüssel aus den ersten vier Spalten, one-to-one-Verbrauch, einzig erlaubte Transition `offen → befördert/abgelehnt (PR #n)`; doppeldeutige Zeilen-Identität ist selbst ein Befund) · **ein** PR je Lauf |
 | 4 | Abteilung | **Merge des Abteilungs-PR** | **Mensch** | fachliche Richtigkeit der Abteilungs-Einträge |
-| 5 | trägt die **obere** Stufengrenze Abteilung → Kern | **Aufstiegs-Prüfung** (`/oai:queue-kern`) | Agent | **Vorab-Abgleich** gegen die Protokolle aller entschiedenen PRs (bereits Entschiedenes wird nie neu klassifiziert); dann je Zeile: Kriterien **und** No-Duplicate gegen die Kern-SSOT (GF4) |
-| 6 | Kern | **Kern-Entwurf + Protokoll** | Agent | „Kern verlinkt, Abteilung dokumentiert" — Einzeiler + Verweis, nie Volltext-Kopie; Zielkategorie nach SSOT-Index Teil 1, Index-Zeile Teil 2 ist Pflicht. Dazu die **committete Protokolldatei** in `Queue-Protokolle/` mit Entscheid, Begründung und Ziel-Dokumentpfad je geprüfter Zeile |
+| 5 | trägt die **obere** Stufengrenze Abteilung → Kern | **Aufstiegs-Prüfung** (`/nc:queue-kern`) | Agent | **Vorab-Abgleich** gegen die Protokolle aller entschiedenen PRs (bereits Entschiedenes wird nie neu klassifiziert); dann je Zeile: Kriterien **und** No-Duplicate gegen die Kern-SSOT (GF4) |
+| 6 | Kern | **Kern-Entwurf + Protokoll** | Agent | „Kern verlinkt, Abteilung dokumentiert" — Einzeiler + Verweis, nie Volltext-Kopie; Zielkategorie nach SSOT-Index Teil 1, Index-Zeile Teil 2 ist Pflicht. Dazu die **committete Protokolldatei** in `queue-protokolle/` mit Entscheid, Begründung und Ziel-Dokumentpfad je geprüfter Zeile |
 | 7 | Kern | **Merge des Promotions-PR = die Kuration** | **Mensch** | Verdichtung, Ablehnung, Umformulierung. **Eine Datei zu streichen ist die Einzelablehnung** — mehr muss der Kurator nicht tun; sein Merge bestätigt zugleich die Ablehnungen des Agenten |
 | 8 | Kern → Abteilung (Rückschreibung in den Abteilungs-Klon) | **Marker-Rückschreibung** (Folgelauf) | Agent — **im Verdichtungsfall Mensch** | **je Zeile dreiwertig** aus Protokoll + Merge-Stand: Dokument da → `befördert (PR #n)` · Dokument fehlt → `abgelehnt (PR #n)` · Widerspruch → **melden, nie raten**. Reiner Statuswechsel, keine Zeile gelöscht oder umgeschrieben |
 
 ## 3. Takt
 
-- **Wochenzyklus, ein Tag Versatz.** `queue-abteilung` zuerst, `queue-kern` einen Tag später.
-  Der Versatz ist Voraussetzung, kein Komfort: `queue-kern` liest ausdrücklich den **gemergten**
+- **14-Tage-Zyklus, ein Tag Versatz** (Firmenspezifikation N6 — der Hook fährt 14 Tage,
+  nicht der Wochentakt des Onsite-Vorbilds). `queue-abteilung` zuerst, `queue-kern`
+  einen Tag später. Der Versatz ist Voraussetzung, kein Komfort: `queue-kern` liest ausdrücklich den **gemergten**
   Stand (§15.36.4).
 - **Angewiesen wird, nicht nur erinnert** (Maintainer-Entscheid 2026-08-24 — vorher: „erinnert,
-  nicht gestartet"). Der SessionStart-Hook `oai-queue-faelligkeit.js` meldet je
-  Skill „Arbeit vorhanden **und** letzter Lauf > 7 Tage" als **Anweisung zum Handeln**: Die
+  nicht gestartet"). Der SessionStart-Hook `nc-queue-faelligkeit.js` meldet je
+  Skill „Arbeit vorhanden **und** letzter Lauf > 14 Tage" als **Anweisung zum Handeln**: Die
   Session, die die Meldung liest, bereitet den Lauf direkt vor — sie führt den Skill aus oder
   beauftragt einen Subagenten damit. Technisch kann SessionStart nur Kontext injizieren, nie
   blockieren oder ausführen — die Ausführung liegt deshalb bei der lesenden Session, und der
-  erste Session-Start nach Ablauf der sieben Tage ist der reale Auslöser (ein
+  erste Session-Start nach Ablauf der 14 Tage ist der reale Auslöser (ein
   Kalenderzeitpunkt, auf dem alle Nutzer einer Abteilung gleichzeitig online sein müssten,
   existiert bewusst nicht). Begründung: Nicht-technische Nutzer können keine PRs stellen; die
   Maschine bereitet vor, der Mensch merged (§15.36.6).
 - **Der Lauf-Marker schließt den Kreis.** Beide Skills stempeln als letzten Schritt
-  `oai-queue-faelligkeit.js --lauf <skill>` (Takt-Datei `~/.claude/oai/queue-lauf.json`).
+  `nc-queue-faelligkeit.js --lauf <skill>` (Takt-Datei `~/.claude/nc/queue-lauf.json`).
   **Ohne Stempel meldet der Hook nach einem erledigten Lauf weiter** — und eine Meldung, die
   auch nach getaner Arbeit kommt, erzieht zum Abschalten. Ein **Dry-Run stempelt nie**.
 - **Kein Cron, kein Scheduler** — je Maschine wäre das eine Setup-Abhängigkeit und widerspräche
@@ -94,7 +95,7 @@ entscheiden. Die stehende Freigabe für die PR-**Erstellung** steht in der Ebene
   verteilt: Es ist der einzige Fall, in dem die Entscheidung mechanisch nicht rekonstruierbar
   ist — und Raten wäre in einer append-only-Queue teurer als Nachfragen.
 - **Fälligkeit 1 bleibt nach dem PR bestehen**, bis der Merge da ist — die Commits stehen weiter
-  vor dem Standardbranch. Gedämpft wird das durch Lauf-Marker und Wochen-Takt; die Alternative
+  vor dem Standardbranch. Gedämpft wird das durch Lauf-Marker und 14-Tage-Takt; die Alternative
   wäre eine GitHub-Abfrage im Sitzungsstart und damit Netz im Startpfad.
 - **Der Hook liest den zuletzt geholten Stand**, nicht den Live-Stand: kein `fetch` im
   Sitzungsstart. Ein hängender Netzaufruf beim Start wäre der teuerste Fehlerfall.
@@ -115,26 +116,26 @@ hier.
 
 | Frage | Entscheid (2026-08-16) | Begründung | Norm steht in |
 |---|---|---|---|
-| **Push-Recht auf das Kern-Repo** für `/oai:queue-kern` | **Ja — Push auf den Branch-Namensraum `queue-kern/**`**, kein Fork-Weg (Pattern am gebauten Skill nachgemessen 2026-08-17, siehe §6.1). Der **Merge bleibt rote Linie** | Ziel des Skills ist der PR, nicht der Push. Ein Fork-Weg wäre ein zweiter, ungetesteter Codepfad für denselben Zweck. Der Namensraum begrenzt den Schaden eines Fehllaufs auf wegwerfbare Branches | **diese Zeile** — der Entscheid betrifft eine Repo-Einstellung, kein ausgeliefertes Artefakt. Rest siehe unten |
-| Darf eine **Abteilungs-Kriterienliste** die Kern-Kriterien abschwächen (speziell GF1/GF4)? | **Nein.** Abteilungen dürfen **verschärfen, nie abschwächen**; **GF1 und GF4 sind unabänderlich** | Wortgleich zum Prüfungs-Eigentum der Hooks (Spec §15.22): keine Kern-Prüfung duplizieren oder abschwächen. Eine Sicherheits-Gegenprüfung, die je Abteilung verhandelbar ist, ist keine | `plugins/oai/referenz/pflege-auspraegung.md` §5.2 (reist im Kern-Plugin) |
-| **Sofort-Pfad × GF1** — Sicherheitsvorfall in einem **fremden** Arbeits-Repo | **Meldung an den Menschen sofort; Queue-Zeile nur abstrahiert** — die verallgemeinerbare Lehre, ohne Repo-Identifikation, ohne Pfade, ohne Auszüge | Firmenrelevant ist die Lehre, nicht der Vorfall. Fremde Repo-Details in unserer SSOT wären eine Datenweitergabe, die niemand freigegeben hat | Verfahren: [`kriterien-pflege.md`](<kriterien-pflege.md>) §6 · ausgelieferte Kurznorm: `plugins/oai/referenz/pflege-auspraegung.md` §5.4 |
+| **Push-Recht auf das Kern-Repo** für `/nc:queue-kern` | **Ja — Push auf den Branch-Namensraum `queue-kern/**`**, kein Fork-Weg (Pattern am gebauten Skill nachgemessen 2026-08-17, siehe §6.1). Der **Merge bleibt rote Linie** | Ziel des Skills ist der PR, nicht der Push. Ein Fork-Weg wäre ein zweiter, ungetesteter Codepfad für denselben Zweck. Der Namensraum begrenzt den Schaden eines Fehllaufs auf wegwerfbare Branches | **diese Zeile** — der Entscheid betrifft eine Repo-Einstellung, kein ausgeliefertes Artefakt. Rest siehe unten |
+| Darf eine **Abteilungs-Kriterienliste** die Kern-Kriterien abschwächen (speziell GF1/GF4)? | **Nein.** Abteilungen dürfen **verschärfen, nie abschwächen**; **GF1 und GF4 sind unabänderlich** | Wortgleich zum Prüfungs-Eigentum der Hooks (Spec §15.22): keine Kern-Prüfung duplizieren oder abschwächen. Eine Sicherheits-Gegenprüfung, die je Abteilung verhandelbar ist, ist keine | `plugins/nc/referenz/pflege-auspraegung.md` §5.2 (reist im Kern-Plugin) |
+| **Sofort-Pfad × GF1** — Sicherheitsvorfall in einem **fremden** Arbeits-Repo | **Meldung an den Menschen sofort; Queue-Zeile nur abstrahiert** — die verallgemeinerbare Lehre, ohne Repo-Identifikation, ohne Pfade, ohne Auszüge | Firmenrelevant ist die Lehre, nicht der Vorfall. Fremde Repo-Details in unserer SSOT wären eine Datenweitergabe, die niemand freigegeben hat | Verfahren: [`kriterien-pflege.md`](<kriterien-pflege.md>) §6 · ausgelieferte Kurznorm: `plugins/nc/referenz/pflege-auspraegung.md` §5.4 |
 
 ### 6.1 Push-Weg: gemessen, nicht angenommen
 
 **Es gibt heute keine Push-Beschränkung, die zu vergeben wäre.** Am 2026-08-17 gegen die
-GitHub-API geprüft: Sowohl `repos/onsite-ai-devs/Onsite.ai-OS/rulesets` als auch
+GitHub-API geprüft: Sowohl `repos/NovaCore-AI/NovaCoreAI-OS/rulesets` als auch
 `…/branches/main/protection` antworten mit **HTTP 403 — „Upgrade to GitHub Pro or make this
 repository public to enable this feature"**. Branch-Rulesets und klassische Branch-Protection
 sind auf dem aktuellen Plan für private Repos **nicht verfügbar**.
 
 Daraus folgt dreierlei:
 
-1. **`/oai:queue-kern` läuft.** Wer Schreibrecht auf dem Kern-Repo hat, pusht jeden Branch —
+1. **`/nc:queue-kern` läuft.** Wer Schreibrecht auf dem Kern-Repo hat, pusht jeden Branch —
    also auch den Queue-Branch. **AP-K10 ist dadurch nicht blockiert;** die Praxisprobe hängt
    allein an der Isolations-/Authentifizierungsfrage der Testumgebung.
 2. **Der Namensraum ist `queue-kern/**`, nicht `queue/*`.** Verbindlich ist, was der gebaute
    Skill anlegt: `queue-kern/<abteilung>/<YYYY-MM-DD>`
-   (`plugins/oai/skills/queue-kern/SKILL.md` Schritt 12, Abteilungs-Filter in Schritt 6).
+   (`plugins/nc/skills/queue-kern/SKILL.md` Schritt 12, Abteilungs-Filter in Schritt 6).
    Die Schreibweise `queue/*` in E-Q1 war eine **geratene Pattern-Angabe ohne Nachmessung**
    und ist hiermit korrigiert. Der Skill bleibt unverändert — er ist gebaut, reviewt und
    gemergt; die Norm folgt dem Artefakt, nicht umgekehrt.

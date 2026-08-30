@@ -43,7 +43,7 @@ const STANDARD_EINTRAEGE = [
   {
     id: 'aktualisierungs-index',
     titel: 'Aktualisierungs-Index',
-    pfad: 'knowledge-base/standardprozesse/aktualisierungs-index.md',
+    pfad: 'knowledge-base/standardprozesse/Aktualisierungs-Index.md',
     router: 'wissen-aendern',
     hinweis: 'je Änderungsart die Nachzüge',
     stichworte: ['aktualisierungs-index', 'was muss ich mitaendern']

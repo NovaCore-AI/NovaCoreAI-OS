@@ -22,7 +22,7 @@
     {
       "id": "aktualisierungs-index",
       "titel": "Aktualisierungs-Index",
-      "pfad": "knowledge-base/standardprozesse/aktualisierungs-index.md",
+      "pfad": "knowledge-base/standardprozesse/Aktualisierungs-Index.md",
       "router": "wissen-aendern",
       "hinweis": "je Änderungsart: Pflichtlektüre und was in derselben Änderung nachzuziehen ist",
       "stichworte": [
@@ -95,31 +95,31 @@
       ]
     },
     {
-      "id": "team-distribution",
-      "titel": "Standardprozess Team-Distribution",
-      "pfad": "knowledge-base/standardprozesse/team-distribution.md",
+      "id": "claude-team-distribution",
+      "titel": "Standardprozess Claude Team Distribution",
+      "pfad": "knowledge-base/standardprozesse/claude-team-distribution.md",
       "router": "wissen-aendern",
-      "hinweis": "Verteilung des OS an das Team, Update-Wege, Auto-Update-Bugs, Koexistenzregeln",
+      "hinweis": "Verteilung des OS an das Team über den Claude-Team-Workspace, Update-Wege, Koexistenzregeln",
       "stichworte": [
         "team-distribution",
+        "claude-team-distribution",
         "team-workspace",
         "rollout",
-        "auto-update-bug",
         "koexistenz"
       ]
     },
     {
-      "id": "ssot-aufbau",
-      "titel": "Standardprozess SSOT-Aufbau",
-      "pfad": "knowledge-base/standardprozesse/ssot-aufbau.md",
+      "id": "kern-ssot-aufbau",
+      "titel": "Standardprozess Kern-SSOT-Aufbau",
+      "pfad": "knowledge-base/standardprozesse/kern-ssot-aufbau.md",
       "router": "wissen-aendern",
-      "hinweis": "Grundbausteine und Aufbau-Ablauf einer Wissensbasis, Struktur-Vererbung und Isolation",
+      "hinweis": "Zielbild, Grundbausteine und Aufbau-Ablauf einer Wissensbasis, Andockpunkte der Plugin-Verknüpfung, Replikation",
       "stichworte": [
         "ssot-aufbau",
+        "kern-ssot-aufbau",
         "wissensbasis aufbau",
         "grundbausteine",
-        "struktur-vererbung",
-        "isolations-invariante"
+        "andockpunkte"
       ]
     },
     {
@@ -177,16 +177,16 @@
       ]
     },
     {
-      "id": "os-bau-methode",
-      "titel": "OS-Bau-Methode",
-      "pfad": "knowledge-base/standardprozesse/os-bau-methode.md",
+      "id": "skill-bau",
+      "titel": "Standardprozess Skill-Bau",
+      "pfad": "knowledge-base/standardprozesse/skill-bau.md",
       "router": "wissen-aendern",
-      "hinweis": "Methodenfragen zum Gesamtaufbau des OS — die an die Firmenphilosophie anpassbare Methode",
+      "hinweis": "Architektur und Anschluss eines Skills: Ebene, Skript ja/nein, Fremdsystem-Andocken, Vorlagepflicht",
       "stichworte": [
-        "os-bau-methode",
-        "bau-methode",
-        "gesamtmethode",
-        "firmenphilosophie"
+        "skill-bau",
+        "skill-architektur",
+        "skill-vs-skript",
+        "vorlagepflicht"
       ]
     },
     {

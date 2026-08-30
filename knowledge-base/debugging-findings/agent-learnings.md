@@ -263,3 +263,21 @@
   gespawnte Bau-Agenten anweisen, **inkrementell zu committen** (je AP), damit ein Abbruch
   nicht den ganzen Arbeitsstand ohne Anker lässt; Bericht zusätzlich in eine Datei im
   Worktree schreiben lassen, nicht nur auf stdout.
+
+### 2026-08-30 — Case-only-Rename: Platte sagte Ja, Git sagte Nein (CI rot auf Ubuntu)
+
+- **Kontext/Aufgabe:** Release-Nachzug 0.15.1 — Verweise (SSOT-Index, Sucheindex,
+  AGENTS/README) auf den umbenannten Prozess `Aktualisierungs-Index.md` umgestellt.
+- **Was schiefging:** Lokal lief die Suite grün (Windows-Dateisystem case-insensitiv),
+  die Ubuntu-CI fiel auf genau diesen Pfaden rot: Der Maintainer hatte die Datei auf der
+  Platte großbenannt, aber **Git trackte sie weiter als `aktualisierungs-index.md`** —
+  ein case-only-Rename kommt mit `core.ignorecase=true` nicht automatisch ins Index. Meine
+  Verweise zeigten auf einen Pfad, den das Repository nicht enthält.
+- **Ursache:** Ich habe die Platte als Beleg genommen („bei Widersprüchen gilt die Platte"
+  gilt für die **Arbeitsstruktur**, nicht für git-getrackte Pfade) und `git ls-files`
+  nicht gegen den Groß-/Kleinschreibungsstand geprüft, obwohl ich den Pfad case-sensitiv
+  in ausgelieferte Dateien schrieb.
+- **Lernerkenntnis/Präventionsregel:** Vor jedem Verweis auf einen case-only umbenannten
+  Pfad: `git ls-files | grep -i <name>` — trackt Git die alte Schreibweise, wird der
+  Rename zuerst mit `git mv <alt> <neu>` sauber nachgezogen. Windows-Grün ist bei
+  Case-Fragen kein Beleg; die Ubuntu-CI ist die Gegenprobe.

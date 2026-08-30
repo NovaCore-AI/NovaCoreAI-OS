@@ -129,5 +129,5 @@ Zeiger, weil ihm vertraut wird. Deshalb:
 - Der Hook endet in jedem Pfad mit Exit-Code 0 — testerzwungen ebenda.
 - Wird eine Wissensdatei angelegt, verschoben oder gelöscht, gehören Router-Tabellen und
   Sucheindex zum Änderungsumfang. Die Zeile dazu steht in der Änderungs-Matrix
-  (`standardprozesse/aktualisierungs-index.md` der Wissensbasis des **OS-Repos**, Abschnitt 2.1,
+  (`standardprozesse/Aktualisierungs-Index.md` der Wissensbasis des **OS-Repos**, Abschnitt 2.1,
   „Wissens-Router oder Zeiger-Index geändert").

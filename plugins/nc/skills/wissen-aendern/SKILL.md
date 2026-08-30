@@ -59,7 +59,7 @@ Kern-Plugin-Datei gekennzeichnet.
 
 | Quelle | Einschlägig wenn … |
 |---|---|
-| `standardprozesse/aktualisierungs-index.md` | **immer** — Abschnitt 1 Pflichtlektüre, Abschnitt 2 Änderungs-Matrix je Änderungsart (2.1 Plugin-Inhalt · 2.2 Wissensbasis und Doku · 2.3 Mechanik), Abschnitt 3 Version/Release/Tag, Abschnitt 4 Protokolle und Indizes, Abschnitt 5 Prüfzyklus, Abschnitt 6 Selbsttest |
+| `standardprozesse/Aktualisierungs-Index.md` | **immer** — Abschnitt 1 Pflichtlektüre, Abschnitt 2 Änderungs-Matrix je Änderungsart (2.1 Plugin-Inhalt · 2.2 Wissensbasis und Doku · 2.3 Mechanik), Abschnitt 3 Version/Release/Tag, Abschnitt 4 Protokolle und Indizes, Abschnitt 5 Prüfzyklus, Abschnitt 6 Selbsttest |
 | `standardprozesse/kern-plugin-bau.md` | am Kern-Plugin `nc` gebaut wird (Scope, Governance-Schichten, Doks-Autosync, Mindest-Client-Schwellen) |
 | `standardprozesse/abteilungs-plugin-bau.md` | an einem Abteilungsplugin, an der Auslieferungsgrenze, am Marketplace, an einer Satelliten-Extraktion (§3a) oder an einem eigenständigen Kollegen-OS (§3b) gebaut wird |
 | `standardprozesse/subagenten-bau.md` | ein Subagent angelegt oder geändert wird (Agent-vs-Skill, Werkzeuggrenzen, Gate-Semantik) |

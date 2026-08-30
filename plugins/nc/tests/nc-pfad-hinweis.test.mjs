@@ -29,7 +29,7 @@ const PLUGIN_ROOT = path.join(HIER, '..');
 const REPO_ROOT = path.join(HIER, '..', '..', '..');
 const HOOK = path.join(PLUGIN_ROOT, 'hooks', 'nc-pfad-hinweis.js');
 const ECHT_INDEX = path.join(PLUGIN_ROOT, 'hooks', 'pfad-aenderungsindex.json');
-const MATRIX = path.join(REPO_ROOT, 'knowledge-base', 'standardprozesse', 'aktualisierungs-index.md');
+const MATRIX = path.join(REPO_ROOT, 'knowledge-base', 'standardprozesse', 'Aktualisierungs-Index.md');
 
 function tmp(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -143,7 +143,7 @@ test('Erste Schreibaktion einer Pfadklasse legt die Matrix-Zeile bei', () => {
   assert.match(text, /Hook neu\/geändert/, 'die Matrix-Zeile muss woertlich genannt sein');
   assert.match(text, /vorher lesen/, 'die Pflichtlektuere gehoert dazu');
   assert.match(text, /mitziehen/, 'der Nachzugsumfang gehoert dazu');
-  assert.match(text, /aktualisierungs-index\.md/, 'die Quelle muss benannt sein');
+  assert.match(text, /Aktualisierungs-Index\.md/i, 'die Quelle muss benannt sein');
   assert.match(text, /blockiert nichts/, 'die Nicht-Gate-Zusage steht im Text');
 });
 

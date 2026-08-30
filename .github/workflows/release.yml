@@ -5,7 +5,7 @@ name: Release
 # weiterhin bewusst von Hand gesetzt (`claude plugin tag`, Maintainer-Entscheidung;
 # die rote Linie "nichts Kundensichtbares automatisieren" bleibt unberührt: das
 # Release ist repo-intern). Ablauf dokumentiert in
-# knowledge-base/standardprozesse/aktualisierungs-index.md, Abschnitt 3.
+# knowledge-base/standardprozesse/Aktualisierungs-Index.md, Abschnitt 3.
 on:
   push:
     tags: ["nc--v*"]

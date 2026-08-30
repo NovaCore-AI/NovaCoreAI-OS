@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "_hinweis": "Vorgebauter, kompakter Pfad-Aenderungsindex des PreToolUse-Hooks nc-pfad-hinweis.js (Port des Onsite-Hooks oai-pfad-hinweis.js, Spec §15.49; Delta-Mapping-Position D5). Der Hook feuert bei JEDER Schreibaktion — er liest ausschliesslich diese Datei und niemals ein Markdown-Dokument. 'prefix' ist repo-relativ zum OS-Repo (kernRepoPfad der Infra-Registry) und wird per LAENGSTEM Treffer aufgeloest: der spezifischste Eintrag gewinnt, damit 'plugins/nc/hooks/lib/session-key.js' die Bibliotheks-Zeile bekommt statt der allgemeinen Hook-Zeile. 'matrixKey' MUSS woertlich als Fett-Anker '**...**' in der Aenderungs-Matrix (§2) von knowledge-base/standardprozesse/aktualisierungs-index.md (OS-Repo) vorkommen — nc-pfad-hinweis.test.mjs erzwingt beide Richtungen (Prefix existiert real, matrixKey ist auffindbar). Handgepflegt, nicht generiert: generierte Indizes driften leiser. Neue Pfadklasse => Eintrag in DERSELBEN Aenderung. 'lesen'/'mitziehen' sind Kurzformen der Matrix-Zeile, nie ihr Ersatz — es gilt immer die Quelle.",
+  "_hinweis": "Vorgebauter, kompakter Pfad-Aenderungsindex des PreToolUse-Hooks nc-pfad-hinweis.js (Port des Onsite-Hooks oai-pfad-hinweis.js, Spec §15.49; Delta-Mapping-Position D5). Der Hook feuert bei JEDER Schreibaktion — er liest ausschliesslich diese Datei und niemals ein Markdown-Dokument. 'prefix' ist repo-relativ zum OS-Repo (kernRepoPfad der Infra-Registry) und wird per LAENGSTEM Treffer aufgeloest: der spezifischste Eintrag gewinnt, damit 'plugins/nc/hooks/lib/session-key.js' die Bibliotheks-Zeile bekommt statt der allgemeinen Hook-Zeile. 'matrixKey' MUSS woertlich als Fett-Anker '**...**' in der Aenderungs-Matrix (§2) von knowledge-base/standardprozesse/Aktualisierungs-Index.md (OS-Repo) vorkommen — nc-pfad-hinweis.test.mjs erzwingt beide Richtungen (Prefix existiert real, matrixKey ist auffindbar). Handgepflegt, nicht generiert: generierte Indizes driften leiser. Neue Pfadklasse => Eintrag in DERSELBEN Aenderung. 'lesen'/'mitziehen' sind Kurzformen der Matrix-Zeile, nie ihr Ersatz — es gilt immer die Quelle.",
   "eintraege": [
     {
       "id": "hook",
@@ -38,7 +38,7 @@
       "id": "agent",
       "prefix": "plugins/nc/agents/",
       "titel": "Subagent",
-      "matrixKey": "Agent (Subagent) neu/geändert",
+      "matrixKey": "Agent neu/geändert",
       "lesen": "subagenten-bau.md (Faustregel Agent-vs-Skill, Scope, Gate-Semantik §8) · plugins/nc/referenz/agent-authoring.md (Feld-Kanon, Werkzeuggrenzen-Regel)",
       "mitziehen": "Registry-agents-Segment · README (Agenten-Nennung) · AGENTS.md Repo-Karte · Trigger-/Overlap-Prüfung gegen Agents UND Skills · agenten.test.mjs · CHANGELOG.md · Kern-Bump · Werkzeuggrenze hart im Frontmatter, verbotene Felder hooks/mcpServers/permissionMode"
     },
@@ -110,8 +110,8 @@
       "id": "vorlage-ssot",
       "prefix": "knowledge-base/standardprozesse/vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage",
       "titel": "Vorlage `ssot-grundgeruest`",
-      "matrixKey": "Vorlage `ssot-grundgeruest` geändert",
-      "lesen": "ssot-aufbau.md §4 und §4a (Isolation) · abteilungs-plugin-bau.md §3b.1 · die Vorlagendatei selbst",
+      "matrixKey": "Vorlage geändert",
+      "lesen": "kern-ssot-aufbau.md §4 (Andockpunkte) und §5 (Anti-Drift) · abteilungs-plugin-bau.md §3b.1 · die Vorlagendatei selbst",
       "mitziehen": "knowledge-base/standardprozesse/vorlagen/abteilungsplugin/VORLAGE.md (Inhaltsliste, Variablen, Kopierzeile) · CHANGELOG.md · der Abteilungs-Platzhalter muss stehenbleiben (Invariante „Vorlage ist kein Plugin\") · KEIN Rück-Nachzug in bereits gebaute Satelliten (eigenständige Repos, eigener Vorgang) · kein Bump, die Vorlage wird nicht ausgeliefert"
     },
     {
@@ -182,7 +182,7 @@
       "id": "wissens-router-referenz",
       "prefix": "plugins/nc/referenz/wissens-router.md",
       "titel": "Referenz Wissens-Router (Laufzeit-Mechanik)",
-      "matrixKey": "Wissens-Router oder Zeiger-Index geändert",
+      "matrixKey": "Wissens-Router oder Sucheindex geändert",
       "lesen": "die Datei selbst · standardprozesse/wissens-router-bau.md (Prozess-Ebene) · NovaCore-OS-Node-Doks-Definition.md (Begriff und Knotenbestand) · die vier Router-SKILL.mds",
       "mitziehen": "die vier Router-SKILL.mds, falls sich Mechanik-Aussagen ändern · wissen-sucheindex.json · nc-wissens-hinweis.js · Node-Doks-Definition, falls Bestand/Geltungsbereich berührt · README.md · Kern-Bump erst am Release-Zug (Produktklasse, §0)"
     }
