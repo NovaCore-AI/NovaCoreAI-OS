@@ -26,7 +26,7 @@
 4. **Triage über den Master-Index:** `knowledge-base/SSOT-Document-Index.md` — Teil 1 sagt,
    wohin ein Dokument gehört, Teil 2 („Relevant wenn …") nennt je Quelle die
    Abruf-Situation. Vor Vermutungen dort nachsehen.
-5. **Vor jeder Änderung:** `knowledge-base/standardprozesse/aktualisierungs-index.md` —
+5. **Vor jeder Änderung:** `knowledge-base/standardprozesse/Aktualisierungs-Index.md` —
    die Änderungs-Matrix nennt je Änderungsart, was vorher zu lesen und was in derselben
    Änderung nachzuziehen ist.
 6. **Aufgabenspezifisch nachladen** (Glossar unten): Skill-Arbeit →
@@ -34,10 +34,10 @@
    `knowledge-base/standardprozesse/abteilungs-plugin-bau.md` (neue Abteilung §3 ·
    Satellit-Extraktion §3a · **eigenständiges Kollegen-/Abteilungs-OS §3b** — pilotiert
    2026-07-28 mit `nc-felix`, inkl. Install-Fallen) bzw. `kern-plugin-bau.md` bei Arbeit am
-   Kern · Wissensbasis-Arbeit → `knowledge-base/standardprozesse/ssot-aufbau.md` ·
+   Kern · Wissensbasis-Arbeit → `knowledge-base/standardprozesse/kern-ssot-aufbau.md` ·
    Workflow-Logik →
    `plugins/nc/wp-rahmen.md` (Rahmen WP0–WP8) und `plugins/nc-development/workflow.md`
-   (Fachablauf) · Methodenfragen → `knowledge-base/standardprozesse/os-bau-methode.md`.
+   (Fachablauf) · Skill-Architektur → `knowledge-base/standardprozesse/skill-bau.md`.
 
 ## Vision (Kurzfassung)
 
@@ -66,7 +66,7 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | `CLAUDE.md` | Claude-Code-Einstieg: importiert `AGENTS.md` (`@AGENTS.md`) und trägt nur Claude-Code-spezifisches (Prüfzyklus, Worktree-Pflicht, Repo-ist-Produkt) — **keine zweite Regelquelle**; getrackt seit 2026-08-25, testerzwungen (`struktur.test.mjs`) |
 | `README.md` | Team-/Contributor-Sicht: Architektur, Skill-Katalog, Installation |
 | `ONBOARDING.md` | Ersteinrichtung + Migration von v0.2.0 |
-| `CHANGELOG.md` | autoritative Änderungshistorie (Keep a Changelog) — geschrieben **nur** vom Release-Zug als Waypoint-Abschnitt (`aktualisierungs-index.md` §0/§3.6), nie im Strang |
+| `CHANGELOG.md` | autoritative Änderungshistorie (Keep a Changelog) — geschrieben **nur** vom Release-Zug als Waypoint-Abschnitt (`Aktualisierungs-Index.md` §0/§3.6), nie im Strang |
 | `SECURITY.md` | Sicherheitslage des OS: was die Kontroll-Schicht garantiert (je Hook eine Zeile mit Opt-out und Grenze), was sie ausdrücklich nicht garantiert, privater Meldeweg — **keine zweite Quelle**: maßgeblich bleiben `hooks.json`, die Hook-Köpfe und `plugins/nc/tests/` |
 | `VERSION` | Produkt-Leitversion (SemVer) = Version des Kern-Plugins |
 | `.claude-plugin/marketplace.json` | Marketplace `novacore-os` — Einträge ohne `version`-Feld (die steht allein in der jeweiligen `plugin.json`); die Repo-Wurzel ist **nur** Marketplace-Wurzel, kein Plugin |
@@ -83,7 +83,7 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 | **`SSOT-Document-Index.md`** (Wurzel) | **Master-Index** der Wissensbasis: Teil 1 Ordner-Routing (wohin gehört ein Dokument), Teil 2 Quellen-Triage („Relevant wenn …") über alle Bestandsdateien. **Einzige Datei auf Wurzelebene** (testerzwungen) | **zuerst** — vor dem Griff in eine Kategorie und vor dem Anlegen/Verschieben/Löschen einer Wissensdatei |
 | `grundwissen/` | Produktvision, Begriffsnormen (SSOT-, Gates-, CLAUDE-Ebenen-Definition) und Design-Specs — dauerhafte Referenzen ohne Datumspräfix; laufende Baupläne liegen seit Phase I in `aktive-bauplaene/` | Vision-/Architektur-Fragen; vor Design-Entscheidungen; wenn ein Begriff (SSOT, Gate, CLAUDE-Ebene) erklärt oder abgegrenzt werden muss |
 | `aktive-bauplaene/` | laufende Baupläne (Datumspräfix je Strang), inkl. Delta-Mappings und Nachtschicht-Ausführungsplänen — der aktuelle Planungsstand, bis ein Plan abgeschlossen/verworfen und ins `bauplan-archiv/` verschoben wird | vor jeder Planungsarbeit; für den aktuellen Bauplan eines laufenden Stranges |
-| `standardprozesse/` | verbindliche Abläufe: `aktualisierungs-index.md` (**„ich ändere X — was muss ich anfassen"**, Langfassung der Sync-Matrix + Prüfzyklus + Selbsttest), `kern-plugin-bau.md` (Kern-Plugin, Governance-Schichten, Doks-Autosync), `abteilungs-plugin-bau.md` (Abteilungen und Satelliten, Auslieferungsgrenze), `ssot-aufbau.md` (Aufbau der Wissensbasis, Struktur-Vererbung an Satelliten), `sync-nachzug-bauzyklus.md` (gebündelte Nachzüge je Bauzyklus), `os-bau-methode.md` (Gesamt-Methode, an die Firmenphilosophie anpassbar), `claude-netz-bau.md` (Instruktions-Schicht der CLAUDE-Ebenen), `subagenten-bau.md` (Bau von Subagenten: Agent-vs-Skill, Scope, Gate-Semantik), `wissens-router-bau.md` (Router, Sucheindex, Wissens-Zeiger-Hook — Anlass-Test, Kontext-Budget, Nachzüge), `standardprozess-authoring.md` (Form und Ablauf für neue Standardprozesse — der Prozess für Prozesse), `abteilungs-inhalts-pruefung.md` (wiederkehrendes, read-only Inhalts-Audit je Abteilung/Satellit), `team-distribution.md` (Rollout ans Team über den Claude-Team-Workspace), `contributing-flow.md` (Strang-Ablauf S1–S7 — bauender Agent unter Overseer, Merge/Release beim Maintainer), `jira-workflow.md` (Jira-Rest/MCP-Wege, Artefakt-Heimat `metaknowledge/`), `workflow-md-implementierung.md` (Anlass-Test und Mindestinhalt je Abteilungs-`workflow.md`) | vor **jeder** inhaltlichen Änderung am Plugin oder Repo — zuerst prüfen, ob ein Standardprozess existiert |
+| `standardprozesse/` | verbindliche Abläufe: `Aktualisierungs-Index.md` (**„ich ändere X — was muss ich anfassen"**, Langfassung der Sync-Matrix + Prüfzyklus + Selbsttest, Zwei-Klassen-Buchführung §0 + Release-Zug-Runbook §3.6), `kern-plugin-bau.md` (Kern-Plugin, Governance-Schichten, Doks-Autosync), `abteilungs-plugin-bau.md` (Abteilungen und Satelliten, Auslieferungsgrenze), `kern-ssot-aufbau.md` (Aufbau der Wissensbasis, Andockpunkte der Plugin-Verknüpfung, Replikation), `sync-nachzug-bauzyklus.md` (gebündelte Nachzüge je Bauzyklus), `skill-bau.md` (Architektur und Anschluss eines Skills: Ebene, Skript, Fremdsystem, Vorlagepflicht), `claude-netz-bau.md` (Instruktions-Schicht der CLAUDE-Ebenen), `subagenten-bau.md` (Bau von Subagenten: Agent-vs-Skill, Scope, Gate-Semantik), `wissens-router-bau.md` (Router, Sucheindex, Wissens-Zeiger-Hook — Anlass-Test, Kontext-Budget, Nachzüge), `standardprozess-authoring.md` (Form und Ablauf für neue Standardprozesse — der Prozess für Prozesse), `abteilungs-inhalts-pruefung.md` (wiederkehrendes, read-only Inhalts-Audit je Abteilung/Satellit), `claude-team-distribution.md` (Rollout ans Team über den Claude-Team-Workspace), `contributing-flow.md` (Strang-Ablauf S1–S7 — bauender Agent unter Overseer, Merge/Release beim Maintainer), `jira-workflow.md` (Jira-Rest/MCP-Wege, Artefakt-Heimat `metaknowledge/`), `workflow-md-implementierung.md` (Anlass-Test und Mindestinhalt je Abteilungs-`workflow.md`) | vor **jeder** inhaltlichen Änderung am Plugin oder Repo — zuerst prüfen, ob ein Standardprozess existiert |
 | `bauplan-archiv/` | abgeschlossene oder verworfene Baupläne, **unverändert** übernommen — **terminal**: keine Quelle Richtung Kern oder Satelliten, keine Kandidaten-Queue | wenn nachvollzogen werden soll, wie ein abgeschlossenes Vorhaben lief; **Pflicht-Verschiebung** dorthin, sobald ein Plan abgeschlossen oder verworfen ist |
 | `ideen-backlog/` | Ideen ohne aktuellen Auftrag, je Idee ein Dokument | beim Festhalten einer Idee ohne Arbeitspaket; wird sie beauftragt, entsteht ein Bauplan in `aktive-bauplaene/`, der auf sie verweist — die Idee bleibt stehen |
 | `feature-manuals/` | Manuals und Beschreibungen **externer** Software, fremder Repos und Features, die ins OS einbezogen werden: MCP-Server, Fremd-APIs, fremde Repos — **nie** eigene Standardprozesse (→ `standardprozesse/`); seit 2026-08-25 vorhanden, erster Inhalt Jira-REST-Zugang | wenn gegen ein Fremdsystem (MCP-Server, externe API, fremdes Repo) gearbeitet wird und dessen Zugangsweg/Setup gebraucht wird |
@@ -95,7 +95,7 @@ Sechs Schichten (Detail: `knowledge-base/grundwissen/NovaCore-OS-Produktarchitek
 
 **Zwei Indizes, zwei Fragen** — beide gehören zum Ablauf, in dieser Reihenfolge:
 `SSOT-Document-Index.md` beantwortet *„welches Dokument existiert, wohin gehört es, wann
-brauche ich es"*; `standardprozesse/aktualisierungs-index.md` beantwortet *„ich ändere X — was
+brauche ich es"*; `standardprozesse/Aktualisierungs-Index.md` beantwortet *„ich ändere X — was
 muss ich alles mitändern"*.
 
 Die **SKILL.md-Formatregeln** (`skill-authoring.md`) liegen **nicht** hier, sondern im
@@ -156,7 +156,7 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   **Governance-Zwei-Schichten-Tabelle §1a**,
   **Autosync-Standardprozess §2a**, Mindest-Client-Schwellen), `abteilungs-plugin-bau.md`
   (Architektur, **Auslieferungsgrenze §1a**, Mechanik-Fakten, §3/§3a/§3b),
-  **`ssot-aufbau.md`** (sieben Grundbausteine, §4 Struktur-Vererbung an Satelliten,
+  **`kern-ssot-aufbau.md`** (vormals `ssot-aufbau.md`; sieben Grundbausteine, §4 Struktur-Vererbung an Satelliten,
   **§4a Isolations-Invariante**) und **`sync-nachzug-bauzyklus.md`** (gebündelte Nachzüge je
   Bauzyklus samt Konfliktzonen-Regel). Dazu die Vorlage
   `vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage`, das zweite Protokoll
@@ -211,7 +211,7 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
 - **Gebaut (Kern v0.9.0, 2026-08-16): Onsite-Endstand-Nachbau Phase 2** nach Bauplan
   `grundwissen/2026-08-15-onsite-endstand-nachbau-bauplan.md` (AP-C1–C5, AP-D1):
   **Prozesskorpus** — vier neue Standardprozesse (`claude-netz-bau.md`, `subagenten-bau.md`,
-  `team-distribution.md`, `abteilungs-inhalts-pruefung.md`) plus `anker-reservierung.md`
+  `claude-team-distribution.md` (vormals `team-distribution.md`), `abteilungs-inhalts-pruefung.md`) plus `anker-reservierung.md`
   samt Definitionsdokument `NovaCore-OS-Anker-Reservierung-Definition.md` (AP-C2).
   **Subagenten** (AP-D1) als neue Komponentenklasse: `agents/`-Verzeichnis, erster Agent
   `sync-nachzug-executor` (schreibend, Marker `nc:schreibend`, `sonnet`, ohne `Bash`),
@@ -293,7 +293,7 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Nachträge N1–N3) und Nachtschicht-Plan `aktive-bauplaene/2026-08-25-nachtschicht-phase-j.md`
   (zwei Sonnet-Bau-Agenten, Orchestrator hält Fugen und Abnahmen). **Anker-Reservierung
   ersatzlos aufgehoben** (D31): beide Dateien + Prozesskarte 09 gelöscht, Begriffsnorm „Anker"
-  als ein Absatz in `os-bau-methode.md`, Absicherung allein über Mechanik. **CI-Kostenschnitt**
+  als ein Absatz in `os-bau-methode.md` (mit der OAI-Umstellung 2026-08-30 ersatzlos entfallen — neuer Ort offen, siehe PR-Memo), Absicherung allein über Mechanik. **CI-Kostenschnitt**
   (D22): Regelfall ein Job `pruefung` (ubuntu/node 24), Vollmatrix nur bei Dispatch/Tag —
   „Breite reduziert, Prüfung nie". **Safety-Gate-Wertentscheidung** (D33): `NAME=wert` bewertet
   nur real zugewiesene Namen, der Wert entscheidet dreistufig (Fehlalarm-Schutz, Härtungen
@@ -376,7 +376,7 @@ Stand-Aussagen immer gegen **drei** Ebenen prüfen: Vision ↔ Spec ↔ gebaute 
          ONBOARDING bei Setup-Ablauf, diese Datei bei Pfaden/Architektur); Live-Verweise
          geprüft (`grep` nach alten Pfaden)
    - [ ] **Kein** CHANGELOG-Eintrag, **kein** Version-Bump im Strang (Zwei-Klassen-Buchführung,
-         `aktualisierungs-index.md` §0, seit 2026-08-24): Wissensträger des Strangs ist das
+         `Aktualisierungs-Index.md` §0, seit 2026-08-24): Wissensträger des Strangs ist das
          **PR-Ergebnismemo** (was/warum/Entscheide/Verifikation, Produktanteil gekennzeichnet).
          Version, CHANGELOG-Waypoint und Tag entstehen ausschließlich am **Release-Zug** auf
          Maintainer-Kommando (§3.6) — eine Version je Batch und Plugin
@@ -402,7 +402,7 @@ Repo-Struktur, Manifeste, `CHANGELOG.md` und Spec.
    |---|---|
    | Datei/Ordner verschoben/umbenannt/gelöscht | `knowledge-base/SSOT-Document-Index.md` (Teil 1 **und** Teil 2); Repo-Karte + Glossar (hier); README; alle Live-Verweise per `grep` |
    | Neue Wissensdatei in `knowledge-base/` | `knowledge-base/SSOT-Document-Index.md` Teil 2 (**testerzwungen**: Vollständigkeit + Linkgültigkeit); Glossar (hier) nur bei neuer Kategorie |
-   | Hook / Gate geändert | `plugins/nc/hooks/hooks.json` (`description` trägt den Prosa-Zustand der ganzen Kontroll-Schicht), `grundwissen/NovaCore-OS-Gates-Definition.md`, README (Hook-Tabelle inkl. Opt-out-Envs), `SECURITY.md` (Garantie-Zeile, Opt-out, Grenze) — Details: `standardprozesse/aktualisierungs-index.md` §2.1; Bump und Waypoint erst am Release-Zug |
+   | Hook / Gate geändert | `plugins/nc/hooks/hooks.json` (`description` trägt den Prosa-Zustand der ganzen Kontroll-Schicht), `grundwissen/NovaCore-OS-Gates-Definition.md`, README (Hook-Tabelle inkl. Opt-out-Envs), `SECURITY.md` (Garantie-Zeile, Opt-out, Grenze) — Details: `standardprozesse/Aktualisierungs-Index.md` §2.1; Bump und Waypoint erst am Release-Zug |
    | Pflicht-Einstieg / rote Linien geändert | der Text ist gespiegelt in `nc-session-start.js`, `skills/start/SKILL.md`, `doks/global-claude-firmenblock.md` und hier — alle vier gemeinsam, **plus Kern-Bump** |
    | Agent macht selbst einen Fehler | `debugging-findings/agent-learnings.md` (sofort, append-only) |
    | Sitzungswissen-Ort geändert | `plugins/nc/doks/nc-teamsync.md` §3, Skills `start`/`end-session`/`journal` (Kern), `SSOT-Document-Index.md`, hier (Glossar) — **plus Kern-Bump** |

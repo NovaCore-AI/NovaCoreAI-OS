@@ -136,3 +136,34 @@
 - **Präventionsregel:** Aus einem Vorbild wird der **Inhalt** übernommen, nicht dessen Beleglage.
   Trägt eine portierte Regel eine Mechanik-Begründung mit Abrufdatum, wird die Quelle **vor** dem
   Port erneut abgerufen — auch dann, wenn das Vorbild sie erst kürzlich geprüft hat.
+
+### 2026-08-30 — OAI-Prozessumstellung ohne Index-Nachzug: fünf Suite-Tests rot
+
+- **Symptom:** Nach den Maintainer-Commits `57e5368` (Jira-Workflow) und `626d0c6`
+  („Standardprozesse auf OAI-Struktur umgestellt", Umbenennungen u. a.
+  `team-distribution.md` → `claude-team-distribution.md`, `ssot-aufbau.md` →
+  `kern-ssot-aufbau.md`, `aktualisierungs-index.md` → `Aktualisierungs-Index.md`, Ersatz
+  `os-bau-methode.md` → `skill-bau.md`) war die Suite mit **fünf** roten Tests auf `main`:
+  zwei SSOT-Document-Index-Invarianten (tote Pfade, fehlende Zeilen), Sucheindex-Pfad-
+  Invariante, T-7 Takt (queue-flow.md hatte den Wochentakt des Onsite-Vorbilds übernommen
+  statt der Firmenspezifikation N6 „14-tägig") und Drift-Invariante 2 (drei `matrixKey`-
+  Anker des Pfad-Änderungsindex passten nicht mehr zur neuen Änderungs-Matrix).
+- **Ursache:** Strukturumstellung direkt auf `main` ohne den durch die Änderungs-Matrix
+  erzwungenen Nachzug (SSOT-Index, wissen-sucheindex.json, pfad-aenderungsindex.json,
+  AGENTS/README-Verweise) — und der Port brachte Onsite-Instanz-Bezüge mit (Wochentakt,
+  `/oai:`-Skill-Namen, Onsite-Pfade), die der NovaCore-Produktrealität (14-Tage-Hook
+  `nc-queue-faelligkeit.js`, `/nc:`-Skills, `~/.claude/nc/`) widersprechen.
+- **Fix:** Release-Nachzug 2026-08-30 (Branch `chore/release-0.15.1`): Index-Zeilen
+  umgestellt/ersetzt, beide Hook-Indizes nachgezogen, queue-flow.md auf 14-Tage-Takt und
+  `/nc:`-Realität zurückgestellt, AGENTS.md/README.md-Verweise repariert. Suite wieder grün
+  (352 Pass/0 Fail). Onsite-Instanz-Bezüge in den portierten Prozessen (v. a. §6-Historie in
+  `queue-flow.md`, `claude-team-distribution.md`, Spec-§15-Referenzen) bleiben als **benannte
+  Lücke** im PR-Memo offen.
+- **Beleg:** `node --test plugins/nc/tests/*.test.mjs` vor/nach dem Nachzug (5 Fail → 0 Fail);
+  `plugins/nc/hooks/nc-queue-faelligkeit.js` Zeile 171 (`FAELLIG_NACH_MS = 14 * TAG_MS`,
+  Firmenspezifikation N6).
+- **Präventionsregel:** Umbenennungs-/Ersetzungs-Kommitts auf `main` laufen vor dem Push einmal
+  durch die Suite — genau die vier Invarianten (Index-Vollständigkeit, Link-Gültigkeit,
+  Sucheindex-Pfade, matrixKey-Anker) decken diesen Fehlertyp ab. Und: Beim Port von
+  Vorbild-Prozessen werden Takts- und Namensangaben gegen die eigene Produktrealität
+  gegengeprüft (Hook-Konstanten, Skill-Namespace), bevor sie übernommen werden.
