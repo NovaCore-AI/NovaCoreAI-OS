@@ -1,135 +1,105 @@
 # Kern-Plugin-Bau — Standardprozess für Agenten
 
-> **Verbindlich** für jede Arbeit am Kern-Plugin `nc` und Referenz für den Bau eines neuen
+> **Verbindlich** für jede Arbeit am Kern-Plugin `oai` und Referenz für den Bau eines neuen
 > Kern-Plugins nach diesem Muster (auch mit abweichendem Scope). Den Bau von
-> **Abteilungsplugins und eigenständigen Satelliten** regelt daneben
-> [`abteilungs-plugin-bau.md`](abteilungs-plugin-bau.md) — die Governance-Tabelle in §1a sagt,
-> wer welche Struktur trägt. Die **Wissens-Seite** regelt [`ssot-aufbau.md`](ssot-aufbau.md),
-> die Nachzugs-Mechanik je Bauzyklus
-> [`sync-nachzug-bauzyklus.md`](sync-nachzug-bauzyklus.md), den Änderungsumfang je Änderungsart
-> der [`aktualisierungs-index.md`](aktualisierungs-index.md).
+> **Abteilungsplugins** regelt daneben
+> [`abteilungs-plugin-bau.md`](<abteilungs-plugin-bau.md>) — die Scope-Tabelle dort (§1)
+> definiert, wer welche Struktur trägt; die **Wissens-Seite** (Kern-SSOT samt
+> Plugin-Verknüpfungsvorbereitung) regelt [`kern-ssot-aufbau.md`](<kern-ssot-aufbau.md>).
 >
-> **Status: lebendes Teilwerk.** Hervorgegangen aus der Zweiteilung des früheren
-> `plugin-bau.md` (2026-08-11, Bauplan-AP1; das Vorbild `Onsite.ai-OS` hat sie am 2026-08-09
-> vollzogen). **Diese Datei trägt die Git-Historie des Vorgängers nicht** (Review-Befund
-> 2026-08-12, Plan-Nachtrag N4): Git erkennt Umbenennungen inhaltsbasiert, und der größere
-> Textanteil ist in `abteilungs-plugin-bau.md` gelandet. Wer die Vorgeschichte einer Regel
-> braucht, liest sie über den alten Pfad —
-> `git log --oneline -- knowledge-base/standardprozesse/plugin-bau.md`. Mechanik-Aussagen
-> sind gegen die offizielle Claude-Code-Doku verifiziert (`plugin-marketplaces` zuletzt
-> **2026-08-11**, `plugins-reference`/`skills` **2026-07-28**, Hooks-Doku **2026-08-10**). Vor
-> Format-Änderungen erneut abrufen — nie aus dem Gedächtnis.
+> **Status: lebendes Teilwerk** (angelegt 2026-08-09, Maintainer-Auftrag; Stand nachgezogen
+> 2026-08-18). Destilliert aus dem real gebauten Kern (aktuell 0.24.0, 15 gebaute Skills
+> inkl. der vier Wissens-Router §15.40) und den Governance-Entscheidungen aus Spec §15.22.
+> Gate 3 ist gebaut (§4.7/§15.21/§15.26), Gate 4 endgültig entfallen (§15.44). Das Dokument
+> wächst mit dem Kern; nach der Kern-Fertigstellung wird es auf den Endstand gehoben und fließt
+> in das geplante firmeninterne Prozessarchiv ein (Roadmap §3).
+> **Kette:** **dieser Prozess** → `sync-nachzug-bauzyklus.md`
 
-## 1. Was das Kern-Plugin ist (Scope)
+## 1. Was ein Kern-Plugin ist (Scope)
 
-Der Kern ist die **team-shared Governance-Schicht**: alles, was für **alle** Abteilungen gleich
-ist — und **nur** das. Fachliches gehört in Abteilungsplugins.
+Der Kern ist die **team-shared Governance-Schicht** (Spec §15.22): alles, was für **alle**
+Abteilungen gleich ist — und **nur** das. Fachliches gehört in Abteilungsplugins.
 
-| Bestandteil | Im Kern `nc` konkret | Regel |
+| Bestandteil | Im Kern `oai` konkret | Regel |
 |---|---|---|
-| **Basis-Gate** (Sicherheitsnetz) | FFG: universelle Destruktiv-Liste, Datei-Gate, Routine-Bash (`hooks/nc-ffg.js` + `hooks/lib/`) | **domänen-frei halten** — keine Abteilungs-Fachprüfungen; jede Kern-Prüfung ist für Abteilungen tabu zu duplizieren (Prüfungs-Eigentum) |
-| **Prozess-Infrastruktur** | Session-Start-Injektion (`nc-session-start.js`), Start-Gate + Fakten-Stempel (`nc-start-gate.js`, `nc-start-stempel.js`), Safety-Gate (`nc-safety-gate.js`, seit 2026-08-23), Doks-Autosync (`nc-doks-autosync.js`); Gate 4 endgültig entfallen (§5) | Hooks **fail-open** bei internen Fehlern, Opt-out-Env je Gate, **keine Marker-Dateien** (ein Gate, das man vergessen kann, ist kein Gate) |
-| **Shared-Skills** | ständige Abteilung `gemeinsam` (`skills/<name>/SKILL.md`): `start`, `end-session` (bis 0.7.x `save-session`), `journal`, `setup`, `os-info`, `skill-builder`, `update-doks`, `queue-abteilung`/`queue-kern` und die vier `wissen-*`-Router (seit 0.12.0; `doku-sync` ist seit 0.12.0 ersatzlos entfallen) | Format strikt nach `referenz/skill-authoring.md`; Ordner ohne `SKILL.md` ignoriert der Scanner und bleibt unausgeliefert |
-| **Normative Doks** | `wp-rahmen.md` (WP0–WP8), `referenz/skill-authoring.md`, `doks/nc-teamsync.md`, `doks/global-claude-firmenblock.md` (Ebene-1-Payload) | liegen **im Kern**, weil sie ausgeliefert werden — installierte Plugins sehen keine Repo-Pfade (§2 Fakt 4 des Abteilungsdokuments) |
+| **Basis-Gate** (Sicherheitsnetz) | FFG: universelle Destruktiv-Liste, Datei-Gate, Routine-Bash (`hooks/oai-ffg.js` + `hooks/lib/`) | **domänen-frei halten** — keine Abteilungs-Fachprüfungen; jede Kern-Prüfung ist für Abteilungen tabu zu duplizieren (Prüfungs-Eigentum) |
+| **Prozess-Infrastruktur** | Session-Start-Injektion (`hooks/oai-session-start.js`) + Start-Gate mit Fakten-Stempel (`hooks/oai-start-gate.js`/`hooks/oai-start-stempel.js`), Safety-Gate (`hooks/oai-safety-gate.js`), Doks-Autosync (`hooks/oai-doks-autosync.js`), PreCompact-Mahnung (`hooks/oai-end-mahnung.js`/`hooks/oai-end-stempel.js`), Queue-Fälligkeits-Erinnerung mit PR-Sichtbarkeit (`hooks/oai-queue-faelligkeit.js`, §15.39), Wissens-Zeiger (`hooks/oai-wissens-hinweis.js`, §15.40) | Hooks fail-open bei internen Fehlern, Opt-out-Env je Hook, **keine Marker-Dateien** (§15.20); Gate 4 (Sitzungsabschluss) ist endgültig entfallen (§15.44) |
+| **Shared-Skills** | ständige Abteilung `gemeinsam` (`skills/<name>/SKILL.md`) | Format strikt nach `referenz/skill-authoring.md`; Platzhalter-Ordner ohne `SKILL.md` bleiben unausgeliefert |
+| **Normative Doks** | `wp-rahmen.md` (WP0–WP8), `referenz/skill-authoring.md`, `referenz/agent-authoring.md` (§15.34), `referenz/wissens-router.md` (§15.40), `referenz/pflege-auspraegung.md` | liegen im Kern, weil sie ausgeliefert werden (§15.18) — installierte Plugins sehen keine Repo-Pfade |
 | **Registry** | `module-registry.json` — reiner Metadaten-SSOT (Abteilung → Plugin → Module → Skills) | steuert nichts aus; spiegelt die Kern-Version (Leitversion) |
-| **Testsuite** | `tests/*.test.mjs` — FFG, Start-Gate, Session-Start, Autosync, SSOT-Provisionierung, Struktur-Invarianten | jeder Hook bekommt Tests **inklusive Negativ- und Fehlalarm-Probe**; die Struktur-Invarianten sind Policy-Tests des ganzen Marketplace |
-| **Manifest** | `.claude-plugin/plugin.json` | Kern-Version = **Produkt-Leitversion**, gespiegelt in `VERSION` + Registry (testerzwungen); der Beschreibungstext nennt die gebauten Hooks (das Team liest ihn im Install-Dialog) |
+| **Testsuite** | `tests/*.test.mjs` — FFG + FFG-Drift, Struktur-Invarianten (inkl. Router-/Fußzeilen-Prüfungen), Session-Start/Start-Gate, Safety-Gate, Doks-Autosync, PreCompact-Mahnung, Agenten-Invarianten (portabel + OS-gebunden), Queue-Fälligkeit, Wissens-Zeiger | jeder Hook bekommt Tests inkl. Negativ-/Fehlalarm-Probe; Struktur-Invarianten sind Policy-Tests des ganzen Marketplace |
+| **Manifest** | `.claude-plugin/plugin.json` | Kern-Version = **Produkt-Leitversion**, gespiegelt in `VERSION` + Registry (testerzwungen); Beschreibungstext nennt die gebauten Hooks (Team liest ihn im Install-Dialog) |
 
-Jedes **repo-interne** Abteilungsplugin führt `dependencies: ["nc"]` — der Kern ist damit das
-Fundament jeder Installation und technisch nicht abwählbar. **Ausnahme:** eigenständige
-Abteilungs-OS in Satelliten-Repos (`nc-felix`, `nc-biggi`) führen keine Kern-Dependency; sie
-bringen Kernmodul und Kontroll-Schicht selbst mit (Begründung und Folgen:
-`abteilungs-plugin-bau.md` §1 und §3b).
+Jedes Abteilungsplugin führt `dependencies: ["oai"]` — der Kern ist damit das
+Fundament jeder Installation und technisch nicht abwählbar.
 
-### 1a. Zwei Governance-Schichten — wer trägt welche Struktur
+## 2. Bauablauf (destilliert aus dem realen Bau seit 0.1.0)
 
-Der Unterschied ist nicht *was*, sondern *für wen*. Diese Tabelle ist die Schnittkante zwischen
-diesem Dokument und `abteilungs-plugin-bau.md`; sie steht **nur hier**.
-
-| | Kern `nc` (team-shared) | Abteilungsplugin / Satellit (individuell) |
-|---|---|---|
-| **Sicherheitsnetz** | **Basis-Gate**: universelle Destruktiv-Liste, Datei-Gate, Routine-Bash — domänen-frei, einmal gepflegt (das heutige FFG) | **Hook-Norm W4:** Bei der Auslieferung trägt nur der Kern Hooks; ein etablierter Satellit darf eigene, **nicht-redundante, nicht-kollidierende, spezialisierte** Hooks — nichts anderes. **Repo-interne Abteilung: keine eigenen Hooks** (sonst feuern die Gates doppelt; testerzwungen durch die Struktur-Invariante „Hooks liegen ausschliesslich im Kern" in `struktur.test.mjs`, die jedes Plugin auf der Platte prüft). Fachliche Prüfwünsche werden als Anforderung an den Kern gestellt. **Eigenständiger Satellit:** trägt eine **eigene Kopie** der Kontroll-Schicht, weil er Kern-Hooks technisch nicht erreichen kann — „eigen" erlaubt keine Duplikate der Kern-Prüfungen |
-| **Infrastruktur** | Session-Start (Injektion + Erzwingungs-Begleiter), Doks-Autosync, SSOT-Präsenz (Wissens-Router `wissen-*` + zwei Zeiger-Hooks; der frühere `/nc:doku-sync` ist ersatzlos entfallen — Träger: CI-Prüfzyklus + Maintainer-Review am PR), Shared-Skills, geteiltes Fehlerprotokoll | Fach-Skills · Fach-Workflow (`workflow.md`) · eigene Konnektoren · beim eigenständigen Satelliten zusätzlich die **eigene Wissensbasis** samt mechanischem Wächter (`ssot-aufbau.md` §4) |
-| **Verbot** | keine Abteilungs-Fachprüfungen im Kern | **keine Kern-Prüfung duplizieren oder abschwächen** |
-
-**Prüfungs-Eigentum statt Matcher-Eigentum:** Jede Prüfung hat genau ein Heimat-Plugin;
-Werkzeugnamen sind frei. Deshalb dürfen sich Matcher überlappen — im Kern tun sie das bereits:
-FFG und Start-Gate abonnieren denselben PreToolUse-Matcher und prüfen Verschiedenes. Die eigene
-Kopie eines Gates im Satelliten ist **keine** Duplikation im Sinne der Regel, weil dort kein
-Kern-Hook läuft.
-
-## 2. Bauablauf
-
-1. **Plan zuerst:** Jede Design-Entscheidung entsteht als **Nachtrag** zum jüngsten Bauplan bzw.
-   Definitionsdokument (nie in-place), bevor gebaut wird; der jüngste Nachtrag gewinnt.
-   Kontrollmechanismen (Regeln, Schwellen, Verbote) sind Teil der Entscheidung und werden dem
-   Maintainer vorgelegt — nicht als Ausgestaltung miterfunden.
+1. **Spec zuerst:** Jede Design-Entscheidung entsteht als **Spec-Nachtrag** (nie in-place),
+   bevor gebaut wird; der jüngste Nachtrag gewinnt. Kontrollmechanismen (Regeln, Schwellen,
+   Verbote) sind Teil der Entscheidung und werden dem Maintainer vorgelegt — nicht als
+   Ausgestaltung miterfunden (Fehlerprotokoll 2026-08-09).
 2. **Manifest + Leitversion:** Version **nur** in `plugin.json`; beim Kern zusätzlich `VERSION`
-   und `module-registry.json` spiegeln. Bump-Schema und Release-Weg: `aktualisierungs-index.md`.
-3. **Skills** nach `referenz/skill-authoring.md` (YAML-Falle, Trigger in dritter Person, Länge);
-   eine Datei je Skill, Detailwissen als Referenzdatei daneben. **Keine Repo-Pfade in
-   ausgelieferten Dateien** (Plugin-Grenze, testerzwungen).
-4. **Kontroll-Schicht** auf gemeinsamem Gerüst, in der Reihenfolge der Gates 1 → 2 → 3 (ein Gate 4 gibt es nicht mehr):
-   quote-aware Bash-Analyse wiederverwenden (`hooks/lib/bash-analyse.js`), Session-Schlüssel aus
-   `hooks/lib/session-key.js` beziehen (nie eine zweite Kopie in Sicherheitscode),
-   **`process.exitCode` statt `process.exit()`** — Truncation-Falle: `process.exit()` kann auf
-   POSIX den gepufferten stdout-Write einer Pipe abschneiden, und eine abgeschnittene Deny-JSON
-   heißt, das Gate blockt **still nicht**. Hook-Pfade über `${CLAUDE_PLUGIN_ROOT}`.
+   und Registry spiegeln. **Gebumpt wird ausschließlich am Release-Zug** (Aktualisierungs-Index §3.6),
+   nie in diesem Bauablauf — hier wird der Gleichstand nur geprüft. Bump-Schema:
+   `Aktualisierungs-Index` §3.
+3. **Skills** nach `skill-authoring.md` (YAML-Falle, dritte-Person-Trigger, Länge); eine Datei
+   je Skill, Detailwissen als Referenzdatei daneben. Keine Repo-Pfade in ausgelieferten Dateien
+   (Plugin-Grenze, testerzwungen).
+4. **Kontroll-Schicht** auf einem gemeinsamen Gerüst, in der Reihenfolge des Zielplans
+   Kontroll-Schicht (Gates 1 → 2 → 3 → 4): quote-aware Bash-Analyse wiederverwenden
+   (`hooks/lib/bash-analyse.js`), `process.exitCode` statt `process.exit()` (Truncation-Falle,
+   Debug-Log 2026-08-04), Hook-Pfade über `${CLAUDE_PLUGIN_ROOT}`.
 5. **Tests + Validierung beider Ebenen** vor jedem Commit-Vorschlag:
-   `node --test plugins/nc/tests/*.test.mjs` · `claude plugin validate .` **und**
-   `claude plugin validate plugins/nc --strict` (die Wurzel-Variante allein prüft keine Skills).
-6. **Doku-Sync** nach dem `aktualisierungs-index.md` (Änderungs-Matrix + Selbsttest); die
-   abgeleiteten Nachzüge laufen gebündelt nach `sync-nachzug-bauzyklus.md`. CHANGELOG-Eintrag
-   **mit Namenszeichnung** ist Pflicht für jede Änderung.
+   `node --test plugins/oai/tests/*.test.mjs` · `claude plugin validate .` **und**
+   `claude plugin validate plugins/oai --strict` (die Wurzel-Variante allein prüft keine
+   Skills).
+6. **Doku-Nachzug** nach `Aktualisierungs-Index` (Änderungs-Matrix + Selbsttest).
+   **Kein CHANGELOG-Eintrag und kein Bump im Strang** —
+   Wissensträger ist das **PR-Ergebnismemo** mit gekennzeichnetem Produktanteil; Version und
+   CHANGELOG-Sektion vergibt der Release-Zug (Aktualisierungs-Index §0/§3.6). Einen ausführenden Skill
+   gibt es seit 2026-08-17 nicht mehr (§15.43); Träger sind CI-Prüfzyklus und
+   Maintainer-Review am PR.
 
-## 2a. Standardprozess Doks-Autosync (gebaut)
+## 2a. Standardprozess Autosync/Doks-Sync (gebaut 2026-08-10, Kern 0.12.0 — AP2)
 
-Der Autosync bekommt **kein eigenes Dokument**, sondern wird hier als Standardprozess geführt.
-Gebaut: `plugins/nc/hooks/nc-doks-autosync.js` + Payload
-`plugins/nc/doks/global-claude-firmenblock.md` + `plugins/nc/tests/nc-doks-autosync.test.mjs`.
-Normative Begriffsquelle der Ebenen: `grundwissen/NovaCore-OS-CLAUDE-Ebenen-Definition.md`.
+Normierungsort laut Spec §15.28 und Bauplan `Bauplan-archiv/2026-08-10-claude-ebenen-architektur-konzeption.md`
+§2.4/§2.4a: der Autosync-Prozess bekommt kein eigenes Dokument, sondern wird hier als
+Standardprozess geführt. **Gebaut** am 2026-08-10 (Kern 0.11.1 → 0.12.0):
+`plugins/oai/hooks/oai-doks-autosync.js` + Payload `plugins/oai/doks/global-claude-firmenblock.md`
++ Tests `plugins/oai/tests/oai-doks-autosync.test.mjs`.
 
-1. **Mechanik:** Ein SessionStart-Script vergleicht den Versions-Stempel im Ziel-Block
-   (`<!-- NC:BLOCK:VERSION <kern-version> -->`, erste Zeile im Block) mit der Plugin-Version; bei
-   Abweichung wird **nur der Inhalt zwischen den Markern** ersetzt. Marker:
-   `<!-- NC:BLOCK:START global -->` … `<!-- NC:BLOCK:ENDE global -->`. **Pfad-Auflösung relativ
-   zum Hook (`__dirname`)** — bewusst nicht über `CLAUDE_PLUGIN_DATA` (die Variable ist zwischen
-   Prozessen inkonsistent); `${CLAUDE_PLUGIN_ROOT}` bleibt der **Lade**-Pfad in `hooks.json`,
-   nicht die State-Quelle. Ziel: `~/.claude/CLAUDE.md`, für Tests umleitbar per
-   `NC_AUTOSYNC_TARGET`.
-2. **Fallunterscheidung:** Ziel fehlt → Datei mit Block anlegen · Ziel ohne Marker → Block ganz
-   **oben** einfügen, Bestand byte-identisch dahinter · Marker + identisch → **No-op** (kein
-   Schreiben, kein Backup) · Marker + abweichend → Blockinhalt ersetzen · **Marker defekt**
-   (START ohne ENDE, ENDE vor START, Mehrfach-Marker) → **nichts schreiben**, stderr-Hinweis
-   (fail-safe: lieber veraltet als zerstört).
-3. **Eigenschaften:** idempotent — **der Versions-Kommentar im Block IST der Stempel**, kein
-   externer State, keine Stempeldateien. Alles außerhalb der Marker ist **Privat-Zone** des
-   Mitarbeiters und bleibt unverändert. Rollierende Sicherung `<ziel>.nc-autosync-backup` vor
-   jedem Schreiben. Subagenten ausgenommen. Opt-out `NC_AUTOSYNC=off` (auch `0`/`false`/
-   `disabled`). Strikt fail-open: `process.exitCode = 0`, nie `process.exit()`.
-4. **Zwei NC-Härtungen über das Vorbild hinaus** (Review 2026-08-10 — nicht wegoptimieren):
-   - **Atomarer Write** über eine Temp-Datei im selben Verzeichnis plus `rename` statt
-     In-place-Write. SessionStart feuert auch bei `resume`/`clear`/`compact`/`fork`, zwei
-     parallel startende Fenster sind also real: Vorher konnte ein zweiter Prozess einen halb
-     geschriebenen Bestand lesen, darin keine Marker finden, den Torso als „Backup" über die
-     einzige gute Sicherung kopieren und ihn hinter den Block hängen — Privat-Zone dauerhaft
-     gekürzt.
-   - **Die Sicherung wird nie verschlechtert:** Trägt das vorhandene Backup ein intaktes
-     Markerpaar und der aktuelle Bestand keines, bleibt das ältere, bessere Backup stehen.
-5. **Kein Cron** — Setup-Abhängigkeit pro Maschine ohne Zusatznutzen; die Wirkung entsteht nur in
-   Sessions, also genügt SessionStart.
-6. **Kein manueller Autosync-Befehl.** Bei defekten Markern repariert der Mensch die Marker; der
-   nächste Session-Start zieht nach. `/nc:setup` ist der Weg für die **Wissensbasis**, nicht für
-   diesen Block — die beiden nicht verwechseln.
-7. **Verifizierte Hook-Mechanik** (offizielle Hooks-Doku, abgerufen 2026-08-10, vor dem Bau):
-   SessionStart-Hooks laufen parallel, sind nicht-blockierend, Default-Timeout **600 s** je Hook
-   und feuern bei `source` startup/resume/clear/compact/fork; `command`-Hooks dürfen Dateien
-   schreiben.
+1. **Mechanik:** Ein SessionStart-Script im Kern (Muster der bestehenden Gates) vergleicht den
+   Versions-Stempel im Ziel-Block (`<!-- OAI:BLOCK:VERSION <kern-version> -->`, erste Blockzeile)
+   mit der Plugin-Version; bei Abweichung wird die Payload aus dem Plugin-Paket an den Zielort
+   geschrieben. **Pfad-Auflösung relativ zum Hook (`__dirname`)** — bewusst weder über
+   `CLAUDE_PLUGIN_DATA` noch über andere Env-Ableitungen (Lesson Kern 0.11.1: die Variable ist
+   zwischen Prozessen inkonsistent); `${CLAUDE_PLUGIN_ROOT}` bleibt der Lade-Pfad in
+   `hooks.json`, nicht die State-Quelle. Ziel: `~/.claude/CLAUDE.md`; für Tests umleitbar per
+   `OAI_AUTOSYNC_TARGET`.
+2. **Eigenschaften:** idempotent (der Versions-Stempel im Block IST der Stempel — kein externer
+   State, keine Stempeldateien); Marker-Blöcke (`<!-- OAI:BLOCK:START name -->` …
+   `<!-- OAI:BLOCK:ENDE name -->`, siehe `Onsite.ai-OS-CLAUDE-Ebenen-Definition.md`) schützen die
+   Privat-Zone (alles außerhalb bleibt byte-identisch); Backup `<ziel>.oai-autosync-backup` vor
+   jedem Schreiben; **fail-safe bei defekten Markern** (START ohne ENDE o. ä. → nichts schreiben,
+   stderr-Hinweis — lieber veraltet als zerstört); Subagenten ausgenommen; Opt-out
+   `OAI_AUTOSYNC=off`; strikt fail-open (`process.exitCode = 0`, nie `process.exit()`).
+3. **Kein Cron** — Setup-Abhängigkeit pro Maschine, kein Zusatznutzen. Wirkung nur in Sessions,
+   also reicht SessionStart.
+4. **`/oai:update-doks`** bleibt der manuelle Reparatur-/Erstlauf-Befehl, hört auf, der
+   Normalweg zu sein (präzisiert §15.3).
+5. **Verifizierte Hook-Mechanik** (offizielle Hooks-Doku, abgerufen 2026-08-10, vor dem Bau):
+   SessionStart-Hooks laufen parallel, sind nicht-blockierend, Default-Timeout **600 s** je Hook,
+   feuern bei den dokumentierten `source`-Werten startup/resume/clear/compact — ein eigener
+   Wert `fork` existiert nicht; ein geforkter Resume bleibt ein Resume. Der Bauplan-§3-Punkt „Offen" ist
+   damit geschlossen.
+6. Verweis: Spec §15.28 + Definitionsdokument `Onsite.ai-OS-CLAUDE-Ebenen-Definition.md`;
+   Ist-Stand: Betriebshandbuch §6.3.
 
-## 2b. Upstream-Drift-Ritual FFG-Engine (Onsite §15.38, Port 2026-08-23 — Mapping D3)
+## 2b. Upstream-Drift-Ritual FFG-Engine (§15.38)
 
 Die FFG-Erkennung (`hooks/lib/bash-analyse.js`, `hooks/lib/shell-substitution.js`,
-Hook-Eintritt `nc-ffg.js`) ist ein Port des GateGuard aus dem ECC-Plugin. Damit ein
+Hook-Eintritt `oai-ffg.js`) ist ein Port des GateGuard aus dem ECC-Plugin. Damit ein
 künftiger Upstream-Fix (GHSA-4v57-ph3x-gf55 war genau so einer) nicht unbemerkt
 vorbeirauscht, gilt:
 
@@ -139,69 +109,48 @@ vorbeirauscht, gilt:
 - **Trigger:** (a) neues ECC-Release im Plugin-Cache (`~/.claude/plugins/cache/ecc/`),
   (b) jede Änderung an den beiden Lib-Dateien (Hook-Zeile im Aktualisierungs-Index
   erinnert), (c) spätestens je Halbjahr ein Versions-Check des Caches.
-- **Schritte je Lauf:** 1. Neue/geänderte Engine-Testfälle aus
+- **Schritte je Lauf:** 1. Neue/ändernte Engine-Testfälle aus
   `tests/hooks/gateguard-fact-force.test.js` in die Drift-Falltabelle
-  (`plugins/nc/tests/nc-ffg-drift.test.mjs`) übernehmen. 2. `shell-substitution.js`
+  (`plugins/oai/tests/oai-ffg-drift.test.mjs`) übernehmen. 2. `shell-substitution.js`
   gegen `scripts/lib/shell-substitution.js` des neuen Stands diffen — Soll:
   funktionell wortgleich. 3. rm-/git-/SQL-/find-/quote-aware-Logik gegen den
   **Monolithen** `scripts/hooks/gateguard-fact-force.js` diffen (für `bash-analyse.js`
   existiert upstream keine Datei-Entsprechung — Strukturwandel PR #1853). 4. Je Punkt
   die Übernahme-Entscheidung im CHANGELOG festhalten — auch „bewusst nicht übernommen".
 - **Bewusste Dauer-Abweichungen** (Erwartungen der Drift-Tabelle dürfen hiervon
-  abweichen, jeweils mit Verweis in der Datei): Env-Namen `NC_FFG_*`, erweiterte
-  Read-only-Allowlist (Onsite §15.25 / NC-AP1 **plus** die NC-eigene segmentweise
-  Introspektion mit `cd`/`worktree list`/`-sb`, Härtung 2026-08-14 — weder Upstream
-  noch Onsite kennen sie), kein KI-sichtbarer Abschalt-Hinweis, Windows-Muster und
-  Wrapper-Passthrough (Onsite §15.38/§15.46 — Upstream hat beides nicht), sowie
-  `psFlagActive` mit nicht-falsy-Semantik (`-Recurse:1` zählt als aktiv — GLM-R2
-  2026-08-24, am PS-5.1-Cmdlet empirisch belegt; Onsite prüft nur `:$true` und teilt
-  die Lücke).
+  abweichen, jeweils mit Spec-§-Verweis in der Datei): Env-Namen `OAI_FFG_*`,
+  erweiterte Read-only-Allowlist (§15.25), kein KI-sichtbarer Abschalt-Hinweis,
+  Windows-Muster (§15.38 — Upstream hat keine).
 
 ## 3. Regeln, die nur den Kern binden
 
-- **Kern-Version = Produkt-Leitversion.** Kein Bump = kein Auto-Update fürs Team. Gespiegelt in
-  `VERSION` und `module-registry.json`, testerzwungen — sonst beginnt die Drift-Serie von Neuem.
+- **Kern-Version = Produkt-Leitversion.** Kein Bump = kein Auto-Update fürs Team.
 - **Basis-Gate bleibt domänen-frei.** Was eine einzelne Abteilung prüfen will, gehört in deren
-  Domänen-Ausprägung — der Kern fragt nie nach Branch-Regeln oder Empfängern.
-- **Hooks bleiben im Kern (Hook-Norm W4).** Repo-interne Abteilungsplugins bringen keine mit
-  (testerzwungene Invariante `Hooks liegen ausschliesslich im Kern`, `struktur.test.mjs`);
-  eigenständige Satelliten sind die dokumentierte Ausnahme (§1a) und dürfen dort ausschließlich
-  eigene, nicht-redundante, nicht-kollidierende, spezialisierte Hooks führen — nie eine
-  Kern-Prüfung duplizieren oder abschwächen.
-- **Mindest-Client des Produkts.** Das Abteilungsmodell hängt an der Dependency-Mechanik:
-  transitives Enable-/Disable-Blocking ab Claude Code **2.1.143**, `defaultEnabled` ab
-  **2.1.154**, `renames` ab **2.1.193**. Das Team fordert **≥ 2.1.193**; ältere Clients melden
-  nur ein nachgelagertes `dependency-unsatisfied`, statt den Kern zu erzwingen.
-  **Was wo steht:** Die **Einzelschwellen samt Begründung** stehen ausschließlich hier —
-  `abteilungs-plugin-bau.md` §2 Fakt 6 verweist darauf, statt sie zu spiegeln. Die **nackte
-  Team-Anforderung** (`≥ 2.1.193`) ist davon ausgenommen: Sie gehört zum Produktstand und wird
-  laut Änderungs-Matrix (`aktualisierungs-index.md` §2.3, Zeile „Mindestversion Claude Code /
-  Node") pflichtgemäß in `README.md`, `ONBOARDING.md` und `AGENTS.md` mitgeführt. Diese
-  Spiegel sind **gewollt** und werden nicht „aufgeräumt"; die Sparsamkeitsregel richtet sich
-  gegen *neue*, unbeauftragte Fundstellen.
-- **Der Kern ist das Referenzbeispiel.** Der Sicherheitsapparat wird zuerst hier vollständig
-  gebaut; Abteilungen und Satelliten iterieren danach nach diesem Vorbild — nie umgekehrt.
+  Domänen-FFG — der Kern fragt nie nach Branch-Regeln oder Empfängern.
+- **Matcher sind kein Kern-Monopol** (§15.22): Der Kern besitzt seine **Prüfungen** exklusiv,
+  nicht die Werkzeugnamen. Abteilungs-Hooks dürfen dieselben Matcher abonnieren — nach der
+  Hook-Norm W4 (2026-08-21) in einem etablierten Satelliten, spezialisiert und
+  nicht-kollidierend.
+- **Der Kern ist das Referenzbeispiel** (Maintainer-Auflage §15.22): Der Sicherheitsapparat
+  wird zuerst hier vollständig gebaut; Abteilungen iterieren danach nach diesem Vorbild.
 
 ## 4. Replikation für einen abweichenden Scope
 
-Wer nach diesem Muster ein neues Kern-Plugin baut (etwa für eine andere Organisation), hält die
-Schichtgrenze ein: team-shared = domänen-freier Basisschutz + Prozess- und Wissens-Infrastruktur
-+ Shared-Skills; alles Fachliche in abgeleitete Plugins mit `dependencies`-Kopplung. Reihenfolge
-wie §2; die Governance-Tabelle §1a gilt spiegelbildlich. Die Wissens-Seite repliziert man nach
-`ssot-aufbau.md` §6.
+Wer nach diesem Muster ein neues Kern-Plugin baut (z. B. für eine andere Organisation), hält
+die Schichtgrenze ein: team-shared = domänen-freier Basisschutz + Prozess-/Wissens-
+Infrastruktur + Shared-Skills; alles Fachliche in abgeleitete Plugins mit
+`dependencies`-Kopplung. Reihenfolge wie §2; die Scope-Tabelle in
+`abteilungs-plugin-bau.md` §1 gilt spiegelbildlich.
 
-## 5. Offene Bestandteile
+## 5. Offene Bestandteile (Stand 2026-08-17)
 
 | Offen | Stand / Blocker |
 |---|---|
-| ~~Gate 3 (Safety-Gate) und Gate 4 (Sitzungsabschluss)~~ **erledigt/entfallen 2026-08-23** | Gate 3 ist **gebaut** (`nc-safety-gate.js`, Port aus dem Onsite-Vorbild — Mapping D1/EN4); Gate 4 ist **endgültig entfallen** (Onsite §15.44, Mapping D2). Stand: `grundwissen/NovaCore-OS-Gates-Definition.md` |
-| **Automatische SSOT-Pflege** über die SSOT-Präsenz (Router + Zeiger-Hooks) hinaus | die Änderungs-Matrix ist heute der Selbsttest; was mechanisch erzwingbar ist, gehört in `struktur.test.mjs` (`ssot-aufbau.md` §2, Baustein 6) |
+| **`/oai:grill-me`** | Platzhalter ohne `SKILL.md`; Inhalt und Abgrenzung zur gebauten Fit-Prüfung sind noch zu konzipieren |
+| Erledigt seit dem letzten Stand: Start-Gate (§15.25) · Safety-Gate (§15.21/§15.26) · endgültiger Entfall von Gate 4 (§15.44) · Wissens-Router + Wissens-Zeiger (§15.40) · Fit-Prüfung Skill+Agent (§15.45) · Entfernung von `doku-sync` (§15.43) · SSOT-Pflege-Skills `queue-abteilung`/`queue-kern` (§15.36) · Neufassung von `update-doks` (§15.47) | — |
 
 ---
 
-*Zweiteilung des früheren `plugin-bau.md` am 2026-08-11 durch Claude (Opus 5, Claude Code) auf
-Weisung Lucas Vöhringer (Bauplan
-`grundwissen/2026-08-11-prozesskorpus-nachzug-und-satelliten-ssot-bauplan.md`, AP1 /
-Entscheid E2). Struktur-Vorbild: `Onsite.ai-OS@5d335a7` `kern-plugin-bau.md`; Inhalte auf den
-NovaCore-Ist-Stand gemappt und dort, wo NovaCore härter ist (Autosync §2a.4, „Hooks nur im
-Kern"), nach dem realen Code statt nach dem Vorbild geschrieben.*
+*Angelegt 2026-08-09 durch Claude (Fable 5, Claude Code) auf Weisung Lucas Vöhringer, im Zuge
+der §15.22-Neufassung (Zweiteilung des früheren `plugin-bau.md`). Abschnitt 2b
+(Upstream-Drift-Ritual) ergänzt 2026-08-15 (§15.38).*

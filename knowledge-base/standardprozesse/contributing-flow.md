@@ -1,103 +1,127 @@
 # Contributing-Flow — Standardprozess
 
-> **Verbindlich** für jeden Strang, der einen Code- oder Wissens-Beitrag ins OS-Repo trägt —
-> Skill, Hook, Standardprozess, Definitionsdokument, Bauplan-Vollzug. Begriffliche Grundlage
-> ist die [`NovaCore-OS-Strang-Definition.md`](../grundwissen/NovaCore-OS-Strang-Definition.md)
-> (was ein „Strang" ist); dieser Prozess sagt, **welche Stationen** ein Strang durchläuft und
-> **wer** an welcher Station steht.
->
-> **Abgrenzung/Schwestern:** Der Prüfzyklus selbst (Tests, `validate`) steht in
-> [`aktualisierungs-index.md`](aktualisierungs-index.md) §5 — hier wird nur referenziert, nicht
-> dupliziert. Die Ergebnismemo-Pflicht des Strangs (statt CHANGELOG/Bump im Strang) steht ebenso
-> dort (§0 Zwei-Klassen-Buchführung). Für **Affiliate-Plugins** (`kimi-code-plugin-cc` und
-> vergleichbare persönliche/externe Werkzeuge) gilt dieser Flow **nicht über die SSOT dieses
-> Repos** — sie leben in eigenen Repos mit eigenen Regeln (Affiliate-Invariante N1.1,
-> [`NovaCore-OS-SSOT-Definition.md`](../grundwissen/NovaCore-OS-SSOT-Definition.md)).
->
-> **Kette:** ein Vorhaben ist beauftragt (Bauplan in `aktive-bauplaene/` oder Maintainer-Auftrag
-> im Chat) → **dieser Prozess** → Merge auf `main` = Ende des Strangs
-> ([`ssot-aufbau.md`](ssot-aufbau.md) für die Wissens-Nachzüge, `aktualisierungs-index.md` §3.6
-> für den Release-Zug).
->
-> **Herkunft:** Port aus Onsite.ai-OS `origin/main@a9927b2`
-> (`plugin-maintanance-ruleset-source/contributing-flow.md`), NovaCore-Zuschnitt: Rollen nach
-> Org-Ruleset statt Onsite-Rollennamen, `/nc:`-Skill-Namen statt Onsite-Skills, Jira-Lücke
-> benannt statt gefüllt (Mapping D34, Entscheid J-E4 des
-> [Phase-J-Bauplans](../aktive-bauplaene/2026-08-25-onsite-delta-phase-j-bauplan.md)).
+> **Verbindlich**, sobald am Onsite.ai-OS mitgewirkt wird — am Kern-Plugin im OS-Repo oder an
+> einem Abteilungs-Satelliten, als Mensch oder als beauftragter Agent: Jeder Beitrag läuft als
+> **Strang** (Worktree/Branch → PR → Review → Merge) und endet an der Übergabe an den
+> Release-Zug. Der Begriff „Strang" und die tragenden Prinzipien stehen in
+> [`project-meta-infos/Onsite.ai-OS-Strang-Definition.md`](<../project-meta-infos/Onsite.ai-OS-Strang-Definition.md>).
+> **Abgrenzung:** der Aufstieg von *Wissen* aus Sitzungen ist der Queue-Flow
+> ([`queue-flow.md`](<queue-flow.md>)) — hier geht es um den *Arbeits*-Beitrag am Produkt; das
+> Release-Runbook selbst steht im [`Aktualisierungs-Index`](<Aktualisierungs-Index.md>) §3.6;
+> **was** inhaltlich gebaut wird, regeln `kern-plugin-bau.md` bzw. `abteilungs-plugin-bau.md`
+> — dieser Prozess regelt den Weg, nicht das Was; die Jira-Board-Pflege regelt
+> [`jira-workflow.md`](<jira-workflow.md>).
+> **Kette:** Jira-Ticket gezogen (Status „In Arbeit") oder Maintainer-Auftrag → **dieser
+> Prozess** (Stationen S1–S7) → S6: Review + Merge durch den Systemarchitekten
+> (Lucas Vöhringer) → S7: Release-Zug auf sein Kommando
+> (`Aktualisierungs-Index` §3.6) übernimmt Version, CHANGELOG und Tag
 
-## 1. Anlass
+## 1. Anlass — wann dieser Prozess greift
 
 | Fall | Weg |
 |---|---|
-| Ein beauftragtes Vorhaben (Bauplan oder direkter Maintainer-Auftrag) soll umgesetzt werden | **dieser Prozess** — S1–S7 |
-| Eine einzelne Registerzeile wird abgehakt, ohne dass Code oder Wissensdateien sich ändern (z. B. reine Kenntnisnahme) | **nicht hier** — Registerpflege direkt im [Offene-Stränge-Register](../sitzungswissen/offene-straenge-register.md) |
-| Eine Änderung landet **nicht** über die SSOT dieses Repos (Affiliate-Plugin, fremdes Arbeits-Repo) | **nicht hier** — eigener Prozess des Zielrepos, keine NovaCore-Stationen |
-| Eine reine `erinnerung/`- bzw. Sitzungswissen-Änderung (Nicht-Code, append-only) | **verkürzt**: Branch → PR bleibt Pflicht (Branch-Protection ist nicht pfad-granular), aber Selbst-/Auto-Merge ohne inhaltliche Code-Review ist zulässig — siehe S6 |
+| Ein Beitrag an Kern oder Satellit steht an (Ticket, Auftrag, Bug, Doku) | **dieser Prozess** |
+| Mehrere Beiträge parallel (Multi-Agent-/Loop-Betrieb, Nachtschicht) | **dieser Prozess** — je Strang ein eigener Worktree und Branch (S2) |
+| Sitzungsergebnisse sollen als Wissen in die SSOT aufsteigen | **nicht hier** → `queue-flow.md` |
+| Ein Release soll geschnitten werden | **nicht hier** → `Aktualisierungs-Index` §3.6 (Release-Zug, Maintainer-Kommando) |
+| Ein neues Plugin oder eine Abteilung soll gebaut werden | Weg nach **diesem Prozess**, Inhalt aus `abteilungs-plugin-bau.md` / `kern-plugin-bau.md` |
+| Eine einmalige Aufgabe mit Anleitung, keine wiederkehrende Änderungsart | **nicht hier** → Bauplan nach `Aktive Baupläne/` (`standardprozess-authoring.md` §1) |
 
-## 2. Ablauf — die sieben Stationen S1–S7
+## 2. Der Flow auf einen Blick
 
-Rollen nach dem Org-Ruleset dieser Instanz: S1–S5 trägt der **bauende Agent** unter
-**Overseer**-Planung und -Review (Plan-Sandwich — der Overseer plant den Auftrag vor und liest
-das Ergebnis danach; er ist der Adressat des Berichtskommentars am Ende von S5, **nicht** der
-Maintainer). S6 (Review + Merge) und S7 (Release-Zug) liegen beim **Maintainer Lucas
-Vöhringer** — bewusst **kein Agent**, an keiner der beiden Stationen.
+```
+Jira-Ticket „In Arbeit" / Maintainer-Auftrag
+  └─ S1 Vorlauf          Pflicht-Einstieg, Standardprozess-Check, Worktree-Lage      [Agent]
+       └─ S2 Strang anlegen   .worktrees/<branch>, Branch <typ>/<thema>, Anker        [Agent]
+            └─ S3 Bauen       versionslos, ein Paket = ein Commit, Matrix je Edit     [Agent]
+                 └─ S4 Abschluss   Checkliste: Suite, validate, Grep, PR-Memo         [Agent]
+                      └─ S5 Einreichen   Push + PR + Bericht, Jira → Internal Review  [Agent, Freigabe]
+                           └─ S6 Review + Merge  Konversationen lösen, aufräumen     [Systemarchitekt]
+                                └─ S7 Übergabe an den Release-Zug                     [Systemarchitekt / Release-Zug]
+```
 
-| # | Station | Wer | Was passiert |
+**Die eine Regel, die der Flow trägt:** Agenten bereiten bis zum fertigen PR vor, Menschen
+entscheiden (wie der Queue-Flow, Spec §15.36.6). Versionen vergibt ausschließlich der
+Release-Zug — ein Strang ist immer versionslos.
+
+## 3. Stationen, Verantwortliche, Prüfpunkte
+
+| # | Station | Wer | Was geprüft wird (QS) |
 |---|---|---|---|
-| **S1** | **Worktree + Branch anlegen** | Agent | `git worktree add .worktrees/<branch> -b <typ>/<thema>` (Branch-Schema `<typ>/<thema>`, z. B. `feat/…`, `fix/…`, `docs/…`); **nie** im Haupt-Checkout schreiben, sobald eine zweite Session oder ein zweiter Agent parallel arbeitet. `git worktree list` **vor** dem ersten Schreiben prüfen (fremde, ungemergte Arbeit) |
-| **S2** | **Pflicht-Einstieg** | Agent | Log-Stand, Produktstand (`CHANGELOG.md`, `VERSION`), Planungsstand (`aktive-bauplaene/`), Triage über `SSOT-Document-Index.md`, Änderungsumfang über `aktualisierungs-index.md` — wie in `AGENTS.md` beschrieben, hier nicht dupliziert |
-| **S3** | **Umsetzung** | Agent | Standardprozess-Check vor jeder inhaltlichen Änderung (existiert schon ein Standardprozess für diese Tätigkeit?); Tests zuerst, wo ein Prüfzyklus existiert; jeder eigene Fehler sofort ins Fehlerprotokoll (`debugging-findings/agent-learnings.md`) |
-| **S4** | **Selbst-Review + Prüfzyklus** | Agent | `node --test plugins/nc/tests/*.test.mjs` · `claude plugin validate .` **und** `claude plugin validate plugins/<name> --strict` je berührtem Plugin · Konflikt-Marker-Grep (`git grep -n "<<<<<<< \|=======\|>>>>>>> "`) als **Kettenglied vor jedem Commit** — ein übersehener Marker ist kein Stilfehler, sondern ein kaputter Build |
-| **S5** | **PR-Memo an den Overseer** | Agent | Ergebnisbericht: was/warum, getroffene Entscheide, Verifikationsbelege (Testzahlen, `validate`-Ausgabe), offene Punkte — **kein** CHANGELOG-Eintrag, **kein** Version-Bump (Zwei-Klassen-Buchführung, `aktualisierungs-index.md` §0). Der Overseer liest das Memo, stichprobt den Diff, gibt frei oder schickt zurück |
-| **S6** | **Review + Merge** | **Maintainer** | Fachliche und Sicherheits-Prüfung, Freigabe oder Änderungswunsch, Merge nach `main` — **kein direkter Push auf `main`**, immer über PR. Ausnahme für reine `erinnerung/`-Änderungen (Nicht-Code, append-only): Selbst-/Auto-Merge ohne inhaltliche Review ist zulässig, der Branch/PR-Weg bleibt trotzdem Pflicht (Branch-Protection ist nicht pfad-granular) |
-| **S7** | **Release-Zug** | **Maintainer** | Version-Bump, CHANGELOG-Waypoint, Tag — ausschließlich am Release-Zug, nie im Strang (`aktualisierungs-index.md` §3.6). Ein Strang endet mit dem Merge; der Release-Zug ist ein eigener, gebündelter Vorgang über mehrere Stränge hinweg |
+| S1 | **Vorlauf** | Agent (Mensch liest mit) | Pflicht-Einstieg nach `CLAUDE.md` vollständig (git log/status, CHANGELOG/VERSION, SSOT-Index-Triage); Standardprozess-Check gegen den `Aktualisierungs-Index` (§1/§2 — Pflichtlektüre je Änderungsart); **fremde Worktrees prüfen** (`git worktree list`, je Baum `git status` — Matrix-Zeile 8); Jira: Ticket dem Epic zuordnen, auf „In Arbeit" ziehen |
+| S2 | **Strang anlegen** | Agent | `git worktree add .worktrees/<branch> -b <branch>` (Worktree-Pflicht, nie im Main-Checkout schreiben); Branch-Schema **`<typ>/<thema>`** mit `typ` ∈ `feat`/`fix`/`docs`/`chore`/`update` (historische Bestands-Branches anderer Namen bleiben unbenannt); **Basis bewusst wählen** — steht ein anderer PR kurz vor dem Merge, auf dessen Kopf aufsetzen statt auf `main`. **Reserviert wird nichts** — Anker und Tags gehören allein zum Release-Zug (Maintainer-Entscheid 2026-08-25); Namenskollisionen fängt der Merge-Konflikt, doppelte Spec-Nummern die Suite-Invariante |
+| S3 | **Bauen** | Agent / Mensch | **versionslos**: kein Version-Bump, kein CHANGELOG-Eintrag, kein Tag — Wissensträger des Strangs ist das PR-Ergebnismemo (S4); Bauplan nach `Aktive Baupläne/` (Ausnahme nur auf ausdrückliches Maintainer-GO, dann Bericht im PR-Memo); je Schreibaktion die passende Zeile der Änderungs-Matrix; **ein Paket = ein Commit** mit **expliziter Dateiliste** (bei Parallelarbeit ist `git add -A` verboten — Fehlerprotokoll 2026-08-22); Scratchpad ist nie final (`scratchpad-nutzung.md`) |
+| S4 | **Abschluss** | Agent | Abschluss-Checkliste der `CLAUDE.md` vollständig: Testsuite **wortgleich** (`node --test plugins/oai/tests/*.test.mjs`), Validierung **beider** Ebenen (`claude plugin validate .` + je berührtem Plugin `--strict`), toter-Pfad-Grep über das ganze Repo, Doku-Nachzug je Matrix, Fehlerprotokoll-Einträge; **signiertes PR-Ergebnismemo** (was/why/Entscheide/Verifikation, Produktanteil gekennzeichnet) |
+| S5 | **Einreichen** | Agent — **Freigabe nötig** | Push + PR gegen den Standardbranch des Ziel-Repos; Bericht als PR-Kommentar: erledigt je Paket · bewusst nicht gemacht + Grund · offene Fragen · Verifikationsbelege; Jira-Transition auf „Internal Review", sobald der PR steht (Transition nur, soweit im Auftrag zugestanden); nie mergen, nie force-pushen |
+| S6 | **Review + Merge** | **Systemarchitekt (Lucas Vöhringer)** — bewusst kein Agent | Review-Konversationen führen und lösen (CI läuft mit); nach jedem aufgelösten Merge-Konflikt ist `grep -rn "^<<<<<<<" .` **leer, bevor committet wird** — als eigenes Kettenglied, nicht als Nebeninformation (Fehlerprotokoll 2026-08-22); **unmittelbar nach dem Merge**: Branch (lokal + Remote) und Worktree aufräumen |
+| S7 | **Übergabe an den Release-Zug** | **Release-Zug auf Kommando des Systemarchitekten (Lucas Vöhringer)** | Kein Versions-Chore je PR — der Zug bündelt die Produktanteile aller gemergten PRs des Batches zu **einer** Version je Plugin (Wochen-Takt; der CI-Detektor meldt „Release-Zug fällig", blockt nie); Satelliten: Release im Satelliten-Repo + SHA-Umpinnen des Marketplace-Eintrags im Kern **als Zug-Schritt** (`abteilungs-plugin-bau.md` §3a) |
 
-## 3. Regeln / rote Linien
+## 4. Ergebnis/Output
 
-- **Versionslos im Strang.** Kein `plugin.json`-Bump, kein CHANGELOG-Eintrag, kein Git-Tag
-  entsteht innerhalb S1–S6 — das ist ausschließlich S7 (Zwei-Klassen-Buchführung).
-- **Kein Merge durch den Agenten.** S6 ist Maintainer-only, ausnahmslos — auch bei einem
-  trivialen, einzeiligen Diff.
-- **Kein Force-Push, keine History-Umschreibung** auf einem geteilten Branch (kein
-  `push --force`, kein `rebase -i` über bereits gepushte Commits, kein `commit --amend` auf
-  veröffentlichtem Stand).
-- **Konflikt-Marker-Grep ist ein Kettenglied, kein optionaler Schritt.** Ein Merge-Konflikt, der
-  unaufgelöst committet wird, bricht `main` leise — S4 prüft das **vor** jedem Commit-Vorschlag.
-- **Worktree-Pflicht bei Parallelarbeit.** Zweite Session, zweiter Agent oder Nachtschicht
-  schreiben nie im Haupt-Checkout (`.worktrees/` ist gitignored, siehe `CLAUDE.md`).
-- **Jira-Lücke benannt, nicht gefüllt.** Onsite führt an dieser Stelle Jira-Spalten (Board,
-  Status-Übergänge je Station); NovaCore hat dafür heute **kein** vollständiges Pendant —
-  Ticket-Anbindung läuft, wo sie existiert, über [`jira-workflow.md`](jira-workflow.md)
-  (zwei Sites, MCP vs. REST, Freigabe-Pflicht für Schreibläufe). Diese Lücke wird hier verwiesen,
-  nicht stillschweigend geschlossen (Invariante J-9 des Phase-J-Bauplans: „nichts erfinden").
-- **Affiliate-Isolation.** Affiliate-Plugins durchlaufen diesen Flow **nicht über die SSOT**
-  dieses Repos — keine Station hier ist für sie zuständig (Invariante J-5).
+Nach einem vollständigen Durchlauf existieren (Fremdprüfbar ohne den Durchlauf gesehen zu haben):
 
-## 4. Ergebnis / Output
+1. **Ein PR** am Ziel-Repo mit signiertem PR-Ergebnismemo und Berichtskommentar — oder deren
+   Merge-Spur auf dem Standardbranch.
+2. **Jira-Ticket auf „Internal Review"** (danach: „Operative Refining"/„Official Release"
+   nach `jira-workflow.md`) — Status entspricht der PR-Realität.
+3. **Aufgeräumte Lage:** `git worktree list` zeigt keinen Strang-Rest, Lokal- und
+   Remote-Branch des Strangs sind gelöscht.
+4. **Register-Zeile nur bei Resten:** bleibt etwas offen (Folgeauftrag, vertagter Punkt),
+   trägt es das Offene-Stränge-Register (`sitzungswissen/offene-straenge-register.md`); ein
+   vollständig gemergter Strang ohne Reste braucht
+   keine Zeile (das PR-Memo ist der Beleg).
+5. **Keine** Versions-/CHANGELOG-Änderung im Strang-Diff (Gegenprobe §6) — Version, CHANGELOG
+   und Tag entstehen ausschließlich am Release-Zug.
 
-Nach einem vollständigen Durchlauf existieren: ein gemergter Commit auf `main` (S6), ein
-PR-Ergebnismemo als PR-Beschreibung oder -Kommentar (S5), bei Bedarf eine
-Registerzeile im [Offene-Stränge-Register](../sitzungswissen/offene-straenge-register.md) für
-Nachfolgeschritte, sowie — **nur** am Release-Zug (S7) — ein Version-Bump, ein
-CHANGELOG-Waypoint-Abschnitt und ein Git-Tag. Ein Dritter prüft den Abschluss eines Strangs am
-Merge-Commit auf `main` plus dem PR-Memo, das die getroffenen Entscheide dokumentiert.
+## 5. Regeln / rote Linien
 
-## 5. Verifikation / Abnahme
+- **Strang-Verbote (aus dem `Aktualisierungs-Index` §5, hier gebündelt):** kein Version-Bump ·
+  kein CHANGELOG-Eintrag · kein Tag/Release · kein Merge · kein Force-Push · keine
+  destruktiven Git-Operationen — alles nur mit ausdrücklicher Maintainer-Freigabe; die
+  Merge-Freigabe deckt Tag und Release desselben Zuges mit ab (Entscheid 2026-08-10).
+- **Ein Schreibweg je Repo, nie direkt auf `main`** — auch kleine Fixes laufen als Strang.
+- **Gebaut gilt erst nach Push** (Lehre 2026-08-17): ungepushte Artefakte sind Workspace,
+  kein Ergebnis; verloren gegangene lokale Stände sind rekonstruierbar, aber teuer.
+- **Fremde Team-Repos (z. B. `offsite`) werden nie direkt geändert** — Finding + Patch
+  außerhalb, dann deren Ticket-Prozess (GF1).
+- **Kein Konflikt-Marker-Commit:** nach Konflikt-Auflösung greift der Marker-Grep aus S6 als
+  hartes Kettenglied — die Merge-Ausgabe „resolved" ist kein Beleg.
+- Alles Kundensichtbare (MR-Texte, Jira-Kommentare) bleibt rote Linie — der Berichtskommentar
+  im eigenen PR ist zugestanden, fremde Kanäle nicht.
 
-- [ ] Branch folgt dem Schema `<typ>/<thema>`, Worktree unter `.worktrees/`, `git worktree list`
-      vor dem ersten Schreiben geprüft.
-- [ ] `node --test plugins/nc/tests/*.test.mjs` grün, `claude plugin validate .` und
-      `claude plugin validate plugins/<name> --strict` je berührtem Plugin grün.
-- [ ] Konflikt-Marker-Grep sauber unmittelbar vor dem Commit-Vorschlag.
-- [ ] PR-Memo an den Overseer trägt was/warum, Entscheide, Verifikationsbelege, offene Punkte —
-      keinen Bump, keinen CHANGELOG-Eintrag.
-- [ ] Merge und Release-Zug sind ausschließlich beim Maintainer erfolgt, nie durch einen Agenten.
-- [ ] Affiliate-Plugins sind an keiner Station dieses Flows über die SSOT beteiligt.
+## 6. Verifikation / Abnahme
+
+- [ ] `node --test plugins/oai/tests/*.test.mjs` grün (wortgleiches Kommando, Glob statt
+      Verzeichnis) — im OS-Repo; Satelliten fahren ihre eigene Suite
+- [ ] `claude plugin validate .` **und** je berührtem Plugin `validate plugins/<name> --strict`
+      gelaufen (nur OS-Repo)
+- [ ] `git diff <basis>..HEAD` enthält keine Version-Datei, keinen CHANGELOG-Eintrag, keinen
+      Tag (Gegenprobe zu §4 Nr. 5)
+- [ ] Toter-Pfad-Grep über alte Pfade/Namen leer; jede neue Wissensdatei hat ihre Index-Zeile
+      (Suite erzwingt es)
+- [ ] PR-Ergebnismemo signiert, Produktanteil gekennzeichnet; Berichtskommentar steht
+- [ ] Jira-Status = PR-Realität; `git worktree list` ohne Strang-Rest (nach Merge)
+- [ ] Selbsttest: *Könnte ein Kollege morgen allein aus PR, Memo und Jira-Ticket erkennen,
+      was gebaut, was bewusst ausgelassen und wo der Stand abgegeben wurde?*
+
+## 7. Verhältnis zu anderen Prozessen
+
+- **Wissen vs. Arbeit:** Wissensaufstieg aus Sitzungen → `queue-flow.md`; dieser Prozess hier
+  ist der Arbeits-Beitrag. Beide enden in einem PR, sind aber verschiedene Flüsse.
+- **Jira:** `jira-workflow.md` regelt Board, Epics und Spalten; dieser Prozess nutzt die
+  Spalten („In Arbeit" → „Internal Review") als Status-Spiegel des Strangs — Jira trägt
+  Arbeit, nie Wissen.
+- **Inhalt vs. Weg:** `kern-plugin-bau.md` / `abteilungs-plugin-bau.md` regeln das Was des
+  Plugin-Baus; `subagenten-bau.md`, `claude-netz-bau.md` usw. deren Fachwege — S3 verweist je
+  Änderungsart dorthin (Aktualisierungs-Index §2).
+- **Doku-Nachzug am Zyklus-Ende:** `sync-nachzug-bauzyklus.md` ist die Ausprägung von S4 für
+  gebündelte Nachzüge per Executor-Subagent.
+- **Format dieses Dokuments:** `standardprozess-authoring.md`.
 
 ---
 
-*Angelegt 2026-08-26 durch AGENT-WEST (Claude, Sonnet 5, Claude Code) im Rahmen der
-Phase-J-Nachtschicht, Paket J-C, AP C3. Quelle: Onsite.ai-OS `origin/main@a9927b2`,
-`plugin-maintanance-ruleset-source/contributing-flow.md`, NovaCore-Zuschnitt nach dem
-[Phase-J-Bauplan](../aktive-bauplaene/2026-08-25-onsite-delta-phase-j-bauplan.md) §7 AP C3 und
-Entscheid J-E4.*
+*Angelegt 2026-08-24 (Jira OS-14, übernommen aus Desktop-TODOs T11; Nachtschicht Kimi Code im
+Auftrag des Maintainers). Stilvorbilder: `queue-flow.md` (Stationen·Wer·QS) und
+`kriterien-pflege.md` (Anlass-Tabelle mit Nicht-Fällen); bündelt die bislang verstreuten
+Regeln aus `CLAUDE.md`, `Aktualisierungs-Index` §0/§3/§5 und den Fehlerprotokoll-Lehren —
+erfindet keine neuen Normen.*
