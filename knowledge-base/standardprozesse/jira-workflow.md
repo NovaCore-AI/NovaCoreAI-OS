@@ -1,77 +1,63 @@
-# Jira-Workflow — Standardprozess für Jira-Arbeit am NovaCore-OS
+# Standardprozess: Jira-Workflow der Abteilung Onsite-OS
 
-> **Verbindlich**, sobald Jira-Tickets gelesen, angelegt, migriert oder über den REST-API
-> bzw. den Atlassian-MCP bearbeitet werden. **Eigenbau 2026-08-25** (Mapping D29, Phase-J-
-> Frühzug) — das Onsite-Vorbild hat **kein** Pendant (verifiziert: kein `jira-*` in
-> `plugin-maintanance-ruleset-source/`); dieser Prozess ist aus dem realen Ablauf der
-> EP→WZ-Migration (2026-08-24/25) abgeleitet, nicht portiert.
-> **Status:** Grundregeln stehen; die Jira-**Projekt-Keys und Workflows je Projekt sind
-> Maintainer-nachzureichen** (Bauplan 2026-08-16 §3 J3 — „Skills raten nichts"). Solange
-> die Blöcke B (NCOS-Konzept) und C (EP-Umzug) zurückgestellt sind (Weisung 2026-08-24),
-> gilt dieser Prozess für die laufende Restarbeit.
-> **Kette:** Jira-Arbeit angefragt → **dieser Prozess** → Zugangs-/Artefakt-Lage in
-> `metaknowledge/` → Fundstellen in `debugging-findings/`, falls etwas bricht
+> **Zweck:** Das Jira-Projekt `OS` ist das eine **Arbeit-Backlog** der Abteilung Onsite-OS —
+> Features, Bugs, Ideen, Priorisierung. Die Wissensbasis dieses Repos bleibt SSOT für
+> **Wissen**; Jira trägt Arbeit, nie Wissen. **Herkunft:** formalisiert aus dem
+> Maintainer-Musterflow vom 2026-08-24 (Ablage-GO gleichen Tags); Projekt- und Board-Aufbau
+> am 2026-08-24 verifiziert (Test-Durchlauf `OS-6` über die volle Statuskette).
+> **Ticket-Kopfnorm + Findings-Regel:** Maintainer-Entscheid 2026-08-28, im selben Zug am
+> Musterumbau der Karten `OS-62`/`OS-63` entwickelt.
 
-## 1. Zugang — zwei Sites, zwei Wege (verifiziert 2026-08-25)
+## Ort & Struktur
 
-| Site | Projekte | Weg | Zugangs-Lage |
-|---|---|---|---|
-| `novacore-ai.atlassian.net` | EP, NC, NCOS | **nur Atlassian-MCP** (MCP-Connector) | Connector-Freigabe je Site |
-| `novacore-ai-team.atlassian.net` | SCRUM, WZ | **nur REST** (API v3, Basic Auth) | Env: `JIRA_EMAIL`, `JIRA_API_TOKEN`, `JIRA_SITE` |
+- Site `https://onsiteai.atlassian.net` (cloudId `74f6bca5-f8ac-4610-b546-591cfa7adb87`),
+  Projekt **`OS` „Onsite-OS"** (team-managed Kanban), Board 35
+- Issue-Typen: `Epic`, `Story` (Feature-Wunsch), `Task`, `Bug`
+- **Epics = Arbeitsstränge, jedes Ticket wird einem zugeordnet:**
+  `OS-1` Kern oai · `OS-2` Abteilungs-Plugins (Differenzierung je Abteilung über Labels
+  `plugin-<name>`) · `OS-3` OS-Evolution (neue Features/Erweiterungen inkl. genereller
+  Infra-Themen des OS) · `OS-4` Schulung & Doku · `OS-5` SSOT-Infrastruktur (Änderungen an
+  der SSOT-Logik selbst)
+- Rollen: Solo-Dev/Projekt-Admin (Maintainer) · 5 User (Rolle Member) — legen Tickets an,
+  kommentieren, priorisieren im Weekly mit; verwalten nicht (prozedurale Regel, team-managed
+  kennt keine feinere Rechte-Stufe)
 
-**Regeln:**
+## Spalten & Flow
 
-1. **Token niemals in Dateien, Commits oder Konversation** — nur Env-Variablen
-   (Windows: `setx`). Zeiger-Dokument: `knowledge-base/feature-manuals/jira-rest-zugang.md`.
-2. **Ein MCP-Connector gibt nur EINE Site frei.** Nach Re-Authenticate zeigt
-   `getAccessibleAtlassianResources`, welche gilt. Site-übergreifende Arbeit läuft nach
-   dem Muster der EP→WZ-Migration: **Quelle per MCP lesen, Ziel per REST schreiben.**
-3. Bei 401 zuerst Token-Rotation prüfen (rotiert regelmäßig; dann `setx` erneuern).
-
-## 2. Artefakt-Heimat (Maintainer-Entscheid 2026-08-25)
-
-Jira-Artefakte — Migrations-Skripte, Export-Batches, Maps, Zugangs-Zeiger — wohnen unter
-**`metaknowledge/jira-migration/`** bzw. **`metaknowledge/`** (Bestandsübersicht in
-`metaknowledge/README.md`). Sie sind **keine** Wissensbasis-Dokumente (keine
-Index-Pflicht) und liegen **nie** unter `.nc/` (kein Ablageort, strikt nach Onsite).
-Neue Skripte folgen dem Bestandsmuster: Env-only-Zugang, Kopfkommentar mit Zweck/Verbrauch.
-
-## 3. Ablauf einer Jira-Arbeit
-
-1. **Auftrag klären:** Welches Projekt, welche Site? → Weg nach §1 wählen.
-2. **Zugang verifizieren** bevor gebaut wird: REST `/rest/api/3/myself`, MCP
-   `getAccessibleAtlassianResources`. Schlägt es fehl: Rotation/Connector prüfen (§1).
-3. **Lesen vor Schreiben:** Bestand (Tickets, Epics, Links) erst vollständig lesen und
-   lokal zwischenspeichern (Map-Dateien in `metaknowledge/jira-migration/`), dann
-   schreiben — der REST-Zugang ist gedrosselt, Bulk-Lesen vermeiden.
-4. **Schreibende Aufrufe** (Tickets anlegen, aktualisieren, verlinken, kommentieren):
-   Der Agent **entwirft**, der Maintainer gibt die Ausführung frei — Jira-Kommentare sind
-   potenziell kundensichtbar (rote Linie „Kundensichtbares posten", `wp-rahmen.md`).
-  REST-Schreibläufe dokumentieren die erzeugten IDs in einer `created-map.json` (Vorbild:
-   EP→WZ-Migration), damit Fehlläufe rückverfolgbar bleiben.
-5. **Migrationen specially:** Export-Batches je Projekt (`export/batch_<KEY>-<n>_<m>.json`),
-   Import-ID-Mapping führen, Kommentare/Links in eigenen Läufen nachziehen — nie alles in
-   einem Lauf.
-6. **Protokoll:** Fundstellen in `knowledge-base/debugging-findings/debug-log.md`
-   (append-only); Abschlüsse im Sitzungs-Journal.
-
-## 4. Benannte Lücken (nicht raten)
-
-| Lücke | Zuständigkeit |
+| Spalte (Status) | Bedeutung |
 |---|---|
-| Projekt-Keys und -Workflows (Status-Spalten, Resolution) je Site | Maintainer-Nachreichung (J3, N6) — bis dahin live per API/MCP erheben, nicht aus Gedächtnis |
-| Jira-Spalten im Contributing-Flow (S-Stationen) | Platzhalter-Verweis auf diesen Prozess, bis Block B/C läuft |
-| Automatische Syncs (Jira ↔ Git) | Nicht beschlossen — kein Automatismus bauen |
+| **To Do** (`Zu erledigen`) | Sammel- **und** Backlog-Spalte: alle — auch die User — legen neue Tickets direkt hier an; das **wöchentliche Weekly** bespricht Prio und Reihenfolge |
+| **In Arbeit** | Dev zieht das Ticket und arbeitet daran |
+| **Internal Review** (`Wird überprüft`, `pilot-release`) | PR ans Repo gestellt; Dev und/oder externe Agenten reviewen, CI läuft, Review-Konversationen werden geführt und gelöst, bis keine Findings mehr bestehen. Status `pilot-release` = Review abgeschlossen: **Merge + Pilot-Release** („Release auf Bewährung" — ab jetzt für User sichtbar) |
+| **Operative Refining** (`Piloting`) | ~1 Woche Live-Nutzung; User-Feedback wird eingearbeitet. Bei Findings läuft die Karte zurück über In Arbeit → Internal Review → Refining, bis seitens der User keine Findings mehr bestehen |
+| **Official Release** | finaler Release mit allen implementierten Feedbacks = erledigt |
 
-## 5. Verifikation / Abnahme
+## Ticket-Kopf (Pflichtstruktur jeder Karte)
 
-- [ ] Zugangs-Zeiger aktualisiert (Rotation, neue Env-Variable) — nur in
-      `knowledge-base/feature-manuals/jira-rest-zugang.md`
-- [ ] Schreiblauf-IDs in der Map dokumentiert (§3.4)
-- [ ] Kein Token/Secret in irgendeiner committeten Datei (grep-Sweep)
-- [ ] Fundstellen protokolliert (§3.6)
+Jedes Ticket trägt drei Abschnitte in fester Reihenfolge — schlank und verständlich, nicht
+voll:
 
----
+1. **Ziele / Erwartetes Verhalten** — bei **Bugs** heißt der Abschnitt „Erwartetes Verhalten"
+   (was stattdessen passieren sollte), bei allen anderen Typen „Ziele" (was erreicht sein
+   soll). Ein bis drei Sätze.
+2. **Ist-Zustand** — was heute tatsächlich passiert oder fehlt, mit Fundstelle (`Datei:Zeile`,
+   PR-/Ticket-Verweis, Messwert). Kurz.
+3. **DoD (Definition of Done)** — nummerierte, einzeln abhakbare Kriterien; einschlägige
+   Prozess-Pflichten benennen (z. B. Zeile im `Aktualisierungs-Index`, Zuständigkeit des
+   Release-Zugs).
 
-*Angelegt 2026-08-25 (Mapping D29, Phase-J-Frühzug) aus dem verifizierten Ablauf der
-EP→WZ-Migration; Onsite hat kein Pendant — Eigenbau mit benannten Lücken statt Erfindung.*
+**Findings, Belege und Beispiele gehören in die Kommentare**, nicht in die Beschreibung: Die
+Beschreibung ist die schlanke Arbeitsgrundlage, der Kommentar trägt die Last —
+Untersuchungsprotokolle, Messreihen, Zitate, Lang-Fassungen. Beim Umbau einer Bestandskarte
+wird der bisherige Text **wortgleich als Kommentar gesichert** („hierher umgezogen") und erst
+danach gekürzt — nichts wird verworfen. Musterbeispiele für beides: `OS-62` und `OS-63`
+(2026-08-28).
+
+## Regeln
+
+- Release-Stufen (**Pilot** vs. **Official**) werden auf GitHub dokumentiert und gekennzeichnet
+  (z. B. im Release-Namen); Jira bildet den Prozess nur ab
+- Kein Sprint-Betrieb, keine Dailys; dringende Bugs darf der Dev außerhalb des Weekly-Rhythmus
+  ziehen (Dev-Entscheid)
+- Tickets, die einen Bauplan brauchen, verlinken ihn aus der Wissensbasis; Baupläne nennen den
+  Jira-Key, sobald einer existiert (keine Doppelpflege)
