@@ -271,7 +271,7 @@ function hinweisText(klassen) {
     + 'Erste Änderung dieser Pfadklasse in dieser Sitzung. Der Aktualisierungs-Index führt dazu '
     + 'eine Zeile — sie gilt, nicht diese Zusammenfassung:\n\n'
     + zeilen.join('\n')
-    + '\n\nQuelle (OS-Repo): `knowledge-base/standardprozesse/aktualisierungs-index.md` §2 '
+    + '\n\nQuelle (OS-Repo): `knowledge-base/standardprozesse/Aktualisierungs-Index.md` §2 '
     + '(Änderungs-Matrix); die Kurzform steht in `AGENTS.md`. Umfang bestimmen statt schätzen — '
     + 'auch bei „nur Doku" und „zu klein für den Standardprozess".'
     + '\n\nJede Pfadklasse erscheint höchstens einmal je Sitzung; dieser Hinweis blockiert nichts.';

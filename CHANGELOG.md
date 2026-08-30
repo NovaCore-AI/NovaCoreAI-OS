@@ -32,6 +32,13 @@ Single-Plugin-Layout und bleiben historisch unverändert.
   `Wissens-Router oder Sucheindex geändert`) — der Hook verspräche sonst Matrix-Zeilen, die
   es nicht mehr gibt; `_hinweis`-Pfad auf `Aktualisierungs-Index.md` und der Vorlagen-
   Leseverweis auf `kern-ssot-aufbau.md` korrigiert.
+- **Case-Rename `Aktualisierungs-Index.md` ins Git nachgezogen:** Die Nur-Groß-/Klein-
+  Umbenennung stand auf Windows nur auf der Platte — Git trackte weiter
+  `aktualisierungs-index.md` (`core.ignorecase`), die Ubuntu-CI fiel auf den neuen
+  Verweisen rot. `git mv` nachgezogen; mitgeschaltet die ausgelieferten Verweise auf den
+  neuen Pfad: Hook-Quellenzeile (`nc-pfad-hinweis.js`), Router-Referenz
+  (`referenz/wissens-router.md`), Router-Skill-Tabelle (`wissen-aendern`), Test-Pfade
+  und der `release.yml`-Kommentar.
 
 ## [0.15.0] — 2026-08-26
 
