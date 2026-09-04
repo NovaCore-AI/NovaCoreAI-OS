@@ -9,7 +9,7 @@
     {
       "name": "nc",
       "source": "./plugins/nc",
-      "description": "Kern des NovaCore-OS: ständige Abteilung gemeinsam — Session-Zyklus start/end-session, Journal, Infrapflege setup/os-info/skill-builder/update-doks, SSOT-Präsenz-Router wissen-aendern/wissen-planen/wissen-nachschlagen/wissen-protokolle, Queue-Flow queue-abteilung/queue-kern, Kontroll-Schicht (Gate 1 FFG, Gate 2 Session-Start-Zwang, PreCompact-Mahnung, Queue-Fälligkeits-Erinnerung, zwei Zeiger-Hooks der SSOT-Präsenz — nc-wissens-hinweis, nc-pfad-hinweis, beide kein Gate), Doks-Autosync (Ebene 1 + 1b), WP-Rahmen WP0–WP8, Abteilungs-Registry, Subagenten. Wird von jedem Abteilungsplugin vorausgesetzt.",
+      "description": "Kern des NovaCore-OS und Pflicht-Dependency jedes Abteilungsplugins: Session-Zyklus (start/end-session, journal), Infrapflege (setup, os-info, skill-builder, update-doks), SSOT-Präsenz-Router (wissen-*), Queue-Flow (queue-abteilung/queue-kern), Kontroll-Schicht (Gate 1 FFG, Gate 2 Session-Start-Zwang, PreCompact-Mahnung, Queue-Fälligkeits-Anweisung, zwei Zeiger-Hooks), Doks-Autosync, WP-Rahmen WP0-WP8, Abteilungs-Registry, Subagenten. Katalog im Detail: README.",
       "category": "kern"
     },
     {
@@ -37,7 +37,7 @@
         "ref": "v0.1.1",
         "sha": "edd5ad06a546508f1c36ae844b65a8c03e8c5ff9"
       },
-      "description": "Abteilung biggi: eigenständiges Biggi-OS — EIN Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder; Arbeitsmodul-Konvention reserviert: controlling/ctrl, medizinisches/mdzn, dokumentation-daily-work/doc+day — ein Modul, zwei Präfixe) und eigener Kontroll-Schicht (FFG mit Review-Härtungen + Session-Start-Zwang nach Onsite-Vorbild, Opt-outs NC_FFG=off / NC_START_GATE=off). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-felix betreiben. Satelliten-Repo (Standardprozess abteilungs-plugin-bau.md §3b).",
+      "description": "Abteilung biggi: eigenständiges Biggi-OS — ein Plugin mit Modulen statt Abteilungen (Kernmodul: start, save-session, journal, os-info, code-tour, skill-builder) und eigener Kontroll-Schicht (FFG mit Review-Härtungen + Session-Start-Zwang nach Onsite-Vorbild, Opt-outs NC_FFG=off / NC_START_GATE=off). Hängt NICHT am Kern nc; nicht parallel zu nc oder nc-felix betreiben. Satelliten-Repo (Standardprozess abteilungs-plugin-bau.md §3b).",
       "category": "abteilung"
     },
     {
@@ -48,7 +48,7 @@
         "ref": "v1.4.0",
         "sha": "159cd9d059b5e2e918a0333693a59f3620fdf61a"
       },
-      "description": "Affiliate-Werkzeug (kein Abteilungs-OS): bindet headless CLI-Agenten — vor allem Kimi Code — als externe Zweitmeinung in Claude Code ein. Liefert Review-Loops, Planning-Loops und adversariale Dual-Reviews (santa) für heterogene Besetzung: Implementierer und Reviewer sind verschiedene Modelle. HOST-ANFORDERUNGEN: das Plugin bringt einen MCP-Server via stdio mit und startet ihn über `uv run` — `uv` muss installiert sein, die `kimi`-CLI ebenfalls (samt eigenem Zugang). Lizenz MIT, externes Repo (nicht von NovaCore gepflegt), gepinnt auf den Commit des annotierten Tags v1.4.0. Hängt an keinem NovaCore-Plugin und trägt keine Abteilungs-Registry-Zeile.",
+      "description": "Affiliate-Werkzeug (kein Abteilungs-OS): bindet headless CLI-Agenten — vor allem Kimi Code — als externe Zweitmeinung in Claude Code ein. Review-Loops, Planning-Loops und adversariale Dual-Reviews (santa) für heterogene Besetzung: Implementierer und Reviewer sind verschiedene Modelle. HOST-ANFORDERUNGEN: `uv` und die `kimi`-CLI müssen installiert sein (eigener Zugang). Lizenz MIT, externes Repo, gepinnt auf v1.4.0. Hängt an keinem NovaCore-Plugin.",
       "category": "affiliate"
     },
     {
@@ -59,7 +59,7 @@
         "ref": "v2.0.24",
         "sha": "406c9f281d4eb8771a6d76d055b633d4d59d5d29"
       },
-      "description": "Affiliate-Werkzeug (kein Abteilungs-OS): persistentes, projektbezogenes Gedächtnis über Sessions hinweg — sieben Hooks (SessionStart, UserPromptSubmit, PostToolUse, PostToolUseFailure, PreCompact, PostCompact, SessionEnd) schreiben Beobachtungen in eine lokale SQLite-Datenbank; der Skill mem-search und die MCP-Werkzeuge (search/timeline/get) holen sie nach dem Prinzip der progressiven Offenlegung wieder heraus. Läuft in Claude Code und Kimi Code; alles bleibt lokal auf dem Rechner. HOST-ANFORDERUNGEN: `uv` muss installiert sein — Hooks und der MCP-Server (stdio, FastMCP) laufen über `uv run --project ${CLAUDE_PLUGIN_ROOT}`. Lizenz AGPL-3.0, externes Repo (nicht von NovaCore gepflegt), gepinnt auf den Commit des annotierten Tags v2.0.24. Hängt an keinem NovaCore-Plugin und trägt keine Abteilungs-Registry-Zeile.",
+      "description": "Affiliate-Werkzeug (kein Abteilungs-OS): projektbezogenes Gedächtnis über Sessions hinweg — sieben Hooks schreiben Beobachtungen in eine lokale SQLite-Datenbank; der Skill mem-search und die MCP-Werkzeuge holen sie nach dem Prinzip der progressiven Offenlegung wieder heraus. Läuft in Claude Code und Kimi Code, alles bleibt lokal. HOST-ANFORDERUNG: `uv` (Hooks und MCP-Server laufen über `uv run`). Lizenz AGPL-3.0, externes Repo, gepinnt auf v2.0.24.",
       "category": "affiliate"
     }
   ]
