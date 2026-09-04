@@ -122,6 +122,18 @@ onsite-ai-devs/Onsite.ai-OS-<Abteilung>   je ein PRIVATES Satelliten-Repo pro we
    Git-Tags im Schema `{plugin-name}--v{version}` auf (`claude plugin tag --push`). Solange die
    Abhängigkeit als bloßer Name (`"oai"`) notiert ist, sind **keine** Tags nötig — genau
    deshalb ist es hier so gelöst.
+8. **Jede Beschreibung unter 500 Zeichen (serverseitige Marktplatz-Grenze):** Der
+   Org-Marktplatz auf claude.ai weist jede `description` über 500 Zeichen ab — im
+   Marketplace-Eintrag **und** in der `plugin.json` des Plugins. Das Plugin synchronisiert
+   trotzdem, aber **ohne** Beschreibung: Das Team sieht im Installationsdialog einen leeren
+   Eintrag. Weder `claude plugin validate` noch die offizielle Doku kennen diese Grenze
+   (verifiziert an CLI 2.1.260 am 2026-09-04, code.claude.com/docs `plugins-reference`) — die
+   lokale Prüfung bleibt also **grün, während der Team-Sync warnt**. Deshalb: ein Zwecksatz
+   plus Kurzkatalog, Details gehören in `README.md`. Gegenprobe vor dem Push:
+   `node -e "for(const p of require('./.claude-plugin/marketplace.json').plugins)console.log(p.name,(p.description||'').length)"`.
+   Dieselbe Grenze gilt fremdgepinnten Satelliten und Affiliates gegenüber — deren
+   Marketplace-Eintrag liegt in diesem Repo und ist hier zu kürzen, ihre eigene
+   `plugin.json` nur im jeweiligen Satelliten-Repo.
 
 ## 3. Ablauf: neues Abteilungsplugin anlegen
 
