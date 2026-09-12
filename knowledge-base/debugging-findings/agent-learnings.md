@@ -281,3 +281,141 @@
   Pfad: `git ls-files | grep -i <name>` — trackt Git die alte Schreibweise, wird der
   Rename zuerst mit `git mv <alt> <neu>` sauber nachgezogen. Windows-Grün ist bei
   Case-Fragen kein Beleg; die Ubuntu-CI ist die Gegenprobe.
+
+### 2026-09-07 — Altstand gelesen statt gemeldet, Soft-Reset ohne Index-Reset, Dummy statt Ursache (Arbeits-Repo Wasserzisterne)
+
+- **Kontext/Aufgabe:** Session 04.–07.09. im Arbeits-Repo Wasserzisterne: `/nc:start`,
+  Gerüst-Verifikation (WZ-87), Reparatur eines verwaisten PR-Inhalts, Review-Nacharbeit.
+- **Was schiefging (1):** Beim Existenz-Check des aufgehobenen Altstands `.nc/erinnerung/`
+  habe ich `stand.md` per Read geöffnet; der Skill `start` verlangt „melden, nicht lesen".
+  Der Inhalt landete im Kontext, wurde aber nicht als Quelle benutzt (im Briefing offengelegt).
+- **Ursache (1):** Existenz und Inhalt mit demselben Werkzeug geprüft.
+- **Lernerkenntnis (1):** Existenz eines Altstands nur per `ls`/Fehlanzeige feststellen,
+  nie über ein Werkzeug, das den Inhalt zurückgibt.
+- **Was schiefging (2):** Beim Neuaufbau von drei Teil-Commits nach `git reset --soft
+  origin/main` blieb der Index gefüllt; `git add <Gruppe> && git commit` committete deshalb
+  den gesamten Index in den ersten Commit, der dritte Commit war leer. Erkannt an
+  „nothing to commit", korrigiert per `git reset` (mixed) und erneutem Aufbau.
+- **Ursache (2):** `--soft` setzt nur HEAD zurück; `git commit` ohne `--only` nimmt den
+  ganzen Index. Die Annahme „nur das eben Hinzugefügte wird committet" war falsch.
+- **Lernerkenntnis (2):** Nach `git reset --soft` immer `git reset` (mixed) vor selektivem
+  `git add`; nach jedem Teil-Commit die Dateiliste per `git show --stat` gegenprüfen, bevor
+  der nächste folgt.
+- **Was schiefging (3):** `prisma generate` scheiterte im Docker-Build, weil
+  `prisma.config.ts` `DATABASE_URL` schon beim Laden erzwang. Ich habe an zwei Aufrufstellen
+  (Dockerfile-Builder-Stage, CI-Job) eine Dummy-URL gesetzt. Erst die Rückfrage des Nutzers
+  („macht der Dummy Sinn?") führte zur Ursachenlösung: Datasource nur bei gesetzter
+  Variable, `generate` braucht keine Verbindung, `migrate` ohne Variable scheitert weiterhin klar.
+- **Ursache (3):** Symptom an den Aufrufstellen behandelt statt die Anforderung der Config
+  zu hinterfragen; Dummy-Zugangsdaten in Build-Dateien sind zudem ein Lesbarkeitsrisiko.
+- **Lernerkenntnis (3):** Verlangt eine Tool-Config eine Variable, zuerst empirisch prüfen,
+  ob der konkrete Befehl sie braucht (hier: `generate` nein, `migrate` ja) und die Config
+  entsprechend tolerant machen — ein Dummy an Call-Sites ist die letzte Option, nie die erste.
+
+### 2026-09-08 — Commit im falschen Repo: `git add -A` fasste fremden Arbeitsstand, weil das Arbeitsverzeichnis aus dem Vorbefehl nachwirkte
+
+- **Kontext/Aufgabe:** Zwei Repos parallel (nc-cockpit, nc-cli); je ein Commit pro Repo in
+  zwei parallelen Bash-Aufrufen. Der erste Aufruf begann mit `cd …/nc-cli`, der zweite sollte
+  im Cockpit committen und enthielt kein eigenes `cd`.
+- **Was schiefging:** Das Arbeitsverzeichnis des ersten Aufrufs wirkte im zweiten nach.
+  `git add -A && git commit` lief damit in nc-cli und schrieb den **unkommittierten
+  Arbeitsstand einer anderen Sitzung** (7 Dateien) mit der Cockpit-Commit-Nachricht als
+  Commit fest. Erkannt an der Dateiliste in der Ausgabe; korrigiert per `git reset --soft
+  HEAD~1 && git reset`, sodass der fremde Stand wieder exakt unkommittiert vorlag.
+- **Ursache:** Zwei Annahmen zugleich: „jeder Bash-Aufruf startet im Projektverzeichnis"
+  (falsch — das Arbeitsverzeichnis persistiert zwischen Aufrufen) und „`git add -A` ist in
+  einem Repo mit nur eigenen Änderungen sicher" (falsch, sobald ein zweiter Akteur im selben
+  Working Tree arbeitet).
+- **Lernerkenntnis/Präventionsregel:** In Multi-Repo-Sitzungen trägt **jeder** Git-Befehl
+  seinen Pfad explizit (`git -C /abs/pfad …` oder ein eigenes `cd /abs/pfad &&` am Anfang
+  desselben Aufrufs), nie implizit über den Vorbefehl. Wo ein fremder unkommittierter Stand
+  liegt, wird ausschließlich pfadgenau gestagt, nie `-A`; und `git status --short` steht im
+  selben Aufruf **vor** dem Commit, damit die Dateiliste geprüft wird, bevor der Commit
+  entsteht. Ein Commit mit fremden Dateien wird sofort mit `reset --soft` zurückgenommen,
+  nicht mit einem Folge-Commit „repariert".
+
+### 2026-09-08 (2) — Idempotenz an einem Vorher-Flag statt am Ergebnis: ein zu früh gescheiterter Abruf wäre nie wiederholt worden
+
+- **Kontext/Aufgabe:** Arbeits-Repo nc-cli, Behebung von Befund 3 eines SDK-Reviews („Befehle und
+  Modelle fehlen vor der ersten Nachricht"). Das Laden der Runtime-Kataloge hing am
+  `system/init`-Ereignis, das die Runtime nicht in jedem Lauf ausgibt; es sollte direkt nach dem
+  Handshake laufen und dabei idempotent bleiben.
+- **Was schiefging:** Meine erste Fassung setzte das Flag `katalogeGeladen = true` **vor** dem
+  Abruf. Weil die beiden Abruf-Methoden ihre Fehler bewusst schlucken (eine Runtime ohne Katalog
+  soll den Chat nicht verhindern), hätte ein zu früher, fehlschlagender Handshake die Kataloge
+  **dauerhaft** leer gelassen — der spätere `system/init`-Pfad hätte nie erneut geladen. Das wäre
+  schlimmer gewesen als der gemeldete Fehler. Aufgefallen beim Eigen-Review des Diffs vor dem
+  Commit, nicht durch einen Test; korrigiert vor dem Commit.
+- **Ursache:** Die Wiederholungssperre wurde am *Versuch* festgemacht statt am *Ergebnis*. In
+  Kombination mit einem Catch, der Fehler verschluckt, wird aus „genau einmal versuchen"
+  unbemerkt „nie wieder versuchen" — der Fehlschlagpfad war nicht mitgedacht.
+- **Lernerkenntnis/Präventionsregel:** Eine Idempotenz-Sperre hängt am **erreichten Zustand**
+  (hier: Katalog ist leer → erneut abrufen), nicht an einem Vorher-Flag — zwingend überall dort,
+  wo der Abruf seine Fehler schluckt. Und: Jeder neue Guard bekommt den **Fehlschlagpfad** als
+  eigenen Test, nicht nur den Erfolgspfad.
+
+### 2026-09-08 (3) — Zahl aus einer limitierten Ausgabe als Gesamtzahl berichtet
+
+- **Kontext/Aufgabe:** Bericht an den Nutzer nach dem GitHub-Upload des Repos nc-cli.
+- **Was schiefging:** Ich nannte „11 Commits"; tatsächlich waren es 13. Die Zahl entstand aus
+  „10 Zeilen aus `git log --oneline -10` plus 1 eigener Commit" — `-10` ist aber ein Limit, keine
+  Gesamtzahl. Aufgefallen erst bei der mechanischen Gegenprobe mit `git rev-list --count`.
+- **Ursache:** Eine bewusst begrenzte Ausgabe wurde als vollständige gelesen.
+- **Lernerkenntnis/Präventionsregel:** Zahlen in einem Bericht stammen aus einem **zählenden**
+  Befehl (`git rev-list --count`, `wc -l`, `--json … | length`), nie aus dem Abzählen einer
+  Ausgabe, die ein `-n`/`head`-Limit trägt.
+
+### 2026-09-11 (1) — Commit abgesetzt, obwohl der Testlauf im selben Befehl rot war
+
+- **Kontext/Aufgabe:** Abschluss einer Bauaufgabe im Arbeits-Repo der Wasserzisterne-Oberfläche;
+  ein Befehl sollte Tests, Typprüfung und Commit hintereinander ausführen.
+- **Was schiefging:** Ich verkettete die Schritte mit `;` statt mit `&&`. `npm test` meldete
+  „1 failed", die Typprüfung lief trotzdem, und der Commit ging durch. Der rote Test lag an einer
+  älteren Prüfung, deren Annahme dieselbe Aufgabe gerade ungültig gemacht hatte. Aufgefallen erst
+  beim Lesen der Ausgabe nach dem Commit; die Korrektur musste als Folge-Commit nachkommen.
+- **Ursache:** Die Verkettung bestimmt, ob ein roter Schritt den nächsten verhindert. `;` führt
+  stur weiter aus, und die Zeile sah durch das anschließende `git commit` trotzdem nach
+  „alles grün, dann committet" aus.
+- **Lernerkenntnis/Präventionsregel:** Prüfschritte und Commit werden **nie** mit `;` verkettet.
+  Entweder `&&` oder getrennte Aufrufe mit gelesener Ausgabe dazwischen. Und: Ein Commit-Text,
+  der Testzahlen behauptet, wird erst geschrieben, nachdem diese Zahlen aus dem Lauf abgelesen
+  sind — nicht aus der Erwartung.
+
+### 2026-09-11 (2) — Tests gegen die deutsche Fehlermeldung statt gegen den Fehlercode geprüft
+
+- **Kontext/Aufgabe:** Test-First für die Governance eines Fachmoduls; die Zusicherungen lauteten
+  `toThrow(/archiv_geschuetzt/)` und `toThrow(/version_conflict/)`.
+- **Was schiefging:** Die Fehler tragen den Code in einem eigenen Feld, die Meldung ist deutscher
+  Klartext für Menschen. Die Zusicherungen prüften die Meldung und schlugen fehl, obwohl die
+  Implementierung stimmte. Derselbe Griff war mir in derselben Sitzung schon einmal passiert —
+  bei einer Netzwerkfehler-Zusicherung mit `/network/`.
+- **Ursache:** Aus dem Kopf geschriebene Zusicherung statt aus der Schnittstelle abgelesene. In
+  diesem Haus sind sichtbare Texte deutsch und Codes stabil-englisch; wer die Meldung prüft,
+  prüft die unbeständige Hälfte.
+- **Lernerkenntnis/Präventionsregel:** Ein Test prüft den **Fehlercode**, nie den Meldungstext —
+  der Code ist der Vertrag, die Meldung ist Prosa und darf sich ändern. Bei geworfenen Objekten
+  einen kleinen Helfer verwenden, der den Code herausgreift, statt `toThrow` mit einem regulären
+  Ausdruck auf die Meldung zu setzen.
+
+### 2026-09-12 (1) — Merge-Wirkung eines Pull Requests aus einem Zwei-Punkt-Diff geschlossen
+
+- **Kontext/Aufgabe:** Zwei alte Pull Requests eines Kunden-Repos beurteilen, nachdem `main`
+  inzwischen drei Commits weitergelaufen war. Frage an mich: Was richtet ein Merge dieser
+  Branches an?
+- **Was schiefging:** Ich habe `git diff origin/main <branch>` (zwei Punkte) gerechnet und aus
+  dem Ergebnis berichtet, ein Merge würde „11.429 Zeilen löschen" und die frische Arbeit des
+  Kollegen zurückrollen. Das war falsch und klang alarmierend: Der Zwei-Punkt-Diff vergleicht
+  zwei Zustände, ein Merge wendet dagegen nur an, was der Branch **seit der Merge-Basis**
+  geändert hat. Der tatsächliche Beitrag desselben Branches waren **+9.660 Zeilen**, davon fast
+  alles Lockfile — und drei auflösbare Konflikte, kein Rückroll.
+- **Ursache:** Zwei Punkte beantworten „worin unterscheiden sich diese beiden Stände", drei
+  Punkte beantworten „was trägt dieser Branch bei". Ich habe die erste Frage gestellt und die
+  Antwort als Antwort auf die zweite ausgegeben. Verschärft wurde es dadurch, dass die falsche
+  Zahl die Empfehlung stützte, die ich ohnehin geben wollte.
+- **Lernerkenntnis/Präventionsregel:** Die Wirkung eines Pull Requests wird **immer** mit dem
+  Drei-Punkt-Diff (`git diff <ziel>...<branch>`) beurteilt, nie mit zwei Punkten — so rechnet
+  auch GitHub. Wer wissen will, ob ein Merge etwas zerstört, prüft zusätzlich mit
+  `git merge-tree --write-tree <ziel> <branch>`, welche Dateien wirklich kollidieren. Der Skill
+  `flc-pr` macht es mit `git diff main...HEAD` bereits richtig — die Regel gilt genauso für
+  jede Ad-hoc-Beurteilung außerhalb des Skills. Und: Eine Zahl, die die eigene Empfehlung
+  stützt, wird vor dem Aussprechen ein zweites Mal geprüft, nicht danach.

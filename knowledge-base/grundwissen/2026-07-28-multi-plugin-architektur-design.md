@@ -296,6 +296,29 @@ sowie der Baustein „ein eigenständiger Satellit führt eine eigene Wissensbas
 **Unberührt bleibt** die Architektur-Entscheidung dieses Dokuments: ein Marketplace, ein Plugin
 je Abteilung, Version nur in `plugin.json`, Satelliten per `ref` + Full-SHA gepinnt.
 
+## Nachtrag 2026-09-05 — Externe Beobachter-CLI („ncpit"): Präzisierung des CLI-Verzichts
+
+**Anlass:** Beauftragung des Terminal-Cockpits `ncpit` (eigenes Projekt `nc-cli`, Schwester
+des Cockpit-Prototyps nc-cockpit; Bauplan
+[`aktive-bauplaene/2026-09-05-ncpit-cli-bauplan.md`](../aktive-bauplaene/2026-09-05-ncpit-cli-bauplan.md),
+Herkunft [`ideen-backlog/2026-09-05-cli-team-cockpit.md`](../ideen-backlog/2026-09-05-cli-team-cockpit.md)).
+Die Erkenntnis 2 oben („Eine eigene CLI ist überflüssige Parallel-Infrastruktur") ist auf
+ihren Anlass zurückzuführen: Sie richtet sich gegen die **Verteilerrolle** — Installation,
+Update und Bootstrap des OS durch eigenes Werkzeug, das den Marketplace parallelisiert
+(Onsite-Entscheidung „Es gibt KEINE eigene CLI", Spec §15).
+
+**Präzisierte Regel:** Eine CLI **außerhalb** des Marketplace ist zulässig, wenn sie
+(1) nichts installiert, updated oder bootstrapt — Verteilung bleibt allein dem Marketplace
+vorbehalten; (2) keinen OS-Zustand schreibt (Invariante „ein Beleg, ein Schreiber", z. B.
+`infra.json` ausschließlich `/nc:setup`); (3) nicht in dieses Repo ausgeliefert wird.
+`ncpit` erfüllt alle drei Bedingungen als reines Lesecast über die lokalen Quellen
+(Infra-Registry, Plugin-Cache, Sitzungswissen, PR-Cache).
+
+**Onsite-Bezug:** Der Beobachtungspunkt D24 (Onsite-Bauplan „init-cli-bootstrap-und-auto-update",
+Status B — nicht nachbauen bis gemergt) bleibt **gesperrt**: `ncpit` baut keine Verteilung,
+kein Bootstrap, kein Auto-Update. Nach Merge des Onsite-Plans wird eine Anpassung explizit
+geprüft.
+
 ---
 
 *Angelegt 2026-07-28 · erstellt in der Nachtschicht-Session (Fable), Review durch
@@ -303,4 +326,6 @@ Maintainer steht aus — dieser Umbau ist als PR zur Abnahme vorgelegt, nicht ge
 Nachtrag §10 ergänzt 2026-07-28 (Abteilung felix, erster Satellit).
 Nachtrag §11 ergänzt 2026-08-05 (Abteilung biggi, zweiter Satellit, Onsite-Leitlinie).
 Nachtrag §12 ergänzt 2026-08-11 (Zweiteilung `plugin-bau.md`) — Claude (Opus 5), veranlasst
-durch das externe Review von Kimi K3 (Befund LOW 2).*
+durch das externe Review von Kimi K3 (Befund LOW 2).
+Nachtrag ergänzt 2026-09-05 (Externe Beobachter-CLI „ncpit", Präzisierung des
+CLI-Verzichts) — Planungs-Session Kimi Code, GO des Maintainers nach Revision 2.*
