@@ -171,6 +171,10 @@ Arbeits-Repo-Einrichtung: [ONBOARDING.md](ONBOARDING.md).
 
 Marketplace-Mechanik: Versions-Bump in `plugin.json` → `/plugin update` bzw. Auto-Update.
 Es gibt **keine** eigene CLI mehr (`ncos`/Setup-Skripte sind mit 0.3.0 entfallen).
+Präzisierung (Spec-Nachtrag 2026-09-05): Eine **externe Beobachter-CLI** ohne
+Verteilungsaufgaben und ohne Schreibzugriff auf OS-Zustand ist vom Verzicht nicht umfasst
+(`ncpit`, eigenes Projekt — siehe
+[`knowledge-base/aktive-bauplaene/2026-09-05-ncpit-cli-bauplan.md`](knowledge-base/aktive-bauplaene/2026-09-05-ncpit-cli-bauplan.md)).
 
 ## Entwicklung
 

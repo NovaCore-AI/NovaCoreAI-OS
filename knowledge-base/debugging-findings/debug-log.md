@@ -167,3 +167,41 @@
   Sucheindex-Pfade, matrixKey-Anker) decken diesen Fehlertyp ab. Und: Beim Port von
   Vorbild-Prozessen werden Takts- und Namensangaben gegen die eigene Produktrealität
   gegengeprüft (Hook-Konstanten, Skill-Namespace), bevor sie übernommen werden.
+
+### 2026-09-05 — `abteilungs-plugin-bau.md` verlor §1a und §3b, elf lebende Verweise zeigen ins Leere
+
+- **Symptom:** `AGENTS.md`, `README.md`, der SSOT-Index, `VORLAGE.md`, der Ideen-Backlog, die
+  Multi-Plugin-Spec und vier **ausgelieferte** Kern-Dateien (`doks/nc-teamsync.md`,
+  `hooks/pfad-aenderungsindex.json`, `hooks/wissen-sucheindex.json`,
+  `skills/wissen-aendern/SKILL.md`) verweisen auf `abteilungs-plugin-bau.md` §1a
+  (Auslieferungsgrenze) und §3b (eigenständiges Kollegen-OS). Beide Abschnitte existieren
+  nicht mehr; die heutigen Überschriften sind 1, 2, 3, 3.0, 3.1, 3.2, 3a, 4.
+- **Ursache:** Commit 626d0c6 („Standardprozesse auf OAI-Struktur umgestellt", 2026-08-30,
+  399+/239−) hat die Datei neu geschnitten; im Vorgängerstand 405ab4e standen
+  `### 1a. Auslieferungsgrenze` (Z. 72) und `## 3b. Eigenständiges Kollegen-OS` (Z. 233).
+  Der Nachzug 694c477 zog Index-Zeilen und Hook-Indizes nach, nicht aber die
+  Abschnittsverweise. Ob der Entfall der Norm Absicht war, ist nicht dokumentiert.
+- **Fix:** offen — Maintainer-Entscheid (Absicht → Verweise bereinigen; Verlust → Norm aus
+  405ab4e zurückholen). Zwischenträger: Register-Zeile 2026-09-05. Der Payload-Anteil braucht
+  einen Kern-Bump am Release-Zug.
+- **Beleg:** `git show 405ab4e:knowledge-base/standardprozesse/abteilungs-plugin-bau.md | grep -n "^## \|^### "`
+  gegen `grep -n "^## \|^### "` am heutigen Stand b4406f0; Verweis-Sweep
+  `grep -rn "§3b\|§1a"` ohne Archiv/CHANGELOG. Erstbefund: Stiftung-OS Re-Review 2026-09-03
+  (Bauplan 2026-09-02 §4a Punkt 6), heute gegen das OS-Repo verifiziert.
+
+### 2026-09-05 — Vorlage `ssot-grundgeruest.md.vorlage` und Ideen-Glossar hinken zwei Normen hinterher
+
+- **Symptom:** Die Vorlage nennt in Z. 38 `grundwissen/` als Ort für Baupläne und kennt weder
+  `aktive-bauplaene/` noch `sitzungswissen/` (0 Treffer). `AGENTS.md` Z. 88 und SSOT-Index
+  Teil 1 (`ideen-backlog/`) sagen, eine beauftragte Idee „bleibt stehen/liegen".
+- **Ursache:** Entscheid P-E1 (2026-08-24, Kategorie `aktive-bauplaene/`) und der
+  Sitzungswissen-Umzug (Phase I, D14) wurden in der Vorlage nicht nachgezogen; die
+  Ideen-Lebenszyklus-Formulierung stammt aus dem Onsite-Port und widerspricht SSOT-Leitplanke 1
+  der Ebene 0 (Idee wird bei Beauftragung archiviert, der Bauplan verweist darauf).
+- **Fix:** offen — Wortlaut-Angleich in Vorlage, AGENTS-Glossar und SSOT-Index Teil 1 im
+  Stiftung-OS-Übergangs-PR (Änderungsart „Vorlage geändert"). Zwischenträger: Register-Zeile
+  2026-09-05.
+- **Beleg:** `grep -n -i "idee" knowledge-base/standardprozesse/vorlagen/abteilungsplugin/ssot-grundgeruest.md.vorlage`;
+  `grep -c "aktive-bauplaene\|sitzungswissen"` auf derselben Datei = 0; `AGENTS.md` Z. 88,
+  `SSOT-Document-Index.md` Z. 71. Erstbefund: Stiftung-OS Re-Review 2026-09-03 (Bauplan
+  2026-09-02 §4a Punkt 5), heute gegen das OS-Repo verifiziert.

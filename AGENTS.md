@@ -109,7 +109,10 @@ installiertes Plugin kann nicht auf Repo-Pfade zugreifen.
   Formatregeln, Testsuite) und `nc-development` 0.1.0 (11 Skills in 4 Modulen,
   `dependencies: ["nc"]`). Die frühere eigene CLI (`ncos`, setup/update-Skripte) ist
   **ersatzlos abgeschafft** — Verteilung und Updates laufen ausschließlich über den
-  Marketplace. Das alte marker-gebundene Safety-Gate ist im Destruktiv-Gate des FFG
+  Marketplace; präzisiert durch den Spec-Nachtrag 2026-09-05 (Design-Spec 2026-07-28):
+  eine externe Beobachter-CLI ohne Verteilungsaufgaben und ohne Schreibzugriff auf
+  OS-Zustand (`ncpit`, eigenes Projekt, Bauplan
+  `aktive-bauplaene/2026-09-05-ncpit-cli-bauplan.md`) ist vom Verzicht nicht umfasst. Das alte marker-gebundene Safety-Gate ist im Destruktiv-Gate des FFG
   aufgegangen (markerlos, deny statt ask); der `.nc-os`-Marker scopte damals nur noch den
   Session-Start-**Hinweis** — seit 0.6.0 hat er **gar keine Funktion mehr** (siehe unten). Team-Mindestversion Claude Code ≥ 2.1.193.
 - **Gebaut (Kern v0.4.0, 2026-07-28):** Zweite Abteilung `felix` als **erster Satellit**

@@ -1,55 +1,54 @@
-# Stand (konsolidiert) — 2026-08-26, nach der Nachtschicht Phase J (Orchestrator-Lauf)
+# Stand (konsolidiert) — 2026-09-05, nach Queue-Triage und Pull
 
 ## Aktueller Arbeitsstand
 
-- **Onsite-Delta Phase J vollständig gebaut** auf `feat/onsite-delta-phase-j` (Basis: main
-  nach PR #30): Pakete J-D → J-A ∥ J-B → J-C → J-E als einzelne Commits, Suite **354/354
-  grün** (Start 323; +31 durch Safety-Gate-Werttests, Queue-Anweisungs-Invariante,
-  Setup-Hinweis-Hook-Tests), beide `--strict`-Validierungen grün.
-- Gefahrenlage sauber: alle vier Baupakete von zwei Sonnet-Bau-Agenten (per Claude-Code-CLI
-  headless gespawnt, eigene Worktrees) gebaut; der Orchestrator (Kimi K3) hat je Paket
-  Suite + Abnahmen verifiziert und die Commits per Cherry-Pick in den Phase-Branch geholt
-  (kein Merge-Commit, Fugen unversehrt).
-- **J-E (Nachzüge + Bump + Waypoint)** vom Orchestrator selbst gezogen: README/AGENTS/
-  SECURITY/ONBOARDING/Aktualisierungs-Index, Mapping-Nachtrag N6, Register-Abschlüsse,
-  Kern-Bump **0.14.0 → 0.15.0**, `nc-development` **0.2.1 → 0.3.0**, ein
-  Waypoint-CHANGELOG-Schnitt.
+- `main` = `origin/main` = b4406f0. Kern `nc` 0.15.1, `nc-development` 0.3.0. Gemergt seit dem
+  Stand vom 2026-08-26: Phase J (PR #31), Waypoint 0.15.1 (PR #32), Marketplace-Beschreibungen
+  unter 500 Zeichen (PR #33). Keine offenen PRs, keine offenen Issues im OS-Repo.
+- Working Tree sauber bis auf das Sitzungswissen dieser Sitzung (Journal, Stand, Roll-up,
+  Register, Debug-Log) — uncommittet, braucht Branch + PR.
+- Vier lokale Queue-Zeilen vom 2026-09-04 (Stiftung-OS-Kontext) wurden geprüft und verworfen;
+  Details im Journal 2026-09-05.
 
 ## Offene Punkte
 
-- **Phase-J-PR:** Review durch Maintainer (Merge = Bestätigung der Entscheide J-E1–J-E10
-  sowie Nachtrag N3 Diagnose-Klasse); danach Tag `nc--v0.15.0` + GitHub-Release
-  (Release-Zug; Orchestrator hat einmalige Freigabe, siehe PR-Body).
-- **Reserve-Tag-Reste:** `reserve/abteilung-automation`, `reserve/abteilung-ui-ux`,
-  `reserve/nc-0.9.0` liegen noch auf origin — Löschung braucht Maintainer-Freigabe
-  (Registerzeile 59).
-- Phase K laut Mapping-N6-Restliste (D16/D17, Registry-Leser-Migration, WZS-Deploy,
-  Jira Block B/C, Skill-Größendeckel, Satellitenanschluss Queue-Flow).
+- **Norm-Verlust §1a/§3b** in `abteilungs-plugin-bau.md` seit 626d0c6 (OAI-Umstellung); Verweise
+  leben weiter in AGENTS/README/SSOT-Index/VORLAGE und in ausgelieferten Payloads
+  (`nc-teamsync.md`, `pfad-aenderungsindex.json`, `wissen-sucheindex.json`, `wissen-aendern`).
+  Maintainer-Frage: Absicht oder Verlust? Danach Verweise bereinigen oder Norm zurückholen;
+  Payload-Anteil → Kern-Bump am Release-Zug.
+- **Vorlage-/Ideen-Lebenszyklus-Drift:** `ssot-grundgeruest.md.vorlage` (grundwissen statt
+  aktive-bauplaene, kein sitzungswissen) und „Idee bleibt stehen" (AGENTS Z. 88, Index Z. 71)
+  gegen SSOT-Leitplanke 1.
+- **Normlücke Kriterienliste:** Vorrang GF3 gegen GL5(i) Fall 3 bei eigenem Fehler in
+  Kollegen-OS-Arbeit ist in 5.5.3 nicht geregelt — Maintainer-Entscheid, Kriterien-Pflege.
+- **Stiftung-OS-Übergangs-PR** ans OS-Repo (Bauplan 2026-09-02 §4a Punkte 1–7) noch nicht
+  gestellt — trägt beide Drift-Befunde oben.
+- **Lesekopie** `~/.nc/ssot` auf 405ab4e (drei Merges zurück) → `/nc:setup`.
+- **Journal 2026-08-26 ohne Roll-up-Zeile** → `/nc:end-session nachzug` durch den Menschen.
+- Weiter offen aus dem Register: Phase-K-Restliste, Reserve-Tag-Reste auf origin, LICENSE,
+  E5 `firmenwissen-suche`, `firmenkernprozesse/`-Entscheid, `referenz/`-Approval, Deploy-Hälfte
+  Safety-Gate. Der Register-Altbestand ist gegen den Merge-Stand nicht neu geprüft.
 
 ## Zuletzt getroffene Entscheidungen
 
-- **N3 (Bauplan Phase J):** Diagnose-Klasse im Agenten-Prüfbaustein 1.4.3 — löst den
-  Konflikt J-E3 (`pipeline-praeflight` braucht Bash) gegen die No-Diff-Zone des Bausteins;
-  Marker `<!-- nc:diagnose -->`, genau Bash, Allowlist-Disziplin.
-- **J-E1–J-E10** wie Bauplan §2 vorgeschlagen (Default Onsite-Parität), Bestätigung am PR.
-- Anker-Reservierung endgültig Mechanik-only (D31): „Es wird nichts reserviert".
+- 2026-09-05: GF3-Zeilen aus Kollegen-OS-Arbeit gehören nicht in die OS-Queue (GL5(i) Fall 3);
+  Befunde am OS-Repo gehen als Doku-Bugs in `debug-log.md` + Register, nicht in die Queue.
+- 2026-09-04 (Maintainer, PR #33): Marketplace-Beschreibungen kürzen statt umlagern; Grenze als
+  Mechanik-Fakt in `abteilungs-plugin-bau.md` §2 Punkt 8.
 
 ## Aktive Branches und offene Pull Requests
 
-- `feat/onsite-delta-phase-j` — der einzige aktive Strang (Phase J komplett, siehe oben).
-- Worktree-Zweige `agent-ost/*`, `agent-west/*` sind eingeholt und können nach PR-Merge
-  aufgeräumt werden.
+- Keine offenen PRs. Lokal nur `main`. Auf origin steht der gemergte Branch
+  `fix/marketplace-beschreibungen-500` noch (Löschung = Maintainer).
 
 ## Bekannte Risiken
 
-- Der zehnte Hook (`nc-setup-hinweis.js`) und die Queue-**Anweisung** (statt Erinnerung)
-  sind teamweit sichtbare Verhaltensänderungen — im PR-Body genannt.
-- Die Laufzeitmessung des Setup-Hinweises ist prozessdominiert (~43–54 ms inkl.
-  Node-Start); reine Bewertungslogik wenige Millisekunden — unkritisch für SessionStart.
+- Ausgelieferte Payloads zeigen auf Abschnitte, die es nicht mehr gibt (§1a/§3b) — teamweit
+  sichtbare Doku-Lücke, bis der Maintainer-Entscheid fällt.
 
 ## Nächster Schritt
 
-**Maintainer:** Phase-J-PR lesen (Wortlaut-Abnahmen: Queue-Anweisungstitel,
-Setup-Hinweis-Zustände, Safety-Gate-Wertstufen, Muster-4-Referenz aus #30), mergen;
-Orchestrator taggt und releast `nc--v0.15.0` im selben Zug (einmalige Freigabe erteilt).
-Danach: gemeinsame Durchsprache der Phase-K-Restliste.
+Sitzungswissen dieser Sitzung per Branch `docs/sitzungswissen-2026-09-05` + PR einbringen
+(Freigabe des Sitzungsführers, Merge beim Maintainer). Dann Maintainer zu 626d0c6 fragen und
+`/nc:setup` für die Lesekopie ausführen.
